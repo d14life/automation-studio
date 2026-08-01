@@ -1,6 +1,8 @@
 <!doctype html><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Landing dev · graphics bench</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@900&family=Comfortaa:wght@700&family=Rubik:wght@800&display=swap">
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#000;color:#EDF2EC;font:15px/1.55 system-ui,-apple-system,sans-serif}
@@ -18,8 +20,8 @@ body{margin:0;background:#000;color:#EDF2EC;font:15px/1.55 system-ui,-apple-syst
 #stageui{position:relative;z-index:5;height:100%;display:flex;flex-direction:column;
   align-items:center;justify-content:center;gap:14px;text-align:center;padding:0 20px}
 /* ---- block 3: liquid text (their sizing: 40pt, lg 6rem, h-16/h-24) ---- */
-#liquid{position:relative;height:6rem;width:100%;max-width:768px;margin:0 auto;text-align:center;
-  font:700 40pt/1 system-ui,sans-serif}
+#liquid{position:relative;height:6rem;width:100%;max-width:860px;margin:0 auto;text-align:center;
+  font:900 40pt/1 Nunito,system-ui,sans-serif}
 @media (min-width:1024px){#liquid{font-size:6rem;height:9rem}}
 .sub{color:#9FAAA1;font-size:15px;max-width:52ch}
 /* ---- block 4: parallax (Osmo structure) ---- */
@@ -47,12 +49,24 @@ body{margin:0;background:#000;color:#EDF2EC;font:15px/1.55 system-ui,-apple-syst
   <button id="b-tubes" class="on">2 · tubes cursor</button>
   <button id="b-liquid" class="on">3 · liquid text</button>
   <button id="b-plx" class="on">4 · parallax</button>
-  <b style="margin-left:14px">flow</b>
-  <button id="g-fire" class="on">orange → red</button>
-  <button id="g-green">green</button>
-  <button id="g-ice">ice</button>
-  <button id="g-none">plain</button>
+  <b style="margin-left:14px">цвет</b>
+  <button id="g-fire" class="on">жёлтый → красный</button>
+  <button id="g-spectrum">радуга</button>
+  <button id="g-neon">неон</button>
+  <button id="g-green">зелёный</button>
+  <button id="g-ice">лёд</button>
+  <button id="g-none">без заливки</button>
   <a href="/">← live site</a>
+  <div style="flex-basis:100%;height:0"></div>
+  <b>шрифт</b>
+  <button id="f-nunito" class="on">Nunito</button>
+  <button id="f-comfortaa">Comfortaa</button>
+  <button id="f-rubik">Rubik</button>
+  <button id="f-system">системный</button>
+  <b style="margin-left:14px">скорость цвета</b>
+  <button id="s-slow">медленно</button>
+  <button id="s-mid" class="on">средне</button>
+  <button id="s-fast">быстро</button>
 </div>
 
 <section id="stage">
@@ -322,19 +336,32 @@ function tubesRandomColors(count){
     });
   }
   /* 3 - liquid text */
+  /* one full colour cycle laid down TWICE across a 200% background: the visible half of the
+     text always carries every colour of the cycle at once, and sliding the image by its own
+     width returns to the identical frame, so the travel never jumps. */
+  function flowGrad(cs){
+    var n=cs.length*2, out=[];
+    for(var i=0;i<=n;i++) out.push(cs[i%cs.length]+' '+(i*100/n).toFixed(3)+'%');
+    return 'linear-gradient(90deg,'+out.join(',')+')';
+  }
   var GRADS={
-    fire:'linear-gradient(90deg,#e0233a,#ff5a1f 25%,#ffa63d 50%,#ff5a1f 75%,#e0233a)',
-    green:'linear-gradient(90deg,#1E7A55,#4CC28F 25%,#9FE8C6 50%,#4CC28F 75%,#1E7A55)',
-    ice:'linear-gradient(90deg,#5C82C9,#7FD8FF 25%,#DFF6FF 50%,#7FD8FF 75%,#5C82C9)',
+    fire:    flowGrad(['#FFE066','#FFB020','#FF6A1F','#F02D3A','#C81E5A','#FF6A1F']),
+    spectrum:flowGrad(['#FFE066','#4CC28F','#39C6E8','#7B6CF6','#F45DBE','#FF6A1F']),
+    neon:    flowGrad(['#00F5D4','#00BBF9','#9B5DE5','#F15BB5','#FEE440']),
+    green:   flowGrad(['#9FE8C6','#4CC28F','#1E7A55','#2AA173']),
+    ice:     flowGrad(['#DFF6FF','#7FD8FF','#5C82C9','#8E7BE8']),
     none:null
   };
-  var flowKey='fire';
+  var FONTS={nunito:['Nunito',900],comfortaa:['Comfortaa',700],rubik:['Rubik',800],system:['system-ui',700]};
+  var flowKey='fire', fontKey='nunito', flowSec=5;
   function liquid(on){
     var host=document.getElementById('liquid');
     if(stopLiquid){stopLiquid();stopLiquid=null;}
     host.classList.toggle('hidden',!on);
+    host.style.fontFamily=FONTS[fontKey][0]+',system-ui,sans-serif';
+    host.style.fontWeight=FONTS[fontKey][1];
     if(on) stopLiquid=LiquidText(host,['ВООБРАЖЕНИЕ','ВАШ ЕДИНСТВЕННЫЙ','ПРЕДЕЛ'],
-      {morphTime:3.2,cooldownTime:1.4,gradient:GRADS[flowKey],flow:8});
+      {morphTime:3.2,cooldownTime:1.4,gradient:GRADS[flowKey],flow:flowSec});
   }
   /* 4 - parallax: same layer speeds as the GSAP timeline, scrubbed by scroll */
   function parallax(on){
@@ -378,15 +405,24 @@ function tubesRandomColors(count){
       apply();
     });
   });
-  [['g-fire','fire'],['g-green','green'],['g-ice','ice'],['g-none','none']].forEach(function(p){
-    document.getElementById(p[0]).addEventListener('click',function(){
-      flowKey=p[1];
-      ['g-fire','g-green','g-ice','g-none'].forEach(function(id){
-        document.getElementById(id).classList.toggle('on',id===p[0]);});
-      liquid(state.liquid);
+  /* one radio helper for all three pickers: light the clicked button, dim its siblings, rebuild */
+  function radio(pairs, set){
+    var ids=pairs.map(function(p){return p[0];});
+    pairs.forEach(function(p){
+      document.getElementById(p[0]).addEventListener('click',function(){
+        set(p[1]);
+        ids.forEach(function(id){document.getElementById(id).classList.toggle('on',id===p[0]);});
+        liquid(state.liquid);
+      });
     });
-  });
-  window.__dev={state:state,apply:apply,grads:GRADS,setFlow:function(k){flowKey=k;liquid(true);}};
+  }
+  radio([['g-fire','fire'],['g-spectrum','spectrum'],['g-neon','neon'],['g-green','green'],
+         ['g-ice','ice'],['g-none','none']], function(v){flowKey=v;});
+  radio([['f-nunito','nunito'],['f-comfortaa','comfortaa'],['f-rubik','rubik'],['f-system','system']],
+        function(v){fontKey=v;});
+  radio([['s-slow',9],['s-mid',5],['s-fast',2.6]], function(v){flowSec=v;});
+  window.__dev={state:state,apply:apply,grads:GRADS,
+    setFlow:function(k){flowKey=k;liquid(true);},setFont:function(k){fontKey=k;liquid(true);}};
   apply();
 })();
 </script>
