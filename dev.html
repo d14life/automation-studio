@@ -50,12 +50,12 @@ body{margin:0;background:#000;color:#EDF2EC;font:15px/1.55 system-ui,-apple-syst
   <button id="b-liquid" class="on">3 · liquid text</button>
   <button id="b-plx" class="on">4 · parallax</button>
   <b style="margin-left:14px">цвет</b>
-  <button id="g-all" class="on">все цвета</button>
+  <button id="g-all">все цвета</button>
   <button id="g-fire">жёлтый → красный</button>
   <button id="g-spectrum">радуга</button>
   <button id="g-neon">неон</button>
   <button id="g-green">зелёный</button>
-  <button id="g-ice">лёд</button>
+  <button id="g-ice" class="on">лёд</button>
   <button id="g-none">без заливки</button>
   <a href="/">← live site</a>
   <div style="flex-basis:100%;height:0"></div>
@@ -66,20 +66,20 @@ body{margin:0;background:#000;color:#EDF2EC;font:15px/1.55 system-ui,-apple-syst
   <button id="f-system">системный</button>
   <b style="margin-left:14px">скорость цвета</b>
   <button id="s-slow">медленно</button>
-  <button id="s-mid" class="on">средне</button>
-  <button id="s-fast">быстро</button>
+  <button id="s-mid">средне</button>
+  <button id="s-fast" class="on">быстро</button>
   <b style="margin-left:14px">разброс цвета</b>
   <button id="d-soft">мягко</button>
-  <button id="d-mid" class="on">средне</button>
-  <button id="d-wide">контраст</button>
+  <button id="d-mid">средне</button>
+  <button id="d-wide" class="on">контраст</button>
   <b style="margin-left:14px">длина трубок</b>
   <button id="t-short" class="on">как было</button>
   <button id="t-mid">средне</button>
   <button id="t-long">длинно</button>
   <b style="margin-left:14px">яркость трубок</b>
   <button id="y-dim">тускло</button>
-  <button id="y-mid" class="on">средне</button>
-  <button id="y-plus">ярче</button>
+  <button id="y-mid">средне</button>
+  <button id="y-plus" class="on">ярче</button>
   <button id="y-bright">ярко</button>
 </div>
 
@@ -395,7 +395,7 @@ function hslHex(h,s,l){
      ~16 fps instead of every frame: the eye reads it as continuous and the material swap
      is not free. */
   var tubesRaf=0, tubeHue=0, tubeLast=0, tubePaints=0;
-  var GLOW={dim:{l:.24,i:45},mid:{l:.34,i:90},plus:{l:.43,i:135},bright:{l:.52,i:190}}, glow=GLOW.mid;
+  var GLOW={dim:{l:.24,i:45},mid:{l:.34,i:90},plus:{l:.43,i:135},bright:{l:.52,i:190}}, glow=GLOW.plus;
   /* lerp is how hard each tube chases the target. The library ships 0.5, which snaps the
      tubes into a tight knot. Lower values let them lag and stretch, so the idle wander draws
      a long sweeping loop instead of a blob. noise is how far that wander roams. */
@@ -483,7 +483,7 @@ function hslHex(h,s,l){
      drifts three times slower, and the tubes ride that same slow drift. */
   /* spreadFrac = how far apart the three stops sit, as a share of the palette. A third of
      the wheel was too loud, neighbours read as one colour, so the middle sits between. */
-  var flowKey='all', fontKey='nunito', flowSec=7, spreadFrac=0.08;
+  var flowKey='ice', fontKey='nunito', flowSec=3.5, spreadFrac=0.15;
   function liquid(on){
     var host=document.getElementById('liquid');
     if(stopLiquid){stopLiquid();stopLiquid=null;}
