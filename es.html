@@ -275,6 +275,18 @@ header{border-bottom:1px solid var(--rule)}
 .avat:first-child{margin-left:0}
 .crew .more{margin-left:6px;font-size:11px;color:var(--ink-soft)}
 
+
+/* inner columns fill their height instead of leaving a void */
+.minicols{align-items:stretch}
+.caselist{justify-content:space-between}
+.caselist .caseitem{flex:1 1 auto;display:flex;flex-direction:column;justify-content:center}
+.casemain{justify-content:space-between}
+.casemain > .mrow{flex:1 1 auto}
+.casemain > .doc{flex:0 1 auto}
+.kanban{align-items:stretch}
+.kcol{justify-content:flex-start}
+.kcol .ktask:last-child{margin-bottom:auto}
+
 /* demo reveal machinery */
 .mock [data-step]{opacity:0;transform:translateY(12px);transition:opacity 320ms var(--ease-out), transform 320ms var(--ease-out)}
 .mock [data-step].shown{opacity:1;transform:none}
@@ -1103,7 +1115,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
       <div data-step><b data-count="94500">0</b><span>puntos emitidos en julio</span></div>
       <div data-step><b data-count="23">0</b><span>estados de cuenta de socios enviados</span></div>
     </div>
-  </div>
+  
       
         <div class="chartwrap solo" data-step>
       <div class="clegend"><span class="c1"><i></i>Puntos emitidos</span></div>
@@ -1116,7 +1128,9 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <circle class="p1" cx="418" cy="16" r="3.5"></circle>
         
       </svg>
-    </div><div class="body">
+    </div>
+      </div>
+      <div class="body">
     <h3><span class="num mono">22</span>Seguimiento de fidelización, referidos y socios</h3>
     <p>Los puntos, niveles, códigos de referido y comisiones de socios se calculan y se informan de forma automática, y lo que no está claro se retiene en lugar de pagarse por error. Los socios ven las mismas cifras que usted.</p>
     <div class="kills"><b>Elimina</b><span>la hoja de cálculo de comisiones que solo una persona en la empresa entiende.</span></div>
@@ -1284,7 +1298,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mrow" data-step><span class="dot a"></span><span class="grow"><b>SKU 4188</b> · 14 semanas de cobertura, pausar compras</span><span class="chip a">exceso de stock</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Orden de compra redactada para Lehmann Handel</span><span class="chip g">aprobado</span></div>
     
-  </div>
+  
       
         <div class="chartwrap" data-step>
       <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="La demanda, con 36 meses de historial, estacionalidad y promociones, sube de forma constante hasta la semana 12">
@@ -1299,7 +1313,9 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <div class="bigstat mono" style="margin-top:8px">
       <div data-step><b data-count="86400">0</b><span>euros liberados de stock muerto</span></div>
       <div data-step><b data-count="3">0</b><span>quiebres de stock evitados este trimestre</span></div>
-    </div><div class="body">
+    </div>
+      </div>
+      <div class="body">
     <h3><span class="num mono">29</span>Previsión de demanda e inventario</h3>
     <p>Un modelo entrenado con su propio historial de ventas, estacionalidad, promociones y plazos de entrega de proveedores le indica qué pedir y cuándo. Se centra en los dos fallos que cuestan dinero real y nunca aparecen con claridad en las cuentas: capital inmovilizado en stock muerto y ventas perdidas por estanterías vacías.</p>
     <div class="kills"><b>Elimina</b><span>pedir por intuición a partir de una hoja de cálculo que ya lleva una semana desactualizada.</span></div>
@@ -1828,7 +1844,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mrow" data-step><span class="dot r"></span><span class="grow">Vellmar Handel · 2 estrellas, entrega tardía</span><span class="mono">09:03</span><span class="chip r">alerta en 4 min</span></div>
     <div class="mrow" data-step><span class="dot a"></span><span class="grow">Respuesta serena redactada, a la espera de su aprobación</span><span class="mono">09:07</span><span class="chip a">aprobar</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Respuesta publicada, el cliente subió a 4 estrellas</span><span class="mono">11:41</span><span class="chip g">recuperado</span></div>
-  </div>
+  
       
         <div class="nodes">
       <div class="node" data-lit>Pedido cerrado</div>
@@ -1836,7 +1852,9 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
       <div class="node" data-lit>Preguntar a la hora adecuada</div>
       <div class="link" data-lit></div>
       <div class="node" data-lit>Respuesta redactada</div>
-    </div><div class="body">
+    </div>
+      </div>
+      <div class="body">
     <h3><span class="num mono">50</span>Piloto automático de reseñas y reputación</h3>
     <p>Tras cada pedido completado, el sistema pide una reseña al cliente satisfecho en el momento en que es más probable que la deje. Una reseña negativa le avisa en minutos, con una respuesta serena ya redactada para su aprobación.</p>
     <div class="kills"><b>Elimina</b><span>el silencio que deja una reseña negativa sin respuesta durante un mes mientras le cuesta clientes en silencio.</span></div>
@@ -1922,7 +1940,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mtitle"><span>Vigilancia de anomalías</span><button class="runbtn" type="button">▶ vigilar las cifras</button></div>
     
     
-  </div>
+  
       
         <div class="minicols">
       <div class="caselist">
@@ -1940,7 +1958,9 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <div class="bigstat mono" style="margin-top:8px">
       <div data-step><b data-count="17">0</b><span>incidencias detectadas este mes</span></div>
       <div data-step><b data-count="11300">0</b><span>euros de margen protegidos</span></div>
-    </div><div class="body">
+    </div>
+      </div>
+      <div class="body">
     <h3><span class="num mono">54</span>Alertas y detección de anomalías</h3>
     <p>Se le avisa en el momento en que algo se sale de su rango normal: el margen bajando en un producto, un cliente habitual sin actividad, existencias por debajo de la cobertura mínima, un servidor caído, un pago fallido, gastos que se disparan.</p>
     <div class="kills"><b>Elimina</b><span>enterarse de un problema de hace un mes cuando llegan las cifras de cierre de mes.</span></div>
@@ -1955,7 +1975,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mrow" data-step><span class="dot r"></span><span class="grow">Northgate Ltd · 4 pedidos al mes, ahora 1 · <span class="mono">€ 87 400</span> en riesgo</span><span class="chip r">enfriándose</span></div>
     <div class="mrow" data-step><span class="dot a"></span><span class="grow">Vellmar Handel · volumen baja 41 por ciento</span><span class="chip a">vigilar</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Tarea de recuperación asignada a A. Koss, historial completo adjunto</span><span class="mono">10:26</span><span class="chip g">asignado</span></div>
-  </div>
+  
       
         <div class="minicols">
       <div class="caselist">
@@ -1975,7 +1995,9 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
           </svg>
         </div>
       </div>
-    </div><div class="body">
+    </div>
+      </div>
+      <div class="body">
     <h3><span class="num mono">55</span>Radar de abandono de clientes</h3>
     <p>La frecuencia y el volumen de pedidos se vigilan por cliente, de modo que los que se están alejando se marcan semanas antes de que dejen de responder. El gestor recibe una tarea de recuperación con todo el historial del cliente adjunto.</p>
     <div class="kills"><b>Elimina</b><span>enterarse de que un cliente del top 20 se fue solo al comparar las cifras anuales.</span></div>

@@ -275,6 +275,18 @@ header{border-bottom:1px solid var(--rule)}
 .avat:first-child{margin-left:0}
 .crew .more{margin-left:6px;font-size:11px;color:var(--ink-soft)}
 
+
+/* inner columns fill their height instead of leaving a void */
+.minicols{align-items:stretch}
+.caselist{justify-content:space-between}
+.caselist .caseitem{flex:1 1 auto;display:flex;flex-direction:column;justify-content:center}
+.casemain{justify-content:space-between}
+.casemain > .mrow{flex:1 1 auto}
+.casemain > .doc{flex:0 1 auto}
+.kanban{align-items:stretch}
+.kcol{justify-content:flex-start}
+.kcol .ktask:last-child{margin-bottom:auto}
+
 /* demo reveal machinery */
 .mock [data-step]{opacity:0;transform:translateY(12px);transition:opacity 320ms var(--ease-out), transform 320ms var(--ease-out)}
 .mock [data-step].shown{opacity:1;transform:none}

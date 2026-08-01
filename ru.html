@@ -275,6 +275,18 @@ header{border-bottom:1px solid var(--rule)}
 .avat:first-child{margin-left:0}
 .crew .more{margin-left:6px;font-size:11px;color:var(--ink-soft)}
 
+
+/* inner columns fill their height instead of leaving a void */
+.minicols{align-items:stretch}
+.caselist{justify-content:space-between}
+.caselist .caseitem{flex:1 1 auto;display:flex;flex-direction:column;justify-content:center}
+.casemain{justify-content:space-between}
+.casemain > .mrow{flex:1 1 auto}
+.casemain > .doc{flex:0 1 auto}
+.kanban{align-items:stretch}
+.kcol{justify-content:flex-start}
+.kcol .ktask:last-child{margin-bottom:auto}
+
 /* demo reveal machinery */
 .mock [data-step]{opacity:0;transform:translateY(12px);transition:opacity 320ms var(--ease-out), transform 320ms var(--ease-out)}
 .mock [data-step].shown{opacity:1;transform:none}
@@ -1103,7 +1115,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
       <div data-step><b data-count="94500">0</b><span>баллов начислено в июле</span></div>
       <div data-step><b data-count="23">0</b><span>отчётов партнёрам отправлено</span></div>
     </div>
-  </div>
+  
       
         <div class="chartwrap solo" data-step>
       <div class="clegend"><span class="c1"><i></i>Начислено баллов</span></div>
@@ -1116,7 +1128,9 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <circle class="p1" cx="418" cy="16" r="3.5"></circle>
         
       </svg>
-    </div><div class="body">
+    </div>
+      </div>
+      <div class="body">
     <h3><span class="num mono">22</span>Учёт лояльности, рефералов и партнёров</h3>
     <p>Баллы, уровни, реферальные коды и партнёрские комиссии считаются и попадают в отчёты сами, а всё спорное задерживается, а не выплачивается неверно. Партнёры видят те же цифры, что и вы.</p>
     <div class="kills"><b>Убирает</b><span>таблицу комиссий, в которой разбирается один человек в компании.</span></div>
@@ -1284,7 +1298,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mrow" data-step><span class="dot a"></span><span class="grow"><b>SKU 4188</b> · покрытие на 14 недель, приостановите закупку</span><span class="chip a">затоварено</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Заказ поставщику Lehmann Handel подготовлен</span><span class="chip g">согласовано</span></div>
     
-  </div>
+  
       
         <div class="chartwrap" data-step>
       <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="Спрос по 36 месяцам истории, сезонности и акций стабильно растёт к 12-й неделе">
@@ -1299,7 +1313,9 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <div class="bigstat mono" style="margin-top:8px">
       <div data-step><b data-count="86400">0</b><span>евро высвобождено из неликвида</span></div>
       <div data-step><b data-count="3">0</b><span>дефицита предотвращено за квартал</span></div>
-    </div><div class="body">
+    </div>
+      </div>
+      <div class="body">
     <h3><span class="num mono">29</span>Прогноз спроса и запасов</h3>
     <p>Модель, обученная на вашей истории продаж, сезонности, акциях и сроках поставки, подсказывает, что и когда заказывать. Она бьёт по двум потерям, которые стоят реальных денег и не видны в отчётности напрямую: капитал, замороженный в неликвиде, и продажи, потерянные из-за пустой полки.</p>
     <div class="kills"><b>Убирает</b><span>закупку по интуиции из таблицы, которая устарела ещё неделю назад.</span></div>
@@ -1828,7 +1844,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mrow" data-step><span class="dot r"></span><span class="grow">Vellmar Handel · 2 звезды , поздняя доставка</span><span class="mono">09:03</span><span class="chip r">тревога через 4 мин</span></div>
     <div class="mrow" data-step><span class="dot a"></span><span class="grow">Спокойный ответ подготовлен , ждём вашего согласия</span><span class="mono">09:07</span><span class="chip a">согласовать</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Ответ опубликован , клиент поднял до 4 звёзд</span><span class="mono">11:41</span><span class="chip g">восстановлено</span></div>
-  </div>
+  
       
         <div class="nodes">
       <div class="node" data-lit>Заказ закрыт</div>
@@ -1836,7 +1852,9 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
       <div class="node" data-lit>Просьба в нужный час</div>
       <div class="link" data-lit></div>
       <div class="node" data-lit>Ответ подготовлен</div>
-    </div><div class="body">
+    </div>
+      </div>
+      <div class="body">
     <h3><span class="num mono">57</span>Автопилот отзывов и репутации</h3>
     <p>После каждого выполненного заказа система просит довольного клиента об отзыве в тот момент, когда он вероятнее всего его оставит. О плохом отзыве вы узнаёте за минуты, вместе с уже готовым спокойным ответом на ваше согласование.</p>
     <div class="kills"><b>Убирает</b><span>молчание, из-за которого один злой отзыв висит без ответа месяц и тихо уводит у вас клиентов.</span></div>
@@ -1922,7 +1940,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mtitle"><span>Контроль отклонений</span><button class="runbtn" type="button">▶ следить за цифрами</button></div>
     
     
-  </div>
+  
       
         <div class="minicols">
       <div class="caselist">
@@ -1940,7 +1958,9 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <div class="bigstat mono" style="margin-top:8px">
       <div data-step><b data-count="17">0</b><span>проблем поймано за месяц</span></div>
       <div data-step><b data-count="11300">0</b><span>евро маржи сохранено</span></div>
-    </div><div class="body">
+    </div>
+      </div>
+      <div class="body">
     <h3><span class="num mono">50</span>Оповещения и поиск отклонений</h3>
     <p>Вам сообщают в тот момент, когда что-то выходит за обычные рамки: падает маржа по товару, затихает постоянный клиент, запас ниже нормы, лежит сервер, не проходит платёж, скачут расходы.</p>
     <div class="kills"><b>Убирает</b><span>ситуацию, когда о проблеме месячной давности вы узнаёте из цифр закрытия месяца.</span></div>
@@ -1955,7 +1975,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mrow" data-step><span class="dot r"></span><span class="grow">Northgate Ltd · было 4 заказа в месяц, теперь 1 · под риском <span class="mono">€ 87 400</span></span><span class="chip r">остывает</span></div>
     <div class="mrow" data-step><span class="dot a"></span><span class="grow">Vellmar Handel · объём упал на 41 процент</span><span class="chip a">контроль</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Задача на возврат назначена A. Koss, вся история приложена</span><span class="mono">10:26</span><span class="chip g">назначено</span></div>
-  </div>
+  
       
         <div class="minicols">
       <div class="caselist">
@@ -1975,7 +1995,9 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
           </svg>
         </div>
       </div>
-    </div><div class="body">
+    </div>
+      </div>
+      <div class="body">
     <h3><span class="num mono">60</span>Радар оттока клиентов</h3>
     <p>Частота и объём заказов отслеживаются по каждому клиенту, поэтому те, кто уходит, видны за недели до того, как перестанут отвечать. Менеджер получает задачу на возврат со всей историей клиента.</p>
     <div class="kills"><b>Убирает</b><span>ситуацию, когда об уходе клиента из топ-20 узнают только при сравнении годовых цифр.</span></div>

@@ -275,6 +275,18 @@ header{border-bottom:1px solid var(--rule)}
 .avat:first-child{margin-left:0}
 .crew .more{margin-left:6px;font-size:11px;color:var(--ink-soft)}
 
+
+/* inner columns fill their height instead of leaving a void */
+.minicols{align-items:stretch}
+.caselist{justify-content:space-between}
+.caselist .caseitem{flex:1 1 auto;display:flex;flex-direction:column;justify-content:center}
+.casemain{justify-content:space-between}
+.casemain > .mrow{flex:1 1 auto}
+.casemain > .doc{flex:0 1 auto}
+.kanban{align-items:stretch}
+.kcol{justify-content:flex-start}
+.kcol .ktask:last-child{margin-bottom:auto}
+
 /* demo reveal machinery */
 .mock [data-step]{opacity:0;transform:translateY(12px);transition:opacity 320ms var(--ease-out), transform 320ms var(--ease-out)}
 .mock [data-step].shown{opacity:1;transform:none}
@@ -1103,7 +1115,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
       <div data-step><b data-count="94500">0</b><span>点积分于 7月发放</span></div>
       <div data-step><b data-count="23">0</b><span>已发出合作伙伴对账单</span></div>
     </div>
-  </div>
+  
       
         <div class="chartwrap solo" data-step>
       <div class="clegend"><span class="c1"><i></i>已发放积分</span></div>
@@ -1116,7 +1128,9 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <circle class="p1" cx="418" cy="16" r="3.5"></circle>
         
       </svg>
-    </div><div class="body">
+    </div>
+      </div>
+      <div class="body">
     <h3><span class="num mono">22</span>会员、推荐与合作伙伴跟踪</h3>
     <p>积分、等级、推荐码和合作伙伴佣金自动核算并出具报表，任何不明确的部分都会先扣住，而不是错付出去。合作伙伴看到的数字与您看到的完全一致。</p>
     <div class="kills"><b>消除</b><span>全公司只有一个人看得懂的佣金表格。</span></div>
@@ -1284,7 +1298,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mrow" data-step><span class="dot a"></span><span class="grow"><b>SKU 4188</b> · 可支撑 14 周，暂停采购</span><span class="chip a">库存过剩</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">已为 Lehmann Handel 起草采购订单</span><span class="chip g">已批准</span></div>
     
-  </div>
+  
       
         <div class="chartwrap" data-step>
       <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="基于 36 个月历史、季节性和促销的需求，稳步上升至第 12 周">
@@ -1299,7 +1313,9 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <div class="bigstat mono" style="margin-top:8px">
       <div data-step><b data-count="86400">0</b><span>欧元从呆滞库存中释放</span></div>
       <div data-step><b data-count="3">0</b><span>本季度已避免的缺货</span></div>
-    </div><div class="body">
+    </div>
+      </div>
+      <div class="body">
     <h3><span class="num mono">29</span>需求与库存预测</h3>
     <p>基于您自己的销售历史、季节性、促销和供应商交期训练的模型，会告诉您该订什么、什么时候订。它针对的是两种真正烧钱、却从来不会清楚地体现在账上的失误：压在滞销库存里的资金，以及因缺货而丢掉的销售。</p>
     <div class="kills"><b>消除</b><span>凭感觉照着已经过时一周的表格下单。</span></div>
@@ -1828,7 +1844,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mrow" data-step><span class="dot r"></span><span class="grow">Vellmar Handel · 2 星，配送延误</span><span class="mono">09:03</span><span class="chip r">4 分钟内告警</span></div>
     <div class="mrow" data-step><span class="dot a"></span><span class="grow">已草拟一条平和的回复，等待您确认</span><span class="mono">09:07</span><span class="chip a">批准</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">回复已发布，客户改为 4 星</span><span class="mono">11:41</span><span class="chip g">已恢复</span></div>
-  </div>
+  
       
         <div class="nodes">
       <div class="node" data-lit>订单已完成</div>
@@ -1836,7 +1852,9 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
       <div class="node" data-lit>在合适的时点提醒</div>
       <div class="link" data-lit></div>
       <div class="node" data-lit>回复已草拟</div>
-    </div><div class="body">
+    </div>
+      </div>
+      <div class="body">
     <h3><span class="num mono">50</span>评价与口碑自动运营</h3>
     <p>每完成一笔订单，系统会在客户最愿意留评的时刻邀请满意的客户写评价。出现差评时，几分钟内就会通知您，并附上一条已草拟好、语气平和的回复供您确认。</p>
     <div class="kills"><b>消除</b><span>无人回应的沉默，让一条差评挂上一个月，悄悄带走您的客户。</span></div>
@@ -1922,7 +1940,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mtitle"><span>异常监控</span><button class="runbtn" type="button">▶ 盯住指标</button></div>
     
     
-  </div>
+  
       
         <div class="minicols">
       <div class="caselist">
@@ -1940,7 +1958,9 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <div class="bigstat mono" style="margin-top:8px">
       <div data-step><b data-count="17">0</b><span>本月发现的问题</span></div>
       <div data-step><b data-count="11300">0</b><span>欧元毛利被守住</span></div>
-    </div><div class="body">
+    </div>
+      </div>
+      <div class="body">
     <h3><span class="num mono">54</span>告警与异常检测</h3>
     <p>一旦有指标越出正常区间，您立刻会收到通知：某个产品毛利下滑、老客户变安静、库存低于安全水位、服务器宕机、扣款失败、费用突增。</p>
     <div class="kills"><b>消除</b><span>等月末数字出来，才发现一个月前就存在的问题。</span></div>
@@ -1955,7 +1975,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mrow" data-step><span class="dot r"></span><span class="grow">Northgate Ltd · 每月 4 笔订单，现在 1 笔 · <span class="mono">€ 87 400</span> 有流失风险</span><span class="chip r">转冷</span></div>
     <div class="mrow" data-step><span class="dot a"></span><span class="grow">Vellmar Handel · 订货量下降 41%</span><span class="chip a">关注</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">挽回任务已分派给 A. Koss，附完整历史</span><span class="mono">10:26</span><span class="chip g">已分配</span></div>
-  </div>
+  
       
         <div class="minicols">
       <div class="caselist">
@@ -1975,7 +1995,9 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
           </svg>
         </div>
       </div>
-    </div><div class="body">
+    </div>
+      </div>
+      <div class="body">
     <h3><span class="num mono">55</span>客户流失雷达</h3>
     <p>按客户跟踪下单频次和数量，正在流失的客户在彻底不回消息前几周就会被标出。经理会收到一条挽回任务，附上该客户的全部历史。</p>
     <div class="kills"><b>消除</b><span>直到对比年度数字时才发现一个前 20 大客户已经走了。</span></div>

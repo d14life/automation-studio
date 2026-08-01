@@ -275,6 +275,18 @@ header{border-bottom:1px solid var(--rule)}
 .avat:first-child{margin-left:0}
 .crew .more{margin-left:6px;font-size:11px;color:var(--ink-soft)}
 
+
+/* inner columns fill their height instead of leaving a void */
+.minicols{align-items:stretch}
+.caselist{justify-content:space-between}
+.caselist .caseitem{flex:1 1 auto;display:flex;flex-direction:column;justify-content:center}
+.casemain{justify-content:space-between}
+.casemain > .mrow{flex:1 1 auto}
+.casemain > .doc{flex:0 1 auto}
+.kanban{align-items:stretch}
+.kcol{justify-content:flex-start}
+.kcol .ktask:last-child{margin-bottom:auto}
+
 /* demo reveal machinery */
 .mock [data-step]{opacity:0;transform:translateY(12px);transition:opacity 320ms var(--ease-out), transform 320ms var(--ease-out)}
 .mock [data-step].shown{opacity:1;transform:none}
@@ -1103,7 +1115,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
       <div data-step><b data-count="94500">0</b><span>points issued in July</span></div>
       <div data-step><b data-count="23">0</b><span>partner statements sent</span></div>
     </div>
-  </div>
+  
       
         <div class="chartwrap solo" data-step>
       <div class="clegend"><span class="c1"><i></i>Points issued</span></div>
@@ -1116,7 +1128,9 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <circle class="p1" cx="418" cy="16" r="3.5"></circle>
         
       </svg>
-    </div><div class="body">
+    </div>
+      </div>
+      <div class="body">
     <h3><span class="num mono">22</span>Loyalty, referral and partner tracking</h3>
     <p>Points, tiers, referral codes and partner commissions are calculated and reported on their own, with anything unclear held back rather than paid out wrong. Partners see the same numbers you do.</p>
     <div class="kills"><b>Removes</b><span>the commission spreadsheet only one person in the company understands.</span></div>
@@ -1284,7 +1298,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mrow" data-step><span class="dot a"></span><span class="grow"><b>SKU 4188</b> · 14 weeks of cover, pause purchasing</span><span class="chip a">overstocked</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Purchase order drafted for Lehmann Handel</span><span class="chip g">approved</span></div>
     
-  </div>
+  
       
         <div class="chartwrap" data-step>
       <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="Demand across 36 months of history, seasonality and promotions rises steadily into week 12">
@@ -1299,7 +1313,9 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <div class="bigstat mono" style="margin-top:8px">
       <div data-step><b data-count="86400">0</b><span>euro freed from dead stock</span></div>
       <div data-step><b data-count="3">0</b><span>stockouts avoided this quarter</span></div>
-    </div><div class="body">
+    </div>
+      </div>
+      <div class="body">
     <h3><span class="num mono">29</span>Demand and inventory forecasting</h3>
     <p>A model trained on your own sales history, seasonality, promotions and supplier lead times tells you what to order and when. It targets the two failures that cost real money and never show up cleanly in the accounts: capital frozen in dead stock, and sales lost to an empty shelf.</p>
     <div class="kills"><b>Removes</b><span>ordering by gut feel from a spreadsheet that is already a week out of date.</span></div>
@@ -1828,7 +1844,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mrow" data-step><span class="dot r"></span><span class="grow">Vellmar Handel · 2 stars , late delivery</span><span class="mono">09:03</span><span class="chip r">alert in 4 min</span></div>
     <div class="mrow" data-step><span class="dot a"></span><span class="grow">Calm reply drafted , waiting for your yes</span><span class="mono">09:07</span><span class="chip a">approve</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Reply published , client raised to 4 stars</span><span class="mono">11:41</span><span class="chip g">recovered</span></div>
-  </div>
+  
       
         <div class="nodes">
       <div class="node" data-lit>Order closed</div>
@@ -1836,7 +1852,9 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
       <div class="node" data-lit>Ask at the right hour</div>
       <div class="link" data-lit></div>
       <div class="node" data-lit>Reply drafted</div>
-    </div><div class="body">
+    </div>
+      </div>
+      <div class="body">
     <h3><span class="num mono">50</span>Reviews and reputation autopilot</h3>
     <p>After each completed order the system asks the happy client for a review at the moment they are most likely to leave one. A bad review pings you within minutes with a calm reply already drafted for your approval.</p>
     <div class="kills"><b>Removes</b><span>the silence that lets one angry review sit unanswered for a month while it quietly costs you clients.</span></div>
@@ -1922,7 +1940,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mtitle"><span>Anomaly watch</span><button class="runbtn" type="button">▶ watch the numbers</button></div>
     
     
-  </div>
+  
       
         <div class="minicols">
       <div class="caselist">
@@ -1940,7 +1958,9 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <div class="bigstat mono" style="margin-top:8px">
       <div data-step><b data-count="17">0</b><span>issues caught this month</span></div>
       <div data-step><b data-count="11300">0</b><span>euro of margin protected</span></div>
-    </div><div class="body">
+    </div>
+      </div>
+      <div class="body">
     <h3><span class="num mono">54</span>Alerting and anomaly detection</h3>
     <p>You get told the moment something leaves its normal range: margin slipping on a product, a regular client going quiet, stock under cover, a server down, a payment failing, expenses spiking.</p>
     <div class="kills"><b>Removes</b><span>finding out about a month-old problem when the month-end figures land.</span></div>
@@ -1955,7 +1975,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mrow" data-step><span class="dot r"></span><span class="grow">Northgate Ltd · 4 orders a month, now 1 · <span class="mono">€ 87 400</span> at risk</span><span class="chip r">cooling</span></div>
     <div class="mrow" data-step><span class="dot a"></span><span class="grow">Vellmar Handel · volume down 41 percent</span><span class="chip a">watch</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Win back task to A. Koss, full history attached</span><span class="mono">10:26</span><span class="chip g">assigned</span></div>
-  </div>
+  
       
         <div class="minicols">
       <div class="caselist">
@@ -1975,7 +1995,9 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
           </svg>
         </div>
       </div>
-    </div><div class="body">
+    </div>
+      </div>
+      <div class="body">
     <h3><span class="num mono">55</span>Client churn radar</h3>
     <p>Order frequency and volume are watched per client, so the ones drifting away are flagged weeks before they stop answering. The manager gets a win-back task with the client's whole history attached.</p>
     <div class="kills"><b>Removes</b><span>finding out a top-20 client left only when the annual numbers are compared.</span></div>
