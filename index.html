@@ -515,9 +515,11 @@ footer a{display:block;padding:3px 0}
     mouseAdjust:false,clickToWarp:false,starColor:'rgba(255,255,255,1)',bgColor:'rgba(0,0,0,1)',zIndex:1});
 
   /* two lines, same timings, started in the same tick: they melt into the next phrase together */
-  var MORPH={morphTime:4.5,cooldownTime:0.45,colors:ICE,flow:FLOW,drift:FLOW*3,spread:ICE.length*0.08};
-  LiquidText(document.getElementById('liq1'),['АВТОМАТИЗИРУЕМ','БЫСТРО','ТОЛЬКО ПРАКТИКА'],MORPH);
-  LiquidText(document.getElementById('liq2'),['БИЗНЕС-ПРОЦЕССЫ','НЕ ЗНАЧИТ ПЛОХО','НОЛЬ ТЕОРИИ'],MORPH);
+  var MORPH={morphTime:4.5,cooldownTime:0.45,colors:ICE,flow:FLOW,drift:FLOW*3,
+             spread:ICE.length*0.08,letters:true};
+  var L1=document.getElementById('liq1'), L2=document.getElementById('liq2');
+  LiquidText(L1,['АВТОМАТИЗИРУЕМ','БЫСТРО','ТОЛЬКО ПРАКТИКА'],MORPH);
+  LiquidText(L2,['БИЗНЕС-ПРОЦЕССЫ','НЕ ЗНАЧИТ ПЛОХО','НОЛЬ ТЕОРИИ'],MORPH);
 
   /* the library chases the pointer from a listener on document.body; swallowing the event in
      the capture phase leaves the tubes drifting on their own, which is what we picked */
@@ -531,7 +533,48 @@ footer a{display:block;padding:3px 0}
   TubesCursorInit(cv,{tubes:{colors:tubeSet(p0),
     lights:{intensity:GLOW.i,colors:[dim(paletteAt(ICE,p0),k),dim(paletteAt(ICE,p0+sp*0.9),k),
                                      dim(paletteAt(ICE,p0+sp*1.5),k),dim(paletteAt(ICE,p0+sp*2.1),k)]}}},
-    function(a){app=a;});
+    function(a){
+      app=a;
+      /* the library's idle path is a Lissajous figure: cos on x, sin at double frequency on y,
+         which is the figure-eight. Slowed right down and widened so it drifts across the slogan
+         instead of buzzing in the middle. */
+      app.options.sleepTimeScale1=0.22;
+      app.options.sleepTimeScale2=0.44;
+      app.options.sleepRadiusX=430;
+      app.options.sleepRadiusY=190;
+    });
+
+  /* Letters get out of the way of the tubes. The tube head is read straight off the library
+     (app.tubes.target, in world units) and converted to page pixels with the renderer's own
+     scale, so the shove always lands where the ribbons actually are. Base positions are
+     measured once per word, not per frame, so this stays cheap. */
+  var PUSH_R=200, PUSH_MAX=54;
+  function measure(sp,stageBox){
+    sp.__base=[];
+    var kids=sp.children;
+    for(var i=0;i<kids.length;i++){
+      kids[i].style.transform='none';
+      var b=kids[i].getBoundingClientRect();
+      sp.__base.push({el:kids[i],x:b.left+b.width/2-stageBox.left,y:b.top+b.height/2-stageBox.top});
+    }
+    sp.__measured=true;
+  }
+  function shove(tx,ty,stageBox){
+    [L1,L2].forEach(function(host){
+      for(var s=0;s<host.children.length;s++){
+        var sp=host.children[s];
+        if(sp.tagName!=='SPAN'||!sp.children.length) continue;
+        if(!sp.__measured||!sp.__base||sp.__base.length!==sp.children.length) measure(sp,stageBox);
+        for(var i=0;i<sp.__base.length;i++){
+          var p=sp.__base[i], dx=p.x-tx, dy=p.y-ty;
+          var d=Math.sqrt(dx*dx+dy*dy)||0.001;
+          if(d>PUSH_R){ if(p.el.style.transform!=='none') p.el.style.transform='none'; continue; }
+          var f=1-d/PUSH_R, k=f*f*PUSH_MAX;
+          p.el.style.transform='translate('+(dx/d*k).toFixed(1)+'px,'+(dy/d*k*0.7).toFixed(1)+'px)';
+        }
+      }
+    });
+  }
 
   /* tubes walk the same palette as the text, one step behind it */
   var hue=0,last=0;
@@ -540,6 +583,11 @@ footer a{display:block;padding:3px 0}
     if(!app){last=now;return;}
     if(now-last<62) return;
     hue=(hue+360*(now-last)/1000/(FLOW*3))%360; last=now;
+    var sz=app.three&&app.three.size, t=app.tubes&&app.tubes.target;
+    if(sz&&t&&sz.wWidth){
+      var box=stage.getBoundingClientRect();
+      shove(box.width/2+t.x*(sz.width/sz.wWidth), box.height/2-t.y*(sz.height/sz.wHeight), box);
+    }
     var p=hue/360*ICE.length+p0;
     try{
       app.tubes.setColors(tubeSet(p));

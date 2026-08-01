@@ -169,6 +169,9 @@ function LiquidText(host, texts, o) {
      hue and the line read as one solid colour; a third of the wheel apart is unmistakably
      three colours, while still being three and not the whole spectrum. */
   var spread       = o.spread!= null ? o.spread: (colors ? colors.length*0.09 : 1);
+  /* letters: each character becomes its own inline-block, so a caller can push them around
+     without touching the melt. Rebuilt only when the word actually changes, never per frame. */
+  var letters      = !!o.letters;
   if (!texts || texts.length < 2) throw new Error('LiquidText: need 2+ texts');
 
   if (!document.getElementById('lt-threshold-svg')){
@@ -214,14 +217,38 @@ function LiquidText(host, texts, o) {
   }
   paintGrad(time);
 
+  function setWord(sp,str){
+    if (sp.__word===str) return;
+    sp.__word=str;
+    if (!letters){ sp.textContent=str; return; }
+    sp.textContent='';
+    for (var i=0;i<str.length;i++){
+      var ch=document.createElement('i');
+      ch.style.cssText='font-style:normal;display:inline-block;will-change:transform;'+
+                       'transition:transform 220ms cubic-bezier(.22,.61,.36,1)';
+      ch.textContent = str.charAt(i)===' ' ? '\u00A0' : str.charAt(i);
+      sp.appendChild(ch);
+    }
+    sp.__measured=false;
+  }
+  /* the visible characters, for whoever wants to shove them out of the way */
+  host.letterSpans=function(){
+    var out=[];
+    [t1,t2].forEach(function(sp){
+      if (parseFloat(sp.style.opacity||'1')<0.05) return;
+      for (var i=0;i<sp.children.length;i++) out.push(sp.children[i]);
+    });
+    return out;
+  };
+
   function setStyles(fraction){
     t2.style.filter='blur('+Math.min(8/fraction-8,100)+'px)';
     t2.style.opacity=(Math.pow(fraction,0.4)*100)+'%';
     var inv=1-fraction;
     t1.style.filter='blur('+Math.min(8/inv-8,100)+'px)';
     t1.style.opacity=(Math.pow(inv,0.4)*100)+'%';
-    t1.textContent=texts[textIndex%texts.length];
-    t2.textContent=texts[(textIndex+1)%texts.length];
+    setWord(t1,texts[textIndex%texts.length]);
+    setWord(t2,texts[(textIndex+1)%texts.length]);
   }
   function doMorph(){
     morph-=cooldown; cooldown=0;
