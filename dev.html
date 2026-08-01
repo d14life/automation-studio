@@ -68,6 +68,10 @@ body{margin:0;background:#000;color:#EDF2EC;font:15px/1.55 system-ui,-apple-syst
   <button id="s-slow">медленно</button>
   <button id="s-mid" class="on">средне</button>
   <button id="s-fast">быстро</button>
+  <b style="margin-left:14px">яркость трубок</b>
+  <button id="y-dim">тускло</button>
+  <button id="y-mid" class="on">средне</button>
+  <button id="y-bright">ярко</button>
 </div>
 
 <section id="stage">
@@ -373,12 +377,15 @@ function hslHex(h,s,l){
      ~16 fps instead of every frame: the eye reads it as continuous and the material swap
      is not free. */
   var tubesRaf=0, tubeHue=0, tubeLast=0;
+  var GLOW={dim:{l:.24,i:45},mid:{l:.34,i:90},bright:{l:.52,i:190}}, glow=GLOW.mid;
   function paintTubes(){
     if(!tubesApp||!tubesApp.tubes) return;
     try{
-      tubesApp.tubes.setColors([hslHex(tubeHue,1,.58),hslHex(tubeHue+120,1,.58),hslHex(tubeHue+240,1,.58)]);
-      tubesApp.tubes.setLightsColors([hslHex(tubeHue+60,1,.6),hslHex(tubeHue+150,1,.6),
-                                      hslHex(tubeHue+240,1,.6),hslHex(tubeHue+330,1,.6)]);
+      var l=glow.l;
+      tubesApp.tubes.setColors([hslHex(tubeHue,.8,l),hslHex(tubeHue+120,.8,l),hslHex(tubeHue+240,.8,l)]);
+      tubesApp.tubes.setLightsColors([hslHex(tubeHue+60,.8,l+.02),hslHex(tubeHue+150,.8,l+.02),
+                                      hslHex(tubeHue+240,.8,l+.02),hslHex(tubeHue+330,.8,l+.02)]);
+      if (tubesApp.tubes.setLightsIntensity) tubesApp.tubes.setLightsIntensity(glow.i);
     }catch(e){ cancelAnimationFrame(tubesRaf); tubesRaf=0; console.warn('tube colours:',e); }
   }
   function cycleTubes(now){
@@ -398,8 +405,10 @@ function hslHex(h,s,l){
     if(!on) return;
     tubesCv=document.createElement('canvas'); tubesCv.className='tubes';
     stage.appendChild(tubesCv);
-    tubesCancel=TubesCursorInit(tubesCv,{tubes:{colors:[hslHex(0,1,.58),hslHex(120,1,.58),hslHex(240,1,.58)],
-      lights:{intensity:260,colors:[hslHex(60,1,.6),hslHex(150,1,.6),hslHex(240,1,.6),hslHex(330,1,.6)]}}},
+    tubesCancel=TubesCursorInit(tubesCv,{tubes:{
+      colors:[hslHex(0,.8,glow.l),hslHex(120,.8,glow.l),hslHex(240,.8,glow.l)],
+      lights:{intensity:glow.i,colors:[hslHex(60,.8,glow.l+.02),hslHex(150,.8,glow.l+.02),
+                                       hslHex(240,.8,glow.l+.02),hslHex(330,.8,glow.l+.02)]}}},
       function(app){tubesApp=app;});
     tubeLast=performance.now();
     tubesRaf=requestAnimationFrame(cycleTubes);
@@ -496,6 +505,7 @@ function hslHex(h,s,l){
   radio([['f-nunito','nunito'],['f-comfortaa','comfortaa'],['f-rubik','rubik'],['f-system','system']],
         function(v){fontKey=v;});
   radio([['s-slow',12],['s-mid',7],['s-fast',3.5]], function(v){flowSec=v;});
+  radio([['y-dim','dim'],['y-mid','mid'],['y-bright','bright']], function(v){glow=GLOW[v];paintTubes();});
   window.__dev={state:state,apply:apply,grads:GRADS,
     setFlow:function(k){flowKey=k;liquid(true);},setFont:function(k){fontKey=k;liquid(true);}};
   apply();
