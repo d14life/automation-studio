@@ -14,7 +14,7 @@ body{margin:0;background:#000;color:#EDF2EC;font:15px/1.55 system-ui,-apple-syst
 
 /* ---- block 1+2: space stage (starfield-1 + tubes cursor) ---- */
 #stage{position:relative;height:100vh;overflow:hidden;background:#000}
-#stage canvas.tubes{position:absolute;inset:0;z-index:2}
+#stage canvas.tubes{position:absolute;inset:0;z-index:2;mix-blend-mode:screen}
 #stageui{position:relative;z-index:5;height:100%;display:flex;flex-direction:column;
   align-items:center;justify-content:center;gap:14px;text-align:center;padding:0 20px}
 /* ---- block 3: liquid text (their sizing: 40pt, lg 6rem, h-16/h-24) ---- */
@@ -182,12 +182,9 @@ function Starfield1(host, o) {
   function onDown(){ hyper=true; } function onUp(){ hyper=false; }
   if (mouseAdjust) host.addEventListener('mousemove', onMove, {passive:true});
   if (clickToWarp){ host.addEventListener('mousedown', onDown); addEventListener('mouseup', onUp); }
-  var onVis=function(){ if(document.hidden){running=false;cancelAnimationFrame(raf);} else if(!running){running=true;animate();} };
-  document.addEventListener('visibilitychange', onVis);
   setup(); bigBang(); animate();
   return function stop(){
     running=false; cancelAnimationFrame(raf);
-    document.removeEventListener('visibilitychange', onVis);
     if (mouseAdjust) host.removeEventListener('mousemove', onMove);
     if (clickToWarp){ host.removeEventListener('mousedown', onDown); removeEventListener('mouseup', onUp); }
     cv.remove();
@@ -246,12 +243,9 @@ function LiquidText(host, texts, o) {
     cooldown-=dt; morph+=dt>0?dt:0;
     if (cooldown<=0) doMorph(); else doCooldown();
   }
-  var onVis=function(){ if(document.hidden){running=false;cancelAnimationFrame(raf);} else if(!running){running=true;time=Date.now();animate();} };
-  document.addEventListener('visibilitychange', onVis);
   animate();
   return function stop(){
     running=false; cancelAnimationFrame(raf);
-    document.removeEventListener('visibilitychange', onVis);
     t1.remove(); t2.remove(); host.style.filter='';
   };
 }

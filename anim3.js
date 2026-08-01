@@ -103,12 +103,9 @@ function Starfield1(host, o) {
   function onDown(){ hyper=true; } function onUp(){ hyper=false; }
   if (mouseAdjust) host.addEventListener('mousemove', onMove, {passive:true});
   if (clickToWarp){ host.addEventListener('mousedown', onDown); addEventListener('mouseup', onUp); }
-  var onVis=function(){ if(document.hidden){running=false;cancelAnimationFrame(raf);} else if(!running){running=true;animate();} };
-  document.addEventListener('visibilitychange', onVis);
   setup(); bigBang(); animate();
   return function stop(){
     running=false; cancelAnimationFrame(raf);
-    document.removeEventListener('visibilitychange', onVis);
     if (mouseAdjust) host.removeEventListener('mousemove', onMove);
     if (clickToWarp){ host.removeEventListener('mousedown', onDown); removeEventListener('mouseup', onUp); }
     cv.remove();
@@ -167,12 +164,9 @@ function LiquidText(host, texts, o) {
     cooldown-=dt; morph+=dt>0?dt:0;
     if (cooldown<=0) doMorph(); else doCooldown();
   }
-  var onVis=function(){ if(document.hidden){running=false;cancelAnimationFrame(raf);} else if(!running){running=true;time=Date.now();animate();} };
-  document.addEventListener('visibilitychange', onVis);
   animate();
   return function stop(){
     running=false; cancelAnimationFrame(raf);
-    document.removeEventListener('visibilitychange', onVis);
     t1.remove(); t2.remove(); host.style.filter='';
   };
 }
