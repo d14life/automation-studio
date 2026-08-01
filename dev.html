@@ -73,9 +73,9 @@ body{margin:0;background:#000;color:#EDF2EC;font:15px/1.55 system-ui,-apple-syst
   <button id="d-mid" class="on">средне</button>
   <button id="d-wide">контраст</button>
   <b style="margin-left:14px">длина трубок</b>
-  <button id="t-short">коротко</button>
+  <button id="t-short" class="on">как было</button>
   <button id="t-mid">средне</button>
-  <button id="t-long" class="on">длинно</button>
+  <button id="t-long">длинно</button>
   <b style="margin-left:14px">яркость трубок</b>
   <button id="y-dim">тускло</button>
   <button id="y-mid" class="on">средне</button>
@@ -399,7 +399,7 @@ function hslHex(h,s,l){
   /* lerp is how hard each tube chases the target. The library ships 0.5, which snaps the
      tubes into a tight knot. Lower values let them lag and stretch, so the idle wander draws
      a long sweeping loop instead of a blob. noise is how far that wander roams. */
-  var TAIL={short:{lerp:.5,noise:.05},mid:{lerp:.25,noise:.06},long:{lerp:.11,noise:.075}}, tail=TAIL.long;
+  var TAIL={short:{lerp:.5,noise:.05},mid:{lerp:.25,noise:.06},long:{lerp:.11,noise:.075}}, tail=TAIL.short;   /* library default: tight and clean. Long trails read as a mess. */
   /* The three tubes sit inside a 70 degree arc rather than spread evenly round the wheel.
      Evenly spread, the SET always looked the same - one warm, one green, one blue at every
      rotation - so the drift was invisible even though it was running. A narrow arc gives the
