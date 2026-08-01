@@ -106,8 +106,8 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
 .plx-num{font:900 min(44vw,520px)/1 Nunito,sans-serif;color:transparent;letter-spacing:-.04em;
   -webkit-text-stroke:2px rgba(223,246,255,.16)}
 .plx-line{font:900 clamp(26px,4.4vw,56px)/1.14 Nunito,sans-serif;text-align:center;max-width:16ch;margin:0}
-.plx-ridge{align-items:flex-end !important;inset:auto 0 -12% 0 !important;height:56vh}
-.plx-ridge svg{width:100%;height:100%;display:block;filter:drop-shadow(0 -18px 40px rgba(0,0,0,.8))}
+.plx-ridge{inset:auto 0 -14% 0 !important;height:52vh;
+  background:linear-gradient(180deg,transparent,rgba(0,0,0,.75) 34%,#000 72%)}
 .plx-fade{position:absolute;left:0;right:0;bottom:0;height:22vh;
   background:linear-gradient(180deg,transparent,rgba(0,0,0,.92));z-index:5}
 .plx-line{text-shadow:0 6px 40px rgba(0,0,0,.7)}
@@ -273,12 +273,7 @@ footer a{display:block;padding:3px 0}
     <div class="plx-layer plx-glow" data-speed="8"></div>
     <div class="plx-layer" data-speed="26" data-scale="0.12"><div class="plx-num">101</div></div>
     <div class="plx-layer" data-speed="62"><p class="plx-line">Только практика.<br>Ноль теории.</p></div>
-    <div class="plx-layer plx-ridge" data-speed="-18">
-      <svg viewBox="0 0 1440 420" preserveAspectRatio="none" aria-hidden="true">
-        <path d="M0 420V236l86-38 74 26 96-58 92 34 78-52 104 44 86-70 96 58 78-30 92 52 84-40 88 46 76-24 110 62v194z" fill="#04080b"/>
-        <path d="M0 420V300l120-42 96 34 110-56 94 46 96-38 118 60 92-48 104 52 86-30 92 44 96-26 116 54 120-38v210z" fill="#010304"/>
-      </svg>
-    </div>
+    <div class="plx-layer plx-ridge" data-speed="-18"></div>
     <div class="plx-fade"></div>
   </div>
 </section>
@@ -608,6 +603,31 @@ footer a{display:block;padding:3px 0}
 })();
 </script>
 <script>
+/* Hero parallax: the two morph lines and the buttons leave at different speeds, so the first
+   screen gains depth as you scroll instead of sliding away as one flat sheet. */
+(function(){
+  var l1=document.getElementById('liq1'), l2=document.getElementById('liq2'),
+      acts=document.querySelector('.acts'), hint=document.querySelector('.scrollhint');
+  if(!l1||!l2) return;
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var ticking=false;
+  function paint(){
+    ticking=false;
+    var y=window.pageYOffset||0, h=innerHeight||1;
+    if(y>h*1.4) return;                       /* off screen: stop paying for it */
+    var f=Math.min(1,y/h);
+    l1.style.transform='translateY('+(y*0.42).toFixed(1)+'px)';
+    l1.style.opacity=(1-f*1.15).toFixed(3);
+    l2.style.transform='translateY('+(y*0.24).toFixed(1)+'px)';
+    l2.style.opacity=(1-f*0.9).toFixed(3);
+    if(acts){ acts.style.transform='translateY('+(-y*0.16).toFixed(1)+'px)';
+              acts.style.opacity=(1-f*1.5).toFixed(3); }
+    if(hint) hint.style.opacity=(1-f*2.4).toFixed(3);
+  }
+  addEventListener('scroll',function(){ if(!ticking){ticking=true;requestAnimationFrame(paint);} },{passive:true});
+  paint();
+})();
+
 /* Parallax divider: the same layer speeds as the GSAP original, scrubbed by scroll position
    and eased per layer so the stack drifts apart instead of snapping. */
 (function(){
