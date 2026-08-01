@@ -586,7 +586,12 @@ footer a{display:block;padding:3px 0}
     var sz=app.three&&app.three.size, t=app.tubes&&app.tubes.target;
     if(sz&&t&&sz.wWidth){
       var box=stage.getBoundingClientRect();
-      shove(box.width/2+t.x*(sz.width/sz.wWidth), box.height/2-t.y*(sz.height/sz.wHeight), box);
+      var px=box.width/2+t.x*(sz.width/sz.wWidth), py=box.height/2-t.y*(sz.height/sz.wHeight);
+      shove(px,py,box);
+      window.__hero={shoves:(window.__hero?window.__hero.shoves:0)+1,head:[Math.round(px),Math.round(py)],
+                     world:[+t.x.toFixed(1),+t.y.toFixed(1)],size:[sz.width,sz.wWidth]};
+    } else {
+      window.__hero={shoves:0,why:{size:!!sz,target:!!t,wWidth:sz&&sz.wWidth}};
     }
     var p=hue/360*ICE.length+p0;
     try{
