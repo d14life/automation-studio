@@ -610,9 +610,9 @@ footer a{display:block;padding:3px 0}
       acts=document.querySelector('.acts'), hint=document.querySelector('.scrollhint');
   if(!l1||!l2) return;
   if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  var ticking=false;
+  /* written straight from the scroll handler: it only writes styles, never reads layout, and
+     the browser already fires scroll at most once a frame. No animation-frame queue to miss. */
   function paint(){
-    ticking=false;
     var y=window.pageYOffset||0, h=innerHeight||1;
     if(y>h*1.4) return;                       /* off screen: stop paying for it */
     var f=Math.min(1,y/h);
@@ -624,7 +624,8 @@ footer a{display:block;padding:3px 0}
               acts.style.opacity=(1-f*1.5).toFixed(3); }
     if(hint) hint.style.opacity=(1-f*2.4).toFixed(3);
   }
-  addEventListener('scroll',function(){ if(!ticking){ticking=true;requestAnimationFrame(paint);} },{passive:true});
+  addEventListener('scroll',paint,{passive:true});
+  addEventListener('resize',paint,{passive:true});
   paint();
 })();
 
