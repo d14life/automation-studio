@@ -39,7 +39,11 @@ header{position:absolute;top:0;left:0;right:0;z-index:20}
 #stage{position:relative;height:260vh;background:transparent}
 .stagesticky{position:sticky;top:0;height:100svh;overflow:hidden}
 /* same as the bench: the tubes own the whole stage and screen-blend over the starfield */
-.stagesticky canvas.tubes{position:absolute;inset:0;z-index:2;mix-blend-mode:screen;pointer-events:none}
+/* The tubes canvas is fixed at the root, next to the starfield, NOT inside the sticky screen.
+   position:sticky creates its own stacking context, and screen blending only reaches the
+   backdrop inside that context: the tube canvas was painting opaque black straight over the
+   stars, which is why they vanished the moment the 3D scene finished loading. */
+canvas.tubes{position:fixed;inset:0;z-index:1;mix-blend-mode:screen;pointer-events:none}
 .stageui{position:relative;z-index:5;height:100%;display:flex;flex-direction:column;
   align-items:center;justify-content:center;text-align:center;gap:14px;padding:96px 24px 64px}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
@@ -582,7 +586,7 @@ footer a{display:block;padding:3px 0}
   window.addEventListener('pointermove',function(e){e.stopPropagation();},true);
 
   var cv=document.createElement('canvas'); cv.className='tubes';
-  document.querySelector('.stagesticky').appendChild(cv);
+  document.body.appendChild(cv);
   var k=GLOW.l/0.64, sp=ICE.length*0.12, p0=ICE.length*0.10, app=null;
   function tubeSet(p){
     return [dim(paletteAt(ICE,p),k),dim(paletteAt(ICE,p+sp),k),dim(paletteAt(ICE,p+sp*2),k)];
@@ -633,8 +637,10 @@ footer a{display:block;padding:3px 0}
     if(hint) hint.style.opacity=(1-f*3.2).toFixed(3);
     /* the ribbons sit behind the words, so they travel slower: that difference is the depth */
     if(!tubes) tubes=document.querySelector('canvas.tubes');
-    if(tubes){ tubes.style.transform='translateY('+(f*150).toFixed(1)+'px)';
-               tubes.style.opacity=(1-f*1.0).toFixed(3); }
+    if(tubes){ var op=Math.max(0,1-f*1.0);
+               tubes.style.transform='translateY('+(f*150).toFixed(1)+'px)';
+               tubes.style.opacity=op.toFixed(3);
+               tubes.style.visibility=op<0.02?'hidden':'visible'; }
   }
   addEventListener('scroll',paint,{passive:true});
   addEventListener('resize',paint,{passive:true});
