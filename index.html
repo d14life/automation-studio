@@ -73,6 +73,69 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
 .stat b{display:block;font:900 30px/1 Nunito,sans-serif;color:var(--ice1)}
 .stat span{display:block;color:var(--dim);font-size:14px;margin-top:6px}
 
+.claim{color:var(--ink);font-size:clamp(17px,2vw,21px);font-weight:700;margin:0 0 22px;max-width:34ch}
+.does{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.does li{padding:14px 0;border-top:1px solid var(--line)}
+.does li:last-child{border-bottom:1px solid var(--line)}
+.does b{display:block;font-weight:700;font-size:16px}
+.does span{display:block;color:var(--dim);font-size:14.5px;margin-top:3px}
+
+/* ---------- section: services ---------- */
+.srv{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));margin-top:34px}
+.card{border:1px solid var(--line);border-radius:18px;padding:24px 24px 26px;background:rgba(127,216,255,.03)}
+.card h3{margin:0 0 10px;font:900 18.5px/1.25 Nunito,sans-serif}
+.card p{margin:0;color:var(--dim);font-size:14.5px}
+.card .gain{display:block;margin-top:14px;padding-top:12px;border-top:1px solid var(--line);
+  color:var(--ice2);font-size:14px;font-weight:700}
+
+/* ---------- section: how ---------- */
+.steps{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));margin-top:34px;counter-reset:s}
+.step{border-radius:18px;padding:22px 22px 24px;background:rgba(255,255,255,.02);border:1px solid var(--line)}
+.step:before{counter-increment:s;content:counter(s);display:block;font:900 26px/1 Nunito,sans-serif;
+  color:var(--ice2);margin-bottom:10px}
+.step b{display:block;font-size:16.5px;margin-bottom:6px}
+.step span{color:var(--dim);font-size:14.5px}
+
+/* ---------- parallax divider ---------- */
+.plx{position:relative;height:210vh;background:#000;z-index:6}
+.plx-sticky{position:sticky;top:0;height:100vh;overflow:hidden}
+.plx-layer{position:absolute;inset:-20% 0;display:flex;align-items:center;justify-content:center;will-change:transform}
+.plx-glow{background:radial-gradient(46% 34% at 50% 46%,rgba(127,216,255,.20),transparent 70%),
+  radial-gradient(30% 24% at 68% 60%,rgba(142,123,232,.16),transparent 70%)}
+.plx-num{font:900 min(44vw,520px)/1 Nunito,sans-serif;color:transparent;letter-spacing:-.04em;
+  -webkit-text-stroke:2px rgba(223,246,255,.16)}
+.plx-line{font:900 clamp(26px,4.4vw,56px)/1.14 Nunito,sans-serif;text-align:center;max-width:16ch;margin:0}
+.plx-fade{position:absolute;left:0;right:0;bottom:0;height:26vh;
+  background:linear-gradient(180deg,transparent,#000);z-index:5}
+
+/* ---------- section: request ---------- */
+.req{display:grid;gap:34px;grid-template-columns:minmax(300px,1fr) minmax(300px,1fr);
+  align-items:start;margin-top:32px}
+@media (max-width:860px){.req{grid-template-columns:1fr}}
+.form{border-radius:20px;padding:26px;background:rgba(127,216,255,.04);border:1px solid var(--line)}
+.form label{display:block;font-size:13px;color:var(--dim);margin:14px 0 6px}
+.form label:first-of-type{margin-top:0}
+.form input,.form textarea{width:100%;background:#05090c;border:1px solid var(--line);border-radius:12px;
+  color:var(--ink);padding:12px 14px;font:15px/1.4 Nunito,sans-serif}
+.form textarea{min-height:104px;resize:vertical}
+.form input:focus,.form textarea:focus{outline:none;border-color:var(--ice2)}
+.form button{margin-top:18px;width:100%;border:0;border-radius:99px;padding:14px 22px;cursor:pointer;
+  background:var(--ice2);color:#04121b;font:900 15.5px Nunito,sans-serif;transition:transform .16s ease,background .18s ease}
+@media (hover:hover){.form button:hover{background:var(--ice1)}}
+.form button:active{transform:scale(.97)}
+.formnote{color:var(--dim);font-size:13px;margin:12px 0 0}
+.ways{display:grid;gap:10px;margin-top:20px}
+.way{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:14px;
+  padding:14px 16px;text-decoration:none;color:var(--ink);font-weight:700;font-size:15px;
+  transition:border-color .18s ease,background .18s ease}
+@media (hover:hover){.way:hover{border-color:var(--ice2);background:rgba(127,216,255,.05)}}
+.way small{margin-left:auto;color:var(--dim);font-weight:400;font-size:13px}
+
+/* reveal on scroll: each section arrives instead of being simply there */
+.rise{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
+.rise.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.rise{opacity:1;transform:none;transition:none}}
+
 /* border beam: comet ring on containers, ported to vanilla from the shadcn panel */
 .beam{position:relative;isolation:isolate}
 .beam .beam-ring,.beam .beam-glow{position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;
@@ -110,10 +173,9 @@ footer a{display:block;padding:3px 0}
 <section id="stage">
   <div class="stageui">
     <div id="liquid"></div>
-    <h1>Рабочий инструмент за дни, <em>а не за месяцы</em></h1>
-    <p class="lede">Расскажите, какая рутина съедает время. Мы соберём работающую первую версию,
-      вы проверите её на своих счетах, заказах и таблицах. Не помогло - не платите.
-      Предоплаты нет, риск на нас.</p>
+    <h1>Автоматизируем бизнес-процессы. <em>Быстро не значит плохо</em></h1>
+    <p class="lede">Отдаём готовый работающий инструмент, а не теорию и не часы консультаций.
+      Вы проверяете его на своих счетах, заказах и таблицах. Не помогло - не платите.</p>
     <div class="acts">
       <a class="btn btn-fill" href="https://wa.me/447756115516" rel="noopener">Обсудить задачу</a>
       <a class="btn btn-line" href="demo/index.html" target="_blank" rel="noopener">Открыть живой продукт</a>
@@ -125,28 +187,28 @@ footer a{display:block;padding:3px 0}
 
 <section class="band" id="about"><div class="wrap">
   <p class="eyebrow">О нас</p>
-  <h2>Небольшая студия с производственной линией на ИИ</h2>
+  <h2>Только практика. Теории у нас нет</h2>
   <div class="about">
     <div>
-      <p>Solutions101 - это инженер с профильным образованием и четырьмя годами практики,
-        помноженный на серьёзную производственную линию из ИИ-агентов. Из-за этой связки
-        <strong>работающая первая версия появляется за дни, а не за месяцы</strong>.</p>
-      <p>Мы не продаём часы и не продаём обещания. Вы приносите рутину, которая съедает время,
-        мы отдаём работающий инструмент. Вы гоняете его на своих счетах, заказах и таблицах.
-        Не заработал своё место - не платите.</p>
-      <p>Отрасль значения не имеет. Работаем с любым бизнесом и любым отделом: продажи, финансы,
-        склад, логистика, поддержка, производство. Под каждую задачу разбираемся отдельно, готовых
-        коробок не навязываем.</p>
+      <p class="claim">Мы не учим и не консультируем. Мы отдаём программу, которая делает работу
+        вместо человека.</p>
+      <ul class="does">
+        <li><b>Никакой теории и обучения.</b><span>Отдаём программу, а не знания о том, как её сделать</span></li>
+        <li><b>Никаких часов и почасовой оплаты.</b><span>Цена за результат, а не за время в календаре</span></li>
+        <li><b>Никакой предоплаты.</b><span>Сначала работающая версия, потом деньги</span></li>
+        <li><b>Отрасль неважна.</b><span>Логистика, стройка, торговля, услуги, производство</span></li>
+      </ul>
     </div>
     <div class="stats">
       <div class="stat beam"><i class="beam-ring"></i><i class="beam-glow"></i>
-        <b>дни</b><span>до первой рабочей версии, а не кварталы</span></div>
+        <b>0 ₽</b><span>предоплата. Платите, только если инструмент помог</span></div>
       <div class="stat beam"><i class="beam-ring"></i><i class="beam-glow"></i>
-        <b>0 ₽</b><span>предоплата, всегда</span></div>
-      <div class="stat beam"><i class="beam-ring"></i><i class="beam-glow"></i>
-        <b>1 день</b><span>ушёл на бухгалтерию для строительной группы, её можно открыть выше</span></div>
+        <b>1 день</b><span>ушёл на учёт взаиморасчётов для строительной группы: 48 контрагентов,
+        3 юрлица, мультивалюта</span></div>
     </div>
   </div>
+  <!-- ждут данных от Damir: состав команды и образование, число сданных проектов и клиентов -->
+
 </div></section>
 
 <footer><div class="wrap">
