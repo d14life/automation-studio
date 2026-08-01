@@ -159,7 +159,7 @@ function LiquidText(host, texts, o) {
   /* the three stops sit a THIRD of the palette apart. Neighbouring entries were too close in
      hue and the line read as one solid colour; a third of the wheel apart is unmistakably
      three colours, while still being three and not the whole spectrum. */
-  var spread       = o.spread!= null ? o.spread: (colors ? colors.length/3 : 1);
+  var spread       = o.spread!= null ? o.spread: (colors ? colors.length*0.09 : 1);
   if (!texts || texts.length < 2) throw new Error('LiquidText: need 2+ texts');
 
   if (!document.getElementById('lt-threshold-svg')){

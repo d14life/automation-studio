@@ -82,6 +82,7 @@ body{margin:0;background:#000;color:#EDF2EC;font:15px/1.55 system-ui,-apple-syst
   <div id="stageui">
     <div id="liquid"></div>
     <p class="sub">Цвет текста и трубок меняется сам. Мышь только водит трубки.</p>
+    <p class="sub" id="tubereadout" style="font:12px/1 ui-monospace,monospace;opacity:.55">трубки: ждут запуска</p>
   </div>
 </section>
 
@@ -234,7 +235,7 @@ function LiquidText(host, texts, o) {
   /* the three stops sit a THIRD of the palette apart. Neighbouring entries were too close in
      hue and the line read as one solid colour; a third of the wheel apart is unmistakably
      three colours, while still being three and not the whole spectrum. */
-  var spread       = o.spread!= null ? o.spread: (colors ? colors.length/3 : 1);
+  var spread       = o.spread!= null ? o.spread: (colors ? colors.length*0.09 : 1);
   if (!texts || texts.length < 2) throw new Error('LiquidText: need 2+ texts');
 
   if (!document.getElementById('lt-threshold-svg')){
@@ -382,16 +383,23 @@ function hslHex(h,s,l){
      is not free. */
   var tubesRaf=0, tubeHue=0, tubeLast=0, tubePaints=0;
   var GLOW={dim:{l:.24,i:45},mid:{l:.34,i:90},bright:{l:.52,i:190}}, glow=GLOW.mid;
+  /* The three tubes sit inside a 70 degree arc rather than spread evenly round the wheel.
+     Evenly spread, the SET always looked the same - one warm, one green, one blue at every
+     rotation - so the drift was invisible even though it was running. A narrow arc gives the
+     scene a dominant colour that visibly travels warm -> green -> blue. */
   function paintTubes(){
     if(!tubesApp||!tubesApp.tubes) return;
+    var l=glow.l;
     try{
-      var l=glow.l;
-      tubesApp.tubes.setColors([hslHex(tubeHue,.8,l),hslHex(tubeHue+120,.8,l),hslHex(tubeHue+240,.8,l)]);
-      tubesApp.tubes.setLightsColors([hslHex(tubeHue+60,.8,l+.02),hslHex(tubeHue+150,.8,l+.02),
-                                      hslHex(tubeHue+240,.8,l+.02),hslHex(tubeHue+330,.8,l+.02)]);
-      if (tubesApp.tubes.setLightsIntensity) tubesApp.tubes.setLightsIntensity(glow.i);
+      tubesApp.tubes.setColors([hslHex(tubeHue,.8,l),hslHex(tubeHue+35,.8,l),hslHex(tubeHue+70,.8,l)]);
+      tubesApp.tubes.setLightsColors([hslHex(tubeHue+10,.8,l+.02),hslHex(tubeHue+30,.8,l+.02),
+                                      hslHex(tubeHue+50,.8,l+.02),hslHex(tubeHue+70,.8,l+.02)]);
       tubePaints++;
-    }catch(e){ cancelAnimationFrame(tubesRaf); tubesRaf=0; console.warn('tube colours:',e); }
+    }catch(e){ if(!paintTubes.warned){paintTubes.warned=1;console.warn('tube colours:',e);} }
+    /* separate guard: a missing or unhappy intensity setter must not stop the recolouring */
+    try{ if (tubesApp.tubes.setLightsIntensity) tubesApp.tubes.setLightsIntensity(glow.i); }catch(e){}
+    var r=document.getElementById('tubereadout');
+    if(r) r.textContent='трубки: тон '+Math.round(tubeHue)+'°, перекрасок '+tubePaints;
   }
   function cycleTubes(now){
     tubesRaf=requestAnimationFrame(cycleTubes);
@@ -411,9 +419,9 @@ function hslHex(h,s,l){
     tubesCv=document.createElement('canvas'); tubesCv.className='tubes';
     stage.appendChild(tubesCv);
     tubesCancel=TubesCursorInit(tubesCv,{tubes:{
-      colors:[hslHex(0,.8,glow.l),hslHex(120,.8,glow.l),hslHex(240,.8,glow.l)],
-      lights:{intensity:glow.i,colors:[hslHex(60,.8,glow.l+.02),hslHex(150,.8,glow.l+.02),
-                                       hslHex(240,.8,glow.l+.02),hslHex(330,.8,glow.l+.02)]}}},
+      colors:[hslHex(0,.8,glow.l),hslHex(35,.8,glow.l),hslHex(70,.8,glow.l)],
+      lights:{intensity:glow.i,colors:[hslHex(10,.8,glow.l+.02),hslHex(30,.8,glow.l+.02),
+                                       hslHex(50,.8,glow.l+.02),hslHex(70,.8,glow.l+.02)]}}},
       function(app){tubesApp=app;});
     tubeLast=performance.now();
     tubesRaf=requestAnimationFrame(cycleTubes);
