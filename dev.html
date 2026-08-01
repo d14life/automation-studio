@@ -50,7 +50,8 @@ body{margin:0;background:#000;color:#EDF2EC;font:15px/1.55 system-ui,-apple-syst
   <button id="b-liquid" class="on">3 · liquid text</button>
   <button id="b-plx" class="on">4 · parallax</button>
   <b style="margin-left:14px">цвет</b>
-  <button id="g-fire" class="on">жёлтый → красный</button>
+  <button id="g-all" class="on">все цвета</button>
+  <button id="g-fire">жёлтый → красный</button>
   <button id="g-spectrum">радуга</button>
   <button id="g-neon">неон</button>
   <button id="g-green">зелёный</button>
@@ -344,7 +345,15 @@ function tubesRandomColors(count){
     for(var i=0;i<=n;i++) out.push(cs[i%cs.length]+' '+(i*100/n).toFixed(3)+'%');
     return 'linear-gradient(90deg,'+out.join(',')+')';
   }
+  /* every hue, evenly spaced round the wheel: the text runs through the whole spectrum
+     instead of one family. Fixed saturation and lightness keep every hue readable on black. */
+  function hueWheel(n){
+    var out=[];
+    for(var i=0;i<n;i++) out.push('hsl('+Math.round(i*360/n)+',92%,64%)');
+    return out;
+  }
   var GRADS={
+    all:     flowGrad(hueWheel(12)),
     fire:    flowGrad(['#FFE066','#FFB020','#FF6A1F','#F02D3A','#C81E5A','#FF6A1F']),
     spectrum:flowGrad(['#FFE066','#4CC28F','#39C6E8','#7B6CF6','#F45DBE','#FF6A1F']),
     neon:    flowGrad(['#00F5D4','#00BBF9','#9B5DE5','#F15BB5','#FEE440']),
@@ -353,7 +362,7 @@ function tubesRandomColors(count){
     none:null
   };
   var FONTS={nunito:['Nunito',900],comfortaa:['Comfortaa',700],rubik:['Rubik',800],system:['system-ui',700]};
-  var flowKey='fire', fontKey='nunito', flowSec=5;
+  var flowKey='all', fontKey='nunito', flowSec=5;
   function liquid(on){
     var host=document.getElementById('liquid');
     if(stopLiquid){stopLiquid();stopLiquid=null;}
@@ -416,7 +425,7 @@ function tubesRandomColors(count){
       });
     });
   }
-  radio([['g-fire','fire'],['g-spectrum','spectrum'],['g-neon','neon'],['g-green','green'],
+  radio([['g-all','all'],['g-fire','fire'],['g-spectrum','spectrum'],['g-neon','neon'],['g-green','green'],
          ['g-ice','ice'],['g-none','none']], function(v){flowKey=v;});
   radio([['f-nunito','nunito'],['f-comfortaa','comfortaa'],['f-rubik','rubik'],['f-system','system']],
         function(v){fontKey=v;});
