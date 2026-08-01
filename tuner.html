@@ -18,12 +18,27 @@ textarea{min-height:84px;resize:vertical}
 .colors input[type=color]{width:100%;height:34px;border:1px solid #2A342E;border-radius:7px;background:none;padding:2px;cursor:pointer}
 button{width:100%;background:#2AA173;color:#F4F6F0;border:none;border-radius:9px;padding:12px;font:700 14px system-ui;cursor:pointer;margin-top:8px}
 button.ghost{background:transparent;border:1px solid #2A342E;color:#9FAAA1}
+.prow{display:flex;gap:6px}
+.prow button{margin-top:4px;padding:9px 6px;font-size:12px}
+.prow button:hover{border-color:#4CC28F;color:#4CC28F}
 #cfgout{font-family:ui-monospace,monospace;font-size:11.5px;min-height:120px}
 .ok{color:#4CC28F;font-size:12.5px;height:16px;margin-top:4px}
 @media (max-width:900px){body{grid-template-columns:1fr}#panel{border-left:0;border-top:1px solid #2A342E}}
 </style>
 <div id="stage"><div id="morphhost"></div></div>
 <div id="panel">
+    <h2>Presets · Space</h2>
+  <div class="prow">
+    <button class="ghost pre" data-pre="space1">Глубокий космос</button>
+    <button class="ghost pre" data-pre="space2">Гиперпрыжок</button>
+    <button class="ghost pre" data-pre="space3">Неон-туннель</button>
+  </div>
+  <h2>Presets · Morph</h2>
+  <div class="prow">
+    <button class="ghost pre" data-pre="morph1">Слоган</button>
+    <button class="ghost pre" data-pre="morph2">Жидкое серебро</button>
+    <button class="ghost pre" data-pre="morph3">Продукты</button>
+  </div>
   <h2>Space</h2>
   <label>mode</label>
   <select id="bgmode"><option value="tubes">tubes (турбо-трубки)</option><option value="warp">warp starfield</option><option value="both">both</option><option value="none">none</option></select>
@@ -346,6 +361,24 @@ function MorphingText(host, words, opts) {
   });
   document.getElementById('reset').addEventListener('click',function(){
     cfg=JSON.parse(JSON.stringify(DEF));localStorage.removeItem('herocfg2');location.reload();});
+
+  var PRESETS={
+    space1:{bg:'warp',qty:1200,spd:0.45,fol:0.6},
+    space2:{bg:'warp',qty:700,spd:1.4,fol:1},
+    space3:{bg:'both',qty:500,spd:0.5,fol:0.8,tubes:['#2AA173','#4CC28F','#1E7A55'],lights:['#4CC28F','#5C82C9','#9FE8C6','#2AA173'],intensity:260},
+    morph1:{words:['IMAGINATION','IS YOUR','ONLY LIMIT'],mt:1.4,ct:1.1,fs:56,grad:'linear-gradient(90deg,#4CC28F,#9FE8C6 30%,#5C82C9 60%,#4CC28F)'},
+    morph2:{words:['IMAGINATION','IS YOUR','ONLY LIMIT'],mt:2.2,ct:0.7,fs:64,grad:'linear-gradient(90deg,#F4F6F0,#9FAAA1 50%,#F4F6F0)'},
+    morph3:{words:['PARSERS','CRM','AI BOTS','DASHBOARDS','AUTOMATION'],mt:0.9,ct:0.6,fs:48,grad:'linear-gradient(90deg,#5eead4,#38bdf8 25%,#818cf8 50%,#c084fc 75%,#5eead4)'}
+  };
+  Array.prototype.forEach.call(document.querySelectorAll('.pre'),function(b){
+    b.addEventListener('click',function(){
+      var p=PRESETS[b.getAttribute('data-pre')];
+      Object.keys(p).forEach(function(k){cfg[k]=JSON.parse(JSON.stringify(p[k]));});
+      try{localStorage.setItem('herocfg2',JSON.stringify(cfg));}catch(e){}
+      location.reload();
+    });
+  });
+
   applyBg();applyMorph();save();
 })();
 </script>
