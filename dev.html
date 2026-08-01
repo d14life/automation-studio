@@ -75,6 +75,7 @@ body{margin:0;background:#000;color:#EDF2EC;font:15px/1.55 system-ui,-apple-syst
   <b style="margin-left:14px">яркость трубок</b>
   <button id="y-dim">тускло</button>
   <button id="y-mid" class="on">средне</button>
+  <button id="y-plus">ярче</button>
   <button id="y-bright">ярко</button>
 </div>
 
@@ -390,7 +391,7 @@ function hslHex(h,s,l){
      ~16 fps instead of every frame: the eye reads it as continuous and the material swap
      is not free. */
   var tubesRaf=0, tubeHue=0, tubeLast=0, tubePaints=0;
-  var GLOW={dim:{l:.24,i:45},mid:{l:.34,i:90},bright:{l:.52,i:190}}, glow=GLOW.mid;
+  var GLOW={dim:{l:.24,i:45},mid:{l:.34,i:90},plus:{l:.43,i:135},bright:{l:.52,i:190}}, glow=GLOW.mid;
   /* The three tubes sit inside a 70 degree arc rather than spread evenly round the wheel.
      Evenly spread, the SET always looked the same - one warm, one green, one blue at every
      rotation - so the drift was invisible even though it was running. A narrow arc gives the
@@ -546,7 +547,8 @@ function hslHex(h,s,l){
         function(v){fontKey=v;});
   radio([['s-slow',12],['s-mid',7],['s-fast',3.5]], function(v){flowSec=v;});
   radio([['d-soft',0.05],['d-mid',0.08],['d-wide',0.15]], function(v){spreadFrac=v;});
-  radio([['y-dim','dim'],['y-mid','mid'],['y-bright','bright']], function(v){glow=GLOW[v];paintTubes();});
+  radio([['y-dim','dim'],['y-mid','mid'],['y-plus','plus'],['y-bright','bright']],
+        function(v){glow=GLOW[v];paintTubes();});
   window.__dev={state:state,apply:apply,grads:GRADS,
     setFlow:function(k){flowKey=k;liquid(true);},setFont:function(k){fontKey=k;liquid(true);},
     /* diagnostics: proves whether the tube loop is actually running and repainting */
