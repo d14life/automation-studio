@@ -31,13 +31,16 @@ header{position:absolute;top:0;left:0;right:0;z-index:20}
 
 /* ---------- hero stage ---------- */
 #stage{position:relative;min-height:100svh;overflow:hidden;background:#000}
-/* the tubes sit in the lower band of the hero, under the text rather than behind it:
-   bright ribbons crossing the letters made the slogan hard to read */
-#stage canvas.tubes{position:absolute;left:0;right:0;bottom:0;height:46%;z-index:2;
-  mix-blend-mode:screen;pointer-events:none}
-@media (max-width:700px){#stage canvas.tubes{height:38%}}
+/* the tubes live in a band along the bottom of the hero, under the text rather than behind
+   it: bright ribbons crossing the letters made the slogan hard to read. The band is a wrapper
+   because the library writes its own pixel width and height onto the canvas, which would
+   override any size set here. */
+.tubeband{position:absolute;left:0;right:0;bottom:0;height:42%;z-index:2;overflow:hidden;
+  pointer-events:none}
+.tubeband canvas{display:block;width:100%;height:100%;mix-blend-mode:screen}
+@media (max-width:700px){.tubeband{height:34%}}
 .stageui{position:relative;z-index:5;min-height:100svh;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;text-align:center;padding:96px 24px 44vh}
+  align-items:center;justify-content:center;text-align:center;padding:92px 24px 46vh}
 #liquid{position:relative;height:4.4rem;width:100%;max-width:900px;margin:0 auto 4px;
   font:900 27pt/1 Nunito,system-ui,sans-serif}
 @media (min-width:1024px){#liquid{font-size:3.9rem;height:5.6rem}}
@@ -122,7 +125,8 @@ footer a{display:block;padding:3px 0}
      the capture phase leaves the tubes drifting on their own, which is what we picked */
   window.addEventListener('pointermove',function(e){e.stopPropagation();},true);
 
-  var cv=document.createElement('canvas'); cv.className='tubes'; stage.appendChild(cv);
+  var band=document.createElement('div'); band.className='tubeband'; stage.appendChild(band);
+  var cv=document.createElement('canvas'); cv.className='tubes'; band.appendChild(cv);
   var k=GLOW.l/0.64, sp=ICE.length*0.12, p0=ICE.length*0.10, app=null;
   function tubeSet(p){
     return [dim(paletteAt(ICE,p),k),dim(paletteAt(ICE,p+sp),k),dim(paletteAt(ICE,p+sp*2),k)];
