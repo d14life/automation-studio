@@ -64,10 +64,11 @@ header{border-bottom:1px solid var(--rule)}
 
 /* ---------- section nav ---------- */
 .secnav{position:sticky;top:0;z-index:20;background:var(--paper);border-bottom:1px solid var(--rule)}
+.secnav .wrap{max-width:1560px}
 .progressline{position:absolute;left:0;bottom:-1px;height:2px;width:100%;background:var(--green);
   transform:scaleX(0);transform-origin:0 50%;transition:transform 120ms linear}
 .secnav-in{display:flex;gap:8px;align-items:center;padding-top:8px;padding-bottom:8px}
-.navlinks{display:flex;gap:2px;flex:1 1 auto;overflow-x:auto;scrollbar-width:none;min-width:0}
+.navlinks{display:flex;gap:2px;flex:1 1 auto;overflow-x:auto;scrollbar-width:none;min-width:0;padding-bottom:1px}
 .navlinks::-webkit-scrollbar{display:none}
 .secnav-in{flex-wrap:nowrap;gap:10px}
 .secnav .tools{flex:0 0 auto;gap:8px}
@@ -553,7 +554,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
       </div>
       <div class="body">
         <h3>面向建筑公司</h3>
-        <p>施工队用手机完成到场签到与日报、按金额审批采购、设备在故障前保养，以及每个项目的预算与实际对比。组合自服务 <b class="mono">18 · 32 · 33 · 36 · 59</b>.</p>
+        <p>施工队用手机完成到场签到与日报、按金额审批采购、设备在故障前保养，以及每个项目的预算与实际对比。</p>
         <div class="kills"><b>消除</b><span>晚上挨个打电话，才能弄清今天工地上到底发生了什么。</span></div>
       </div>
     </article>
@@ -1135,7 +1136,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     </div>
     <div class="mrow" data-step><span class="grow">客户：18mm 板材有货吗，送到里昂运费多少？</span><span class="mono">21:14</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">机器人：有货， <b class="mono">€ 42,60</b> 每张。里昂配送 <b class="mono">€ 19</b>，2 天。</span><span class="chip g">价目表 v14</span></div>
-    <div class="mrow" data-step><span class="dot g"></span><span class="grow">机器人：当天可裁切，最多 <b class="mono">12</b> 张， <b class="mono">€ 3,40</b> 每刀。</span><span class="chip g">服务清单</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">张， <b class="mono">€ 3,40</b> 每刀。</span><span class="chip g">服务清单</span></div>
     <div class="mrow" data-step><span class="dot a"></span><span class="grow">账期问题需要人工处理。已转交 Elena，时间 <span class="mono">21:16</span> 并附完整会话记录。</span><span class="chip a">转人工</span></div>
     <div class="bigstat mono" style="margin-top:8px">
       <div data-step><b data-count="71">0</b><span>% 无需人工即可解答</span></div>
@@ -1246,9 +1247,9 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mtitle"><span>招聘岗位 · 仓库主管</span><button class="runbtn" type="button">▶ 对候选人排序</button></div>
     <div class="minicols">
       <div class="caselist">
-        <div class="caseitem active" data-step><b class="mono">94</b>A. Marchetti · 6 年经验，WMS，叉车</div>
-        <div class="caseitem" data-step><b class="mono">78</b>J. Okafor · 4 年，班组长</div>
-        <div class="caseitem" data-step><b class="mono">51</b>P. Novak · 能力强，行业不对口</div>
+        <div class="caseitem active" data-step>A. Marchetti · 6 年经验，WMS，叉车</div>
+        <div class="caseitem" data-step>J. Okafor · 4 年，班组长</div>
+        <div class="caseitem" data-step>P. Novak · 能力强，行业不对口</div>
       </div>
       <div class="casemain">
         <div class="mrow" data-step><span class="grow">简历已解析并与岗位要求匹配</span><span class="mono"><span data-count="184">0</span></span></div>
@@ -1279,7 +1280,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mrow mono" data-step><span class="grow">SKU 2210 可支撑</span><div class="bar"><i data-w="11"></i></div><span data-count="9">0</span></div>
     <div class="mrow mono" data-step><span class="grow">SKU 3105 可售天数</span><div class="bar"><i data-w="47"></i></div><span data-count="38">0</span></div>
     <div class="mrow mono" data-step><span class="grow">SKU 4188 可售天数</span><div class="bar"><i data-w="96"></i></div><span data-count="97">0</span></div>
-    <div class="mrow" data-step><span class="dot r"></span><span class="grow"><b>SKU 2210</b> · 9 天后缺货，建议订货 <b class="mono">640</b> 件现存</span><span class="chip r">紧急</span></div>
+    <div class="mrow" data-step><span class="dot r"></span><span class="grow"><b>SKU 2210</b>件现存</span><span class="chip r">紧急</span></div>
     <div class="mrow" data-step><span class="dot a"></span><span class="grow"><b>SKU 4188</b> · 可支撑 14 周，暂停采购</span><span class="chip a">库存过剩</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">已为 Lehmann Handel 起草采购订单</span><span class="chip g">已批准</span></div>
     
@@ -1315,7 +1316,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <div class="caseitem" data-step><b class="mono">CAM 22</b>场区大门 · 托盘标签</div>
       </div>
       <div class="casemain">
-        <div class="mrow" data-step><span class="dot g"></span><span class="grow">由照片盘点库存： <b class="mono">312</b> 件在架</span><span class="chip g">与系统一致</span></div>
+        <div class="mrow" data-step><span class="dot g"></span><span class="grow">件在架</span><span class="chip g">与系统一致</span></div>
         <div class="mrow" data-step><span class="dot r"></span><span class="grow">陈列违规，14 号门店：您的货位上出现竞品</span><span class="chip r">已标记</span></div>
         <div class="mrow" data-step><span class="dot a"></span><span class="grow">产线：3 件边缘缺陷，序列号 <span class="mono">MX-70412</span> 已识别</span><span class="chip a">已撤下</span></div>
         <div class="mrow" data-step><span class="dot g"></span><span class="grow">报告已发送给现场经理，时间 <span class="mono">09:41</span></span><span class="chip g">已完成</span></div>
@@ -1925,7 +1926,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
       
         <div class="minicols">
       <div class="caselist">
-        <div class="caseitem active" data-step><b class="mono">42</b>项检查，每 15 分钟一次</div>
+        <div class="caseitem active" data-step>项检查，每 15 分钟一次</div>
         <div class="caseitem" data-step>毛利，SKU 2210</div>
         <div class="caseitem" data-step>沉默客户，Northgate</div>
       </div>

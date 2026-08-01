@@ -64,10 +64,11 @@ header{border-bottom:1px solid var(--rule)}
 
 /* ---------- section nav ---------- */
 .secnav{position:sticky;top:0;z-index:20;background:var(--paper);border-bottom:1px solid var(--rule)}
+.secnav .wrap{max-width:1560px}
 .progressline{position:absolute;left:0;bottom:-1px;height:2px;width:100%;background:var(--green);
   transform:scaleX(0);transform-origin:0 50%;transition:transform 120ms linear}
 .secnav-in{display:flex;gap:8px;align-items:center;padding-top:8px;padding-bottom:8px}
-.navlinks{display:flex;gap:2px;flex:1 1 auto;overflow-x:auto;scrollbar-width:none;min-width:0}
+.navlinks{display:flex;gap:2px;flex:1 1 auto;overflow-x:auto;scrollbar-width:none;min-width:0;padding-bottom:1px}
 .navlinks::-webkit-scrollbar{display:none}
 .secnav-in{flex-wrap:nowrap;gap:10px}
 .secnav .tools{flex:0 0 auto;gap:8px}
@@ -477,7 +478,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 </header>
 <nav class="secnav"><div class="progressline" id="progressline"></div><div class="wrap secnav-in">
 <input class="finder" id="finder" type="search" placeholder="Schreiben Sie, was Sie stört: Rechnungen, Dienstplan, Leads..." aria-label="Die 60 Leistungen durchsuchen">
-<a href="#s-ind">Branchen</a><a href="#s-data">Daten</a><a href="#s-fin">Finanzen</a><a href="#s-crm">Vertrieb</a><a href="#s-ai">KI</a><a href="#s-ops">Betrieb</a><a href="#s-web">Web</a><a href="#s-rep">Reporting</a><a href="#s-infra">Infra</a>
+<a href="#s-ind">Branchen</a><a href="#s-data">Daten</a><a href="#s-fin">Finanzen</a><a href="#s-crm">Vertrieb und CRM</a><a href="#s-ai">KI</a><a href="#s-ops">Betrieb</a><a href="#s-web">Web und Kunden</a><a href="#s-rep">Reporting</a><a href="#s-infra">Infrastruktur</a>
 <div class="tools"><button class="themebtn" type="button" id="themebtn" aria-label="Helles und dunkles Design wechseln" title="Helles und dunkles Design wechseln"><svg viewBox="0 0 24 24" aria-hidden="true"><g class="sun"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/></g><g class="moon"><path d="M20 14.2A8.4 8.4 0 0 1 9.8 4 8.4 8.4 0 1 0 20 14.2z"/></g></svg></button><select class="langsel" id="langsel" aria-label="Sprache"><option value="./">EN</option><option value="ru.html">RU</option><option value="de.html" selected>DE</option><option value="zh.html">ZH</option><option value="es.html">ES</option></select></div></div></nav>
 
 <div class="hero">
@@ -553,7 +554,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
       </div>
       <div class="body">
         <h3>Für Bauunternehmen</h3>
-        <p>Check-ins auf der Baustelle und Tagesberichte von den Handys der Kolonne, Einkaufsfreigaben nach Betrag, Gerätewartung vor dem Ausfall und Soll-Ist-Vergleich je Objekt. Zusammengesetzt aus den Leistungen <b class="mono">18 · 32 · 33 · 36 · 59</b>.</p>
+        <p>Check-ins auf der Baustelle und Tagesberichte von den Handys der Kolonne, Einkaufsfreigaben nach Betrag, Gerätewartung vor dem Ausfall und Soll-Ist-Vergleich je Objekt.</p>
         <div class="kills"><b>Beseitigt</b><span>die abendliche Telefonrunde, um herauszufinden, was heute auf der Baustelle wirklich passiert ist.</span></div>
       </div>
     </article>
@@ -866,13 +867,12 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Belegeingang</span><button class="runbtn" type="button">▶ Belege auslesen</button></div>
-        <div class="kanban">
+    <div class="filechips"><span class="fchip" data-eat>Foto: Tankstelle</span><span class="fchip" data-eat>Foto: Hotelrechnung</span><span class="fchip" data-eat>PDF-Rechnung</span></div>
+    <div class="kanban">
       <div class="kcol done" data-step><div class="khead"><span>Gelesen</span><b>✓</b></div><div class="ktask">Shell Ostende <span class="chip g">€ 84,10</span></div><div class="ktask">Hotel Ambra <span class="chip g">€ 213,00</span></div></div>
       <div class="kcol done" data-step><div class="khead"><span>Kontiert</span><b>✓</b></div><div class="ktask">Kraftstoff, 21% MwSt. <span class="chip g">ok</span></div><div class="ktask">Reise, 14. Mär <span class="chip g">ok</span></div></div>
       <div class="kcol" data-step><div class="khead"><span>Sichtprüfung</span><b>1</b></div><div class="ktask">unscharfe Summe <span class="chip a">prüfen</span></div></div>
     </div>
-    <div class="filechips"><span class="fchip" data-eat>Foto: Tankstelle</span><span class="fchip" data-eat>Foto: Hotelrechnung</span><span class="fchip" data-eat>PDF-Rechnung</span></div>
-    
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">3 Ausgaben dem März zugeordnet, Umsatzsteuer ausgewiesen</span><span class="chip g">erledigt</span></div>
     <div class="mrow" data-step><span class="grow">Letzten Monat von Hand erfasst <span class="mono">4 Std. 20 Min.</span></span><span class="chip g"><span class="mono">40 s</span></span></div>
   </div>
@@ -1093,18 +1093,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Treue und Partner</span><button class="runbtn" type="button">▶ Monat abschließen</button></div>
-    
-    <div class="mrow" data-step><span class="grow">Northgate Ltd · 3 Bestellungen im Juli</span><span class="mono">€ 18 940</span></div>
-    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Gold-Stufe erreicht bei <span class="mono">45 000</span> Punkte <span class="up">▲</span></span><span class="chip g">hochgestuft</span></div>
-    <div class="mrow" data-step><span class="dot a"></span><span class="grow">Partnerprovision zurückgehalten, Bankdaten fehlen</span><span class="chip a">prüfen</span></div>
-    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Empfehlungscode <span class="mono">ANNA 12</span> Anna Ruiz gutgeschrieben</span><span class="chip g">ausgezahlt</span></div>
-    <div class="bigstat mono" style="margin-top:8px">
-      <div data-step><b data-count="94500">0</b><span>Punkte im Juli vergeben</span></div>
-      <div data-step><b data-count="23">0</b><span>Partnerabrechnungen versendet</span></div>
-    </div>
-  </div>
-      
-        <div class="chartwrap solo" data-step>
+    <div class="chartwrap solo" data-step>
       <div class="clegend"><span class="c1"><i></i>Punkte vergeben</span></div>
       <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="Vergebene Punkte und Partnerumsätze steigen Monat für Monat, mit einem Sprung im Juli">
         <line x1="0" y1="28" x2="420" y2="28"></line>
@@ -1115,7 +1104,17 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <circle class="p1" cx="418" cy="16" r="3.5"></circle>
         
       </svg>
-    </div><div class="body">
+    </div>
+    <div class="mrow" data-step><span class="grow">Northgate Ltd · 3 Bestellungen im Juli</span><span class="mono">€ 18 940</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Gold-Stufe erreicht bei <span class="mono">45 000</span> Punkte <span class="up">▲</span></span><span class="chip g">hochgestuft</span></div>
+    <div class="mrow" data-step><span class="dot a"></span><span class="grow">Partnerprovision zurückgehalten, Bankdaten fehlen</span><span class="chip a">prüfen</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Empfehlungscode <span class="mono">ANNA 12</span> Anna Ruiz gutgeschrieben</span><span class="chip g">ausgezahlt</span></div>
+    <div class="bigstat mono" style="margin-top:8px">
+      <div data-step><b data-count="94500">0</b><span>Punkte im Juli vergeben</span></div>
+      <div data-step><b data-count="23">0</b><span>Partnerabrechnungen versendet</span></div>
+    </div>
+  </div>
+      <div class="body">
     <h3><span class="num mono">22</span>Nachverfolgung von Treue, Empfehlungen und Partnern</h3>
     <p>Punkte, Stufen, Empfehlungscodes und Partnerprovisionen werden eigenständig berechnet und ausgewiesen, Unklares wird zurückgehalten statt falsch ausgezahlt. Partner sehen dieselben Zahlen wie Sie.</p>
     <div class="kills"><b>Beseitigt</b><span>die Provisionstabelle, die nur eine Person im Unternehmen versteht.</span></div>
@@ -1135,7 +1134,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     </div>
     <div class="mrow" data-step><span class="grow">Kunde: Ist die 18-mm-Platte auf Lager und was kostet die Lieferung nach Lyon?</span><span class="mono">21:14</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Bot: auf Lager, <b class="mono">€ 42,60</b> pro Platte. Lieferung Lyon <b class="mono">€ 19</b>, 2 Tage.</span><span class="chip g">Preisliste v14</span></div>
-    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Bot: Zuschnitt am selben Tag bis <b class="mono">12</b> Platten, <b class="mono">€ 3,40</b> pro Zuschnitt.</span><span class="chip g">Serviceblatt</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Platten, <b class="mono">€ 3,40</b> pro Zuschnitt.</span><span class="chip g">Serviceblatt</span></div>
     <div class="mrow" data-step><span class="dot a"></span><span class="grow">Zahlungsziele brauchen einen Menschen. Weitergeleitet an Elena um <span class="mono">21:16</span> mit dem vollständigen Verlauf.</span><span class="chip a">Übergabe</span></div>
     <div class="bigstat mono" style="margin-top:8px">
       <div data-step><b data-count="71">0</b><span>% ohne Menschen beantwortet</span></div>
@@ -1218,7 +1217,6 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Katalogerstellung</span><button class="runbtn" type="button">▶ den Katalog schreiben</button></div>
-        <div class="doc" data-step><b>Eichen-Arbeitsplatte, 3m, 40mm</b><div class="dline"></div><div class="dline"></div><div class="dline short"></div></div>
     <div class="minicols">
       <div class="caselist">
         <div class="caseitem active" data-step><b class="mono">OW 3040</b>Eichenarbeitsplatte, 3m</div>
@@ -1226,7 +1224,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <div class="caseitem" data-step><b class="mono">SK 2210</b>Set für Spülenausschnitt</div>
       </div>
       <div class="casemain">
-        
+        <div class="doc" data-step><b>Eichen-Arbeitsplatte, 3m, 40mm</b><div class="dline"></div><div class="dline"></div><div class="dline short"></div></div>
         <div class="mrow" data-step style="margin-top:8px"><span class="dot g"></span><span class="grow">Beschreibung, technische Daten und Meta-Tags in Ihrer Tonalität</span><span class="chip g">markenkonform</span></div>
       </div>
     </div>
@@ -1246,9 +1244,9 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mtitle"><span>Stelle · Lagerleitung</span><button class="runbtn" type="button">▶ Bewerber bewerten</button></div>
     <div class="minicols">
       <div class="caselist">
-        <div class="caseitem active" data-step><b class="mono">94</b>A. Marchetti · 6 J., WMS, Stapler</div>
-        <div class="caseitem" data-step><b class="mono">78</b>J. Okafor · 4 J., Schichtleitung</div>
-        <div class="caseitem" data-step><b class="mono">51</b>P. Novak · stark, falsche Branche</div>
+        <div class="caseitem active" data-step>A. Marchetti · 6 J., WMS, Stapler</div>
+        <div class="caseitem" data-step>J. Okafor · 4 J., Schichtleitung</div>
+        <div class="caseitem" data-step>P. Novak · stark, falsche Branche</div>
       </div>
       <div class="casemain">
         <div class="mrow" data-step><span class="grow">Bewerbungen ausgelesen und mit den Anforderungen abgeglichen</span><span class="mono"><span data-count="184">0</span></span></div>
@@ -1275,17 +1273,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Einkaufsplan · KW 12</span><button class="runbtn" type="button">▶ Prognose starten</button></div>
-    
-    <div class="mrow mono" data-step><span class="grow">Reichweite SKU 2210</span><div class="bar"><i data-w="11"></i></div><span data-count="9">0</span></div>
-    <div class="mrow mono" data-step><span class="grow">Reichweite SKU 3105</span><div class="bar"><i data-w="47"></i></div><span data-count="38">0</span></div>
-    <div class="mrow mono" data-step><span class="grow">Reichweite SKU 4188</span><div class="bar"><i data-w="96"></i></div><span data-count="97">0</span></div>
-    <div class="mrow" data-step><span class="dot r"></span><span class="grow"><b>SKU 2210</b> · Bestandslücke in 9 Tagen, bestellen <b class="mono">640</b> Stück aktuell</span><span class="chip r">dringend</span></div>
-    <div class="mrow" data-step><span class="dot a"></span><span class="grow"><b>SKU 4188</b> · 14 Wochen Reichweite, Einkauf pausieren</span><span class="chip a">Überbestand</span></div>
-    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Bestellung für Lehmann Handel entworfen</span><span class="chip g">genehmigt</span></div>
-    
-  </div>
-      
-        <div class="chartwrap" data-step>
+    <div class="chartwrap" data-step>
       <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="Nachfrage über 36 Monate Historie, Saisonalität und Aktionen steigt stetig bis Woche 12">
         <line x1="0" y1="28" x2="420" y2="28"></line>
         <line x1="0" y1="56" x2="420" y2="56"></line>
@@ -1295,10 +1283,18 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <circle class="p1" cx="418" cy="26" r="3.5"></circle>
       </svg>
     </div>
-        <div class="bigstat mono" style="margin-top:8px">
+    <div class="mrow mono" data-step><span class="grow">Reichweite SKU 2210</span><div class="bar"><i data-w="11"></i></div><span data-count="9">0</span></div>
+    <div class="mrow mono" data-step><span class="grow">Reichweite SKU 3105</span><div class="bar"><i data-w="47"></i></div><span data-count="38">0</span></div>
+    <div class="mrow mono" data-step><span class="grow">Reichweite SKU 4188</span><div class="bar"><i data-w="96"></i></div><span data-count="97">0</span></div>
+    <div class="mrow" data-step><span class="dot r"></span><span class="grow"><b>SKU 2210</b>Stück aktuell</span><span class="chip r">dringend</span></div>
+    <div class="mrow" data-step><span class="dot a"></span><span class="grow"><b>SKU 4188</b> · 14 Wochen Reichweite, Einkauf pausieren</span><span class="chip a">Überbestand</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Bestellung für Lehmann Handel entworfen</span><span class="chip g">genehmigt</span></div>
+    <div class="bigstat mono" style="margin-top:8px">
       <div data-step><b data-count="86400">0</b><span>Euro aus totem Bestand freigesetzt</span></div>
       <div data-step><b data-count="3">0</b><span>Bestandslücken in diesem Quartal vermieden</span></div>
-    </div><div class="body">
+    </div>
+  </div>
+      <div class="body">
     <h3><span class="num mono">29</span>Bedarfs- und Bestandsprognose</h3>
     <p>Ein Modell, trainiert auf Ihrer eigenen Verkaufshistorie, Saisonalität, Aktionen und Lieferzeiten, sagt Ihnen, was Sie wann bestellen sollten. Es zielt auf die zwei Fehler, die richtig Geld kosten und in der Buchhaltung nie sauber auftauchen: Kapital, das in Ladenhütern gebunden ist, und Umsatz, der am leeren Regal verloren geht.</p>
     <div class="kills"><b>Beseitigt</b><span>Bestellen nach Bauchgefühl auf Basis einer Tabelle, die schon eine Woche veraltet ist.</span></div>
@@ -1315,7 +1311,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <div class="caseitem" data-step><b class="mono">CAM 22</b>Hoftor · Palettenetiketten</div>
       </div>
       <div class="casemain">
-        <div class="mrow" data-step><span class="dot g"></span><span class="grow">Bestand vom Foto gezählt: <b class="mono">312</b> Stück im Regal</span><span class="chip g">stimmt mit dem System überein</span></div>
+        <div class="mrow" data-step><span class="dot g"></span><span class="grow">Stück im Regal</span><span class="chip g">stimmt mit dem System überein</span></div>
         <div class="mrow" data-step><span class="dot r"></span><span class="grow">Planogramm-Verstoß, Filiale 14: Wettbewerbsprodukt in Ihrem Regalfeld</span><span class="chip r">markiert</span></div>
         <div class="mrow" data-step><span class="dot a"></span><span class="grow">Linie: 3 Stück mit Kantenfehler, Seriennr. <span class="mono">MX-70412</span> gelesen</span><span class="chip a">entfernt</span></div>
         <div class="mrow" data-step><span class="dot g"></span><span class="grow">Bericht an den Gebietsleiter gesendet um <span class="mono">09:41</span></span><span class="chip g">erledigt</span></div>
@@ -1409,13 +1405,12 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Freigabesteuerung</span><button class="runbtn" type="button">▶ zur Freigabe schicken</button></div>
-        <div class="kanban">
+    <div class="mrow" data-step><span class="grow">Freigebende im Dienstplan, Weiterleitung nach Betrag und Art</span><span class="crew"><span class="avat">LK</span><span class="avat">FD</span><span class="avat">AM</span><span class="more">+2 Vertretungen</span></span></div>
+    <div class="kanban">
       <div class="kcol done" data-step><div class="khead"><span>Vorgesetzter</span><b>✓</b></div><div class="ktask">Einkauf <span class="mono">€1,240</span> <span class="chip g">09:41</span></div><div class="ktask">Spesen <span class="mono">€380</span> <span class="chip g">Richtlinie ok</span></div></div>
       <div class="kcol" data-step><div class="khead"><span>Finanzleiter</span><b>1</b></div><div class="ktask">Rabatt 18% <span class="chip a">Erinnerung gesendet</span></div></div>
       <div class="kcol done" data-step><div class="khead"><span>Abgelegt</span><b>✓</b></div><div class="ktask">Urlaubsantrag <span class="chip g">gebucht</span></div></div>
     </div>
-    <div class="mrow" data-step><span class="grow">Freigebende im Dienstplan, Weiterleitung nach Betrag und Art</span><span class="crew"><span class="avat">LK</span><span class="avat">FD</span><span class="avat">AM</span><span class="more">+2 Vertretungen</span></span></div>
-    
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Vertretung hat übernommen, während F. Dorner vor Ort war</span><span class="chip g">kein Stillstand</span></div>
     <div class="mrow" data-step><span class="grow">Nachweiskette geschrieben, 4 von 4 freigegeben in <span class="mono">6 Std.</span></span><span class="chip g">erledigt</span></div>
   </div>
@@ -1549,6 +1544,12 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Routen für morgen</span><button class="runbtn" type="button">▶ Touren planen</button></div>
+    <div class="minicols">
+      <div class="caselist">
+        <div class="caseitem active" data-step><b class="mono">FZG 2</b>9 Stopps · Nordrunde</div>
+        <div class="caseitem" data-step><b class="mono">VAN 3</b>7 Stopps · Innenstadt</div>
+      </div>
+      <div class="casemain">
         <div class="chartwrap solo" data-step>
           <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="Kilometer pro Fahrzeugtour sinken von 141 auf 112, sobald die Routen sortiert sind">
             <line x1="0" y1="28" x2="420" y2="28"></line><line x1="0" y1="56" x2="420" y2="56"></line><line x1="0" y1="84" x2="420" y2="84"></line>
@@ -1557,13 +1558,6 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
             <circle class="p1" cx="418" cy="24" r="3.5"></circle>
           </svg>
         </div>
-    <div class="minicols">
-      <div class="caselist">
-        <div class="caseitem active" data-step><b class="mono">FZG 2</b>9 Stopps · Nordrunde</div>
-        <div class="caseitem" data-step><b class="mono">VAN 3</b>7 Stopps · Innenstadt</div>
-      </div>
-      <div class="casemain">
-        
       </div>
     </div>
     <div class="mrow" data-step style="margin-top:8px"><span class="grow">28 Stopps, 4 Fahrzeuge, Kapazität und Zeitfenster berücksichtigt</span></div>
@@ -1603,16 +1597,14 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Fuhrpark und Maschinen · Wartung fällig</span><button class="runbtn" type="button">▶ Arbeitsaufträge anlegen</button></div>
-        <div class="kanban">
+    <div class="mrow mono" data-step><span class="grow">Presslinie 2 · Stunden bis zur Wartung</span><div class="bar"><i data-w="94"></i></div><span data-count="470">0</span></div>
+    <div class="mrow mono" data-step><span class="grow">Fahrzeug MB-317 · km bis zur Wartung</span><div class="bar"><i data-w="81"></i></div><span data-count="12400">0</span></div>
+    <div class="mrow mono" data-step><span class="grow">Stapler F-6 · Tage bis zur Prüfung</span><div class="bar"><i data-w="62"></i></div><span data-count="23">0</span></div>
+    <div class="kanban">
       <div class="kcol done" data-step><div class="khead"><span>Fällig</span><b>✓</b></div><div class="ktask">Presse 2 erreicht am Donnerstag 500 h <span class="chip a">Auftrag angelegt</span></div></div>
       <div class="kcol done" data-step><div class="khead"><span>Teile</span><b>✓</b></div><div class="ktask">Filtersatz und Riemen reserviert <span class="chip g">€ 214</span></div></div>
       <div class="kcol done" data-step><div class="khead"><span>Gebucht</span><b>✓</b></div><div class="ktask">Sonntag <span class="mono">06:00</span>, Techniker zugewiesen <span class="chip g">geplant</span></div></div>
     </div>
-        
-    <div class="mrow mono" data-step><span class="grow">Presslinie 2 · Stunden bis zur Wartung</span><div class="bar"><i data-w="94"></i></div><span data-count="470">0</span></div>
-    <div class="mrow mono" data-step><span class="grow">Fahrzeug MB-317 · km bis zur Wartung</span><div class="bar"><i data-w="81"></i></div><span data-count="12400">0</span></div>
-    <div class="mrow mono" data-step><span class="grow">Stapler F-6 · Tage bis zur Prüfung</span><div class="bar"><i data-w="62"></i></div><span data-count="23">0</span></div>
-    
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Kein Produktionsausfall, Störungen in diesem Quartal von 11 auf 2 gesunken</span><span class="chip g">geplant</span></div>
   </div>
       <div class="body">
@@ -1702,7 +1694,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Zahlungen und Abstimmung</span><button class="runbtn" type="button">▶ Tag abschließen</button></div>
-        <div class="nodes">
+    <div class="nodes">
       <div class="node" data-lit>Karte</div>
       <div class="link" data-lit></div>
       <div class="node" data-lit>Bank</div>
@@ -1711,8 +1703,6 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
       <div class="link" data-lit></div>
       <div class="node" data-lit>Buchhaltung</div>
     </div>
-        
-    
     <div class="mrow" data-step><span class="grow">Heute eingegangene Zahlungen</span><span class="mono">€ <span data-count="21740">0</span></span></div>
     <div class="mrow" data-step><span class="grow">Bestellungen zugeordnet</span><div class="bar"><i data-w="100"></i></div></div>
     <div class="mrow" data-step><span class="dot a"></span><span class="grow">2 Unterzahlungen fürs Büro markiert</span><span class="chip a">prüfen</span></div>
@@ -1728,10 +1718,6 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Verkaufsbot im Messenger</span><button class="runbtn" type="button">▶ in Telegram bestellen</button></div>
-        <div class="bigstat mono" style="margin-top:8px">
-      <div data-step><b data-count="34">0</b><span>% besser als das mobile Webformular</span></div>
-      <div data-step><b data-count="62">0</b><span>Bestellungen diese Woche im Chat entgegengenommen</span></div>
-    </div>
     <div class="minicols">
       <div class="caselist">
         <div class="caseitem active" data-step><b class="mono">19:24</b>M. Ilves · Katalog geöffnet</div>
@@ -1744,7 +1730,10 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <div class="mrow" data-step><span class="dot g"></span><span class="grow">Im Messenger bezahlt <span class="mono">19:26</span>, dann verfolgt: Kurier <span class="mono">DPD 7741</span> vor 18:00</span><span class="chip g">auto</span></div>
       </div>
     </div>
-    
+    <div class="bigstat mono" style="margin-top:8px">
+      <div data-step><b data-count="34">0</b><span>% besser als das mobile Webformular</span></div>
+      <div data-step><b data-count="62">0</b><span>Bestellungen diese Woche im Chat entgegengenommen</span></div>
+    </div>
   </div>
       <div class="body">
     <h3><span class="num mono">47</span>Telegram- oder WhatsApp-Bot als Vertriebskanal</h3>
@@ -1756,7 +1745,8 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Marktplatz-Steuerung</span><button class="runbtn" type="button">▶ Preisupdate ausspielen</button></div>
-        <div class="chartwrap solo" data-step>
+    <div class="filechips"><span class="fchip" data-eat>Adminpanel 1</span><span class="fchip" data-eat>Adminbereich 2</span><span class="fchip" data-eat>Adminbereich 3</span><span class="fchip" data-eat>Adminpanel 4</span></div>
+    <div class="chartwrap solo" data-step>
       <div class="clegend"><span class="c1"><i></i>Buy-Box-Anteil</span></div>
       <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="Der Buy-Box-Anteil steigt, während die Repricing-Regel dem günstigsten Wettbewerbspreis nach unten folgt">
         <line x1="0" y1="28" x2="420" y2="28"></line>
@@ -1768,8 +1758,6 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         
       </svg>
     </div>
-    <div class="filechips"><span class="fchip" data-eat>Adminpanel 1</span><span class="fchip" data-eat>Adminbereich 2</span><span class="fchip" data-eat>Adminbereich 3</span><span class="fchip" data-eat>Adminpanel 4</span></div>
-    
     <div class="mrow" data-step><span class="grow">Angebote über 4 Marktplätze synchronisiert</span><span class="mono"><span data-count="1280">0</span></span></div>
     <div class="mrow" data-step><span class="dot a"></span><span class="grow">Repricing-Regel ausgelöst · SKU 2210 gesenkt, um die Buy-Box zu halten</span><span class="mono">€ 41,90</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Bestand und Bestellungen in einer Liste zusammengeführt</span><span class="chip g">synchron</span></div>
@@ -1784,7 +1772,8 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Attributions-Dashboard</span><button class="runbtn" type="button">▶ Ausgaben mit Umsatz verknüpfen</button></div>
-        <div class="chartwrap" data-step>
+    <div class="nodes"><div class="node" data-lit>Anzeigenklick</div><div class="link" data-lit></div><div class="node" data-lit>CRM-Vorgang</div><div class="link" data-lit></div><div class="node" data-lit>Abgeschlossener Umsatz</div></div>
+    <div class="chartwrap" data-step>
       <div class="clegend"><span class="c1"><i></i>Umsatz</span><span class="c2"><i></i>Werbeausgaben</span></div>
       <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="Der Umsatz steigt weiter, nachdem die Display-Ausgaben gekürzt wurden, während die Gesamtausgaben zurückgehen">
         <line x1="0" y1="28" x2="420" y2="28"></line>
@@ -1796,8 +1785,6 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <circle class="p2" cx="418" cy="56" r="3.5"></circle>
       </svg>
     </div>
-    <div class="nodes"><div class="node" data-lit>Anzeigenklick</div><div class="link" data-lit></div><div class="node" data-lit>CRM-Vorgang</div><div class="link" data-lit></div><div class="node" data-lit>Abgeschlossener Umsatz</div></div>
-    
     <div class="mrow" data-step><span class="grow">Bezahlte Suche · Kosten pro Kunde</span><span class="mono">€ 118</span><span class="chip g">behalten</span></div>
     <div class="mrow" data-step><span class="dot r"></span><span class="grow">Display · Kosten pro Kunde</span><span class="mono">€ 940</span><span class="chip r">gekürzt</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Budget umverteilt, Formulare als Leads gezählt, nicht als Verkäufe</span><span class="chip g">erfasst</span></div>
@@ -1812,7 +1799,13 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Bewertungswache · Google, Trustpilot, Marktplatz</span><button class="runbtn" type="button">▶ den Autopiloten starten</button></div>
-    
+    <div class="nodes">
+      <div class="node" data-lit>Auftrag abgeschlossen</div>
+      <div class="link" data-lit></div>
+      <div class="node" data-lit>Zur richtigen Stunde fragen</div>
+      <div class="link" data-lit></div>
+      <div class="node" data-lit>Antwort entworfen</div>
+    </div>
     <div class="chartwrap solo" data-step>
       <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="Die durchschnittliche öffentliche Bewertung sinkt nach einer schlechten Rezension und erholt sich über den Ausgangswert hinaus, sobald Antworten veröffentlicht werden">
         <line x1="0" y1="28" x2="420" y2="28"></line>
@@ -1828,14 +1821,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mrow" data-step><span class="dot a"></span><span class="grow">Sachliche Antwort entworfen , wartet auf Ihr Ja</span><span class="mono">09:07</span><span class="chip a">freigeben</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Antwort veröffentlicht, Kunde auf 4 Sterne erhöht</span><span class="mono">11:41</span><span class="chip g">zurückgewonnen</span></div>
   </div>
-      
-        <div class="nodes">
-      <div class="node" data-lit>Auftrag abgeschlossen</div>
-      <div class="link" data-lit></div>
-      <div class="node" data-lit>Zur richtigen Stunde fragen</div>
-      <div class="link" data-lit></div>
-      <div class="node" data-lit>Antwort entworfen</div>
-    </div><div class="body">
+      <div class="body">
     <h3><span class="num mono">50</span>Bewertungen und Reputation auf Autopilot</h3>
     <p>Nach jedem abgeschlossenen Auftrag bittet das System den zufriedenen Kunden genau dann um eine Bewertung, wenn er sie am ehesten abgibt. Eine schlechte Bewertung meldet sich innerhalb von Minuten bei Ihnen, mit einer sachlichen Antwort im Entwurf zu Ihrer Freigabe.</p>
     <div class="kills"><b>Beseitigt</b><span>das Schweigen, das eine wütende Bewertung einen Monat lang unbeantwortet stehen lässt, während sie Sie still und leise Kunden kostet.</span></div>
@@ -1850,7 +1836,9 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Bildschirm der Geschäftsführung</span><button class="runbtn" type="button">▶ Board aktualisieren</button></div>
-        <div class="chartwrap" data-step>
+    <div class="mrow" data-step><span class="grow">Umsatz, Monat bis heute</span><span class="mono">€<span data-count="418500">0</span></span><span class="up">▲</span></div>
+    <div class="mrow" data-step><span class="grow">Rohertragsmarge</span><div class="bar"><i data-w="34"></i></div><span class="mono">34%</span></div>
+    <div class="chartwrap" data-step>
       <div class="clegend"><span class="c1"><i></i>Umsatz</span><span class="c2"><i></i>Kosten</span></div>
       <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="Umsatz steigt über zwölf Monate über die abflachenden Kosten">
         <line x1="0" y1="28" x2="420" y2="28"></line><line x1="0" y1="56" x2="420" y2="56"></line><line x1="0" y1="84" x2="420" y2="84"></line>
@@ -1859,10 +1847,6 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <circle class="p1" cx="418" cy="38" r="3.5"></circle><circle class="p2" cx="418" cy="42" r="3.5"></circle>
       </svg>
     </div>
-        
-    <div class="mrow" data-step><span class="grow">Umsatz, Monat bis heute</span><span class="mono">€<span data-count="418500">0</span></span><span class="up">▲</span></div>
-    <div class="mrow" data-step><span class="grow">Rohertragsmarge</span><div class="bar"><i data-w="34"></i></div><span class="mono">34%</span></div>
-    
     <div class="mrow" data-step><span class="grow">Aus den Quellsystemen gezogen <span class="mono">08:00</span>, stündlich aktualisiert</span><span class="chip g">aktuell</span></div>
   </div>
   <div class="body">
@@ -1919,13 +1903,9 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Anomalie-Überwachung</span><button class="runbtn" type="button">▶ Kennzahlen überwachen</button></div>
-    
-    
-  </div>
-      
-        <div class="minicols">
+    <div class="minicols">
       <div class="caselist">
-        <div class="caseitem active" data-step><b class="mono">42</b>Prüfungen, alle 15 Minuten</div>
+        <div class="caseitem active" data-step>Prüfungen, alle 15 Minuten</div>
         <div class="caseitem" data-step>Marge, SKU 2210</div>
         <div class="caseitem" data-step>Stiller Kunde, Northgate</div>
       </div>
@@ -1936,10 +1916,12 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <div class="mrow" data-step><span class="dot g"></span><span class="grow">Alle am selben Morgen gemeldet, nicht zum Monatsende</span><span class="chip g">markiert</span></div>
       </div>
     </div>
-        <div class="bigstat mono" style="margin-top:8px">
+    <div class="bigstat mono" style="margin-top:8px">
       <div data-step><b data-count="17">0</b><span>Probleme in diesem Monat erkannt</span></div>
       <div data-step><b data-count="11300">0</b><span>Euro Marge gesichert</span></div>
-    </div><div class="body">
+    </div>
+  </div>
+      <div class="body">
     <h3><span class="num mono">54</span>Alarme und Anomalieerkennung</h3>
     <p>Sie erfahren es in dem Moment, in dem etwas seinen normalen Bereich verlässt: eine sinkende Marge bei einem Produkt, ein Stammkunde, der still wird, zu geringe Bestandsreichweite, ein ausgefallener Server, eine fehlgeschlagene Zahlung, aus dem Ruder laufende Kosten.</p>
     <div class="kills"><b>Beseitigt</b><span>von einem einen Monat alten Problem erst zu erfahren, wenn die Monatszahlen eintreffen.</span></div>
@@ -1949,14 +1931,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Abwanderungsradar · letzte 90 Tage</span><button class="runbtn" type="button">▶ die Kundenbasis prüfen</button></div>
-    
-    <div class="mrow mono" data-step style="margin-top:8px"><span class="grow">Aktive Kunden geprüft</span><span data-count="312">0</span><span class="chip a">9 werden still</span></div>
-    <div class="mrow" data-step><span class="dot r"></span><span class="grow">Northgate Ltd · 4 Bestellungen im Monat, jetzt 1 · <span class="mono">€ 87 400</span> gefährdet</span><span class="chip r">kühlt ab</span></div>
-    <div class="mrow" data-step><span class="dot a"></span><span class="grow">Vellmar Handel · Menge 41 Prozent gesunken</span><span class="chip a">beobachten</span></div>
-    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Rückgewinnungsaufgabe an A. Koss, vollständige Historie angehängt</span><span class="mono">10:26</span><span class="chip g">zugewiesen</span></div>
-  </div>
-      
-        <div class="minicols">
+    <div class="minicols">
       <div class="caselist">
         <div class="caseitem active" data-step><b class="mono">C 0412</b>Northgate Ltd · kühlt ab</div>
         <div class="caseitem" data-step><b class="mono">C 0871</b>Vellmar Handel · beobachten</div>
@@ -1974,7 +1949,13 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
           </svg>
         </div>
       </div>
-    </div><div class="body">
+    </div>
+    <div class="mrow mono" data-step style="margin-top:8px"><span class="grow">Aktive Kunden geprüft</span><span data-count="312">0</span><span class="chip a">9 werden still</span></div>
+    <div class="mrow" data-step><span class="dot r"></span><span class="grow">Northgate Ltd · 4 Bestellungen im Monat, jetzt 1 · <span class="mono">€ 87 400</span> gefährdet</span><span class="chip r">kühlt ab</span></div>
+    <div class="mrow" data-step><span class="dot a"></span><span class="grow">Vellmar Handel · Menge 41 Prozent gesunken</span><span class="chip a">beobachten</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Rückgewinnungsaufgabe an A. Koss, vollständige Historie angehängt</span><span class="mono">10:26</span><span class="chip g">zugewiesen</span></div>
+  </div>
+      <div class="body">
     <h3><span class="num mono">55</span>Abwanderungsradar für Kunden</h3>
     <p>Bestellfrequenz und Menge werden je Kunde beobachtet, sodass abdriftende Kunden Wochen bevor sie nicht mehr antworten markiert werden. Der Betreuer erhält eine Rückgewinnungsaufgabe mit der gesamten Kundenhistorie.</p>
     <div class="kills"><b>Beseitigt</b><span>erst beim Jahresvergleich zu merken, dass ein Top-20-Kunde weg ist.</span></div>
@@ -2084,9 +2065,8 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Übergabepaket</span><button class="runbtn" type="button">▶ übergeben</button></div>
-        <div class="doc" data-step><b>Bedienhandbuch · Lagermodul</b><div class="dline"></div><div class="dline short"></div></div>
     <div class="calstrip" data-step><div class="day">Mo<b>06</b></div><div class="day due">Di<b>07</b></div><div class="day">Mi<b>08</b></div><div class="day due">Do<b>09</b></div><div class="day">Fr<b>10</b></div></div>
-    
+    <div class="doc" data-step><b>Bedienhandbuch · Lagermodul</b><div class="dline"></div><div class="dline short"></div></div>
     <div class="mrow" data-step><span class="grow">Video-Anleitungen aufgezeichnet</span><span class="mono"><span data-count="12">0</span></span></div>
     <div class="mrow" data-step><span class="grow">Zwei Schulungen am <span class="mono">11:00</span> <span class="crew"><span class="avat">DK</span><span class="avat">MR</span><span class="avat">EL</span><span class="more">+15 Mitarbeiter</span></span></span><span class="chip g">18 von 18</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Adminrechte und Quellcode an Ihr Team übergeben</span><span class="chip g">gehört Ihnen</span></div>

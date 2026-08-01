@@ -64,10 +64,11 @@ header{border-bottom:1px solid var(--rule)}
 
 /* ---------- section nav ---------- */
 .secnav{position:sticky;top:0;z-index:20;background:var(--paper);border-bottom:1px solid var(--rule)}
+.secnav .wrap{max-width:1560px}
 .progressline{position:absolute;left:0;bottom:-1px;height:2px;width:100%;background:var(--green);
   transform:scaleX(0);transform-origin:0 50%;transition:transform 120ms linear}
 .secnav-in{display:flex;gap:8px;align-items:center;padding-top:8px;padding-bottom:8px}
-.navlinks{display:flex;gap:2px;flex:1 1 auto;overflow-x:auto;scrollbar-width:none;min-width:0}
+.navlinks{display:flex;gap:2px;flex:1 1 auto;overflow-x:auto;scrollbar-width:none;min-width:0;padding-bottom:1px}
 .navlinks::-webkit-scrollbar{display:none}
 .secnav-in{flex-wrap:nowrap;gap:10px}
 .secnav .tools{flex:0 0 auto;gap:8px}
@@ -477,7 +478,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 </header>
 <nav class="secnav"><div class="progressline" id="progressline"></div><div class="wrap secnav-in">
 <input class="finder" id="finder" type="search" placeholder="Escriba qué le molesta: facturas, turnos, leads..." aria-label="Buscar entre los 60 servicios">
-<a href="#s-ind">Industrias</a><a href="#s-data">Datos</a><a href="#s-fin">Finanzas</a><a href="#s-crm">Ventas</a><a href="#s-ai">IA</a><a href="#s-ops">Operaciones</a><a href="#s-web">Web</a><a href="#s-rep">Informes</a><a href="#s-infra">Infra</a>
+<a href="#s-ind">Industrias</a><a href="#s-data">Datos</a><a href="#s-fin">Finanzas</a><a href="#s-crm">Ventas y CRM</a><a href="#s-ai">IA</a><a href="#s-ops">Operaciones</a><a href="#s-web">Web y clientes</a><a href="#s-rep">Informes</a><a href="#s-infra">Infraestructura</a>
 <div class="tools"><button class="themebtn" type="button" id="themebtn" aria-label="Cambiar tema claro y oscuro" title="Cambiar tema claro y oscuro"><svg viewBox="0 0 24 24" aria-hidden="true"><g class="sun"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/></g><g class="moon"><path d="M20 14.2A8.4 8.4 0 0 1 9.8 4 8.4 8.4 0 1 0 20 14.2z"/></g></svg></button><select class="langsel" id="langsel" aria-label="Idioma"><option value="./">EN</option><option value="ru.html">RU</option><option value="de.html">DE</option><option value="zh.html">ZH</option><option value="es.html" selected>ES</option></select></div></div></nav>
 
 <div class="hero">
@@ -553,7 +554,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
       </div>
       <div class="body">
         <h3>Para empresas de construcción</h3>
-        <p>Registro de entrada en obra e informes diarios desde los teléfonos de la cuadrilla, aprobaciones de compra por importe, mantenimiento de equipos antes de la avería, y presupuesto contra real por obra. Ensamblado a partir de servicios <b class="mono">18 · 32 · 33 · 36 · 59</b>.</p>
+        <p>Registro de entrada en obra e informes diarios desde los teléfonos de la cuadrilla, aprobaciones de compra por importe, mantenimiento de equipos antes de la avería, y presupuesto contra real por obra.</p>
         <div class="kills"><b>Elimina</b><span>la ronda de llamadas nocturna para averiguar qué pasó realmente hoy en la obra.</span></div>
       </div>
     </article>
@@ -1135,7 +1136,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     </div>
     <div class="mrow" data-step><span class="grow">Cliente: ¿hay stock del panel de 18 mm y cuánto cuesta el envío a Lyon?</span><span class="mono">21:14</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Bot: en stock, <b class="mono">€ 42,60</b> por plancha. Entrega en Lyon <b class="mono">€ 19</b>, 2 días.</span><span class="chip g">lista de precios v14</span></div>
-    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Bot: el corte se hace el mismo día hasta <b class="mono">12</b> planchas, <b class="mono">€ 3,40</b> por corte.</span><span class="chip g">ficha de servicio</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">planchas, <b class="mono">€ 3,40</b> por corte.</span><span class="chip g">ficha de servicio</span></div>
     <div class="mrow" data-step><span class="dot a"></span><span class="grow">Las condiciones de crédito requieren a una persona. Derivado a Elena a las <span class="mono">21:16</span> con el hilo completo.</span><span class="chip a">traspaso</span></div>
     <div class="bigstat mono" style="margin-top:8px">
       <div data-step><b data-count="71">0</b><span>% respondido sin intervención humana</span></div>
@@ -1246,9 +1247,9 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mtitle"><span>Vacante · Supervisor de almacén</span><button class="runbtn" type="button">▶ clasificar candidatos</button></div>
     <div class="minicols">
       <div class="caselist">
-        <div class="caseitem active" data-step><b class="mono">94</b>A. Marchetti · 6 años, WMS, carretilla elevadora</div>
-        <div class="caseitem" data-step><b class="mono">78</b>J. Okafor · 4 años, jefe de turno</div>
-        <div class="caseitem" data-step><b class="mono">51</b>P. Novak · sólido, sector equivocado</div>
+        <div class="caseitem active" data-step>A. Marchetti · 6 años, WMS, carretilla elevadora</div>
+        <div class="caseitem" data-step>J. Okafor · 4 años, jefe de turno</div>
+        <div class="caseitem" data-step>P. Novak · sólido, sector equivocado</div>
       </div>
       <div class="casemain">
         <div class="mrow" data-step><span class="grow">Solicitudes analizadas y comparadas con los requisitos</span><span class="mono"><span data-count="184">0</span></span></div>
@@ -1279,7 +1280,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mrow mono" data-step><span class="grow">Cobertura SKU 2210</span><div class="bar"><i data-w="11"></i></div><span data-count="9">0</span></div>
     <div class="mrow mono" data-step><span class="grow">Cobertura SKU 3105</span><div class="bar"><i data-w="47"></i></div><span data-count="38">0</span></div>
     <div class="mrow mono" data-step><span class="grow">cobertura SKU 4188</span><div class="bar"><i data-w="96"></i></div><span data-count="97">0</span></div>
-    <div class="mrow" data-step><span class="dot r"></span><span class="grow"><b>SKU 2210</b> · quiebre de stock en 9 días, pedido <b class="mono">640</b> unidades ahora</span><span class="chip r">urgente</span></div>
+    <div class="mrow" data-step><span class="dot r"></span><span class="grow"><b>SKU 2210</b>unidades ahora</span><span class="chip r">urgente</span></div>
     <div class="mrow" data-step><span class="dot a"></span><span class="grow"><b>SKU 4188</b> · 14 semanas de cobertura, pausar compras</span><span class="chip a">exceso de stock</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Orden de compra redactada para Lehmann Handel</span><span class="chip g">aprobado</span></div>
     
@@ -1315,7 +1316,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <div class="caseitem" data-step><b class="mono">CAM 22</b>Puerta del patio · etiquetas de palés</div>
       </div>
       <div class="casemain">
-        <div class="mrow" data-step><span class="dot g"></span><span class="grow">Stock contado a partir de la foto: <b class="mono">312</b> unidades en estantería</span><span class="chip g">coincide con sistema</span></div>
+        <div class="mrow" data-step><span class="dot g"></span><span class="grow">unidades en estantería</span><span class="chip g">coincide con sistema</span></div>
         <div class="mrow" data-step><span class="dot r"></span><span class="grow">Incumplimiento de planograma, tienda 14: producto de la competencia en su estantería</span><span class="chip r">marcado</span></div>
         <div class="mrow" data-step><span class="dot a"></span><span class="grow">Línea: 3 unidades con defecto de borde, número de serie <span class="mono">MX-70412</span> leído</span><span class="chip a">retirado</span></div>
         <div class="mrow" data-step><span class="dot g"></span><span class="grow">Informe enviado al supervisor de campo a las <span class="mono">09:41</span></span><span class="chip g">hecho</span></div>
@@ -1925,7 +1926,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
       
         <div class="minicols">
       <div class="caselist">
-        <div class="caseitem active" data-step><b class="mono">42</b>comprobaciones, cada 15 minutos</div>
+        <div class="caseitem active" data-step>comprobaciones, cada 15 minutos</div>
         <div class="caseitem" data-step>Margen, SKU 2210</div>
         <div class="caseitem" data-step>Cliente inactivo, Northgate</div>
       </div>

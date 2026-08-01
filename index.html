@@ -64,10 +64,11 @@ header{border-bottom:1px solid var(--rule)}
 
 /* ---------- section nav ---------- */
 .secnav{position:sticky;top:0;z-index:20;background:var(--paper);border-bottom:1px solid var(--rule)}
+.secnav .wrap{max-width:1560px}
 .progressline{position:absolute;left:0;bottom:-1px;height:2px;width:100%;background:var(--green);
   transform:scaleX(0);transform-origin:0 50%;transition:transform 120ms linear}
 .secnav-in{display:flex;gap:8px;align-items:center;padding-top:8px;padding-bottom:8px}
-.navlinks{display:flex;gap:2px;flex:1 1 auto;overflow-x:auto;scrollbar-width:none;min-width:0}
+.navlinks{display:flex;gap:2px;flex:1 1 auto;overflow-x:auto;scrollbar-width:none;min-width:0;padding-bottom:1px}
 .navlinks::-webkit-scrollbar{display:none}
 .secnav-in{flex-wrap:nowrap;gap:10px}
 .secnav .tools{flex:0 0 auto;gap:8px}
@@ -477,7 +478,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 </header>
 <nav class="secnav"><div class="progressline" id="progressline"></div><div class="wrap secnav-in">
 <input class="finder" id="finder" type="search" placeholder="Type what annoys you: invoices, rota, leads..." aria-label="Search the 60 services">
-<a href="#s-ind">Industries</a><a href="#s-data">Data</a><a href="#s-fin">Finance</a><a href="#s-crm">Sales</a><a href="#s-ai">AI</a><a href="#s-ops">Operations</a><a href="#s-web">Web</a><a href="#s-rep">Reporting</a><a href="#s-infra">Infra</a>
+<a href="#s-ind">Industries</a><a href="#s-data">Data</a><a href="#s-fin">Finance</a><a href="#s-crm">Sales and CRM</a><a href="#s-ai">AI</a><a href="#s-ops">Operations</a><a href="#s-web">Web and clients</a><a href="#s-rep">Reporting</a><a href="#s-infra">Infrastructure</a>
 <div class="tools"><button class="themebtn" type="button" id="themebtn" aria-label="Switch light and dark theme" title="Switch light and dark theme"><svg viewBox="0 0 24 24" aria-hidden="true"><g class="sun"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/></g><g class="moon"><path d="M20 14.2A8.4 8.4 0 0 1 9.8 4 8.4 8.4 0 1 0 20 14.2z"/></g></svg></button><select class="langsel" id="langsel" aria-label="Language"><option value="./" selected>EN</option><option value="ru.html">RU</option><option value="de.html">DE</option><option value="zh.html">ZH</option><option value="es.html">ES</option></select></div></div></nav>
 
 <div class="hero">
