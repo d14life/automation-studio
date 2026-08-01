@@ -113,14 +113,50 @@ function Starfield1(host, o) {
   };
 }
 
+
+
+/* one cycle laid down twice across a 200% background: sliding it by its own width lands on
+   an identical frame, so a left-to-right travel loops without a seam */
+function flowGrad(cs){
+  var n=cs.length*2, out=[];
+  for(var i=0;i<=n;i++) out.push(cs[i%cs.length]+' '+(i*100/n).toFixed(3)+'%');
+  return 'linear-gradient(90deg,'+out.join(',')+')';
+}
+/* read a palette at a fractional position, mixing the two neighbours, so a window can slide
+   along it continuously instead of jumping colour to colour */
+function paletteAt(pal, p){
+  var n=pal.length, f=((p%n)+n)%n, i=Math.floor(f), t=f-i;
+  var a=pal[i], b=pal[(i+1)%n], out='#';
+  for (var c=1;c<7;c+=2){
+    var v=Math.round(parseInt(a.substr(c,2),16)*(1-t)+parseInt(b.substr(c,2),16)*t);
+    out+=v.toString(16).padStart(2,'0');
+  }
+  return out;
+}
+/* hue -> hex. The tube library takes hex strings, so the wheel is converted here rather
+   than handed over as hsl(), which its colour parser is not guaranteed to accept. */
+function hslHex(h,s,l){
+  h=((h%360)+360)%360; s=s==null?0.92:s; l=l==null?0.64:l;
+  var a=s*Math.min(l,1-l);
+  function f(n){
+    var k=(n+h/30)%12, c=l-a*Math.max(-1,Math.min(k-3,9-k,1));
+    return Math.round(255*c).toString(16).padStart(2,'0');
+  }
+  return '#'+f(0)+f(8)+f(4);
+}
+
 function LiquidText(host, texts, o) {
   o = o || {};
   var morphTime    = o.morphTime    != null ? o.morphTime    : 1.5;
   var cooldownTime = o.cooldownTime != null ? o.cooldownTime : 0.5;
-  /* colour: the WHOLE line is a single colour at any moment, and that colour walks the
-     given list over time. Not a gradient across the letters - one colour, changing. */
+  /* colour: a short window of the palette is spread across the letters and travels left to
+     right, while the window itself slides along the palette. So the line is always
+     multi-coloured and flowing, but it is three neighbouring colours at a time, never the
+     whole wheel at once. */
   var colors       = o.colors && o.colors.length ? o.colors : null;
-  var flowSeconds  = o.flow != null ? o.flow : 6;
+  var flowSeconds  = o.flow  != null ? o.flow  : 6;
+  var driftSeconds = o.drift != null ? o.drift : flowSeconds * 2.5;
+  var spread       = o.spread!= null ? o.spread: 0.9;   // palette steps between the 3 stops
   if (!texts || texts.length < 2) throw new Error('LiquidText: need 2+ texts');
 
   if (!document.getElementById('lt-threshold-svg')){
@@ -132,30 +168,39 @@ function LiquidText(host, texts, o) {
   }
   host.style.position = host.style.position || 'relative';
   host.style.filter = 'url(#threshold) blur(0.6px)';
-  var flowName=null, st=null;
-  if (colors){
-    /* the palette becomes keyframes on `color` itself, so both copies of the text hold the
-       same single colour at the same instant and the browser tweens between neighbours.
-       Last stop repeats the first, otherwise the loop snaps on restart. */
-    flowName='lt-hue-'+Math.random().toString(36).slice(2,8);
-    var pct=[];
-    for (var ci=0; ci<=colors.length; ci++)
-      pct.push((ci*100/colors.length).toFixed(3)+'%{color:'+colors[ci%colors.length]+'}');
-    st=document.createElement('style'); st.className='lt-flow-style';
-    st.textContent='@keyframes '+flowName+'{'+pct.join('')+'}';
+  if (colors && !document.getElementById('lt-flow-style')){
+    var st=document.createElement('style'); st.id='lt-flow-style';
+    st.textContent='@keyframes lt-flow{from{background-position:0% center}to{background-position:-200% center}}';
     document.head.appendChild(st);
   }
   function mkSpan(){
     var s=document.createElement('span');
     s.style.cssText='position:absolute;left:0;right:0;top:0;margin:auto;display:inline-block;width:100%;text-align:center';
     if (colors){
-      s.style.color=colors[0];
-      s.style.animation=flowName+' '+flowSeconds+'s linear infinite';
+      /* the cycle is laid twice across a 200% background, so sliding it by its own width
+         lands on an identical frame and the travel never jumps */
+      s.style.backgroundSize='200% auto';
+      s.style.webkitBackgroundClip='text';
+      s.style.backgroundClip='text';
+      s.style.color='transparent';
+      s.style.animation='lt-flow '+flowSeconds+'s linear infinite';
     }
     host.appendChild(s); return s;
   }
   var t1=mkSpan(), t2=mkSpan();
   var textIndex=0, morph=0, cooldown=0, time=Date.now();
+
+  /* the window walks the palette at ~10 fps: smooth to the eye, and far cheaper than
+     rebuilding the gradient string on every frame */
+  var pos=0, gradAt=time-100;   /* seeded, so the first paint is one tick of drift, not the epoch */
+  function paintGrad(now){
+    if (!colors || now-gradAt < 100) return;
+    pos += (now-gradAt)/1000/driftSeconds*colors.length;
+    gradAt=now;
+    var g=flowGrad([paletteAt(colors,pos), paletteAt(colors,pos+spread), paletteAt(colors,pos+spread*2)]);
+    t1.style.backgroundImage=g; t2.style.backgroundImage=g;
+  }
+  paintGrad(time);
 
   function setStyles(fraction){
     t2.style.filter='blur('+Math.min(8/fraction-8,100)+'px)';
@@ -185,11 +230,13 @@ function LiquidText(host, texts, o) {
     var now=Date.now(), dt=(now-time)/1000; time=now;
     cooldown-=dt; morph+=dt>0?dt:0;
     if (cooldown<=0) doMorph(); else doCooldown();
+    paintGrad(now);
   }
   animate();
   return function stop(){
     running=false; cancelAnimationFrame(raf);
-    t1.remove(); t2.remove(); if(st) st.remove(); host.style.filter='';
+    /* the keyframes rule is shared by id and stays for the next instance */
+    t1.remove(); t2.remove(); host.style.filter='';
   };
 }
 
