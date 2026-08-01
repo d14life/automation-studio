@@ -526,7 +526,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 .aimuted{font-size:12.5px;color:var(--ink-soft)}
 /* ---------- main page ---------- */
 .space-wrap{position:relative;overflow:hidden;background:#0D1512;color:#E8ECE6}
-#stars{position:absolute;inset:0;width:100%;height:100%;display:block}
+#stars{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
 .space-wrap .inner{position:relative;z-index:2}
 .space-wrap .hero{border-bottom:0;background:transparent}
 .space-wrap .hero h1,.space-wrap .hero .serif{color:#EDF2EC}
@@ -556,6 +556,54 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 .dircard i{font-style:normal;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--acc,var(--green));font-weight:700}
 .dircard span{font-size:13.5px;color:var(--ink-soft);line-height:1.5}
 
+
+/* hero: two columns, morph line, floating real mockup */
+.hero .wrap{display:grid;grid-template-columns:1.12fr .88fr;gap:46px;align-items:center}
+.heroleft{min-width:0}
+.morphline{position:relative;height:76px;margin:6px 0 2px;
+  font:800 54px/1 "Instrument Sans",system-ui,sans-serif;letter-spacing:.02em}
+.heromock{min-width:0;background:var(--card);border:1px solid rgba(255,255,255,.14);border-radius:14px;
+  box-shadow:0 24px 70px rgba(0,0,0,.5);overflow:hidden;transform:rotate(.6deg)}
+.heromock .mock{border:0;min-height:0;padding:16px 18px 18px}
+@media (max-width:1020px){
+  .hero .wrap{grid-template-columns:1fr;gap:30px}
+  .heromock{transform:none}
+  .morphline{height:52px;font-size:34px}
+}
+
+
+/* border beam: comet ring on containers (ported to vanilla from the shadcn panel) */
+.beam{position:relative;isolation:isolate}
+.beam .beam-ring,.beam .beam-glow{content:"";position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;
+  background:conic-gradient(from var(--beam-a,0deg),
+    transparent 0deg,
+    color-mix(in srgb,#4CC28F 4%,transparent) 18deg,
+    color-mix(in srgb,#4CC28F 55%,transparent) 46deg,
+    #9FE8C6 56deg, #d9fff0 60deg, transparent 63deg,
+    transparent 198deg,
+    color-mix(in srgb,#5C82C9 4%,transparent) 216deg,
+    color-mix(in srgb,#5C82C9 50%,transparent) 244deg,
+    #5C82C9 254deg, #cfe0ff 258deg, transparent 261deg,
+    transparent 360deg)}
+.beam .beam-ring{padding:2px;
+  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);mask-composite:exclude}
+.beam .beam-glow{filter:blur(14px);opacity:.3;z-index:-1}
+.dircard.beam .beam-ring,.dircard.beam .beam-glow{opacity:0;transition:opacity 300ms ease}
+.dircard.beam:hover .beam-ring{opacity:1}
+.dircard.beam:hover .beam-glow{opacity:.25}
+@media (forced-colors: active){.beam .beam-ring,.beam .beam-glow{display:none}}
+
+
+.heromock{position:relative;aspect-ratio:16/10.6;background:#0b1220}
+.heromock iframe{position:absolute;top:0;left:0;width:1280px;height:848px;border:0;
+  transform:scale(var(--demo-scale,0.42));transform-origin:0 0;pointer-events:none}
+.heromock .demo-overlay{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;
+  padding:16px;gap:6px;text-decoration:none;background:linear-gradient(180deg,transparent 55%,rgba(5,10,8,.82));z-index:3}
+.heromock .demo-overlay i{font-style:normal;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#9FE8C6;font-weight:700}
+.heromock .demo-overlay b{font-family:"Fraunces",Georgia,serif;font-size:21px;color:#F4F6F0}
+.morphline{display:none}
+
 </style>
 
 <div class="space-wrap"><canvas id="stars"></canvas><div class="inner"><header>
@@ -567,9 +615,10 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 <input class="finder" id="finder" type="search" placeholder="Schreiben Sie, was Sie stört: Rechnungen, Dienstplan, Leads..." aria-label="Die 60 Leistungen durchsuchen">
 <a href="../industries.html">Branchen</a><a href="../data.html">Daten</a><a href="../finance.html">Finanzen</a><a href="../sales.html">Vertrieb und CRM</a><a href="../ai.html">KI</a><a href="../operations.html">Betrieb</a><a href="../web.html">Web und Kunden</a><a href="../reporting.html">Reporting</a><a href="../infrastructure.html">Infrastruktur</a>
 <div class="tools"><button class="themebtn" type="button" id="themebtn" aria-label="Helles und dunkles Design wechseln" title="Helles und dunkles Design wechseln"><svg viewBox="0 0 24 24" aria-hidden="true"><g class="sun"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/></g><g class="moon"><path d="M20 14.2A8.4 8.4 0 0 1 9.8 4 8.4 8.4 0 1 0 20 14.2z"/></g></svg></button><select class="langsel" id="langsel" aria-label="Sprache"><option value="/index.html">EN</option><option value="/ru/index.html">RU</option><option value="/de/index.html" selected>DE</option><option value="/zh/index.html">ZH</option><option value="/es/index.html">ES</option></select></div></div></nav><div class="hero">
-  <div class="wrap">
+  <div class="wrap"><div class="heroleft">
     <span class="kicker">Leistungskatalog · alle 60</span>
     <h1 class="serif">Wir bauen Ihr Werkzeug in Tagen. Sie testen es an echter Arbeit. <em>Wenn es nicht hilft, zahlen Sie nicht.</em></h1>
+    <div class="morphline" id="morphline"></div>
     <p>Schnell heißt nicht schlampig. Wir bauen eine funktionierende erste Version Ihrer Automatisierung, Sie setzen sie auf Ihre echten Rechnungen, Aufträge und Tabellen an und zahlen erst, wenn sie sich lohnt. Nichts im Voraus, das Risiko bleibt bei uns.</p>
     <p>Nachfolgend sechzig Dinge, die wir bauen, für jede Abteilung jedes Unternehmens: Vertrieb, Finanzen, Betrieb, Lager, Support, Auslieferung. Jedes davon nimmt Ihnen eine konkret benannte Routineaufgabe ab und rechnet sich messbar.</p>
     <p class="hint">▶ Jede Karte unten ist eine funktionierende Demo. Drücken Sie einen Knopf und sehen Sie zu, wie die Routineaufgabe verschwindet.</p>
@@ -578,12 +627,11 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
       <div class="stat"><b class="mono">Tage</b><span>bis zu Ihrer ersten Version, nicht Monate</span></div>
       <div class="stat"><b class="mono">€0</b><span>im Voraus, Sie zahlen nur, wenn es hilft</span></div>
     </div>
-  </div>
-</div>
+  </div><aside class="heromock beam"><i class="beam-ring" aria-hidden="true"></i><i class="beam-glow" aria-hidden="true"></i><iframe src="../demo/index.html" loading="lazy" title="demo"></iframe><a class="demo-overlay" href="../demo/index.html" target="_blank" rel="noopener"><i>Echtes Produkt, an einem Tag gebaut</i><b>Live-Demo öffnen →</b></a></aside></div>
+</div><aside class="heromock beam"><i class="beam-ring" aria-hidden="true"></i><i class="beam-glow" aria-hidden="true"></i><iframe src="../demo/index.html" loading="lazy" title="demo"></iframe><a class="demo-overlay" href="../demo/index.html" target="_blank" rel="noopener"><i>Echtes Produkt, an einem Tag gebaut</i><b>Live-Demo öffnen →</b></a></aside></div></div>
 
-</div></div>
 <main class="wrap">
-<div class="section-head"><span class="idx serif">9</span><h2 class="serif">Wählen Sie Ihren Bereich</h2></div><p class="section-sub">Neun Bereiche, sechzig Beispiele. Jede Karte ist eine laufende Demo.</p><div class="dirgrid"><a class="dircard" id="s-ind" href="industries.html"><i>2 Beispiele</i><b>Für Ihre Branche gebaut</b><span>Zuerst zwei fertige Beispiele: Die sechzig Leistungen unten sind Bausteine, und so fügen sie sich für zwei seh</span></a><a class="dircard" id="s-data" href="data.html"><i>7 Beispiele</i><b>Datenerfassung und Integration</b><span>Die morgendliche Routine, Websites abzuklappern, die Preislisten in zwölf Formaten, die Systeme, die jeweils i</span></a><a class="dircard" id="s-fin" href="finance.html"><i>7 Beispiele</i><b>Buchhaltung und Finanzen</b><span>Rechnungen, Abstimmung, Lohnabrechnung, Liquidität. Der Papierkram, der die erste Woche jedes Monats auffrisst</span></a><a class="dircard" id="s-crm" href="sales.html"><i>8 Beispiele</i><b>Vertrieb und CRM</b><span>Anfragen in Minuten beantwortet, Angebote in Sekunden, und eine Kundenhistorie, die bleibt, wenn ein Vertriebl</span></a><a class="dircard" id="s-ai" href="ai.html"><i>10 Beispiele</i><b>Künstliche Intelligenz</b><span>Bots, die aus Ihren eigenen Dokumenten antworten, Anrufe, die sich selbst ins CRM schreiben, und Prognosen, di</span></a><a class="dircard" id="s-ops" href="operations.html"><i>10 Beispiele</i><b>Betrieb und interne Abläufe</b><span>Freigaben, die vorankommen, Dienstpläne, die sich selbst bauen, Kolonnen, die von unterwegs melden, Bestände, </span></a><a class="dircard" id="s-web" href="web.html"><i>8 Beispiele</i><b>Web und Kundenkontakt</b><span>Websites, die konvertieren, Shops, die synchron laufen, Zahlungen, die sich selbst abstimmen, und ein Vertrieb</span></a><a class="dircard" id="s-rep" href="reporting.html"><i>5 Beispiele</i><b>Reporting und Führungsüberblick</b><span>Ein Bildschirm mit der Wahrheit für die Geschäftsführung und eine Meldung in der Stunde, in der etwas schiefge</span></a><a class="dircard" id="s-infra" href="infrastructure.html"><i>5 Beispiele</i><b>Infrastruktur und Support</b><span>Die kritische Tabelle abgelöst, das Altprogramm gezähmt, Backups, die wirklich getestet werden, und Schulungen</span></a></div>
+<div class="section-head"><span class="idx serif">9</span><h2 class="serif">Wählen Sie Ihren Bereich</h2></div><p class="section-sub">Neun Bereiche, sechzig Beispiele. Jede Karte ist eine laufende Demo.</p><div class="dirgrid"><a class="dircard beam" id="s-ind" href="industries.html"><i class="beam-ring" aria-hidden="true"></i><i class="beam-glow" aria-hidden="true"></i><i>2 Beispiele</i><b>Für Ihre Branche gebaut</b><span>Zuerst zwei fertige Beispiele: Die sechzig Leistungen unten sind Bausteine, und so fügen sie sich für zwei seh</span></a><a class="dircard beam" id="s-data" href="data.html"><i class="beam-ring" aria-hidden="true"></i><i class="beam-glow" aria-hidden="true"></i><i>7 Beispiele</i><b>Datenerfassung und Integration</b><span>Die morgendliche Routine, Websites abzuklappern, die Preislisten in zwölf Formaten, die Systeme, die jeweils i</span></a><a class="dircard beam" id="s-fin" href="finance.html"><i class="beam-ring" aria-hidden="true"></i><i class="beam-glow" aria-hidden="true"></i><i>7 Beispiele</i><b>Buchhaltung und Finanzen</b><span>Rechnungen, Abstimmung, Lohnabrechnung, Liquidität. Der Papierkram, der die erste Woche jedes Monats auffrisst</span></a><a class="dircard beam" id="s-crm" href="sales.html"><i class="beam-ring" aria-hidden="true"></i><i class="beam-glow" aria-hidden="true"></i><i>8 Beispiele</i><b>Vertrieb und CRM</b><span>Anfragen in Minuten beantwortet, Angebote in Sekunden, und eine Kundenhistorie, die bleibt, wenn ein Vertriebl</span></a><a class="dircard beam" id="s-ai" href="ai.html"><i class="beam-ring" aria-hidden="true"></i><i class="beam-glow" aria-hidden="true"></i><i>10 Beispiele</i><b>Künstliche Intelligenz</b><span>Bots, die aus Ihren eigenen Dokumenten antworten, Anrufe, die sich selbst ins CRM schreiben, und Prognosen, di</span></a><a class="dircard beam" id="s-ops" href="operations.html"><i class="beam-ring" aria-hidden="true"></i><i class="beam-glow" aria-hidden="true"></i><i>10 Beispiele</i><b>Betrieb und interne Abläufe</b><span>Freigaben, die vorankommen, Dienstpläne, die sich selbst bauen, Kolonnen, die von unterwegs melden, Bestände, </span></a><a class="dircard beam" id="s-web" href="web.html"><i class="beam-ring" aria-hidden="true"></i><i class="beam-glow" aria-hidden="true"></i><i>8 Beispiele</i><b>Web und Kundenkontakt</b><span>Websites, die konvertieren, Shops, die synchron laufen, Zahlungen, die sich selbst abstimmen, und ein Vertrieb</span></a><a class="dircard beam" id="s-rep" href="reporting.html"><i class="beam-ring" aria-hidden="true"></i><i class="beam-glow" aria-hidden="true"></i><i>5 Beispiele</i><b>Reporting und Führungsüberblick</b><span>Ein Bildschirm mit der Wahrheit für die Geschäftsführung und eine Meldung in der Stunde, in der etwas schiefge</span></a><a class="dircard beam" id="s-infra" href="infrastructure.html"><i class="beam-ring" aria-hidden="true"></i><i class="beam-glow" aria-hidden="true"></i><i>5 Beispiele</i><b>Infrastruktur und Support</b><span>Die kritische Tabelle abgelöst, das Altprogramm gezähmt, Backups, die wirklich getestet werden, und Schulungen</span></a></div>
 <div class="section-head"><span class="idx serif">Ablauf</span><h2 class="serif">So läuft die Arbeit</h2></div>
   <p class="section-sub">Festpreis je Phase, wo der Umfang klar ist, Stundensatz, wo er es wirklich nicht ist. Kleine Automatisierungen sind oft ein paar Tage Arbeit und rechnen sich innerhalb eines Quartals.</p>
   <div class="steps">
@@ -690,33 +738,112 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 })();
 </script>
 <script>
-(function(){
-  var cv=document.getElementById('stars'); if(!cv) return;
-  var reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var ctx=cv.getContext('2d'), W,H,stars=[],mx=0,my=0,tx=0,ty=0;
-  function size(){var r=cv.parentElement.getBoundingClientRect();W=cv.width=r.width*devicePixelRatio;H=cv.height=r.height*devicePixelRatio;}
-  function seed(){stars=[];var n=Math.round(W*H/9000/devicePixelRatio/devicePixelRatio);
-    for(var i=0;i<n;i++){stars.push({x:Math.random()*W,y:Math.random()*H,z:Math.random()*0.9+0.1,
-      r:(Math.random()*1.4+0.4)*devicePixelRatio,tw:Math.random()*6.28});}}
-  function draw(t){
-    ctx.clearRect(0,0,W,H);
-    tx+=(mx-tx)*0.06; ty+=(my-ty)*0.06;
-    stars.forEach(function(s){
-      var ox=tx*s.z*36*devicePixelRatio, oy=ty*s.z*36*devicePixelRatio;
-      var a=0.35+0.65*Math.abs(Math.sin(t/1600+s.tw));
-      ctx.globalAlpha=a*(0.35+s.z*0.65);
-      ctx.fillStyle=s.z>0.75?'#9FE8C6':'#E8ECE6';
-      ctx.beginPath();ctx.arc(s.x+ox,s.y+oy,s.r*(0.7+s.z*0.6),0,6.28);ctx.fill();
-    });
-    ctx.globalAlpha=1;
-    if(!reduced) requestAnimationFrame(draw);
+/* Warp starfield — stars fly at you from a vanishing point that follows the mouse.
+   Vanilla JS, zero dependencies, canvas 2D. Восстановлено из первой Тайги (starfield-1).
+
+   Usage:
+     const stop = Starfield(document.body, { quantity: 950, speed: 0.6 });
+     stop();                                     // remove it
+
+   Options: quantity, speed, color, maxAlpha, follow (mouse parallax 0..1), zIndex.
+*/
+function Starfield(host, opts) {
+  opts = opts || {};
+  const QTY     = opts.quantity != null ? opts.quantity : 950;
+  const SPEED   = opts.speed    != null ? opts.speed    : 0.6;
+  const COLOR   = opts.color    || '255,255,255';
+  const MAXA    = opts.maxAlpha != null ? opts.maxAlpha : 0.9;
+  const TRAIL   = opts.trail || '0,0,0';
+  const FOLLOW  = opts.follow   != null ? opts.follow   : 1;
+
+  const cv = document.createElement('canvas');
+  cv.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none;z-index:' + (opts.zIndex != null ? opts.zIndex : 0);
+  host.appendChild(cv);
+  const ctx = cv.getContext('2d', { alpha: true });
+
+  let W = 0, H = 0, dpr = 1;
+  // vanishing point: where the stars come FROM. tx/ty is the mouse target, cx/cy eases toward it.
+  let cx = 0, cy = 0, tx = 0, ty = 0;
+  const stars = new Array(QTY);
+
+  function spawn(s, seed) {
+    s.x = (Math.random() * 2 - 1) * W;
+    s.y = (Math.random() * 2 - 1) * H;
+    // seed=true fills every depth at once so the field is dense from frame 1; recycled stars
+    // re-enter at the far plane and fade in as they approach.
+    s.z = seed ? 1 + Math.random() * (W - 1) : W;
+    s.pz = s.z;
   }
-  size();seed();
-  addEventListener('resize',function(){size();seed();});
-  addEventListener('mousemove',function(e){var r=cv.getBoundingClientRect();
-    mx=(e.clientX-r.left)/r.width-0.5; my=(e.clientY-r.top)/r.height-0.5;});
-  if(reduced){draw(0);} else requestAnimationFrame(draw);
-})();
+
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const r = host.getBoundingClientRect();
+    W = Math.max(1, r.width); H = Math.max(1, r.height);
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    cx = tx = W / 2; cy = ty = H / 2;
+  }
+  resize();
+  // seeded AFTER resize — seeding first meant W/H were still 0, so every star spawned at the
+  // same far plane with alpha 0 and the whole field rendered black.
+  for (let i = 0; i < QTY; i++) { stars[i] = {}; spawn(stars[i], true); }
+
+  function onMove(e) {
+    const r = host.getBoundingClientRect();
+    // parallax: the vanishing point drifts a quarter of the way toward the pointer, never to the edge
+    tx = W / 2 + ((e.clientX - r.left) - W / 2) * 0.25 * FOLLOW;
+    ty = H / 2 + ((e.clientY - r.top) - H / 2) * 0.25 * FOLLOW;
+  }
+
+  let raf = 0, running = true;
+  function frame() {
+    if (!running) return;
+    raf = requestAnimationFrame(frame);
+
+    cx += (tx - cx) * 0.045;   // ease so the field glides instead of snapping
+    cy += (ty - cy) * 0.045;
+
+    ctx.fillStyle = 'rgba(' + TRAIL + ',0.28)';   // motion trails, instead of a hard clear
+    ctx.fillRect(0, 0, W, H);
+
+    const step = SPEED * 9;
+    for (let i = 0; i < QTY; i++) {
+      const s = stars[i];
+      s.pz = s.z;
+      s.z -= step;
+      if (s.z < 1) { spawn(s, false); continue; }
+
+      const k  = 128 / s.z,  px = s.x * k + cx,       py = s.y * k + cy;
+      const pk = 128 / s.pz, ox = s.x * pk + cx,      oy = s.y * pk + cy;
+
+      if (px < -50 || px > W + 50 || py < -50 || py > H + 50) { spawn(s, false); continue; }
+
+      const depth = 1 - s.z / W;                 // 0 far -> 1 near
+      ctx.strokeStyle = 'rgba(' + COLOR + ',' + (MAXA * depth).toFixed(3) + ')';
+      ctx.lineWidth = Math.max(0.4, depth * 2.1);
+      ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(px, py); ctx.stroke();
+    }
+  }
+
+  const ro = new ResizeObserver(resize);
+  ro.observe(host);
+  window.addEventListener('mousemove', onMove, { passive: true });
+  // ponytail: pause off-screen/hidden — a background animation must never burn CPU nobody is watching
+  const onVis = () => { if (document.hidden) { running = false; cancelAnimationFrame(raf); } else if (!running) { running = true; frame(); } };
+  document.addEventListener('visibilitychange', onVis);
+  frame();
+
+  return function stop() {
+    running = false; cancelAnimationFrame(raf);
+    ro.disconnect();
+    window.removeEventListener('mousemove', onMove);
+    document.removeEventListener('visibilitychange', onVis);
+    cv.remove();
+  };
+}
+
+
+
 </script><script>
 
 
@@ -884,5 +1011,138 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   window.addEventListener('scroll', requestCheck, {passive:true});
   window.addEventListener('resize', requestCheck, {passive:true});
   onScrollCheck();
+})();
+</script>
+<script type="module">
+(async function(){
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var cv=document.getElementById('stars'); if(!cv) return;
+  try{
+    var mod=await import('https://cdn.jsdelivr.net/npm/threejs-components@0.0.19/build/cursors/tubes1.min.js');
+    var app=mod.default(cv,{tubes:{colors:['#2AA173','#4CC28F','#1E7A55'],
+      lights:{intensity:200,colors:['#4CC28F','#5C82C9','#9FE8C6','#2AA173']}}});
+    document.querySelector('.space-wrap').addEventListener('click',function(){
+      function rnd(n){return new Array(n).fill(0).map(function(){return '#'+Math.floor(Math.random()*16777215).toString(16).padStart(6,'0');});}
+      app.tubes.setColors(rnd(3)); app.tubes.setLightsColors(rnd(4));
+    });
+  }catch(e){ if(typeof Starfield==='function'){cv.remove();Starfield(document.querySelector('.space-wrap'),{quantity:950,speed:0.6,follow:1,trail:'13,21,18',color:'235,242,236'});} }
+})();
+</script><script>
+/* Morphing text — letters melt into the next word (gooey/liquid morph) with a shining gradient.
+   Vanilla JS, zero dependencies. Восстановлено из первой Тайги (morphing-text.tsx).
+
+   The trick: two stacked copies of the text, each blurred and faded in opposition, then an SVG
+   `threshold` filter re-hardens the edges — blur + contrast = liquid. Nothing is drawn per-letter.
+
+   Usage:
+     const stop = MorphingText(el, ['ТАЙГА', 'СВОБОДА', 'БЕЗ ЦЕНЗУРЫ'], { morphTime: 1.5, cooldownTime: 0.9 });
+     stop();
+
+   Options: morphTime (sec of melting), cooldownTime (sec of holding a word), gradient (CSS), shine (sec).
+*/
+function MorphingText(host, words, opts) {
+  opts = opts || {};
+  const MORPH = opts.morphTime    != null ? opts.morphTime    : 1.5;
+  const COOL  = opts.cooldownTime != null ? opts.cooldownTime : 0.9;
+  const GRAD  = opts.gradient || 'linear-gradient(90deg,#5eead4,#38bdf8 25%,#818cf8 50%,#c084fc 75%,#5eead4)';
+  const SHINE = opts.shine != null ? opts.shine : 9;
+
+  if (!words || words.length < 2) throw new Error('MorphingText: need at least 2 words');
+
+  const uid = 'mt' + Math.random().toString(36).slice(2, 8);
+
+  if (!document.getElementById('mt-style')) {
+    const st = document.createElement('style');
+    st.id = 'mt-style';
+    st.textContent = '@keyframes mt-shine{to{background-position:200% center}}';
+    document.head.appendChild(st);
+  }
+
+  host.style.position = host.style.position || 'relative';
+  host.style.filter = 'url(#' + uid + '-threshold) blur(0.6px)';
+
+  const mkSpan = () => {
+    const s = document.createElement('span');
+    s.style.cssText =
+      'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;' +
+      'white-space:nowrap;background-image:' + GRAD + ';background-size:200% auto;' +
+      '-webkit-background-clip:text;background-clip:text;color:transparent;' +
+      'animation:mt-shine ' + SHINE + 's linear infinite;will-change:opacity,filter';
+    host.appendChild(s);
+    return s;
+  };
+  const a = mkSpan(), b = mkSpan();
+
+  // the threshold filter: heavy blur -> steep alpha contrast -> the blurs fuse into liquid shapes
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(svgNS, 'svg');
+  svg.setAttribute('style', 'position:absolute;width:0;height:0;pointer-events:none');
+  svg.innerHTML =
+    '<defs><filter id="' + uid + '-threshold" x="-20%" y="-50%" width="140%" height="200%">' +
+    '<feColorMatrix in="SourceGraphic" type="matrix" values="' +
+    '1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 255 -140"/></filter></defs>';
+  host.appendChild(svg);
+
+  let i = 0;                 // index of the word currently melting away
+  let frac = 0;              // 0..1 through the morph
+  let cooldown = COOL;
+  let last = performance.now();
+  a.textContent = words[0];
+  b.textContent = words[1 % words.length];
+
+  // opposed blur/opacity curves — one word dissolves exactly as the other condenses
+  function paint(f) {
+    const g = Math.min(Math.max(f, 1e-4), 1 - 1e-4);
+    b.style.filter  = 'blur(' + Math.min(8 / g - 8, 100).toFixed(2) + 'px)';
+    b.style.opacity = Math.pow(g, 0.4).toFixed(3);
+    const h = 1 - g;
+    a.style.filter  = 'blur(' + Math.min(8 / h - 8, 100).toFixed(2) + 'px)';
+    a.style.opacity = Math.pow(h, 0.4).toFixed(3);
+  }
+  paint(0);
+
+  let raf = 0, running = true;
+  function frame(now) {
+    if (!running) return;
+    raf = requestAnimationFrame(frame);
+    const dt = Math.min((now - last) / 1000, 0.1);   // clamp: a backgrounded tab must not jump the morph
+    last = now;
+
+    if (cooldown > 0) {                 // holding the current word steady
+      cooldown -= dt;
+      if (cooldown <= 0) frac = 0;
+      else { a.style.filter = b.style.filter = 'none'; a.style.opacity = '0'; b.style.opacity = '1'; return; }
+    }
+    frac += dt / MORPH;
+    if (frac >= 1) {                    // morph finished -> advance and hold
+      frac = 1; paint(1);
+      i = (i + 1) % words.length;
+      a.textContent = words[i];
+      b.textContent = words[(i + 1) % words.length];
+      cooldown = COOL;
+      return;
+    }
+    paint(frac);
+  }
+  const onVis = () => { if (document.hidden) { running = false; cancelAnimationFrame(raf); } else if (!running) { running = true; last = performance.now(); frame(last); } };
+  document.addEventListener('visibilitychange', onVis);
+  raf = requestAnimationFrame(frame);
+
+  return function stop() {
+    running = false; cancelAnimationFrame(raf);
+    document.removeEventListener('visibilitychange', onVis);
+    a.remove(); b.remove(); svg.remove();
+    host.style.filter = '';
+  };
+}
+
+
+(function(){
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var el=document.getElementById('morphline');
+  if (el) MorphingText(el, ["PARSER", "CRM", "KI-BOTS", "DASHBOARDS", "AUTOMATION"], {morphTime:1.4, cooldownTime:1.1,
+    gradient:'linear-gradient(90deg,#4CC28F,#9FE8C6 30%,#5C82C9 60%,#4CC28F)'});
+  var hm=document.querySelector('.heromock .runbtn');
+  if (hm) setInterval(function(){ hm.click(); }, 14000);
 })();
 </script>
