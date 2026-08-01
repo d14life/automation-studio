@@ -500,8 +500,10 @@ footer a{display:block;padding:3px 0}
   /* the spread is measured from the container, so six cards always fit the screen instead of
      piling up on each other or running off the side */
   function edgeX(){
-    var avail=wrap.clientWidth, cardW=cards[0].getBoundingClientRect().width||300;
-    return Math.max(60,(avail-cardW)/2);
+    /* card width comes from the same formula as the CSS, not from a measurement: measuring
+       during load caught the card mid-layout and collapsed the whole fan into one pile */
+    var avail=wrap.clientWidth, cardW=Math.min(300,avail*0.74);
+    return Math.max(80,(avail-cardW)/2);
   }
   function slotCfg(slot){
     var d=N>1?(slot-center)/center:0, ad=Math.abs(d);
@@ -539,6 +541,7 @@ footer a{display:block;padding:3px 0}
   });
   wrap.addEventListener('mouseleave',refresh);
   addEventListener('resize',refresh,{passive:true});
+  addEventListener('load',refresh);
   refresh();
 })();
 </script>
