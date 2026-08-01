@@ -114,11 +114,19 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
 
 
 /* ---------- projects: big cards, each with a mock screen of what we build ---------- */
-.projects{display:grid;gap:22px;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));margin-top:38px}
-@media (max-width:820px){.projects{grid-template-columns:1fr}}
-.proj{border:1px solid var(--line);border-radius:22px;overflow:hidden;background:rgba(6,12,16,.78);
-  display:flex;flex-direction:column}
-.shot{height:230px;background:linear-gradient(160deg,#07131c,#04090d);border-bottom:1px solid var(--line);
+/* project fan: the cards sit in an arc and part when you point at one */
+.projects{position:relative;height:min(560px,82vw);margin:52px 0 10px}
+.proj{position:absolute;left:50%;top:50%;width:min(380px,76vw);aspect-ratio:1;
+  margin:calc(min(380px,76vw)/-2) 0 0 calc(min(380px,76vw)/-2);
+  border:1px solid var(--line);border-radius:22px;overflow:hidden;background:rgba(6,12,16,.86);
+  display:flex;flex-direction:column;isolation:isolate;box-shadow:0 22px 60px rgba(0,0,0,.5);
+  transform:translate(var(--fx,0),var(--fy,0)) rotate(var(--fr,0deg)) scale(var(--fs,1));
+  transition:transform .55s cubic-bezier(.34,1.45,.5,1),opacity .5s ease;z-index:var(--fz,1)}
+@media (max-width:820px){
+  .projects{height:auto;display:flex;flex-direction:column;gap:18px}
+  .proj{position:static;margin:0;width:100%;aspect-ratio:auto;transform:none;transition:none}
+}
+.shot{height:44%;flex:none;background:linear-gradient(160deg,#07131c,#04090d);border-bottom:1px solid var(--line);
   padding:16px;display:flex;flex-direction:column;gap:8px;overflow:hidden}
 .shot .bar{height:9px;border-radius:99px;background:rgba(127,216,255,.16)}
 .shot .bar.w1{width:70%}.shot .bar.w2{width:46%}.shot .bar.w3{width:88%}.shot .bar.w4{width:34%}
@@ -140,12 +148,13 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
 .shot .tiles{flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .shot .tile{border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.03);
   display:flex;align-items:center;justify-content:center;font:900 17px Nunito,sans-serif;color:var(--ice2)}
-.proj .body{padding:22px 24px 26px;display:flex;flex-direction:column;flex:1}
+.proj .body{padding:18px 20px 20px;display:flex;flex-direction:column;flex:1;min-height:0}
 .proj .tag{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ice2);margin-bottom:10px}
 .proj .tag em{font-style:normal;color:var(--dim)}
-.proj h3{margin:0 0 10px;font:900 21px/1.2 Nunito,sans-serif}
-.proj p{margin:0;color:var(--dim);font-size:15px}
-.proj .go{margin-top:16px;color:var(--ice1);font-weight:900;font-size:14.5px;text-decoration:none}
+.proj h3{margin:0 0 8px;font:900 19px/1.2 Nunito,sans-serif}
+.proj p{margin:0;color:var(--dim);font-size:13.5px;line-height:1.5;flex:1;overflow:hidden;
+  display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical}
+.proj .go{margin-top:12px;color:var(--ice1);font-weight:900;font-size:14.5px;text-decoration:none}
 @media (hover:hover){.proj .go:hover{color:var(--ice2)}}
 
 /* ---------- questions ---------- */
@@ -254,7 +263,7 @@ footer a{display:block;padding:3px 0}
   </div>
   <div class="acts">
     <button class="btn btn-fill" type="button" id="aiopen">Обсудить задачу</button>
-    <a class="btn btn-line" href="demo/index.html" target="_blank" rel="noopener">Живой продукт</a>
+    <a class="btn btn-line" href="#projects">Живой продукт</a>
   </div>
   <a class="scrollhint" href="#about">листайте вниз</a>
 </section>
@@ -496,6 +505,39 @@ footer a{display:block;padding:3px 0}
   </div>
 </div>
 
+<script>
+/* Card fan: slot geometry from the original carousel (21 degrees at the edges, scale falling
+   with the square of the distance). Pointing at a card lifts it and pushes its neighbours aside. */
+(function(){
+  var wrap=document.querySelector('.projects'); if(!wrap) return;
+  var cards=[].slice.call(wrap.querySelectorAll('.proj'));
+  if(matchMedia('(max-width:820px)').matches) return;
+  var N=cards.length, center=(N-1)/2;
+  function slotCfg(slot){
+    var d=N>1?(slot-center)/center:0, ad=Math.abs(d);
+    return {rot:d*21, scale:1-0.2244*ad*ad, x:d*15, y:ad*ad*4.5, z:10-Math.abs(slot-center)};
+  }
+  function apply(slot,extra){
+    var c=slotCfg(slot), el=cards[slot]; extra=extra||{};
+    el.style.setProperty('--fx',(c.x+(extra.dx||0))+'rem');
+    el.style.setProperty('--fy',(c.y+(extra.dy||0))+'rem');
+    el.style.setProperty('--fr',(c.rot+(extra.dr||0))+'deg');
+    el.style.setProperty('--fs',(c.scale*(extra.ds||1)).toFixed(4));
+    el.style.setProperty('--fz',extra.z!=null?extra.z:c.z);
+  }
+  function layout(hover){
+    cards.forEach(function(el,slot){
+      if(hover==null){apply(slot);return;}
+      if(slot===hover){apply(slot,{dy:-2.2,ds:1.1,z:20});return;}
+      var dist=Math.abs(slot-hover), push=5*(1+0.2*Math.max(0,3-dist));
+      apply(slot,{dx:slot<hover?-push:push, dr:(slot<hover?-3:3)/dist});
+    });
+  }
+  cards.forEach(function(el,slot){ el.addEventListener('mouseenter',function(){layout(slot);}); });
+  wrap.addEventListener('mouseleave',function(){layout(null);});
+  layout(null);
+})();
+</script>
 <script src="anim3.js"></script>
 <script>
 /* Border beam engine: sprung angular velocity (k=30, d=11), idle 42 deg/s, 240 on hover.
