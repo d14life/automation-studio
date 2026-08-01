@@ -67,8 +67,9 @@ header{border-bottom:1px solid var(--rule)}
 .progressline{position:absolute;left:0;bottom:-1px;height:2px;width:100%;background:var(--green);
   transform:scaleX(0);transform-origin:0 50%;transition:transform 120ms linear}
 .secnav-in{display:flex;gap:8px;align-items:center;padding-top:8px;padding-bottom:8px}
-.navlinks{display:flex;gap:4px;overflow-x:auto;flex:1 1 auto;scrollbar-width:none}
-.navlinks::-webkit-scrollbar{display:none}
+.navlinks{display:flex;gap:4px;flex-wrap:wrap;flex:1 1 auto}
+.secnav-in{flex-wrap:wrap}
+.secnav .tools{margin-left:auto}
 .secnav a{color:var(--ink-soft);text-decoration:none;font-size:13px;font-weight:600;
   padding:6px 12px;border-radius:999px;white-space:nowrap;transition:color 140ms ease,background 140ms ease}
 .secnav a.active{color:var(--green);background:var(--green-soft)}
@@ -164,6 +165,11 @@ header{border-bottom:1px solid var(--rule)}
 .grid .card .mock > .chartwrap .chart{height:100%;min-height:110px}
 .grid .card .body{padding:26px 28px;justify-content:center;gap:12px}
 .grid .card h3{font-size:22px}
+.grid .card:nth-child(even){grid-template-columns:1fr 1.12fr}
+.grid .card:nth-child(even) .mock{order:2;border-right:0;border-left:1px solid var(--rule)}
+@media (max-width:820px){
+  .grid .card:nth-child(even) .mock{order:0;border-left:0;border-bottom:1px solid var(--rule)}
+}
 @media (max-width:820px){
   .grid .card{display:flex;flex-direction:column}
   .grid .card .mock{border-right:0;border-bottom:1px solid var(--rule)}
@@ -455,19 +461,12 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 <header>
   <div class="wrap topbar">
     <div class="wordmark serif">Студия заказного ПО <span class="tick">и</span> автоматизации</div>
-    <div class="tools">
-      <button class="themebtn" type="button" id="themebtn" aria-label="Переключить светлую и тёмную тему" title="Переключить светлую и тёмную тему">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><g class="sun"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/></g><g class="moon"><path d="M20 14.2A8.4 8.4 0 0 1 9.8 4 8.4 8.4 0 1 0 20 14.2z"/></g></svg>
-      </button>
-      <nav class="langs" aria-label="Язык"><a href="./">EN</a><a href="ru.html" class="on">RU</a><a href="de.html">DE</a><a href="zh.html">ZH</a><a href="es.html">ES</a></nav>
-      <a class="cta" href="mailto:tagir.zalyatov@gmail.com">Получить расчёт</a>
-    </div>
   </div>
 </header>
 <nav class="secnav"><div class="progressline" id="progressline"></div><div class="wrap secnav-in">
 <input class="finder" id="finder" type="search" placeholder="Напишите, что вас раздражает: счета, график смен, заявки..." aria-label="Поиск по 60 услугам">
 <a href="#s-ind">Отрасли</a><a href="#s-data">Данные</a><a href="#s-fin">Финансы</a><a href="#s-crm">Продажи и CRM</a><a href="#s-ai">ИИ</a><a href="#s-ops">Операции</a><a href="#s-web">Веб и клиенты</a><a href="#s-rep">Отчётность</a><a href="#s-infra">Инфраструктура</a>
-</div></nav>
+<div class="tools"><button class="themebtn" type="button" id="themebtn" aria-label="Переключить светлую и тёмную тему" title="Переключить светлую и тёмную тему"><svg viewBox="0 0 24 24" aria-hidden="true"><g class="sun"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/></g><g class="moon"><path d="M20 14.2A8.4 8.4 0 0 1 9.8 4 8.4 8.4 0 1 0 20 14.2z"/></g></svg></button><nav class="langs" aria-label="Язык"><a href="./">EN</a><a href="ru.html" class="on">RU</a><a href="de.html">DE</a><a href="zh.html">ZH</a><a href="es.html">ES</a></nav><a class="cta" href="mailto:tagir.zalyatov@gmail.com">Получить расчёт</a></div></div></nav>
 
 <div class="hero">
   <div class="wrap">
@@ -588,7 +587,6 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
       <div class="mock demo">
         <div class="mtitle"><span>Мониторинг цен · ежедневный запуск</span><button class="runbtn" type="button">▶ запустить сбор 06:00</button></div>
         <div class="filechips"><span class="fchip" data-eat>Каталог Конкурент A</span><span class="fchip" data-eat>Каталог Конкурент B</span><span class="fchip" data-eat>Остатки поставщика</span><span class="fchip" data-eat>Ваша страница на маркетплейсе</span></div>
-        <div class="arrowdown">▼ сверка с вашим прайс-листом ▼</div>
         <div class="chartwrap" data-step>
           <div class="clegend"><span class="c1"><i></i>Ваша цена</span><span class="c2"><i></i>Конкурент A</span></div>
           <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="Конкурент A снижал цену всю неделю, ваша цена не менялась">
@@ -621,7 +619,6 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
           <span class="fchip" data-eat>Прайс XLSX</span><span class="fchip" data-eat>Каталог PDF</span>
           <span class="fchip" data-eat>XML-фид</span><span class="fchip" data-eat>Вложение EML</span>
         </div>
-        <div class="arrowdown">▼ один импортёр ▼</div>
         <div class="kanban">
           <div class="kcol done" data-step><div class="khead"><span>Считано</span><b>✓</b></div><div class="ktask">Northgate Ltd <span class="chip g">1 842 строки</span></div><div class="ktask">Vellmar Handel <span class="chip g">610 строк</span></div></div>
           <div class="kcol done" data-step><div class="khead"><span>Сверка</span><b>✓</b></div><div class="ktask">Ваши коды SKU <span class="chip g">авто</span></div><div class="ktask">Упаковки и единицы <span class="chip g">авто</span></div></div>
@@ -717,7 +714,6 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
       <div class="mock demo">
         <div class="mtitle"><span>Миграция со старой системы</span><button class="runbtn" type="button">▶ перенести 12 лет</button></div>
         <div class="filechips"><span class="fchip" data-eat>База Access 2003</span><span class="fchip" data-eat>Выгрузки 1C</span><span class="fchip" data-eat>Прайсы Excel</span></div>
-        <div class="arrowdown">▼ сопоставлено, без дублей, проверено дважды ▼</div>
         <div class="mrow mono" data-step><span class="grow">Клиенты</span><div class="bar"><i data-w="100"></i></div><span data-count="48102">0</span></div>
         <div class="mrow mono" data-step><span class="grow">Заказы</span><div class="bar"><i data-w="100"></i></div><span data-count="310556">0</span></div>
         <div class="mrow mono" data-step><span class="grow">Документы</span><div class="bar"><i data-w="100"></i></div><span data-count="88913">0</span></div>
@@ -859,7 +855,6 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   <div class="mock demo">
     <div class="mtitle"><span>Входящие чеки</span><button class="runbtn" type="button">▶ распознать чеки</button></div>
     <div class="filechips"><span class="fchip" data-eat>Фото: заправка</span><span class="fchip" data-eat>Фото: счёт из отеля</span><span class="fchip" data-eat>PDF-счёт</span></div>
-    <div class="arrowdown">▼ распознавание ▼</div>
     <div class="kanban">
       <div class="kcol done" data-step><div class="khead"><span>Распознано</span><b>✓</b></div><div class="ktask">Shell Ostend <span class="chip g">€ 84,10</span></div><div class="ktask">Hotel Ambra <span class="chip g">€ 213,00</span></div></div>
       <div class="kcol done" data-step><div class="khead"><span>Разнесено</span><b>✓</b></div><div class="ktask">топливо, НДС 21% <span class="chip g">ок</span></div><div class="ktask">поездки, 14 мар <span class="chip g">ок</span></div></div>
@@ -1155,7 +1150,6 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="filechips">
       <span class="fchip" data-eat>Прайс-лист v14</span><span class="fchip" data-eat>Лист услуг</span><span class="fchip" data-eat>Зоны доставки</span>
     </div>
-    <div class="arrowdown">▼ бот отвечает только по этим документам ▼</div>
     <div class="mrow" data-step><span class="grow">Клиент: панель 18 мм есть в наличии и сколько стоит доставка в Лион?</span><span class="mono">21:14</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Бот: в наличии, <b class="mono">€ 42,60</b> за лист. Доставка в Лион <b class="mono">€ 19</b>, 2 дня.</span><span class="chip g">прайс-лист v14</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Бот: раскрой в тот же день до <b class="mono">12</b> листов, <b class="mono">€ 3,40</b> за рез.</span><span class="chip g">лист услуг</span></div>
@@ -1176,7 +1170,6 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   <div class="mock demo">
     <div class="mtitle"><span>Внутренний ассистент</span><button class="runbtn" type="button">▶ спросить про договор</button></div>
     <div class="filechips"><span class="fchip" data-eat>Договоры поставки</span><span class="fchip" data-eat>Внутренние регламенты</span><span class="fchip" data-eat>Техническая документация</span><span class="fchip" data-eat>Архив проектов</span></div>
-    <div class="arrowdown">▼ проиндексировано, 21 400 страниц ▼</div>
     <div class="mrow" data-step><span class="grow">Инженер: какая у нас неустойка за просрочку поставки для Northgate Ltd?</span><span class="mono">11:02</span></div>
     <div class="doc" data-step><b>0.1% от суммы заказа за день, не более 10%</b><div class="dline"></div><div class="dline short"></div></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Ответ приходит со ссылкой на источник, проверить можно в один клик</span><span class="chip g">Northgate MSA, п. 8.3</span></div>
@@ -1222,7 +1215,6 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
       <span class="fchip" data-eat>Скан сертификата</span>
       <span class="fchip" data-eat>Подписанная заявка</span>
     </div>
-    <div class="arrowdown">▼ прочитано, распознано, направлено ▼</div>
     <div class="kanban">
       <div class="kcol done" data-step><div class="khead"><span>Бухгалтерия</span><b>✓</b></div><div class="ktask">Счёт · Northgate Ltd <span class="chip g">€ 3,412.00</span></div><div class="ktask">Срок <span class="mono">28 фев</span>, сопоставлен с заказом <span class="chip g">сопоставлено</span></div></div>
       <div class="kcol done" data-step><div class="khead"><span>Юристы</span><b>✓</b></div><div class="ktask">Договор поставки, срок 24 месяца <span class="chip g">подшито</span></div><div class="ktask">Уведомление за 60 дней, напоминание стоит <span class="chip g">ок</span></div></div>
@@ -1576,7 +1568,6 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
       <span class="fchip" data-eat>площадка: склад Бремен</span>
       <span class="fchip" data-eat>руководитель: A. Koss</span>
     </div>
-    <div class="arrowdown">▼ выдача доступов ▼</div>
     <div class="calstrip" data-step><div class="day due">Пн<b>04</b></div><div class="day">Вт<b>05</b></div><div class="day">Ср<b>06</b></div><div class="day">Чт<b>07</b></div><div class="day">Пт<b>08</b></div></div>
     <div class="mrow" data-step><span class="grow">Команда первого дня назначена, наставник и руководитель</span><span class="crew"><span class="avat">AK</span><span class="avat">JR</span><span class="avat">TM</span><span class="more">+2 склад</span></span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Почта , CRM , доска диспетчера созданы</span><span class="chip g">3 учётки</span></div>
@@ -1742,7 +1733,6 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   <div class="mock demo">
     <div class="mtitle"><span>Панель управления маркетплейсами</span><button class="runbtn" type="button">▶ обновить цены</button></div>
     <div class="filechips"><span class="fchip" data-eat>Кабинет 1</span><span class="fchip" data-eat>Кабинет 2</span><span class="fchip" data-eat>Кабинет 3</span><span class="fchip" data-eat>Кабинет 4</span></div>
-    <div class="arrowdown">▼ один экран ▼</div>
     <div class="chartwrap" data-step>
       <div class="clegend"><span class="c1"><i></i>Доля карточки-победителя</span><span class="c2"><i></i>Цена самого дешёвого конкурента</span></div>
       <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="Доля карточки-победителя растёт, пока правило переоценки следует за снижением цены конкурента">
@@ -1968,7 +1958,6 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   <div class="mock demo">
     <div class="mtitle"><span>Таблица в приложение</span><button class="runbtn" type="button">▶ списать файл</button></div>
     <div class="filechips"><span class="fchip" data-eat>plan_final_v7.xlsx</span><span class="fchip" data-eat>plan_final_v7 (копия).xlsx</span><span class="fchip" data-eat>Версия Анны</span></div>
-    <div class="arrowdown">▼ импорт ▼</div>
     <div class="minicols">
       <div class="caselist">
         <div class="caseitem active" data-step><b class="mono">MOD 1</b>Заказы · 14 380 строк</div>
@@ -1999,7 +1988,6 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
       <span class="fchip" data-eat>Окно печати</span>
       <span class="fchip" data-eat>Окно выгрузки</span>
     </div>
-    <div class="arrowdown">▼ робот кликает и печатает, экран за экраном ▼</div>
     <div class="mrow" data-step><span class="dot a"></span><span class="grow">API нет, разработчик исчез в 2011</span><span class="chip a">как есть</span></div>
     <div class="mrow" data-step><span class="grow">240 счетов введено за ночь</span><div class="bar"><i data-w="100"></i></div></div>
     <div class="mrow" data-step><span class="grow">Экономия времени сотрудника в неделю</span><span class="mono"><span data-count="11">0</span> ч</span></div>
@@ -2016,7 +2004,6 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   <div class="mock demo">
     <div class="mtitle"><span>Резервные копии и доступы</span><button class="runbtn" type="button">▶ учебное восстановление</button></div>
     <div class="filechips"><span class="fchip" data-eat>База ERP</span><span class="fchip" data-eat>Файловый сервер</span><span class="fchip" data-eat>Архив почты</span></div>
-    <div class="arrowdown">▼ шифрование, копия вне офиса, проверка восстановления в 02:00 ▼</div>
     <div class="bigstat mono">
       <div data-step><b data-count="4">0</b><span>ГБ за прошлую ночь</span></div>
       <div data-step><b data-count="6">0</b><span>мин на восстановление</span></div>
@@ -2205,7 +2192,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 
   // scrollspy + demo autoplay, one scroll handler (no IntersectionObserver:
   // it is throttled in background tabs and some webviews)
-  var navLinks = Array.prototype.slice.call(document.querySelectorAll('.secnav a'));
+  var navLinks = Array.prototype.slice.call(document.querySelectorAll('.secnav a[href^="#"]'));
   (function(){
     var bar = document.querySelector('.secnav-in');
     if (!bar || !navLinks.length) return;
