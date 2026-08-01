@@ -1,0 +1,351 @@
+<!doctype html><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hero tuner · solutions101</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0D1512;color:#E8ECE6;font:15px/1.5 system-ui,sans-serif;display:grid;grid-template-columns:1fr 360px;min-height:100vh}
+#stage{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+#morphhost{position:relative;z-index:5;height:120px;width:80%;font:800 56px/1 system-ui,sans-serif;letter-spacing:.02em}
+#panel{background:#131B17;border-left:1px solid #2A342E;padding:20px;overflow-y:auto;z-index:10}
+#panel h2{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:#4CC28F;margin:22px 0 10px}
+#panel h2:first-child{margin-top:0}
+label{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:#9FAAA1;margin:8px 0 3px}
+label output{color:#E8ECE6;font-family:ui-monospace,monospace}
+input[type=range]{width:100%;accent-color:#4CC28F}
+select,textarea,input[type=text]{width:100%;background:#0D1512;color:#E8ECE6;border:1px solid #2A342E;border-radius:8px;padding:9px 10px;font:500 13.5px/1.4 system-ui}
+textarea{min-height:84px;resize:vertical}
+.colors{display:flex;gap:6px;margin:6px 0}
+.colors input[type=color]{width:100%;height:34px;border:1px solid #2A342E;border-radius:7px;background:none;padding:2px;cursor:pointer}
+button{width:100%;background:#2AA173;color:#F4F6F0;border:none;border-radius:9px;padding:12px;font:700 14px system-ui;cursor:pointer;margin-top:8px}
+button.ghost{background:transparent;border:1px solid #2A342E;color:#9FAAA1}
+#cfgout{font-family:ui-monospace,monospace;font-size:11.5px;min-height:120px}
+.ok{color:#4CC28F;font-size:12.5px;height:16px;margin-top:4px}
+@media (max-width:900px){body{grid-template-columns:1fr}#panel{border-left:0;border-top:1px solid #2A342E}}
+</style>
+<div id="stage"><div id="morphhost"></div></div>
+<div id="panel">
+  <h2>Space</h2>
+  <label>mode</label>
+  <select id="bgmode"><option value="tubes">tubes (турбо-трубки)</option><option value="warp">warp starfield</option><option value="both">both</option><option value="none">none</option></select>
+  <label>tubes colors</label><div class="colors" id="tubecols"></div>
+  <label>tube lights</label><div class="colors" id="lightcols"></div>
+  <label>lights intensity <output id="o-int">200</output></label><input type="range" id="r-int" min="30" max="600" value="200">
+  <label>warp stars <output id="o-qty">950</output></label><input type="range" id="r-qty" min="100" max="1600" step="50" value="950">
+  <label>warp speed <output id="o-spd">0.6</output></label><input type="range" id="r-spd" min="0.1" max="2" step="0.1" value="0.6">
+  <label>warp follow <output id="o-fol">1</output></label><input type="range" id="r-fol" min="0" max="1" step="0.1" value="1">
+  <h2>Morph text</h2>
+  <label>words, one per line</label>
+  <textarea id="words">IMAGINATION
+IS YOUR
+ONLY LIMIT</textarea>
+  <label>morph time <output id="o-mt">1.4</output>s</label><input type="range" id="r-mt" min="0.5" max="3" step="0.1" value="1.4">
+  <label>hold time <output id="o-ct">1.1</output>s</label><input type="range" id="r-ct" min="0.3" max="2.5" step="0.1" value="1.1">
+  <label>size <output id="o-fs">56</output>px</label><input type="range" id="r-fs" min="28" max="96" step="2" value="56">
+  <label>gradient</label>
+  <select id="grad">
+    <option value="linear-gradient(90deg,#4CC28F,#9FE8C6 30%,#5C82C9 60%,#4CC28F)">green · mint · blue (ours)</option>
+    <option value="linear-gradient(90deg,#5eead4,#38bdf8 25%,#818cf8 50%,#c084fc 75%,#5eead4)">teal · blue · violet (original)</option>
+    <option value="linear-gradient(90deg,#F4F6F0,#9FAAA1 50%,#F4F6F0)">silver</option>
+    <option value="linear-gradient(90deg,#E8C468,#F4F6F0 40%,#E8C468 80%)">gold shine</option>
+  </select>
+  <h2>Config</h2>
+  <button id="copy">Copy config</button>
+  <button class="ghost" id="reset">Reset to defaults</button>
+  <div class="ok" id="okmsg"></div>
+  <textarea id="cfgout" readonly></textarea>
+</div>
+<script>
+/* Warp starfield — stars fly at you from a vanishing point that follows the mouse.
+   Vanilla JS, zero dependencies, canvas 2D. Восстановлено из первой Тайги (starfield-1).
+
+   Usage:
+     const stop = Starfield(document.body, { quantity: 950, speed: 0.6 });
+     stop();                                     // remove it
+
+   Options: quantity, speed, color, maxAlpha, follow (mouse parallax 0..1), zIndex.
+*/
+function Starfield(host, opts) {
+  opts = opts || {};
+  const QTY     = opts.quantity != null ? opts.quantity : 950;
+  const SPEED   = opts.speed    != null ? opts.speed    : 0.6;
+  const COLOR   = opts.color    || '255,255,255';
+  const MAXA    = opts.maxAlpha != null ? opts.maxAlpha : 0.9;
+  const TRAIL   = opts.trail || '13,21,18';
+  const FOLLOW  = opts.follow   != null ? opts.follow   : 1;
+
+  const cv = document.createElement('canvas');
+  cv.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none;z-index:' + (opts.zIndex != null ? opts.zIndex : 0);
+  host.appendChild(cv);
+  const ctx = cv.getContext('2d', { alpha: true });
+
+  let W = 0, H = 0, dpr = 1;
+  // vanishing point: where the stars come FROM. tx/ty is the mouse target, cx/cy eases toward it.
+  let cx = 0, cy = 0, tx = 0, ty = 0;
+  const stars = new Array(QTY);
+
+  function spawn(s, seed) {
+    s.x = (Math.random() * 2 - 1) * W;
+    s.y = (Math.random() * 2 - 1) * H;
+    // seed=true fills every depth at once so the field is dense from frame 1; recycled stars
+    // re-enter at the far plane and fade in as they approach.
+    s.z = seed ? 1 + Math.random() * (W - 1) : W;
+    s.pz = s.z;
+  }
+
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const r = host.getBoundingClientRect();
+    W = Math.max(1, r.width); H = Math.max(1, r.height);
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    cx = tx = W / 2; cy = ty = H / 2;
+  }
+  resize();
+  // seeded AFTER resize — seeding first meant W/H were still 0, so every star spawned at the
+  // same far plane with alpha 0 and the whole field rendered black.
+  for (let i = 0; i < QTY; i++) { stars[i] = {}; spawn(stars[i], true); }
+
+  function onMove(e) {
+    const r = host.getBoundingClientRect();
+    // parallax: the vanishing point drifts a quarter of the way toward the pointer, never to the edge
+    tx = W / 2 + ((e.clientX - r.left) - W / 2) * 0.25 * FOLLOW;
+    ty = H / 2 + ((e.clientY - r.top) - H / 2) * 0.25 * FOLLOW;
+  }
+
+  let raf = 0, running = true;
+  function frame() {
+    if (!running) return;
+    raf = requestAnimationFrame(frame);
+
+    cx += (tx - cx) * 0.045;   // ease so the field glides instead of snapping
+    cy += (ty - cy) * 0.045;
+
+    ctx.fillStyle = 'rgba(' + TRAIL + ',0.28)';   // motion trails, instead of a hard clear
+    ctx.fillRect(0, 0, W, H);
+
+    const step = SPEED * 9;
+    for (let i = 0; i < QTY; i++) {
+      const s = stars[i];
+      s.pz = s.z;
+      s.z -= step;
+      if (s.z < 1) { spawn(s, false); continue; }
+
+      const k  = 128 / s.z,  px = s.x * k + cx,       py = s.y * k + cy;
+      const pk = 128 / s.pz, ox = s.x * pk + cx,      oy = s.y * pk + cy;
+
+      if (px < -50 || px > W + 50 || py < -50 || py > H + 50) { spawn(s, false); continue; }
+
+      const depth = 1 - s.z / W;                 // 0 far -> 1 near
+      ctx.strokeStyle = 'rgba(' + COLOR + ',' + (MAXA * depth).toFixed(3) + ')';
+      ctx.lineWidth = Math.max(0.4, depth * 2.1);
+      ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(px, py); ctx.stroke();
+    }
+  }
+
+  const ro = new ResizeObserver(resize);
+  ro.observe(host);
+  window.addEventListener('mousemove', onMove, { passive: true });
+  // ponytail: pause off-screen/hidden — a background animation must never burn CPU nobody is watching
+  const onVis = () => { if (document.hidden) { running = false; cancelAnimationFrame(raf); } else if (!running) { running = true; frame(); } };
+  document.addEventListener('visibilitychange', onVis);
+  frame();
+
+  return function stop() {
+    running = false; cancelAnimationFrame(raf);
+    ro.disconnect();
+    window.removeEventListener('mousemove', onMove);
+    document.removeEventListener('visibilitychange', onVis);
+    cv.remove();
+  };
+}
+
+
+/* Morphing text — letters melt into the next word (gooey/liquid morph) with a shining gradient.
+   Vanilla JS, zero dependencies. Восстановлено из первой Тайги (morphing-text.tsx).
+
+   The trick: two stacked copies of the text, each blurred and faded in opposition, then an SVG
+   `threshold` filter re-hardens the edges — blur + contrast = liquid. Nothing is drawn per-letter.
+
+   Usage:
+     const stop = MorphingText(el, ['ТАЙГА', 'СВОБОДА', 'БЕЗ ЦЕНЗУРЫ'], { morphTime: 1.5, cooldownTime: 0.9 });
+     stop();
+
+   Options: morphTime (sec of melting), cooldownTime (sec of holding a word), gradient (CSS), shine (sec).
+*/
+function MorphingText(host, words, opts) {
+  opts = opts || {};
+  const MORPH = opts.morphTime    != null ? opts.morphTime    : 1.5;
+  const COOL  = opts.cooldownTime != null ? opts.cooldownTime : 0.9;
+  const GRAD  = opts.gradient || 'linear-gradient(90deg,#5eead4,#38bdf8 25%,#818cf8 50%,#c084fc 75%,#5eead4)';
+  const SHINE = opts.shine != null ? opts.shine : 9;
+
+  if (!words || words.length < 2) throw new Error('MorphingText: need at least 2 words');
+
+  const uid = 'mt' + Math.random().toString(36).slice(2, 8);
+
+  if (!document.getElementById('mt-style')) {
+    const st = document.createElement('style');
+    st.id = 'mt-style';
+    st.textContent = '@keyframes mt-shine{to{background-position:200% center}}';
+    document.head.appendChild(st);
+  }
+
+  host.style.position = host.style.position || 'relative';
+  host.style.filter = 'url(#' + uid + '-threshold) blur(0.6px)';
+
+  const mkSpan = () => {
+    const s = document.createElement('span');
+    s.style.cssText =
+      'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;' +
+      'white-space:nowrap;background-image:' + GRAD + ';background-size:200% auto;' +
+      '-webkit-background-clip:text;background-clip:text;color:transparent;' +
+      'animation:mt-shine ' + SHINE + 's linear infinite;will-change:opacity,filter';
+    host.appendChild(s);
+    return s;
+  };
+  const a = mkSpan(), b = mkSpan();
+
+  // the threshold filter: heavy blur -> steep alpha contrast -> the blurs fuse into liquid shapes
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(svgNS, 'svg');
+  svg.setAttribute('style', 'position:absolute;width:0;height:0;pointer-events:none');
+  svg.innerHTML =
+    '<defs><filter id="' + uid + '-threshold" x="-20%" y="-50%" width="140%" height="200%">' +
+    '<feColorMatrix in="SourceGraphic" type="matrix" values="' +
+    '1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 255 -140"/></filter></defs>';
+  host.appendChild(svg);
+
+  let i = 0;                 // index of the word currently melting away
+  let frac = 0;              // 0..1 through the morph
+  let cooldown = COOL;
+  let last = performance.now();
+  a.textContent = words[0];
+  b.textContent = words[1 % words.length];
+
+  // opposed blur/opacity curves — one word dissolves exactly as the other condenses
+  function paint(f) {
+    const g = Math.min(Math.max(f, 1e-4), 1 - 1e-4);
+    b.style.filter  = 'blur(' + Math.min(8 / g - 8, 100).toFixed(2) + 'px)';
+    b.style.opacity = Math.pow(g, 0.4).toFixed(3);
+    const h = 1 - g;
+    a.style.filter  = 'blur(' + Math.min(8 / h - 8, 100).toFixed(2) + 'px)';
+    a.style.opacity = Math.pow(h, 0.4).toFixed(3);
+  }
+  paint(0);
+
+  let raf = 0, running = true;
+  function frame(now) {
+    if (!running) return;
+    raf = requestAnimationFrame(frame);
+    const dt = Math.min((now - last) / 1000, 0.1);   // clamp: a backgrounded tab must not jump the morph
+    last = now;
+
+    if (cooldown > 0) {                 // holding the current word steady
+      cooldown -= dt;
+      if (cooldown <= 0) frac = 0;
+      else { a.style.filter = b.style.filter = 'none'; a.style.opacity = '0'; b.style.opacity = '1'; return; }
+    }
+    frac += dt / MORPH;
+    if (frac >= 1) {                    // morph finished -> advance and hold
+      frac = 1; paint(1);
+      i = (i + 1) % words.length;
+      a.textContent = words[i];
+      b.textContent = words[(i + 1) % words.length];
+      cooldown = COOL;
+      return;
+    }
+    paint(frac);
+  }
+  const onVis = () => { if (document.hidden) { running = false; cancelAnimationFrame(raf); } else if (!running) { running = true; last = performance.now(); frame(last); } };
+  document.addEventListener('visibilitychange', onVis);
+  raf = requestAnimationFrame(frame);
+
+  return function stop() {
+    running = false; cancelAnimationFrame(raf);
+    document.removeEventListener('visibilitychange', onVis);
+    a.remove(); b.remove(); svg.remove();
+    host.style.filter = '';
+  };
+}
+
+
+(function(){
+  var DEF={bg:'tubes',tubes:['#2AA173','#4CC28F','#1E7A55'],lights:['#4CC28F','#5C82C9','#9FE8C6','#2AA173'],
+    intensity:200,qty:950,spd:0.6,fol:1,
+    words:['IMAGINATION','IS YOUR','ONLY LIMIT'],mt:1.4,ct:1.1,fs:56,
+    grad:'linear-gradient(90deg,#4CC28F,#9FE8C6 30%,#5C82C9 60%,#4CC28F)'};
+  var cfg; try{cfg=JSON.parse(localStorage.getItem('herocfg'))||null;}catch(e){cfg=null;}
+  cfg=cfg||JSON.parse(JSON.stringify(DEF));
+
+  var stage=document.getElementById('stage');
+  var stopWarp=null, tubesApp=null, tubesCv=null, stopMorph=null;
+
+  function colorInputs(holder, arr, onch){
+    holder.innerHTML='';
+    arr.forEach(function(c,i){
+      var inp=document.createElement('input');inp.type='color';inp.value=c;
+      inp.addEventListener('input',function(){arr[i]=inp.value;onch();});
+      holder.appendChild(inp);
+    });
+  }
+  function applyBg(){
+    if(stopWarp){stopWarp();stopWarp=null;}
+    if(tubesApp&&tubesApp.dispose){try{tubesApp.dispose();}catch(e){}}
+    if(tubesCv){tubesCv.remove();tubesCv=null;} tubesApp=null;
+    if(cfg.bg==='warp'||cfg.bg==='both')
+      stopWarp=Starfield(stage,{quantity:cfg.qty,speed:cfg.spd,follow:cfg.fol,trail:'13,21,18',color:'235,242,236',zIndex:1});
+    if(cfg.bg==='tubes'||cfg.bg==='both'){
+      tubesCv=document.createElement('canvas');
+      tubesCv.style.cssText='position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none';
+      stage.appendChild(tubesCv);
+      import('https://cdn.jsdelivr.net/npm/threejs-components@0.0.19/build/cursors/tubes1.min.js')
+        .then(function(m){tubesApp=m.default(tubesCv,{tubes:{colors:cfg.tubes,lights:{intensity:cfg.intensity,colors:cfg.lights}}});})
+        .catch(function(){});
+    }
+  }
+  function applyMorph(){
+    if(stopMorph){stopMorph();stopMorph=null;}
+    var host=document.getElementById('morphhost');
+    host.style.fontSize=cfg.fs+'px'; host.style.height=(cfg.fs*2)+'px';
+    var w=cfg.words.filter(function(x){return x.trim();});
+    if(w.length>=2) stopMorph=MorphingText(host,w,{morphTime:cfg.mt,cooldownTime:cfg.ct,gradient:cfg.grad});
+  }
+  function save(){try{localStorage.setItem('herocfg',JSON.stringify(cfg));}catch(e){}
+    document.getElementById('cfgout').value=JSON.stringify(cfg,null,1);}
+  function bind(id,out,key,fn,isInt){
+    var el=document.getElementById(id);
+    el.value=cfg[key];
+    if(out) document.getElementById(out).textContent=cfg[key];
+    el.addEventListener('input',function(){
+      cfg[key]=isInt?parseInt(el.value):parseFloat(el.value);
+      if(out) document.getElementById(out).textContent=el.value;
+      fn();save();});
+  }
+  document.getElementById('bgmode').value=cfg.bg;
+  document.getElementById('bgmode').addEventListener('change',function(e){cfg.bg=e.target.value;applyBg();save();});
+  colorInputs(document.getElementById('tubecols'),cfg.tubes,function(){applyBg();save();});
+  colorInputs(document.getElementById('lightcols'),cfg.lights,function(){applyBg();save();});
+  bind('r-int','o-int','intensity',applyBg,true);
+  bind('r-qty','o-qty','qty',applyBg,true);
+  bind('r-spd','o-spd','spd',applyBg);
+  bind('r-fol','o-fol','fol',applyBg);
+  var wta=document.getElementById('words'); wta.value=cfg.words.join('\n');
+  wta.addEventListener('input',function(){cfg.words=wta.value.split('\n');applyMorph();save();});
+  bind('r-mt','o-mt','mt',applyMorph);
+  bind('r-ct','o-ct','ct',applyMorph);
+  bind('r-fs','o-fs','fs',applyMorph,true);
+  var g=document.getElementById('grad'); g.value=cfg.grad;
+  g.addEventListener('change',function(){cfg.grad=g.value;applyMorph();save();});
+  document.getElementById('copy').addEventListener('click',function(){
+    var t=JSON.stringify(cfg);
+    (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(function(){
+      document.getElementById('okmsg').textContent='Скопировано - кидай мне в чат';
+    }).catch(function(){document.getElementById('cfgout').select();document.execCommand('copy');
+      document.getElementById('okmsg').textContent='Выдели и скопируй из окна ниже';});
+    setTimeout(function(){document.getElementById('okmsg').textContent='';},4000);
+  });
+  document.getElementById('reset').addEventListener('click',function(){
+    cfg=JSON.parse(JSON.stringify(DEF));localStorage.removeItem('herocfg');location.reload();});
+  applyBg();applyMorph();save();
+})();
+</script>
