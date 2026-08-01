@@ -91,7 +91,7 @@ header{border-bottom:1px solid var(--rule)}
 .section-head .idx{font-size:13px;color:var(--ink-soft);letter-spacing:.1em;text-transform:uppercase}
 .section-sub{color:var(--ink-soft);margin:10px 0 32px;max-width:64ch}
 
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start}
 @media (max-width:820px){.grid{grid-template-columns:1fr}}
 
 /* ---------- service card ---------- */
@@ -287,13 +287,13 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 
 <header>
   <div class="wrap topbar">
-    <div class="wordmark serif">Custom Software <span class="tick">&amp;</span> Automation Studio</div>
+    <div class="wordmark serif">Custom Software <span class="tick">and</span> Automation Studio</div>
     <a class="cta" href="mailto:tagir.zalyatov@gmail.com">Get a quote</a>
   </div>
 </header>
 <nav class="secnav"><div class="progressline" id="progressline"></div><div class="wrap secnav-in">
 <input class="finder" id="finder" type="search" placeholder="Type what annoys you: invoices, rota, leads..." aria-label="Search the 56 services">
-<a href="#s-data">Data</a><a href="#s-fin">Finance</a><a href="#s-crm">Sales &amp; CRM</a><a href="#s-ai">AI</a><a href="#s-ops">Operations</a><a href="#s-web">Web &amp; clients</a><a href="#s-rep">Reporting</a><a href="#s-infra">Infrastructure</a>
+<a href="#s-data">Data</a><a href="#s-fin">Finance</a><a href="#s-crm">Sales and CRM</a><a href="#s-ai">AI</a><a href="#s-ops">Operations</a><a href="#s-web">Web and clients</a><a href="#s-rep">Reporting</a><a href="#s-infra">Infrastructure</a>
 </div></nav>
 
 <div class="hero">
@@ -309,12 +309,29 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 
 <main class="wrap">
 
-  <div class="section-head" id="s-data"><span class="idx serif">7 services</span><h2 class="serif">Data collection &amp; integration</h2></div>
+  <div class="section-head" id="s-data"><span class="idx serif">7 services</span><h2 class="serif">Data collection and integration</h2></div>
   <p class="section-sub">The morning routine of checking sites, the price lists in twelve formats, the systems that each hold their own version of the truth.</p>
 
   <div class="grid" id="g-data">
 
     <!-- 1 -->
+    <article class="card wide">
+      <div class="mock demo">
+        <div class="mtitle"><span>Marketplace alerts</span><button class="runbtn" type="button">▶ go live</button></div>
+        <div class="nodes"><div class="node" data-lit>Amazon</div><div class="link" data-lit></div><div class="node" data-lit>Ozon</div><div class="link" data-lit></div><div class="node" data-lit>eBay</div><div class="link" data-lit></div><div class="node" data-lit>Telegram</div></div>
+        <div class="mrow" data-step><span class="dot r"></span><span class="grow"><b>Buy-box lost</b> · Amazon, SKU 2210</span><span class="mono">09:41</span></div>
+        <div class="mrow" data-step><span class="dot a"></span><span class="grow">Undercut by <span class="mono">€1.30</span> · Ozon, SKU 1148</span><span class="mono">09:37</span></div>
+        <div class="mrow" data-step><span class="dot a"></span><span class="grow">Review ★2 posted · Wildberries</span><span class="mono">08:15</span></div>
+        <div class="mrow" data-step><span class="dot g"></span><span class="grow">Competitor out of stock, you are alone on the page · eBay</span><span class="mono">07:52</span></div>
+        <div class="mrow" data-step><span class="grow">Position report pushed to your phone</span><span class="chip g">sent</span></div>
+      </div>
+      <div class="body">
+        <h3><span class="num mono">03</span>Marketplace monitoring</h3>
+        <p>Track your own and competitor cards on Amazon, Wildberries, Ozon, eBay, Etsy: position, price, stock, reviews, buy-box status. Alerts fire the moment a competitor undercuts you or a listing dies.</p>
+        <div class="kills"><b>Removes</b><span>finding out about a lost buy-box days later. Now it's minutes.</span></div>
+      </div>
+    </article>
+
     <article class="card">
       <div class="mock demo">
         <div class="mtitle"><span>Price watch · daily run</span><button class="runbtn" type="button">▶ run 06:00 scrape</button></div>
@@ -324,17 +341,16 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <div class="mrow mono" data-step><span class="grow">CompetitorB · Widget Pro</span><span>€51.20</span><span class="chip g">holding</span></div>
         <div class="mrow mono" data-step><span class="grow">Supplier stock · SKU 1148</span><span>212 pcs</span><span class="up">▲</span></div>
         <div class="mrow mono" data-step><span class="grow">Your price now 2nd cheapest</span><span>€49.99</span><span class="chip a">review</span></div>
-        <div class="mrow" data-step><span class="grow">Written to CRM &amp; spreadsheet</span><span class="chip g">done</span></div>
+        <div class="mrow" data-step><span class="grow">Written to CRM and spreadsheet</span><span class="chip g">done</span></div>
         <span class="cursorline mono">06:00:04 · 4 sources</span>
       </div>
       <div class="body">
-        <h3><span class="num mono">01</span>Website &amp; competitor parsers</h3>
+        <h3><span class="num mono">01</span>Website and competitor parsers</h3>
         <p>A bot visits the sites you already check by hand every morning (competitor prices, supplier stock, marketplace listings, exchange rates) and drops the data into your spreadsheet, database or CRM before the office opens.</p>
         <div class="kills"><b>Removes</b><span>2 hours a day of manual checking, and data that's always a day stale.</span></div>
       </div>
     </article>
 
-    <!-- 2 -->
     <article class="card">
       <div class="mock demo">
         <div class="mtitle"><span>Supplier import</span><button class="runbtn" type="button">▶ import 4 files</button></div>
@@ -357,25 +373,6 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
       </div>
     </article>
 
-    <!-- 3 -->
-    <article class="card wide">
-      <div class="mock demo">
-        <div class="mtitle"><span>Marketplace alerts</span><button class="runbtn" type="button">▶ go live</button></div>
-        <div class="nodes"><div class="node" data-lit>Amazon</div><div class="link" data-lit></div><div class="node" data-lit>Ozon</div><div class="link" data-lit></div><div class="node" data-lit>eBay</div><div class="link" data-lit></div><div class="node" data-lit>Telegram</div></div>
-        <div class="mrow" data-step><span class="dot r"></span><span class="grow"><b>Buy-box lost</b> · Amazon, SKU 2210</span><span class="mono">09:41</span></div>
-        <div class="mrow" data-step><span class="dot a"></span><span class="grow">Undercut by <span class="mono">€1.30</span> · Ozon, SKU 1148</span><span class="mono">09:37</span></div>
-        <div class="mrow" data-step><span class="dot a"></span><span class="grow">Review ★2 posted · Wildberries</span><span class="mono">08:15</span></div>
-        <div class="mrow" data-step><span class="dot g"></span><span class="grow">Competitor out of stock, you are alone on the page · eBay</span><span class="mono">07:52</span></div>
-        <div class="mrow" data-step><span class="grow">Position report pushed to your phone</span><span class="chip g">sent</span></div>
-      </div>
-      <div class="body">
-        <h3><span class="num mono">03</span>Marketplace monitoring</h3>
-        <p>Track your own and competitor cards on Amazon, Wildberries, Ozon, eBay, Etsy: position, price, stock, reviews, buy-box status. Alerts fire the moment a competitor undercuts you or a listing dies.</p>
-        <div class="kills"><b>Removes</b><span>finding out about a lost buy-box days later. Now it's minutes.</span></div>
-      </div>
-    </article>
-
-    <!-- 4 -->
     <article class="card">
       <div class="mock demo">
         <div class="mtitle"><span>Registry watch → Telegram</span><button class="runbtn" type="button">▶ overnight scan</button></div>
@@ -387,13 +384,12 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <div class="mrow" data-step><span class="grow">3 matches on your phone before you woke up</span><span class="chip g">sent</span></div>
       </div>
       <div class="body">
-        <h3><span class="num mono">04</span>Tender &amp; registry monitoring</h3>
+        <h3><span class="num mono">04</span>Tender and registry monitoring</h3>
         <p>Automated watching of procurement portals, company registries, court databases and bankruptcy notices, filtered to your criteria and pushed to email or Telegram.</p>
         <div class="kills"><b>Removes</b><span>missed tenders, and signing contracts with counterparties already in court.</span></div>
       </div>
     </article>
 
-    <!-- 5 -->
     <article class="card">
       <div class="mock demo">
         <div class="mtitle"><span>Lead harvest → CRM</span><button class="runbtn" type="button">▶ scrape</button></div>
@@ -404,13 +400,12 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <div class="mrow" data-step><span class="grow"><b>Loaded to CRM, ready to call</b> at <span class="mono">08:40</span></span><span class="chip g">293 new</span></div>
       </div>
       <div class="body">
-        <h3><span class="num mono">05</span>Lead scraping from directories &amp; maps</h3>
+        <h3><span class="num mono">05</span>Lead scraping from directories and maps</h3>
         <p>Pull business listings from Google Maps, industry catalogues and directories, clean them, deduplicate against your existing base, and load them into the CRM ready to call.</p>
         <div class="kills"><b>Removes</b><span>the junior researcher role, and the stale, half-duplicate call lists.</span></div>
       </div>
     </article>
 
-    <!-- 6 -->
     <article class="card">
       <div class="mock demo">
         <div class="mtitle"><span>Systems, connected</span><button class="runbtn" type="button">▶ new order</button></div>
@@ -430,7 +425,6 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
       </div>
     </article>
 
-    <!-- 7 -->
     <article class="card">
       <div class="mock demo">
         <div class="mtitle"><span>Legacy migration</span><button class="runbtn" type="button">▶ migrate 12 years</button></div>
@@ -449,11 +443,28 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 
   <div class="band">
-  <div class="section-head" id="s-fin"><span class="idx serif">7 services</span><h2 class="serif">Accounting &amp; finance</h2></div>
+  <div class="section-head" id="s-fin"><span class="idx serif">7 services</span><h2 class="serif">Accounting and finance</h2></div>
   <p class="section-sub">Invoices, reconciliation, payroll, cash. The paperwork that eats the first week of every month.</p>
   <div class="grid" id="g-fin">
 
     <!-- 8 -->
+    <article class="card wide">
+      <div class="mock demo">
+        <div class="mtitle"><span>Deal won → paperwork</span><button class="runbtn" type="button">▶ mark deal won</button></div>
+        <div class="nodes"><div class="node" data-lit>Deal won</div><div class="link" data-lit></div><div class="node" data-lit>Documents</div><div class="link" data-lit></div><div class="node" data-lit>Client inbox</div></div>
+        <div class="doc" data-step><b>Invoice #2041 · Northgate Ltd · €14 200</b><div class="dline"></div><div class="dline"></div><div class="dline short"></div></div>
+        <div class="mrow" data-step><span class="dot g"></span><span class="grow">Numbered and filed, no gaps in the series</span><span class="mono">14:02:11</span></div>
+        <div class="mrow" data-step><span class="dot g"></span><span class="grow">Delivery note + contract from your template</span><span class="mono">14:02:12</span></div>
+        <div class="mrow" data-step><span class="dot g"></span><span class="grow">Emailed to client, copy to accounting</span><span class="mono">14:02:14</span></div>
+        <div class="mrow" data-step><span class="grow">Human involvement</span><span class="chip g">none</span></div>
+      </div>
+      <div class="body">
+        <h3><span class="num mono">09</span>Automatic invoice and document generation</h3>
+        <p>Invoices, delivery notes, contracts and closing documents generated the moment a deal changes state: numbered correctly, filed correctly, sent to the client automatically.</p>
+        <div class="kills"><b>Removes</b><span>the full working week a 200-invoice-a-month company loses to paperwork.</span></div>
+      </div>
+    </article>
+
     <article class="card">
       <div class="mock demo">
         <div class="mtitle"><span>Monthly report</span><button class="runbtn" type="button">▶ generate</button></div>
@@ -473,25 +484,6 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
       </div>
     </article>
 
-    <!-- 9 -->
-    <article class="card wide">
-      <div class="mock demo">
-        <div class="mtitle"><span>Deal won → paperwork</span><button class="runbtn" type="button">▶ mark deal won</button></div>
-        <div class="nodes"><div class="node" data-lit>Deal won</div><div class="link" data-lit></div><div class="node" data-lit>Documents</div><div class="link" data-lit></div><div class="node" data-lit>Client inbox</div></div>
-        <div class="doc" data-step><b>Invoice #2041 · Northgate Ltd · €14 200</b><div class="dline"></div><div class="dline"></div><div class="dline short"></div></div>
-        <div class="mrow" data-step><span class="dot g"></span><span class="grow">Numbered and filed, no gaps in the series</span><span class="mono">14:02:11</span></div>
-        <div class="mrow" data-step><span class="dot g"></span><span class="grow">Delivery note + contract from your template</span><span class="mono">14:02:12</span></div>
-        <div class="mrow" data-step><span class="dot g"></span><span class="grow">Emailed to client, copy to accounting</span><span class="mono">14:02:14</span></div>
-        <div class="mrow" data-step><span class="grow">Human involvement</span><span class="chip g">none</span></div>
-      </div>
-      <div class="body">
-        <h3><span class="num mono">09</span>Automatic invoice &amp; document generation</h3>
-        <p>Invoices, delivery notes, contracts and closing documents generated the moment a deal changes state: numbered correctly, filed correctly, sent to the client automatically.</p>
-        <div class="kills"><b>Removes</b><span>the full working week a 200-invoice-a-month company loses to paperwork.</span></div>
-      </div>
-    </article>
-
-    <!-- 10 -->
     <article class="card">
       <div class="mock demo">
         <div class="mtitle"><span>Bank reconciliation</span><button class="runbtn" type="button">▶ run matching</button></div>
@@ -509,7 +501,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
       </div>
     </article>
 
-<article class="card">
+    <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Overdue ledger</span><button class="runbtn" type="button">▶ chase debtors</button></div>
     <div class="mrow" data-step><span class="dot a"></span><span class="grow"><b>Northgate Ltd</b> · <span class="mono">€ 14 200</span> · polite nudge</span><span class="chip a">day 12</span></div>
@@ -526,7 +518,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 </article>
 
-<article class="card">
+    <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Receipt inbox</span><button class="runbtn" type="button">▶ read receipts</button></div>
     <div class="filechips"><span class="fchip" data-eat>Photo: fuel station</span><span class="fchip" data-eat>Photo: hotel bill</span><span class="fchip" data-eat>PDF invoice</span></div>
@@ -543,7 +535,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 </article>
 
-<article class="card">
+    <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Payroll run · March</span><button class="runbtn" type="button">▶ run payroll</button></div>
     <div class="nodes"><div class="node" data-lit>Time clock</div><div class="link" data-lit></div><div class="node" data-lit>Payroll</div><div class="link" data-lit></div><div class="node" data-lit>Accounting</div></div>
@@ -560,7 +552,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 </article>
 
-<article class="card">
+    <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Cash position</span><button class="runbtn" type="button">▶ look 90 days ahead</button></div>
     <div class="mrow mono" data-step><span class="grow">Cash today</span><div class="bar"><i data-w="72"></i></div><span data-count="128400">0</span></div>
@@ -579,10 +571,26 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
   </div><!-- /band -->
 
-  <div class="section-head" id="s-crm"><span class="idx serif">8 services</span><h2 class="serif">Sales &amp; CRM</h2></div>
+  <div class="section-head" id="s-crm"><span class="idx serif">8 services</span><h2 class="serif">Sales and CRM</h2></div>
   <p class="section-sub">Leads answered in minutes, proposals in seconds, and a client history that stays when a salesperson leaves.</p>
   <div class="grid" id="g-crm">
-<article class="card">
+<article class="card wide">
+  <div class="mock demo">
+    <div class="mtitle"><span>Funnel · this month</span><button class="runbtn" type="button">▶ show the funnel</button></div>
+    <div class="mrow" data-step><span class="grow">Qualified</span><span class="bar"><i data-w="100"></i></span><span class="mono"><span data-count="212">0</span></span></div>
+    <div class="mrow" data-step><span class="grow">Proposal sent</span><span class="bar"><i data-w="54"></i></span><span class="mono">114</span></div>
+    <div class="mrow" data-step><span class="grow">Won <span class="up">▲</span> 3 pts on last month</span><span class="bar"><i data-w="22"></i></span><span class="mono">47</span></div>
+    <div class="mrow" data-step><span class="dot r"></span><span class="grow">Stalled 19 days · Verrico SRL, <span class="mono">€ 88 000</span></span><span class="chip r">act</span></div>
+    <div class="mrow" data-step><span class="grow">Two deals need the meeting, rest is fine</span><span class="chip g">done</span></div>
+  </div>
+  <div class="body">
+    <h3><span class="num mono">19</span>Sales pipeline dashboard</h3>
+    <p>A live view of the funnel by manager, product, source and stage, with conversion rates and alerts on deals that have stopped moving. The weekly sales meeting becomes a five minute conversation about the two deals that matter.</p>
+    <div class="kills"><b>Removes</b><span>an hour of reading numbers aloud from a spreadsheet somebody rebuilt on Sunday night.</span></div>
+  </div>
+</article>
+
+    <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Pipeline · your stages</span><button class="runbtn" type="button">▶ open deal card</button></div>
     <div class="nodes"><div class="node" data-lit>Enquiry</div><div class="link" data-lit></div><div class="node" data-lit>Survey</div><div class="link" data-lit></div><div class="node" data-lit>Drawing</div><div class="link" data-lit></div><div class="node" data-lit>Quote</div></div>
@@ -600,7 +608,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 </article>
 
-<article class="card">
+    <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Client card · Northgate Ltd</span><button class="runbtn" type="button">▶ open history</button></div>
     <div class="nodes"><div class="node" data-lit>Phone</div><div class="link" data-lit></div><div class="node" data-lit>CRM</div><div class="link" data-lit></div><div class="node" data-lit>Email</div></div>
@@ -616,7 +624,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 </article>
 
-<article class="card">
+    <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Incoming enquiries</span><button class="runbtn" type="button">▶ route leads</button></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow"><b>Score 92</b> · 400 units, budget stated · Milan</span><span class="chip g">Anna, south</span></div>
@@ -632,7 +640,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 </article>
 
-<article class="card">
+    <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Proposal builder</span><button class="runbtn" type="button">▶ build proposal</button></div>
     <div class="mrow" data-step><span class="grow">Picked: 3 line items, 12% volume discount</span><span class="mono">€ 47 300</span></div>
@@ -648,23 +656,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 </article>
 
-<article class="card wide">
-  <div class="mock demo">
-    <div class="mtitle"><span>Funnel · this month</span><button class="runbtn" type="button">▶ show the funnel</button></div>
-    <div class="mrow" data-step><span class="grow">Qualified</span><span class="bar"><i data-w="100"></i></span><span class="mono"><span data-count="212">0</span></span></div>
-    <div class="mrow" data-step><span class="grow">Proposal sent</span><span class="bar"><i data-w="54"></i></span><span class="mono">114</span></div>
-    <div class="mrow" data-step><span class="grow">Won <span class="up">▲</span> 3 pts on last month</span><span class="bar"><i data-w="22"></i></span><span class="mono">47</span></div>
-    <div class="mrow" data-step><span class="dot r"></span><span class="grow">Stalled 19 days · Verrico SRL, <span class="mono">€ 88 000</span></span><span class="chip r">act</span></div>
-    <div class="mrow" data-step><span class="grow">Two deals need the meeting, rest is fine</span><span class="chip g">done</span></div>
-  </div>
-  <div class="body">
-    <h3><span class="num mono">19</span>Sales pipeline dashboard</h3>
-    <p>A live view of the funnel by manager, product, source and stage, with conversion rates and alerts on deals that have stopped moving. The weekly sales meeting becomes a five minute conversation about the two deals that matter.</p>
-    <div class="kills"><b>Removes</b><span>an hour of reading numbers aloud from a spreadsheet somebody rebuilt on Sunday night.</span></div>
-  </div>
-</article>
-
-<article class="card">
+    <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Campaign engine</span><button class="runbtn" type="button">▶ wake dormant clients</button></div>
     <div class="bigstat mono"><div data-step><b data-count="1840">0</b><span>no order in 9 months</span></div><div data-step><b data-count="167">0</b><span>came back</span></div><div data-step><b data-count="18900">0</b><span>euro reordered</span></div></div>
@@ -680,7 +672,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 </article>
 
-<article class="card">
+    <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Client portal · Northgate Ltd</span><button class="runbtn" type="button">▶ log in as client</button></div>
     <div class="mrow" data-step><span class="grow">Client asks: where is my order, and what do I owe?</span><span class="mono">08:41</span></div>
@@ -697,7 +689,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 </article>
 
-<article class="card wide">
+    <article class="card wide">
   <div class="mock demo">
     <div class="mtitle"><span>Loyalty and partners</span><button class="runbtn" type="button">▶ close the month</button></div>
     <div class="nodes"><div class="node" data-lit>Purchase</div><div class="link" data-lit></div><div class="node" data-lit>Points</div><div class="link" data-lit></div><div class="node" data-lit>Tier</div></div>
@@ -723,7 +715,29 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   <div class="section-head" id="s-ai"><span class="idx serif">10 services</span><h2 class="serif">Artificial intelligence</h2></div>
   <p class="section-sub">Bots that answer from your own documents, calls that write themselves into the CRM, and forecasts that order stock before it runs out.</p>
   <div class="grid" id="g-ai">
-<article class="card">
+<article class="card wide">
+  <div class="mock demo">
+    <div class="mtitle"><span>Purchase plan · week 12</span><button class="runbtn" type="button">▶ run the forecast</button></div>
+    <div class="mrow" data-step><span class="grow">Sales history, seasonality, promos, supplier lead times</span><span class="mono">36 months</span></div>
+    <div class="mrow mono" data-step><span class="grow">SKU 2210 cover</span><div class="bar"><i data-w="11"></i></div><span data-count="9">0</span></div>
+    <div class="mrow mono" data-step><span class="grow">SKU 3105 cover</span><div class="bar"><i data-w="47"></i></div><span data-count="38">0</span></div>
+    <div class="mrow mono" data-step><span class="grow">SKU 4188 cover</span><div class="bar"><i data-w="96"></i></div><span data-count="97">0</span></div>
+    <div class="mrow" data-step><span class="dot r"></span><span class="grow"><b>SKU 2210</b> · stockout in 9 days, order <b class="mono">640</b> units now</span><span class="chip r">urgent</span></div>
+    <div class="mrow" data-step><span class="dot a"></span><span class="grow"><b>SKU 4188</b> · 14 weeks of cover, pause purchasing</span><span class="chip a">overstocked</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Purchase order drafted for Lehmann Handel</span><span class="chip g">approved</span></div>
+    <div class="bigstat mono" style="margin-top:8px">
+      <div data-step><b data-count="86400">0</b><span>euro freed from dead stock</span></div>
+      <div data-step><b data-count="3">0</b><span>stockouts avoided this quarter</span></div>
+    </div>
+  </div>
+      <div class="body">
+    <h3><span class="num mono">29</span>Demand and inventory forecasting</h3>
+    <p>A model trained on your own sales history, seasonality, promotions and supplier lead times tells you what to order and when. It targets the two failures that cost real money and never show up cleanly in the accounts: capital frozen in dead stock, and sales lost to an empty shelf.</p>
+    <div class="kills"><b>Removes</b><span>ordering by gut feel from a spreadsheet that is already a week out of date.</span></div>
+  </div>
+</article>
+
+    <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Support bot, WhatsApp</span><button class="runbtn" type="button">▶ ask the bot</button></div>
     <div class="mrow" data-step><span class="grow">Customer: is the 18mm panel in stock and what does delivery to Lyon cost?</span><span class="mono">21:14</span></div>
@@ -744,7 +758,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 </article>
 
-<article class="card">
+    <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Internal assistant</span><button class="runbtn" type="button">▶ ask about the contract</button></div>
     <div class="filechips"><span class="fchip" data-eat>Supply contracts</span><span class="fchip" data-eat>Internal policy</span><span class="fchip" data-eat>Tech manuals</span><span class="fchip" data-eat>Project archive</span></div>
@@ -760,7 +774,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 </article>
 
-<article class="card">
+    <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Call · Northgate Ltd</span><button class="runbtn" type="button">▶ transcribe call</button></div>
     <div class="mrow" data-step><span class="grow">Sales call, 14 min, recorded</span><span class="mono">10:26</span></div>
@@ -776,7 +790,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 </article>
 
-<article class="card">
+    <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Inbox · incoming documents</span><button class="runbtn" type="button">▶ sort the mailbox</button></div>
     <div class="filechips">
@@ -802,7 +816,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 </article>
 
-<article class="card">
+    <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Catalogue generation</span><button class="runbtn" type="button">▶ write the catalogue</button></div>
     <div class="mrow" data-step><span class="grow">Source attributes read from your PIM</span><span class="mono">5,000 items</span></div>
@@ -818,7 +832,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 </article>
 
-<article class="card">
+    <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Vacancy · Warehouse supervisor</span><button class="runbtn" type="button">▶ rank applicants</button></div>
     <div class="mrow" data-step><span class="grow">Applications parsed and matched to requirements</span><span class="mono"><span data-count="184">0</span></span></div>
@@ -834,29 +848,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 </article>
 
-<article class="card wide">
-  <div class="mock demo">
-    <div class="mtitle"><span>Purchase plan · week 12</span><button class="runbtn" type="button">▶ run the forecast</button></div>
-    <div class="mrow" data-step><span class="grow">Sales history, seasonality, promos, supplier lead times</span><span class="mono">36 months</span></div>
-    <div class="mrow mono" data-step><span class="grow">SKU 2210 cover</span><div class="bar"><i data-w="11"></i></div><span data-count="9">0</span></div>
-    <div class="mrow mono" data-step><span class="grow">SKU 3105 cover</span><div class="bar"><i data-w="47"></i></div><span data-count="38">0</span></div>
-    <div class="mrow mono" data-step><span class="grow">SKU 4188 cover</span><div class="bar"><i data-w="96"></i></div><span data-count="97">0</span></div>
-    <div class="mrow" data-step><span class="dot r"></span><span class="grow"><b>SKU 2210</b> · stockout in 9 days, order <b class="mono">640</b> units now</span><span class="chip r">urgent</span></div>
-    <div class="mrow" data-step><span class="dot a"></span><span class="grow"><b>SKU 4188</b> · 14 weeks of cover, pause purchasing</span><span class="chip a">overstocked</span></div>
-    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Purchase order drafted for Lehmann Handel</span><span class="chip g">approved</span></div>
-    <div class="bigstat mono" style="margin-top:8px">
-      <div data-step><b data-count="86400">0</b><span>euro freed from dead stock</span></div>
-      <div data-step><b data-count="3">0</b><span>stockouts avoided this quarter</span></div>
-    </div>
-  </div>
-      <div class="body">
-    <h3><span class="num mono">29</span>Demand and inventory forecasting</h3>
-    <p>A model trained on your own sales history, seasonality, promotions and supplier lead times tells you what to order and when. It targets the two failures that cost real money and never show up cleanly in the accounts: capital frozen in dead stock, and sales lost to an empty shelf.</p>
-    <div class="kills"><b>Removes</b><span>ordering by gut feel from a spreadsheet that is already a week out of date.</span></div>
-  </div>
-</article>
-
-<article class="card">
+    <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Shelf and line checks</span><button class="runbtn" type="button">▶ read the photos</button></div>
     <div class="filechips"><span class="fchip" data-eat>Store 14 shelf</span><span class="fchip" data-eat>Line camera</span><span class="fchip" data-eat>Pallet label</span></div>
@@ -873,7 +865,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 </article>
 
-<article class="card">
+    <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Voice bot · Sunday 23:04</span><button class="runbtn" type="button">▶ take the call</button></div>
     <div class="nodes"><div class="node" data-lit>Phone line</div><div class="link" data-lit></div><div class="node" data-lit>Voice bot</div><div class="link" data-lit></div><div class="node" data-lit>CRM</div></div>
@@ -917,106 +909,9 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <a class="cta" href="mailto:tagir.zalyatov@gmail.com?subject=Automation%20enquiry">Get a quote</a>
   </div>
 
-  <div class="section-head" id="s-ops"><span class="idx serif">8 services</span><h2 class="serif">Operations &amp; internal workflow</h2></div>
+  <div class="section-head" id="s-ops"><span class="idx serif">8 services</span><h2 class="serif">Operations and internal workflow</h2></div>
   <p class="section-sub">Approvals that move, rotas that build themselves, crews that report from the road, stock counts that match the shelf.</p>
   <div class="grid" id="g-ops">
-<article class="card">
-  <div class="mock demo">
-    <div class="mtitle"><span>Fit-out job board</span><button class="runbtn" type="button">▶ move the job</button></div>
-    <div class="mrow" data-step><span class="dot g"></span><span class="grow"><b>Northgate Ltd</b> · unit 4 fit-out</span><span class="mono">stage 3/6</span></div>
-    <div class="mrow" data-step><span class="grow">Site survey checklist</span><div class="bar"><i data-w="100"></i></div><span class="chip g">signed off</span></div>
-    <div class="mrow" data-step><span class="grow">Materials on site</span><div class="bar"><i data-w="72"></i></div><span class="chip a">2 items late</span></div>
-    <div class="mrow" data-step><span class="dot a"></span><span class="grow">Handover to install crew · due <span class="mono">14 Mar</span></span></div>
-    <div class="mrow" data-step><span class="grow">Client view updated, no email needed</span><span class="chip g">live</span></div>
-  </div>
-  <div class="body">
-    <h3><span class="num mono">32</span>Custom task and project tracking</h3>
-    <p>Generic trackers force your work into someone else's shape. This one is built around your stages, checklists, handover points and deadlines, with the right view for each person who needs it. Strongest in production, construction, installation and agency work.</p>
-    <div class="kills"><b>Removes</b><span>chasing every stage update by phone and rebuilding the same status list in a spreadsheet.</span></div>
-  </div>
-</article>
-
-<article class="card">
-  <div class="mock demo">
-    <div class="mtitle"><span>Approval routing</span><button class="runbtn" type="button">▶ route for sign-off</button></div>
-    <div class="filechips"><span class="fchip" data-eat>Purchase request</span><span class="fchip" data-eat>Discount 18%</span><span class="fchip" data-eat>Leave request</span><span class="fchip" data-eat>Expenses</span></div>
-    <div class="arrowdown">▼ routed by amount and type ▼</div>
-    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Purchase <span class="mono">€1,240</span> · line manager</span><span class="chip g">approved 09:41</span></div>
-    <div class="mrow" data-step><span class="dot a"></span><span class="grow">Discount 18% · finance director</span><span class="chip a">reminder sent</span></div>
-    <div class="mrow" data-step><span class="grow">Expenses <span class="mono">€380</span> · policy check passed</span><span class="chip g">approved</span></div>
-    <div class="mrow" data-step><span class="grow">Audit trail written, 4 of 4 cleared in <span class="mono">6h</span></span><span class="chip g">done</span></div>
-  </div>
-  <div class="body">
-    <h3><span class="num mono">33</span>Approval and sign-off workflows</h3>
-    <p>Purchase requests, discounts, leave, expenses and contracts go to the right approver automatically by amount and type, with reminders, deadlines and a complete audit trail behind every decision.</p>
-    <div class="kills"><b>Removes</b><span>the paper folder that sits four days on a director's desk while the deal waits.</span></div>
-  </div>
-</article>
-
-<article class="card">
-  <div class="mock demo">
-    <div class="mtitle"><span>Document assembly</span><button class="runbtn" type="button">▶ generate the contract</button></div>
-    <div class="mrow" data-step><span class="grow">Client <b>Northgate Ltd</b> · order <span class="mono">SO-4417</span></span><span class="chip g">data found</span></div>
-    <div class="mrow" data-step><span class="grow">Clause set: prepayment, 30 days, EU delivery</span><span class="chip g">by rule</span></div>
-    <div class="doc" data-step><b>Supply contract 2026/118</b><div class="dline"></div><div class="dline short"></div></div>
-    <div class="mrow" data-step><span class="grow">Numbered, versioned <span class="mono">v1.0</span>, stored to file</span><span class="chip g">ready to sign</span></div>
-  </div>
-  <div class="body">
-    <h3><span class="num mono">34</span>Document generation from templates</h3>
-    <p>Contracts, acts, powers of attorney, specifications and reports built from data you already hold, correctly numbered and versioned, with variable clauses picked by rule. Legal approves the template once instead of reading every document.</p>
-    <div class="kills"><b>Removes</b><span>copying last month's file, editing the names by hand and hoping nothing was missed.</span></div>
-  </div>
-</article>
-
-<article class="card">
-  <div class="mock demo">
-    <div class="mtitle"><span>Week 11 rota</span><button class="runbtn" type="button">▶ build the rota</button></div>
-    <div class="mrow" data-step><span class="grow">Forecast demand: <span data-count="312">0</span> covers Fri evening</span><span class="up">▲</span></div>
-    <div class="mrow" data-step><span class="grow">Shifts filled</span><div class="bar"><i data-w="96"></i></div><span class="mono">44/46</span></div>
-    <div class="mrow" data-step><span class="dot a"></span><span class="grow">Sat late · needs a keyholder</span><span class="chip a">1 gap</span></div>
-    <div class="mrow" data-step><span class="grow">Swap request: A. Petrova to M. Ilves</span><span class="chip g">accepted</span></div>
-    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Rest rules and contract hours respected</span><span class="chip g">compliant</span></div>
-    <div class="mrow" data-step><span class="grow">Published to 46 phones at <span class="mono">16:20</span></span><span class="chip g">published</span></div>
-  </div>
-  <div class="body">
-    <h3><span class="num mono">35</span>Shift scheduling and rostering</h3>
-    <p>The rota builds itself against availability, skills, labour rules and forecast demand, then publishes straight to staff phones and handles swap requests. In retail, hospitality and logistics this is a manager's entire Friday.</p>
-    <div class="kills"><b>Removes</b><span>the whiteboard rota rebuilt every week and the phone calls to fill a gap.</span></div>
-  </div>
-</article>
-
-<article class="card">
-  <div class="mock demo">
-    <div class="mtitle"><span>Crew app · van 7</span><button class="runbtn" type="button">▶ dispatch jobs</button></div>
-    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Job <span class="mono">J-2210</span> · boiler service, Riverside 14</span><span class="mono">09:15</span></div>
-    <div class="mrow" data-step><span class="grow">Route sent, client history on screen</span><span class="chip g">on the way</span></div>
-    <div class="mrow" data-step><span class="grow">Checklist complete, 6 photos attached</span><div class="bar"><i data-w="100"></i></div></div>
-    <div class="mrow" data-step><span class="grow">Parts used: pump seal, filter <span class="mono">€64</span></span><span class="chip g">booked out</span></div>
-    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Client signature captured <span class="mono">10:48</span></span><span class="chip g">closed</span></div>
-  </div>
-  <div class="body">
-    <h3><span class="num mono">36</span>Field service and mobile crew app</h3>
-    <p>Jobs land on the engineer's phone with route, client history, checklists, photo capture, parts used and a client signature, and the completion report reaches the office the moment the job ends.</p>
-    <div class="kills"><b>Removes</b><span>ringing round the crew to ask where they are and what they fitted.</span></div>
-  </div>
-</article>
-
-<article class="card">
-  <div class="mock demo">
-    <div class="mtitle"><span>Warehouse scanner</span><button class="runbtn" type="button">▶ scan and post</button></div>
-    <div class="mrow" data-step><span class="grow">Receiving <span class="mono">GRN-8841</span> · 3 pallets</span><span class="chip g">scanned</span></div>
-    <div class="mrow" data-step><span class="grow">Pick list <span class="mono">P-0912</span></span><div class="bar"><i data-w="100"></i></div><span class="chip g">12/12</span></div>
-    <div class="mrow" data-step><span class="dot a"></span><span class="grow">Stocktake variance, bin B-14</span><span class="mono">-2</span><span class="down">▼</span></div>
-    <div class="nodes"><div class="node" data-lit>Scanner</div><div class="link" data-lit></div><div class="node" data-lit>Stock</div><div class="link" data-lit></div><div class="node" data-lit>Website</div><div class="link" data-lit></div><div class="node" data-lit>Accounts</div></div>
-    <div class="mrow" data-step><span class="grow">Live levels pushed everywhere</span><span class="chip g">in sync</span></div>
-  </div>
-  <div class="body">
-    <h3><span class="num mono">37</span>Warehouse and inventory management</h3>
-    <p>Receiving, picking, moving and stocktaking done by barcode or QR on a phone or scanner, with live stock levels feeding the website and the accounts at the same moment.</p>
-    <div class="kills"><b>Removes</b><span>the gap between what the system says you hold and what is actually on the shelf.</span></div>
-  </div>
-</article>
-
 <article class="card wide">
   <div class="mock demo">
     <div class="mtitle"><span>Booking desk</span><button class="runbtn" type="button">▶ take the booking</button></div>
@@ -1039,7 +934,104 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 </article>
 
-<article class="card wide">
+    <article class="card">
+  <div class="mock demo">
+    <div class="mtitle"><span>Fit-out job board</span><button class="runbtn" type="button">▶ move the job</button></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow"><b>Northgate Ltd</b> · unit 4 fit-out</span><span class="mono">stage 3/6</span></div>
+    <div class="mrow" data-step><span class="grow">Site survey checklist</span><div class="bar"><i data-w="100"></i></div><span class="chip g">signed off</span></div>
+    <div class="mrow" data-step><span class="grow">Materials on site</span><div class="bar"><i data-w="72"></i></div><span class="chip a">2 items late</span></div>
+    <div class="mrow" data-step><span class="dot a"></span><span class="grow">Handover to install crew · due <span class="mono">14 Mar</span></span></div>
+    <div class="mrow" data-step><span class="grow">Client view updated, no email needed</span><span class="chip g">live</span></div>
+  </div>
+  <div class="body">
+    <h3><span class="num mono">32</span>Custom task and project tracking</h3>
+    <p>Generic trackers force your work into someone else's shape. This one is built around your stages, checklists, handover points and deadlines, with the right view for each person who needs it. Strongest in production, construction, installation and agency work.</p>
+    <div class="kills"><b>Removes</b><span>chasing every stage update by phone and rebuilding the same status list in a spreadsheet.</span></div>
+  </div>
+</article>
+
+    <article class="card">
+  <div class="mock demo">
+    <div class="mtitle"><span>Approval routing</span><button class="runbtn" type="button">▶ route for sign-off</button></div>
+    <div class="filechips"><span class="fchip" data-eat>Purchase request</span><span class="fchip" data-eat>Discount 18%</span><span class="fchip" data-eat>Leave request</span><span class="fchip" data-eat>Expenses</span></div>
+    <div class="arrowdown">▼ routed by amount and type ▼</div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Purchase <span class="mono">€1,240</span> · line manager</span><span class="chip g">approved 09:41</span></div>
+    <div class="mrow" data-step><span class="dot a"></span><span class="grow">Discount 18% · finance director</span><span class="chip a">reminder sent</span></div>
+    <div class="mrow" data-step><span class="grow">Expenses <span class="mono">€380</span> · policy check passed</span><span class="chip g">approved</span></div>
+    <div class="mrow" data-step><span class="grow">Audit trail written, 4 of 4 cleared in <span class="mono">6h</span></span><span class="chip g">done</span></div>
+  </div>
+  <div class="body">
+    <h3><span class="num mono">33</span>Approval and sign-off workflows</h3>
+    <p>Purchase requests, discounts, leave, expenses and contracts go to the right approver automatically by amount and type, with reminders, deadlines and a complete audit trail behind every decision.</p>
+    <div class="kills"><b>Removes</b><span>the paper folder that sits four days on a director's desk while the deal waits.</span></div>
+  </div>
+</article>
+
+    <article class="card">
+  <div class="mock demo">
+    <div class="mtitle"><span>Document assembly</span><button class="runbtn" type="button">▶ generate the contract</button></div>
+    <div class="mrow" data-step><span class="grow">Client <b>Northgate Ltd</b> · order <span class="mono">SO-4417</span></span><span class="chip g">data found</span></div>
+    <div class="mrow" data-step><span class="grow">Clause set: prepayment, 30 days, EU delivery</span><span class="chip g">by rule</span></div>
+    <div class="doc" data-step><b>Supply contract 2026/118</b><div class="dline"></div><div class="dline short"></div></div>
+    <div class="mrow" data-step><span class="grow">Numbered, versioned <span class="mono">v1.0</span>, stored to file</span><span class="chip g">ready to sign</span></div>
+  </div>
+  <div class="body">
+    <h3><span class="num mono">34</span>Document generation from templates</h3>
+    <p>Contracts, acts, powers of attorney, specifications and reports built from data you already hold, correctly numbered and versioned, with variable clauses picked by rule. Legal approves the template once instead of reading every document.</p>
+    <div class="kills"><b>Removes</b><span>copying last month's file, editing the names by hand and hoping nothing was missed.</span></div>
+  </div>
+</article>
+
+    <article class="card">
+  <div class="mock demo">
+    <div class="mtitle"><span>Week 11 rota</span><button class="runbtn" type="button">▶ build the rota</button></div>
+    <div class="mrow" data-step><span class="grow">Forecast demand: <span data-count="312">0</span> covers Fri evening</span><span class="up">▲</span></div>
+    <div class="mrow" data-step><span class="grow">Shifts filled</span><div class="bar"><i data-w="96"></i></div><span class="mono">44/46</span></div>
+    <div class="mrow" data-step><span class="dot a"></span><span class="grow">Sat late · needs a keyholder</span><span class="chip a">1 gap</span></div>
+    <div class="mrow" data-step><span class="grow">Swap request: A. Petrova to M. Ilves</span><span class="chip g">accepted</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Rest rules and contract hours respected</span><span class="chip g">compliant</span></div>
+    <div class="mrow" data-step><span class="grow">Published to 46 phones at <span class="mono">16:20</span></span><span class="chip g">published</span></div>
+  </div>
+  <div class="body">
+    <h3><span class="num mono">35</span>Shift scheduling and rostering</h3>
+    <p>The rota builds itself against availability, skills, labour rules and forecast demand, then publishes straight to staff phones and handles swap requests. In retail, hospitality and logistics this is a manager's entire Friday.</p>
+    <div class="kills"><b>Removes</b><span>the whiteboard rota rebuilt every week and the phone calls to fill a gap.</span></div>
+  </div>
+</article>
+
+    <article class="card">
+  <div class="mock demo">
+    <div class="mtitle"><span>Crew app · van 7</span><button class="runbtn" type="button">▶ dispatch jobs</button></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Job <span class="mono">J-2210</span> · boiler service, Riverside 14</span><span class="mono">09:15</span></div>
+    <div class="mrow" data-step><span class="grow">Route sent, client history on screen</span><span class="chip g">on the way</span></div>
+    <div class="mrow" data-step><span class="grow">Checklist complete, 6 photos attached</span><div class="bar"><i data-w="100"></i></div></div>
+    <div class="mrow" data-step><span class="grow">Parts used: pump seal, filter <span class="mono">€64</span></span><span class="chip g">booked out</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Client signature captured <span class="mono">10:48</span></span><span class="chip g">closed</span></div>
+  </div>
+  <div class="body">
+    <h3><span class="num mono">36</span>Field service and mobile crew app</h3>
+    <p>Jobs land on the engineer's phone with route, client history, checklists, photo capture, parts used and a client signature, and the completion report reaches the office the moment the job ends.</p>
+    <div class="kills"><b>Removes</b><span>ringing round the crew to ask where they are and what they fitted.</span></div>
+  </div>
+</article>
+
+    <article class="card">
+  <div class="mock demo">
+    <div class="mtitle"><span>Warehouse scanner</span><button class="runbtn" type="button">▶ scan and post</button></div>
+    <div class="mrow" data-step><span class="grow">Receiving <span class="mono">GRN-8841</span> · 3 pallets</span><span class="chip g">scanned</span></div>
+    <div class="mrow" data-step><span class="grow">Pick list <span class="mono">P-0912</span></span><div class="bar"><i data-w="100"></i></div><span class="chip g">12/12</span></div>
+    <div class="mrow" data-step><span class="dot a"></span><span class="grow">Stocktake variance, bin B-14</span><span class="mono">-2</span><span class="down">▼</span></div>
+    <div class="nodes"><div class="node" data-lit>Scanner</div><div class="link" data-lit></div><div class="node" data-lit>Stock</div><div class="link" data-lit></div><div class="node" data-lit>Website</div><div class="link" data-lit></div><div class="node" data-lit>Accounts</div></div>
+    <div class="mrow" data-step><span class="grow">Live levels pushed everywhere</span><span class="chip g">in sync</span></div>
+  </div>
+  <div class="body">
+    <h3><span class="num mono">37</span>Warehouse and inventory management</h3>
+    <p>Receiving, picking, moving and stocktaking done by barcode or QR on a phone or scanner, with live stock levels feeding the website and the accounts at the same moment.</p>
+    <div class="kills"><b>Removes</b><span>the gap between what the system says you hold and what is actually on the shelf.</span></div>
+  </div>
+</article>
+
+    <article class="card wide">
   <div class="mock demo">
     <div class="mtitle"><span>Tomorrow's routes</span><button class="runbtn" type="button">▶ plan the runs</button></div>
     <div class="mrow" data-step><span class="grow">28 drops, 4 vans, capacity and time windows applied</span></div>
@@ -1057,24 +1049,9 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 
   <div class="band">
-  <div class="section-head" id="s-web"><span class="idx serif">7 services</span><h2 class="serif">Web &amp; customer-facing</h2></div>
+  <div class="section-head" id="s-web"><span class="idx serif">7 services</span><h2 class="serif">Web and customer-facing</h2></div>
   <p class="section-sub">Sites that convert, stores that sync, payments that reconcile themselves, and a sales channel inside the client's messenger.</p>
   <div class="grid" id="g-web">
-<article class="card">
-  <div class="mock demo">
-    <div class="mtitle"><span>Landing page to CRM</span><button class="runbtn" type="button">▶ send an enquiry</button></div>
-    <div class="mrow" data-step><span class="grow">Mobile load time</span><span class="mono"><span data-count="9">0</span>00 ms</span><span class="chip g">fast</span></div>
-    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Form submitted · Northgate Ltd, quote request</span><span class="mono">10:12</span></div>
-    <div class="nodes" data-step><div class="node" data-lit>Landing form</div><div class="link" data-lit></div><div class="node" data-lit>CRM</div><div class="link" data-lit></div><div class="node" data-lit>Sales rep</div></div>
-    <div class="mrow" data-step><span class="grow">Lead assigned to Anna K. · source: paid search</span><span class="chip g">in CRM</span></div>
-  </div>
-  <div class="body">
-    <h3><span class="num mono">40</span>Corporate site and landing pages</h3>
-    <p>Fast, mobile-correct pages built to convert instead of to look busy. Forms are wired into your CRM from the first day live.</p>
-    <div class="kills"><b>Removes</b><span>Enquiries sitting unread in a shared mailbox nobody owns.</span></div>
-  </div>
-</article>
-
 <article class="card wide">
   <div class="mock demo">
     <div class="mtitle"><span>Online store</span><button class="runbtn" type="button">▶ place an order</button></div>
@@ -1092,7 +1069,22 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 </article>
 
-<article class="card">
+    <article class="card">
+  <div class="mock demo">
+    <div class="mtitle"><span>Landing page to CRM</span><button class="runbtn" type="button">▶ send an enquiry</button></div>
+    <div class="mrow" data-step><span class="grow">Mobile load time</span><span class="mono"><span data-count="9">0</span>00 ms</span><span class="chip g">fast</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Form submitted · Northgate Ltd, quote request</span><span class="mono">10:12</span></div>
+    <div class="nodes" data-step><div class="node" data-lit>Landing form</div><div class="link" data-lit></div><div class="node" data-lit>CRM</div><div class="link" data-lit></div><div class="node" data-lit>Sales rep</div></div>
+    <div class="mrow" data-step><span class="grow">Lead assigned to Anna K. · source: paid search</span><span class="chip g">in CRM</span></div>
+  </div>
+  <div class="body">
+    <h3><span class="num mono">40</span>Corporate site and landing pages</h3>
+    <p>Fast, mobile-correct pages built to convert instead of to look busy. Forms are wired into your CRM from the first day live.</p>
+    <div class="kills"><b>Removes</b><span>Enquiries sitting unread in a shared mailbox nobody owns.</span></div>
+  </div>
+</article>
+
+    <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Subscriptions</span><button class="runbtn" type="button">▶ run the monthly cycle</button></div>
     <div class="bigstat mono">
@@ -1112,7 +1104,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 </article>
 
-<article class="card">
+    <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Payments and reconciliation</span><button class="runbtn" type="button">▶ close the day</button></div>
     <div class="mrow" data-step><span class="grow">Card, transfer, instalments, invoice</span><span class="chip g">all live</span></div>
@@ -1127,7 +1119,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 </article>
 
-<article class="card">
+    <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Messenger sales bot</span><button class="runbtn" type="button">▶ order in telegram</button></div>
     <div class="mrow" data-step><span class="grow">Client opens the catalogue in chat, picks 2 items</span><span class="mono">19:24</span></div>
@@ -1147,7 +1139,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 </article>
 
-<article class="card">
+    <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Marketplace control panel</span><button class="runbtn" type="button">▶ push price update</button></div>
     <div class="filechips" data-step><span class="fchip" data-eat>Admin panel 1</span><span class="fchip" data-eat>Admin panel 2</span><span class="fchip" data-eat>Admin panel 3</span><span class="fchip" data-eat>Admin panel 4</span></div>
@@ -1163,7 +1155,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 </article>
 
-<article class="card">
+    <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Attribution dashboard</span><button class="runbtn" type="button">▶ join spend to revenue</button></div>
     <div class="nodes" data-step><div class="node" data-lit>Ad click</div><div class="link" data-lit></div><div class="node" data-lit>CRM deal</div><div class="link" data-lit></div><div class="node" data-lit>Closed revenue</div></div>
@@ -1180,7 +1172,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
   </div><!-- /band -->
 
-  <div class="section-head" id="s-rep"><span class="idx serif">4 services</span><h2 class="serif">Reporting &amp; management visibility</h2></div>
+  <div class="section-head" id="s-rep"><span class="idx serif">4 services</span><h2 class="serif">Reporting and management visibility</h2></div>
   <p class="section-sub">One screen of truth for the director, and an alert the hour something goes wrong instead of a surprise at month end.</p>
   <div class="grid" id="g-rep">
 <article class="card wide">
@@ -1199,7 +1191,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 </article>
 
-<article class="card">
+    <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Sales KPIs · March</span><button class="runbtn" type="button">▶ score the month</button></div>
     <div class="mrow" data-step><span class="grow">A. Petrova · <span class="mono">€96,400</span> closed</span><div class="bar"><i data-w="107"></i></div><span class="chip g">107%</span></div>
@@ -1215,7 +1207,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 </article>
 
-<article class="card">
+    <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Monday pack</span><button class="runbtn" type="button">▶ send the reports</button></div>
     <div class="mrow" data-step><span class="grow">Schedule fired <span class="mono">Mon 07:00</span></span><span class="chip g">on time</span></div>
@@ -1231,7 +1223,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 </article>
 
-<article class="card wide">
+    <article class="card wide">
   <div class="mock demo">
     <div class="mtitle"><span>Anomaly watch</span><button class="runbtn" type="button">▶ watch the numbers</button></div>
     <div class="nodes"><div class="node" data-lit>Live data</div><div class="link" data-lit></div><div class="node" data-lit>42 checks</div><div class="link" data-lit></div><div class="node" data-lit>Alerts</div></div>
@@ -1254,7 +1246,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 
   <div class="band">
-  <div class="section-head" id="s-infra"><span class="idx serif">5 services</span><h2 class="serif">Infrastructure &amp; support</h2></div>
+  <div class="section-head" id="s-infra"><span class="idx serif">5 services</span><h2 class="serif">Infrastructure and support</h2></div>
   <p class="section-sub">The critical spreadsheet retired, the legacy program tamed, backups that are actually tested, and training so it all gets used.</p>
   <div class="grid" id="g-infra">
 <article class="card wide">
@@ -1273,7 +1265,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 </article>
 
-<article class="card">
+    <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Legacy Windows program</span><button class="runbtn" type="button">▶ run the robot</button></div>
     <div class="mrow" data-step><span class="dot a"></span><span class="grow">No API, vendor gone since 2011</span><span class="chip a">as is</span></div>
@@ -1288,7 +1280,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 </article>
 
-<article class="card">
+    <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Backup and access</span><button class="runbtn" type="button">▶ run the recovery drill</button></div>
     <div class="mrow" data-step><span class="grow">Backup taken · 02:00, verified by restore test</span><span class="mono">4,2 GB</span></div>
@@ -1303,7 +1295,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 </article>
 
-<article class="card">
+    <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Hosting and monitoring</span><button class="runbtn" type="button">▶ ship a release</button></div>
     <div class="nodes" data-step><div class="node" data-lit>Commit</div><div class="link" data-lit></div><div class="node" data-lit>Tests</div><div class="link" data-lit></div><div class="node" data-lit>Live server</div></div>
@@ -1318,7 +1310,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 </article>
 
-<article class="card">
+    <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Handover pack</span><button class="runbtn" type="button">▶ hand it over</button></div>
     <div class="doc" data-step><b>Operating manual · warehouse module</b><div class="dline"></div><div class="dline short"></div></div>
@@ -1375,7 +1367,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 </div>
 
 <footer>
-  <div class="wrap">Custom software &amp; automation for any business. All 56 services shown above.</div>
+  <div class="wrap">Custom software and automation for any business. All 56 services shown above.</div>
 </footer>
 
 <script>
