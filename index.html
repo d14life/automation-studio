@@ -616,11 +616,11 @@ footer a{display:block;padding:3px 0}
     var y=window.pageYOffset||0, h=innerHeight||1;
     if(y>h*1.4) return;                       /* off screen: stop paying for it */
     var f=Math.min(1,y/h);
-    l1.style.transform='translateY('+(y*0.42).toFixed(1)+'px)';
-    l1.style.opacity=(1-f*1.15).toFixed(3);
-    l2.style.transform='translateY('+(y*0.24).toFixed(1)+'px)';
-    l2.style.opacity=(1-f*0.9).toFixed(3);
-    if(acts){ acts.style.transform='translateY('+(-y*0.16).toFixed(1)+'px)';
+    l1.style.transform='translateY('+(y*0.78).toFixed(1)+'px)';
+    l1.style.opacity=(1-f*1.45).toFixed(3);
+    l2.style.transform='translateY('+(y*0.46).toFixed(1)+'px)';
+    l2.style.opacity=(1-f*1.15).toFixed(3);
+    if(acts){ acts.style.transform='translateY('+(-y*0.34).toFixed(1)+'px)';
               acts.style.opacity=(1-f*1.5).toFixed(3); }
     if(hint) hint.style.opacity=(1-f*2.4).toFixed(3);
   }
