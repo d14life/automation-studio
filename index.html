@@ -444,13 +444,19 @@ footer a{display:block;padding:3px 0}
   var cards=[].slice.call(wrap.querySelectorAll('.proj'));
   if(matchMedia('(max-width:820px)').matches) return;
   var N=cards.length, center=(N-1)/2;
+  /* the spread is measured from the container, so six cards always fit the screen instead of
+     piling up on each other or running off the side */
+  function edgeX(){
+    var avail=wrap.clientWidth, cardW=cards[0].getBoundingClientRect().width||300;
+    return Math.max(60,(avail-cardW)/2);
+  }
   function slotCfg(slot){
     var d=N>1?(slot-center)/center:0, ad=Math.abs(d);
-    return {rot:d*21, scale:1-0.2244*ad*ad, x:d*15, y:ad*ad*4.5, z:10-Math.abs(slot-center)};
+    return {rot:d*8, scale:1-0.08*ad*ad, x:d*edgeX(), y:ad*ad*2.2, z:10-Math.abs(slot-center)};
   }
   function apply(slot,extra){
     var c=slotCfg(slot), el=cards[slot]; extra=extra||{};
-    el.style.setProperty('--fx',(c.x+(extra.dx||0))+'rem');
+    el.style.setProperty('--fx',(c.x+(extra.dx||0)*16)+'px');
     el.style.setProperty('--fy',(c.y+(extra.dy||0))+'rem');
     el.style.setProperty('--fr',(c.rot+(extra.dr||0))+'deg');
     el.style.setProperty('--fs',(c.scale*(extra.ds||1)).toFixed(4));
@@ -459,13 +465,14 @@ footer a{display:block;padding:3px 0}
   function layout(hover){
     cards.forEach(function(el,slot){
       if(hover==null){apply(slot);return;}
-      if(slot===hover){apply(slot,{dy:-2.2,ds:1.1,z:20});return;}
-      var dist=Math.abs(slot-hover), push=5*(1+0.2*Math.max(0,3-dist));
+      if(slot===hover){apply(slot,{dy:-1.4,ds:1.08,z:20});return;}
+      var dist=Math.abs(slot-hover), push=2.6*(1+0.2*Math.max(0,3-dist));
       apply(slot,{dx:slot<hover?-push:push, dr:(slot<hover?-3:3)/dist});
     });
   }
   cards.forEach(function(el,slot){ el.addEventListener('mouseenter',function(){layout(slot);}); });
   wrap.addEventListener('mouseleave',function(){layout(null);});
+  addEventListener('resize',function(){layout(null);},{passive:true});
   layout(null);
 })();
 </script>
