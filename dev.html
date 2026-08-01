@@ -224,10 +224,11 @@ function LiquidText(host, texts, o) {
     var s=document.createElement('span');
     s.style.cssText='position:absolute;left:0;right:0;top:0;margin:auto;display:inline-block;width:100%;text-align:center';
     if (gradient){
-      /* 300% wide ramp slid under the glyphs: at any instant the text reads as
-         one colour, and that colour sweeps across the line */
+      /* 200% ramp: the visible half spans the whole line, so the text itself is
+         multi-coloured (red on the left into orange on the right) and the colours
+         travel across it. Symmetric stops keep the loop seamless. */
       s.style.backgroundImage=gradient;
-      s.style.backgroundSize='300% auto';
+      s.style.backgroundSize='200% auto';
       s.style.webkitBackgroundClip='text';
       s.style.backgroundClip='text';
       s.style.color='transparent';
@@ -321,9 +322,9 @@ function tubesRandomColors(count){
   }
   /* 3 - liquid text */
   var GRADS={
-    fire:'linear-gradient(90deg,#ff8a2b,#ff5a1f 20%,#e0233a 45%,#ff5a1f 70%,#ff8a2b)',
-    green:'linear-gradient(90deg,#4CC28F,#9FE8C6 25%,#5C82C9 55%,#4CC28F)',
-    ice:'linear-gradient(90deg,#9FE8C6,#7FD8FF 30%,#8FA8FF 60%,#9FE8C6)',
+    fire:'linear-gradient(90deg,#e0233a,#ff5a1f 25%,#ffa63d 50%,#ff5a1f 75%,#e0233a)',
+    green:'linear-gradient(90deg,#1E7A55,#4CC28F 25%,#9FE8C6 50%,#4CC28F 75%,#1E7A55)',
+    ice:'linear-gradient(90deg,#5C82C9,#7FD8FF 25%,#DFF6FF 50%,#7FD8FF 75%,#5C82C9)',
     none:null
   };
   var flowKey='fire';

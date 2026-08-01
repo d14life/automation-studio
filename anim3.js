@@ -140,10 +140,11 @@ function LiquidText(host, texts, o) {
     var s=document.createElement('span');
     s.style.cssText='position:absolute;left:0;right:0;top:0;margin:auto;display:inline-block;width:100%;text-align:center';
     if (gradient){
-      /* 300% wide ramp slid under the glyphs: at any instant the text reads as
-         one colour, and that colour sweeps across the line */
+      /* 200% ramp: the visible half spans the whole line, so the text itself is
+         multi-coloured (red on the left into orange on the right) and the colours
+         travel across it. Symmetric stops keep the loop seamless. */
       s.style.backgroundImage=gradient;
-      s.style.backgroundSize='300% auto';
+      s.style.backgroundSize='200% auto';
       s.style.webkitBackgroundClip='text';
       s.style.backgroundClip='text';
       s.style.color='transparent';
