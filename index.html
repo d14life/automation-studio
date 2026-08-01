@@ -576,6 +576,9 @@ footer a{display:block;padding:3px 0}
     });
   }
 
+  /* callable by hand so the shove can be checked without waiting for animation frames */
+  window.__shove=function(x,y){ shove(x,y,stage.getBoundingClientRect()); };
+
   /* tubes walk the same palette as the text, one step behind it */
   var hue=0,last=0;
   (function cycle(now){
