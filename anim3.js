@@ -117,9 +117,9 @@ function LiquidText(host, texts, o) {
   o = o || {};
   var morphTime    = o.morphTime    != null ? o.morphTime    : 1.5;
   var cooldownTime = o.cooldownTime != null ? o.cooldownTime : 0.5;
-  /* optional flowing colour: the whole text is one colour at a time, and that
-     colour travels left to right (orange into red, etc). */
-  var gradient     = o.gradient || null;
+  /* colour: the WHOLE line is a single colour at any moment, and that colour walks the
+     given list over time. Not a gradient across the letters - one colour, changing. */
+  var colors       = o.colors && o.colors.length ? o.colors : null;
   var flowSeconds  = o.flow != null ? o.flow : 6;
   if (!texts || texts.length < 2) throw new Error('LiquidText: need 2+ texts');
 
@@ -132,24 +132,25 @@ function LiquidText(host, texts, o) {
   }
   host.style.position = host.style.position || 'relative';
   host.style.filter = 'url(#threshold) blur(0.6px)';
-  if (gradient && !document.getElementById('lt-flow-style')){
-    var st=document.createElement('style'); st.id='lt-flow-style';
-    st.textContent='@keyframes lt-flow{from{background-position:0% center}to{background-position:-200% center}}';
+  var flowName=null, st=null;
+  if (colors){
+    /* the palette becomes keyframes on `color` itself, so both copies of the text hold the
+       same single colour at the same instant and the browser tweens between neighbours.
+       Last stop repeats the first, otherwise the loop snaps on restart. */
+    flowName='lt-hue-'+Math.random().toString(36).slice(2,8);
+    var pct=[];
+    for (var ci=0; ci<=colors.length; ci++)
+      pct.push((ci*100/colors.length).toFixed(3)+'%{color:'+colors[ci%colors.length]+'}');
+    st=document.createElement('style'); st.className='lt-flow-style';
+    st.textContent='@keyframes '+flowName+'{'+pct.join('')+'}';
     document.head.appendChild(st);
   }
   function mkSpan(){
     var s=document.createElement('span');
     s.style.cssText='position:absolute;left:0;right:0;top:0;margin:auto;display:inline-block;width:100%;text-align:center';
-    if (gradient){
-      /* 200% ramp: the visible half spans the whole line, so the text itself is
-         multi-coloured (red on the left into orange on the right) and the colours
-         travel across it. Symmetric stops keep the loop seamless. */
-      s.style.backgroundImage=gradient;
-      s.style.backgroundSize='200% auto';
-      s.style.webkitBackgroundClip='text';
-      s.style.backgroundClip='text';
-      s.style.color='transparent';
-      s.style.animation='lt-flow '+flowSeconds+'s linear infinite';
+    if (colors){
+      s.style.color=colors[0];
+      s.style.animation=flowName+' '+flowSeconds+'s linear infinite';
     }
     host.appendChild(s); return s;
   }
@@ -188,7 +189,7 @@ function LiquidText(host, texts, o) {
   animate();
   return function stop(){
     running=false; cancelAnimationFrame(raf);
-    t1.remove(); t2.remove(); host.style.filter='';
+    t1.remove(); t2.remove(); if(st) st.remove(); host.style.filter='';
   };
 }
 

@@ -20,9 +20,9 @@ body{margin:0;background:#000;color:#EDF2EC;font:15px/1.55 system-ui,-apple-syst
 #stageui{position:relative;z-index:5;height:100%;display:flex;flex-direction:column;
   align-items:center;justify-content:center;gap:14px;text-align:center;padding:0 20px}
 /* ---- block 3: liquid text (their sizing: 40pt, lg 6rem, h-16/h-24) ---- */
-#liquid{position:relative;height:6rem;width:100%;max-width:860px;margin:0 auto;text-align:center;
-  font:900 40pt/1 Nunito,system-ui,sans-serif}
-@media (min-width:1024px){#liquid{font-size:6rem;height:9rem}}
+#liquid{position:relative;height:4.4rem;width:100%;max-width:860px;margin:0 auto;text-align:center;
+  font:900 27pt/1 Nunito,system-ui,sans-serif}
+@media (min-width:1024px){#liquid{font-size:3.9rem;height:5.6rem}}
 .sub{color:#9FAAA1;font-size:15px;max-width:52ch}
 /* ---- block 4: parallax (Osmo structure) ---- */
 .parallax{position:relative;background:#000}
@@ -73,7 +73,7 @@ body{margin:0;background:#000;color:#EDF2EC;font:15px/1.55 system-ui,-apple-syst
 <section id="stage">
   <div id="stageui">
     <div id="liquid"></div>
-    <p class="sub">Зажмите мышь для гиперпрыжка. Клик меняет цвета трубок.</p>
+    <p class="sub">Цвет текста и трубок меняется сам. Мышь только водит трубки.</p>
   </div>
 </section>
 
@@ -216,9 +216,9 @@ function LiquidText(host, texts, o) {
   o = o || {};
   var morphTime    = o.morphTime    != null ? o.morphTime    : 1.5;
   var cooldownTime = o.cooldownTime != null ? o.cooldownTime : 0.5;
-  /* optional flowing colour: the whole text is one colour at a time, and that
-     colour travels left to right (orange into red, etc). */
-  var gradient     = o.gradient || null;
+  /* colour: the WHOLE line is a single colour at any moment, and that colour walks the
+     given list over time. Not a gradient across the letters - one colour, changing. */
+  var colors       = o.colors && o.colors.length ? o.colors : null;
   var flowSeconds  = o.flow != null ? o.flow : 6;
   if (!texts || texts.length < 2) throw new Error('LiquidText: need 2+ texts');
 
@@ -231,24 +231,25 @@ function LiquidText(host, texts, o) {
   }
   host.style.position = host.style.position || 'relative';
   host.style.filter = 'url(#threshold) blur(0.6px)';
-  if (gradient && !document.getElementById('lt-flow-style')){
-    var st=document.createElement('style'); st.id='lt-flow-style';
-    st.textContent='@keyframes lt-flow{from{background-position:0% center}to{background-position:-200% center}}';
+  var flowName=null, st=null;
+  if (colors){
+    /* the palette becomes keyframes on `color` itself, so both copies of the text hold the
+       same single colour at the same instant and the browser tweens between neighbours.
+       Last stop repeats the first, otherwise the loop snaps on restart. */
+    flowName='lt-hue-'+Math.random().toString(36).slice(2,8);
+    var pct=[];
+    for (var ci=0; ci<=colors.length; ci++)
+      pct.push((ci*100/colors.length).toFixed(3)+'%{color:'+colors[ci%colors.length]+'}');
+    st=document.createElement('style'); st.className='lt-flow-style';
+    st.textContent='@keyframes '+flowName+'{'+pct.join('')+'}';
     document.head.appendChild(st);
   }
   function mkSpan(){
     var s=document.createElement('span');
     s.style.cssText='position:absolute;left:0;right:0;top:0;margin:auto;display:inline-block;width:100%;text-align:center';
-    if (gradient){
-      /* 200% ramp: the visible half spans the whole line, so the text itself is
-         multi-coloured (red on the left into orange on the right) and the colours
-         travel across it. Symmetric stops keep the loop seamless. */
-      s.style.backgroundImage=gradient;
-      s.style.backgroundSize='200% auto';
-      s.style.webkitBackgroundClip='text';
-      s.style.backgroundClip='text';
-      s.style.color='transparent';
-      s.style.animation='lt-flow '+flowSeconds+'s linear infinite';
+    if (colors){
+      s.style.color=colors[0];
+      s.style.animation=flowName+' '+flowSeconds+'s linear infinite';
     }
     host.appendChild(s); return s;
   }
@@ -287,7 +288,7 @@ function LiquidText(host, texts, o) {
   animate();
   return function stop(){
     running=false; cancelAnimationFrame(raf);
-    t1.remove(); t2.remove(); host.style.filter='';
+    t1.remove(); t2.remove(); if(st) st.remove(); host.style.filter='';
   };
 }
 
@@ -308,6 +309,17 @@ function tubesRandomColors(count){
   return new Array(count).fill(0).map(function(){
     return '#'+Math.floor(Math.random()*16777215).toString(16).padStart(6,'0');});
 }
+/* hue -> hex. The tube library takes hex strings, so the wheel is converted here rather
+   than handed over as hsl(), which its colour parser is not guaranteed to accept. */
+function hslHex(h,s,l){
+  h=((h%360)+360)%360; s=s==null?0.92:s; l=l==null?0.64:l;
+  var a=s*Math.min(l,1-l);
+  function f(n){
+    var k=(n+h/30)%12, c=l-a*Math.max(-1,Math.min(k-3,9-k,1));
+    return Math.round(255*c).toString(16).padStart(2,'0');
+  }
+  return '#'+f(0)+f(8)+f(4);
+}
 
 (function(){
   var stage=document.getElementById('stage');
@@ -316,61 +328,78 @@ function tubesRandomColors(count){
   /* 1 - starfield-1 port: mouse steering + hold-to-warp */
   function stars(on){
     if(stopStars){stopStars();stopStars=null;}
-    if(on) stopStars=Starfield1(stage,{quantity:700,speed:1.4,easing:1,warpFactor:10,opacity:0.1,
-      mouseAdjust:false,clickToWarp:true,starColor:'rgba(255,255,255,1)',bgColor:'rgba(0,0,0,1)',zIndex:1});
+    if(on) stopStars=Starfield1(stage,{quantity:700,speed:2.1,easing:1,warpFactor:10,opacity:0.1,
+      mouseAdjust:false,clickToWarp:false,starColor:'rgba(255,255,255,1)',bgColor:'rgba(0,0,0,1)',zIndex:1});
   }
-  /* 2 - tubes cursor on top */
+  /* 2 - tubes cursor on top, riding the same hue wheel as the text.
+     Three tubes sit 120 degrees apart and four lights 90 degrees apart, so the set always
+     spans the whole wheel while the offset turns once per colour-flow period. Repainted at
+     ~16 fps instead of every frame: the eye reads it as continuous and the material swap
+     is not free. */
+  var tubesRaf=0, tubeHue=0, tubeLast=0;
+  function paintTubes(){
+    if(!tubesApp||!tubesApp.tubes) return;
+    try{
+      tubesApp.tubes.setColors([hslHex(tubeHue),hslHex(tubeHue+16),hslHex(tubeHue+32)]);
+      tubesApp.tubes.setLightsColors([hslHex(tubeHue+8),hslHex(tubeHue+22),
+                                      hslHex(tubeHue+36),hslHex(tubeHue+50)]);
+    }catch(e){ cancelAnimationFrame(tubesRaf); tubesRaf=0; console.warn('tube colours:',e); }
+  }
+  function cycleTubes(now){
+    tubesRaf=requestAnimationFrame(cycleTubes);
+    if(!tubesApp) { tubeLast=now; return; }
+    if(now-tubeLast<62) return;
+    tubeHue=(tubeHue+360*(now-tubeLast)/1000/flowSec)%360;
+    tubeLast=now;
+    paintTubes();
+  }
   function tubes(on){
     if(tubesCancel){tubesCancel();tubesCancel=null;}
+    if(tubesRaf){cancelAnimationFrame(tubesRaf);tubesRaf=0;}
     if(tubesApp&&tubesApp.dispose){try{tubesApp.dispose();}catch(e){}}
     tubesApp=null;
     if(tubesCv){tubesCv.remove();tubesCv=null;}
     if(!on) return;
     tubesCv=document.createElement('canvas'); tubesCv.className='tubes';
     stage.appendChild(tubesCv);
-    tubesCancel=TubesCursorInit(tubesCv,{tubes:{colors:["#2AA173","#4CC28F","#1E7A55"],
-      lights:{intensity:200,colors:["#4CC28F","#5C82C9","#9FE8C6","#2AA173"]}}},function(app){tubesApp=app;});
-    stage.addEventListener('click',function(){
-      if(!tubesApp) return;
-      tubesApp.tubes.setColors(tubesRandomColors(3));
-      tubesApp.tubes.setLightsColors(tubesRandomColors(4));
-    });
+    tubesCancel=TubesCursorInit(tubesCv,{tubes:{colors:[hslHex(0),hslHex(16),hslHex(32)],
+      lights:{intensity:200,colors:[hslHex(8),hslHex(22),hslHex(36),hslHex(50)]}}},
+      function(app){tubesApp=app;});
+    tubeLast=performance.now();
+    tubesRaf=requestAnimationFrame(cycleTubes);
   }
+  /* no click handlers on the stage: the colours already walk on their own and the starfield
+     no longer warps, so a click should do nothing at all */
   /* 3 - liquid text */
-  /* one full colour cycle laid down TWICE across a 200% background: the visible half of the
-     text always carries every colour of the cycle at once, and sliding the image by its own
-     width returns to the identical frame, so the travel never jumps. */
-  function flowGrad(cs){
-    var n=cs.length*2, out=[];
-    for(var i=0;i<=n;i++) out.push(cs[i%cs.length]+' '+(i*100/n).toFixed(3)+'%');
-    return 'linear-gradient(90deg,'+out.join(',')+')';
-  }
-  /* every hue, evenly spaced round the wheel: the text runs through the whole spectrum
-     instead of one family. Fixed saturation and lightness keep every hue readable on black. */
+  /* every hue, evenly spaced round the wheel. Fixed saturation and lightness keep each one
+     readable on black. The text wears ONE of these at a time and walks the list. */
   function hueWheel(n){
     var out=[];
-    for(var i=0;i<n;i++) out.push('hsl('+Math.round(i*360/n)+',92%,64%)');
+    for(var i=0;i<n;i++) out.push(hslHex(i*360/n));
     return out;
   }
   var GRADS={
-    all:     flowGrad(hueWheel(12)),
-    fire:    flowGrad(['#FFE066','#FFB020','#FF6A1F','#F02D3A','#C81E5A','#FF6A1F']),
-    spectrum:flowGrad(['#FFE066','#4CC28F','#39C6E8','#7B6CF6','#F45DBE','#FF6A1F']),
-    neon:    flowGrad(['#00F5D4','#00BBF9','#9B5DE5','#F15BB5','#FEE440']),
-    green:   flowGrad(['#9FE8C6','#4CC28F','#1E7A55','#2AA173']),
-    ice:     flowGrad(['#DFF6FF','#7FD8FF','#5C82C9','#8E7BE8']),
-    none:null
+    all:     hueWheel(12),
+    fire:    ['#FFE066','#FFB020','#FF6A1F','#F02D3A','#C81E5A','#FF6A1F'],
+    spectrum:['#FFE066','#4CC28F','#39C6E8','#7B6CF6','#F45DBE','#FF6A1F'],
+    neon:    ['#00F5D4','#00BBF9','#9B5DE5','#F15BB5','#FEE440'],
+    green:   ['#9FE8C6','#4CC28F','#1E7A55','#2AA173'],
+    ice:     ['#DFF6FF','#7FD8FF','#5C82C9','#8E7BE8'],
+    none:    null
   };
   var FONTS={nunito:['Nunito',900],comfortaa:['Comfortaa',700],rubik:['Rubik',800],system:['system-ui',700]};
-  var flowKey='all', fontKey='nunito', flowSec=5;
+  /* flowSec = seconds for one full trip round the palette, shared by the text and the tubes */
+  var flowKey='all', fontKey='nunito', flowSec=14;
   function liquid(on){
     var host=document.getElementById('liquid');
     if(stopLiquid){stopLiquid();stopLiquid=null;}
     host.classList.toggle('hidden',!on);
     host.style.fontFamily=FONTS[fontKey][0]+',system-ui,sans-serif';
     host.style.fontWeight=FONTS[fontKey][1];
+    /* long melt, short hold: the change itself is what the visitor should see, so the words
+       swap often and each transition is drawn out. */
     if(on) stopLiquid=LiquidText(host,['ВООБРАЖЕНИЕ','ВАШ ЕДИНСТВЕННЫЙ','ПРЕДЕЛ'],
-      {morphTime:3.2,cooldownTime:1.4,gradient:GRADS[flowKey],flow:flowSec});
+      {morphTime:4.5,cooldownTime:0.45,colors:GRADS[flowKey],flow:flowSec});
   }
   /* 4 - parallax: same layer speeds as the GSAP timeline, scrubbed by scroll */
   function parallax(on){
@@ -429,7 +458,7 @@ function tubesRandomColors(count){
          ['g-ice','ice'],['g-none','none']], function(v){flowKey=v;});
   radio([['f-nunito','nunito'],['f-comfortaa','comfortaa'],['f-rubik','rubik'],['f-system','system']],
         function(v){fontKey=v;});
-  radio([['s-slow',9],['s-mid',5],['s-fast',2.6]], function(v){flowSec=v;});
+  radio([['s-slow',26],['s-mid',14],['s-fast',6]], function(v){flowSec=v;});
   window.__dev={state:state,apply:apply,grads:GRADS,
     setFlow:function(k){flowKey=k;liquid(true);},setFont:function(k){fontKey=k;liquid(true);}};
   apply();
