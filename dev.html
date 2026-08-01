@@ -1,0 +1,356 @@
+<!doctype html><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Landing dev · graphics bench</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#000;color:#EDF2EC;font:15px/1.55 system-ui,-apple-system,sans-serif}
+.bar{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;gap:8px;flex-wrap:wrap;align-items:center;
+  padding:10px 14px;background:rgba(8,12,10,.86);backdrop-filter:blur(10px);border-bottom:1px solid #1e2a24}
+.bar b{font:700 12px/1 system-ui;letter-spacing:.12em;text-transform:uppercase;color:#4CC28F;margin-right:4px}
+.bar button{background:transparent;border:1px solid #2A342E;color:#9FAAA1;border-radius:99px;padding:8px 13px;
+  font:600 12.5px system-ui;cursor:pointer}
+.bar button.on{border-color:#4CC28F;color:#4CC28F;background:rgba(76,194,143,.12)}
+.bar a{margin-left:auto;color:#9FAAA1;font-size:12.5px;text-decoration:none}
+
+/* ---- block 1+2: space stage (starfield-1 + tubes cursor) ---- */
+#stage{position:relative;height:100vh;overflow:hidden;background:#000}
+#stage canvas.tubes{position:absolute;inset:0;z-index:2}
+#stageui{position:relative;z-index:5;height:100%;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:14px;text-align:center;padding:0 20px}
+/* ---- block 3: liquid text (their sizing: 40pt, lg 6rem, h-16/h-24) ---- */
+#liquid{position:relative;height:6rem;width:100%;max-width:768px;margin:0 auto;text-align:center;
+  font:700 40pt/1 system-ui,sans-serif}
+@media (min-width:1024px){#liquid{font-size:6rem;height:9rem}}
+.sub{color:#9FAAA1;font-size:15px;max-width:52ch}
+/* ---- block 4: parallax (Osmo structure) ---- */
+.parallax{position:relative;background:#000}
+.parallax__header{height:250vh;position:relative}
+.parallax__visuals{position:sticky;top:0;height:100vh;overflow:hidden}
+.parallax__layers{position:absolute;inset:0}
+[data-parallax-layer]{position:absolute;inset:-20% 0;display:flex;align-items:center;justify-content:center;will-change:transform}
+.pl1{background:radial-gradient(46% 36% at 50% 45%,rgba(76,194,143,.30),transparent 70%),
+     radial-gradient(30% 26% at 70% 62%,rgba(92,130,201,.22),transparent 70%)}
+.pl2 span{font:800 min(46vw,540px)/1 ui-monospace,monospace;color:transparent;
+  -webkit-text-stroke:2px rgba(159,232,198,.22);letter-spacing:-.04em}
+.parallax__title{font:600 clamp(32px,5.4vw,72px)/1.12 Georgia,serif;text-align:center;max-width:15ch;margin:0}
+.pl4{background:linear-gradient(180deg,transparent 42%,#000 84%)}
+.parallax__fade{position:absolute;left:0;right:0;bottom:0;height:22vh;
+  background:linear-gradient(180deg,transparent,#000);z-index:6}
+.parallax__content{min-height:60vh;display:flex;align-items:center;justify-content:center;color:#4CC28F}
+.parallax__content svg{width:90px;opacity:.5}
+.hidden{display:none !important}
+</style>
+
+<div class="bar">
+  <b>graphics</b>
+  <button id="b-stars" class="on">1 · starfield</button>
+  <button id="b-tubes" class="on">2 · tubes cursor</button>
+  <button id="b-liquid" class="on">3 · liquid text</button>
+  <button id="b-plx" class="on">4 · parallax</button>
+  <a href="/">← live site</a>
+</div>
+
+<section id="stage">
+  <div id="stageui">
+    <div id="liquid"></div>
+    <p class="sub">Hold the mouse down for hyperspace. Click to change tube colors.</p>
+  </div>
+</section>
+
+<div class="parallax" id="plx">
+  <section class="parallax__header">
+    <div class="parallax__visuals">
+      <div data-parallax-layers class="parallax__layers">
+        <div data-parallax-layer="1" class="pl1"></div>
+        <div data-parallax-layer="2" class="pl2"><span>60</span></div>
+        <div data-parallax-layer="3"><h2 class="parallax__title">Sixty working solutions. One studio. Days, not months.</h2></div>
+        <div data-parallax-layer="4" class="pl4"></div>
+      </div>
+      <div class="parallax__fade"></div>
+    </div>
+  </section>
+  <section class="parallax__content">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" fill="none">
+      <path d="M94.8284 53.8578C92.3086 56.3776 88 54.593 88 51.0294V0H72V59.9999C72 66.6273 66.6274 71.9999 60 71.9999H0V87.9999H51.0294C54.5931 87.9999 56.3777 92.3085 53.8579 94.8283L18.3431 130.343L29.6569 141.657L65.1717 106.142C67.684 103.63 71.9745 105.396 72 108.939V160L88.0001 160L88 99.9999C88 93.3725 93.3726 87.9999 100 87.9999H160V71.9999H108.939C105.407 71.9745 103.64 67.7091 106.12 65.1938L106.142 65.1716L141.657 29.6568L130.343 18.3432L94.8284 53.8578Z" fill="currentColor"/>
+    </svg>
+  </section>
+</div>
+
+<script>
+/* ANIM3: faithful vanilla ports of the three canonical components.
+   1. Starfield1  - starfield-1.tsx  (per-star drift, mouse offset >>4, hyperspace on hold)
+   2. LiquidText  - liquid-text.tsx  (two spans, blur/opacity curves, SVG threshold filter)
+   3. TubesCursor - tubes-cursor.tsx (threejs-components tubes1, 100ms init delay, click randomize)
+*/
+
+function Starfield1(host, o) {
+  o = o || {};
+  var starColor  = o.starColor  || 'rgba(255,255,255,1)';
+  var bgColor    = o.bgColor    || 'rgba(0,0,0,1)';
+  var mouseAdjust= !!o.mouseAdjust;
+  var easing     = o.easing     != null ? o.easing     : 1;
+  var clickToWarp= !!o.clickToWarp;
+  var warpFactor = o.warpFactor != null ? o.warpFactor : 10;
+  var opacity    = o.opacity    != null ? o.opacity    : 0.1;
+  var speed      = o.speed      != null ? o.speed      : 1;
+  var quantity   = o.quantity   != null ? o.quantity   : 512;
+
+  var cv = document.createElement('canvas');
+  cv.style.cssText = 'position:absolute;inset:0;z-index:' + (o.zIndex != null ? o.zIndex : 0);
+  host.appendChild(cv);
+  var ctx = cv.getContext('2d');
+
+  var w=0,h=0,cx=0,cy=0,z=0,colorRatio=0,arr=[];
+  var ratio = quantity / 2;
+  var cursor = {x:0,y:0}, mouse = {x:0,y:0};
+  var hyper = false;
+
+  function measure(){
+    w = host.clientWidth; h = host.clientHeight;
+    cx = Math.round(w/2); cy = Math.round(h/2);
+    z = (w+h)/2; colorRatio = 1/z;
+    if (cursor.x===0||cursor.y===0){ cursor.x=cx; cursor.y=cy; }
+  }
+  function setup(){
+    measure();
+    cv.width = w; cv.height = h;
+  }
+  function bigBang(){
+    if (arr.length !== quantity){
+      arr = new Array(quantity);
+      for (var i=0;i<quantity;i++){
+        arr[i] = [Math.random()*w*2 - cx*2, Math.random()*h*2 - cy*2,
+                  Math.round(Math.random()*z), 0,0,0,0,true];
+      }
+    }
+  }
+  function resizeIfNeeded(){
+    var pw=w, ph=h;
+    measure();
+    if (cv.width!==w || cv.height!==h){
+      var rw = w/(pw||w), rh = h/(ph||h);
+      cv.width=w; cv.height=h;
+      for (var i=0;i<arr.length;i++){
+        var s=arr[i];
+        s[0]*=rw; s[1]*=rh;
+        s[3]=cx+(s[0]/s[2])*ratio; s[4]=cy+(s[1]/s[2])*ratio;
+      }
+    }
+  }
+  function update(){
+    mouse.x = (cursor.x - cx)/easing;
+    mouse.y = (cursor.y - cy)/easing;
+    var compSpeed = hyper ? speed*warpFactor : speed;
+    for (var i=0;i<arr.length;i++){
+      var s=arr[i];
+      s[7]=true; s[5]=s[3]; s[6]=s[4];
+      s[0]+= mouse.x>>4;
+      if (s[0] >  cx<<1){ s[0]-= w<<1; s[7]=false; }
+      if (s[0] < -cx<<1){ s[0]+= w<<1; s[7]=false; }
+      s[1]+= mouse.y>>4;
+      if (s[1] >  cy<<1){ s[1]-= h<<1; s[7]=false; }
+      if (s[1] < -cy<<1){ s[1]+= h<<1; s[7]=false; }
+      s[2]-= compSpeed;
+      if (s[2] > z){ s[2]-=z; s[7]=false; }
+      if (s[2] < 0){ s[2]+=z; s[7]=false; }
+      s[3]=cx+(s[0]/s[2])*ratio;
+      s[4]=cy+(s[1]/s[2])*ratio;
+    }
+  }
+  function draw(){
+    ctx.fillStyle = hyper ? 'rgba(0,0,0,'+opacity+')' : bgColor;
+    ctx.fillRect(0,0,w,h);
+    ctx.strokeStyle = starColor;
+    for (var i=0;i<arr.length;i++){
+      var s=arr[i];
+      if (s[5]>0 && s[5]<w && s[6]>0 && s[6]<h && s[7]){
+        ctx.lineWidth = (1-colorRatio*s[2])*2;
+        ctx.beginPath(); ctx.moveTo(s[5],s[6]); ctx.lineTo(s[3],s[4]); ctx.stroke(); ctx.closePath();
+      }
+    }
+  }
+  var raf=0, running=true;
+  function animate(){
+    if (!running) return;
+    resizeIfNeeded(); update(); draw();
+    raf=requestAnimationFrame(animate);
+  }
+  function onMove(e){
+    var r=host.getBoundingClientRect();
+    cursor.x=e.clientX-r.left; cursor.y=e.clientY-r.top;
+  }
+  function onDown(){ hyper=true; } function onUp(){ hyper=false; }
+  if (mouseAdjust) host.addEventListener('mousemove', onMove, {passive:true});
+  if (clickToWarp){ host.addEventListener('mousedown', onDown); addEventListener('mouseup', onUp); }
+  var onVis=function(){ if(document.hidden){running=false;cancelAnimationFrame(raf);} else if(!running){running=true;animate();} };
+  document.addEventListener('visibilitychange', onVis);
+  setup(); bigBang(); animate();
+  return function stop(){
+    running=false; cancelAnimationFrame(raf);
+    document.removeEventListener('visibilitychange', onVis);
+    if (mouseAdjust) host.removeEventListener('mousemove', onMove);
+    if (clickToWarp){ host.removeEventListener('mousedown', onDown); removeEventListener('mouseup', onUp); }
+    cv.remove();
+  };
+}
+
+function LiquidText(host, texts, o) {
+  o = o || {};
+  var morphTime    = o.morphTime    != null ? o.morphTime    : 1.5;
+  var cooldownTime = o.cooldownTime != null ? o.cooldownTime : 0.5;
+  if (!texts || texts.length < 2) throw new Error('LiquidText: need 2+ texts');
+
+  if (!document.getElementById('lt-threshold-svg')){
+    var svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+    svg.id='lt-threshold-svg';
+    svg.setAttribute('style','position:absolute;width:0;height:0');
+    svg.innerHTML='<defs><filter id="threshold"><feColorMatrix in="SourceGraphic" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 255 -140"/></filter></defs>';
+    document.body.appendChild(svg);
+  }
+  host.style.position = host.style.position || 'relative';
+  host.style.filter = 'url(#threshold) blur(0.6px)';
+  function mkSpan(){
+    var s=document.createElement('span');
+    s.style.cssText='position:absolute;left:0;right:0;top:0;margin:auto;display:inline-block;width:100%;text-align:center';
+    host.appendChild(s); return s;
+  }
+  var t1=mkSpan(), t2=mkSpan();
+  var textIndex=0, morph=0, cooldown=0, time=Date.now();
+
+  function setStyles(fraction){
+    t2.style.filter='blur('+Math.min(8/fraction-8,100)+'px)';
+    t2.style.opacity=(Math.pow(fraction,0.4)*100)+'%';
+    var inv=1-fraction;
+    t1.style.filter='blur('+Math.min(8/inv-8,100)+'px)';
+    t1.style.opacity=(Math.pow(inv,0.4)*100)+'%';
+    t1.textContent=texts[textIndex%texts.length];
+    t2.textContent=texts[(textIndex+1)%texts.length];
+  }
+  function doMorph(){
+    morph-=cooldown; cooldown=0;
+    var fraction=morph/morphTime;
+    if (fraction>1){ cooldown=cooldownTime; fraction=1; }
+    setStyles(fraction);
+    if (fraction===1) textIndex++;
+  }
+  function doCooldown(){
+    morph=0;
+    t2.style.filter='none'; t2.style.opacity='100%';
+    t1.style.filter='none'; t1.style.opacity='0%';
+  }
+  var raf=0, running=true;
+  function animate(){
+    if(!running) return;
+    raf=requestAnimationFrame(animate);
+    var now=Date.now(), dt=(now-time)/1000; time=now;
+    cooldown-=dt; morph+=dt>0?dt:0;
+    if (cooldown<=0) doMorph(); else doCooldown();
+  }
+  var onVis=function(){ if(document.hidden){running=false;cancelAnimationFrame(raf);} else if(!running){running=true;time=Date.now();animate();} };
+  document.addEventListener('visibilitychange', onVis);
+  animate();
+  return function stop(){
+    running=false; cancelAnimationFrame(raf);
+    document.removeEventListener('visibilitychange', onVis);
+    t1.remove(); t2.remove(); host.style.filter='';
+  };
+}
+
+function TubesCursorInit(canvas, opts, onReady) {
+  /* 100ms delay: lets the canvas get real dimensions first (their NaN-radius fix) */
+  var timer=setTimeout(function(){
+    import('https://cdn.jsdelivr.net/npm/threejs-components@0.0.19/build/cursors/tubes1.min.js')
+      .then(function(m){
+        var app=m.default(canvas, opts || {tubes:{colors:["#5e72e4","#8965e0","#f5365c"],
+          lights:{intensity:200,colors:["#21d4fd","#b721ff","#f4d03f","#11cdef"]}}});
+        if (onReady) onReady(app);
+      })
+      .catch(function(err){ console.error('Failed to load TubesCursor module:', err); });
+  },100);
+  return function cancel(){ clearTimeout(timer); };
+}
+function tubesRandomColors(count){
+  return new Array(count).fill(0).map(function(){
+    return '#'+Math.floor(Math.random()*16777215).toString(16).padStart(6,'0');});
+}
+
+(function(){
+  var stage=document.getElementById('stage');
+  var stopStars=null, tubesApp=null, tubesCancel=null, tubesCv=null, stopLiquid=null, stopPlx=null;
+
+  /* 1 - starfield-1 port: mouse steering + hold-to-warp */
+  function stars(on){
+    if(stopStars){stopStars();stopStars=null;}
+    if(on) stopStars=Starfield1(stage,{quantity:512,speed:1,easing:1,warpFactor:10,opacity:0.1,
+      mouseAdjust:true,clickToWarp:true,starColor:'rgba(255,255,255,1)',bgColor:'rgba(0,0,0,1)',zIndex:1});
+  }
+  /* 2 - tubes cursor on top */
+  function tubes(on){
+    if(tubesCancel){tubesCancel();tubesCancel=null;}
+    if(tubesApp&&tubesApp.dispose){try{tubesApp.dispose();}catch(e){}}
+    tubesApp=null;
+    if(tubesCv){tubesCv.remove();tubesCv=null;}
+    if(!on) return;
+    tubesCv=document.createElement('canvas'); tubesCv.className='tubes';
+    stage.appendChild(tubesCv);
+    tubesCancel=TubesCursorInit(tubesCv,{tubes:{colors:["#2AA173","#4CC28F","#1E7A55"],
+      lights:{intensity:200,colors:["#4CC28F","#5C82C9","#9FE8C6","#2AA173"]}}},function(app){tubesApp=app;});
+    stage.addEventListener('click',function(){
+      if(!tubesApp) return;
+      tubesApp.tubes.setColors(tubesRandomColors(3));
+      tubesApp.tubes.setLightsColors(tubesRandomColors(4));
+    });
+  }
+  /* 3 - liquid text */
+  function liquid(on){
+    var host=document.getElementById('liquid');
+    if(stopLiquid){stopLiquid();stopLiquid=null;}
+    host.classList.toggle('hidden',!on);
+    if(on) stopLiquid=LiquidText(host,['IMAGINATION','IS YOUR','ONLY LIMIT'],{morphTime:1.5,cooldownTime:0.5});
+  }
+  /* 4 - parallax: same layer speeds as the GSAP timeline, scrubbed by scroll */
+  function parallax(on){
+    var sec=document.getElementById('plx');
+    sec.classList.toggle('hidden',!on);
+    if(stopPlx){stopPlx();stopPlx=null;}
+    if(!on) return;
+    var trigger=sec.querySelector('[data-parallax-layers]');
+    var SPEEDS={1:70,2:55,3:40,4:10};
+    var layers=[].map.call(trigger.querySelectorAll('[data-parallax-layer]'),function(el){
+      return {el:el, sp:SPEEDS[el.getAttribute('data-parallax-layer')]||0, cur:0};
+    });
+    var target=0, ticking=false;
+    function measure(){
+      var r=trigger.getBoundingClientRect();
+      target=Math.min(1,Math.max(0,-r.top/(r.height||1)));
+    }
+    function frame(){
+      var busy=false;
+      layers.forEach(function(L){
+        L.cur+=(target-L.cur)*0.14;
+        if(Math.abs(target-L.cur)>0.0006) busy=true;
+        L.el.style.transform='translateY('+(L.cur*L.sp).toFixed(3)+'%)';
+      });
+      if(busy) requestAnimationFrame(frame); else ticking=false;
+    }
+    function kick(){measure(); if(!ticking){ticking=true;requestAnimationFrame(frame);}}
+    addEventListener('scroll',kick,{passive:true});
+    addEventListener('resize',kick,{passive:true});
+    kick();
+    stopPlx=function(){removeEventListener('scroll',kick);removeEventListener('resize',kick);};
+  }
+
+  var state={stars:true,tubes:true,liquid:true,plx:true};
+  function apply(){stars(state.stars);tubes(state.tubes);liquid(state.liquid);parallax(state.plx);}
+  [['b-stars','stars'],['b-tubes','tubes'],['b-liquid','liquid'],['b-plx','plx']].forEach(function(p){
+    var btn=document.getElementById(p[0]);
+    btn.addEventListener('click',function(){
+      state[p[1]]=!state[p[1]];
+      btn.classList.toggle('on',state[p[1]]);
+      apply();
+    });
+  });
+  window.__dev={state:state,apply:apply};
+  apply();
+})();
+</script>
