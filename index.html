@@ -29,8 +29,12 @@ header{position:absolute;top:0;left:0;right:0;z-index:20}
 @media (hover:hover){.cta:hover{background:rgba(127,216,255,.12);border-color:var(--ice2)}}
 .cta:active{transform:scale(.97)}
 
+/* the starfield is fixed behind the whole document, so every section flies through space */
+#space{position:fixed;inset:0;z-index:0;pointer-events:none;background:#000}
+#space canvas{position:absolute;inset:0}
+
 /* ---------- hero stage ---------- */
-#stage{position:relative;min-height:100svh;overflow:hidden;background:#000}
+#stage{position:relative;min-height:100svh;overflow:hidden;background:transparent}
 /* same as the bench: the tubes own the whole stage and screen-blend over the starfield */
 #stage canvas.tubes{position:absolute;inset:0;z-index:2;mix-blend-mode:screen;pointer-events:none}
 .stageui{position:relative;z-index:5;min-height:100svh;display:flex;flex-direction:column;
@@ -56,7 +60,8 @@ h1 em{font-style:normal;color:var(--ice2)}
   color:var(--dim);font-size:12.5px;letter-spacing:.14em;text-transform:uppercase}
 
 /* ---------- section: about ---------- */
-section.band{position:relative;z-index:6;background:#000;padding:96px 0 90px;border-top:1px solid var(--line)}
+section.band{position:relative;z-index:6;padding:96px 0 90px;border-top:1px solid var(--line);
+  background:linear-gradient(180deg,rgba(0,0,0,.72),rgba(0,0,0,.86))}
 .eyebrow{font-size:12.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ice2);margin:0 0 14px}
 h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;margin:0;max-width:22ch}
 .about{display:grid;gap:44px;grid-template-columns:minmax(320px,1.15fr) minmax(280px,.85fr);
@@ -65,7 +70,7 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
 .about p{color:var(--dim);margin:0 0 16px;max-width:62ch}
 .about p strong{color:var(--ink);font-weight:700}
 .stats{display:grid;gap:14px}
-.stat{border:1px solid var(--line);border-radius:16px;padding:20px 22px;background:rgba(127,216,255,.03)}
+.stat{border:1px solid var(--line);border-radius:16px;padding:20px 22px;background:rgba(6,12,16,.7)}
 .stat b{display:block;font:900 30px/1 Nunito,sans-serif;color:var(--ice1)}
 .stat span{display:block;color:var(--dim);font-size:14px;margin-top:6px}
 
@@ -78,7 +83,7 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
 
 /* ---------- section: services ---------- */
 .srv{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));margin-top:34px}
-.card{border:1px solid var(--line);border-radius:18px;padding:24px 24px 26px;background:rgba(127,216,255,.03)}
+.card{border:1px solid var(--line);border-radius:18px;padding:24px 24px 26px;background:rgba(6,12,16,.72)}
 .card h3{margin:0 0 10px;font:900 18.5px/1.25 Nunito,sans-serif}
 .card p{margin:0;color:var(--dim);font-size:14.5px}
 .card .gain{display:block;margin-top:14px;padding-top:12px;border-top:1px solid var(--line);
@@ -86,14 +91,14 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
 
 /* ---------- section: how ---------- */
 .steps{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));margin-top:34px;counter-reset:s}
-.step{border-radius:18px;padding:22px 22px 24px;background:rgba(255,255,255,.02);border:1px solid var(--line)}
+.step{border-radius:18px;padding:22px 22px 24px;background:rgba(6,12,16,.7);border:1px solid var(--line)}
 .step:before{counter-increment:s;content:counter(s);display:block;font:900 26px/1 Nunito,sans-serif;
   color:var(--ice2);margin-bottom:10px}
 .step b{display:block;font-size:16.5px;margin-bottom:6px}
 .step span{color:var(--dim);font-size:14.5px}
 
 /* ---------- parallax divider ---------- */
-.plx{position:relative;height:210vh;background:#000;z-index:6}
+.plx{position:relative;height:260vh;z-index:6}
 .plx-sticky{position:sticky;top:0;height:100vh;overflow:hidden}
 .plx-layer{position:absolute;inset:-20% 0;display:flex;align-items:center;justify-content:center;will-change:transform}
 .plx-glow{background:radial-gradient(46% 34% at 50% 46%,rgba(127,216,255,.20),transparent 70%),
@@ -101,14 +106,17 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
 .plx-num{font:900 min(44vw,520px)/1 Nunito,sans-serif;color:transparent;letter-spacing:-.04em;
   -webkit-text-stroke:2px rgba(223,246,255,.16)}
 .plx-line{font:900 clamp(26px,4.4vw,56px)/1.14 Nunito,sans-serif;text-align:center;max-width:16ch;margin:0}
-.plx-fade{position:absolute;left:0;right:0;bottom:0;height:26vh;
-  background:linear-gradient(180deg,transparent,#000);z-index:5}
+.plx-ridge{align-items:flex-end !important;inset:auto 0 -12% 0 !important;height:56vh}
+.plx-ridge svg{width:100%;height:100%;display:block;filter:drop-shadow(0 -18px 40px rgba(0,0,0,.8))}
+.plx-fade{position:absolute;left:0;right:0;bottom:0;height:22vh;
+  background:linear-gradient(180deg,transparent,rgba(0,0,0,.92));z-index:5}
+.plx-line{text-shadow:0 6px 40px rgba(0,0,0,.7)}
 
 
 /* ---------- projects: big cards, each with a mock screen of what we build ---------- */
 .projects{display:grid;gap:22px;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));margin-top:38px}
 @media (max-width:820px){.projects{grid-template-columns:1fr}}
-.proj{border:1px solid var(--line);border-radius:22px;overflow:hidden;background:rgba(127,216,255,.03);
+.proj{border:1px solid var(--line);border-radius:22px;overflow:hidden;background:rgba(6,12,16,.78);
   display:flex;flex-direction:column}
 .shot{height:230px;background:linear-gradient(160deg,#07131c,#04090d);border-bottom:1px solid var(--line);
   padding:16px;display:flex;flex-direction:column;gap:8px;overflow:hidden}
@@ -142,7 +150,7 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
 
 /* ---------- questions ---------- */
 .qbox{margin-top:32px;border:1px solid var(--line);border-radius:22px;padding:30px 30px 34px;
-  background:rgba(255,255,255,.02)}
+  background:rgba(6,12,16,.7)}
 .qs{display:grid;gap:0;grid-template-columns:1fr 1fr;margin-top:20px}
 @media (max-width:820px){.qs{grid-template-columns:1fr}}
 .qs li{list-style:none;display:flex;gap:12px;padding:14px 22px 14px 0;border-bottom:1px dashed rgba(30,42,36,.9);
@@ -153,7 +161,7 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
 .req{display:grid;gap:34px;grid-template-columns:minmax(300px,1fr) minmax(300px,1fr);
   align-items:start;margin-top:32px}
 @media (max-width:860px){.req{grid-template-columns:1fr}}
-.form{border-radius:20px;padding:26px;background:rgba(127,216,255,.04);border:1px solid var(--line)}
+.form{border-radius:20px;padding:26px;background:rgba(6,12,16,.78);border:1px solid var(--line)}
 .form label{display:block;font-size:13px;color:var(--dim);margin:14px 0 6px}
 .form label:first-of-type{margin-top:0}
 .form input,.form textarea{width:100%;background:#05090c;border:1px solid var(--line);border-radius:12px;
@@ -218,7 +226,7 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
 @media (forced-colors:active){.beam .beam-ring,.beam .beam-glow{display:none}}
 
 /* ---------- footer ---------- */
-footer{border-top:1px solid var(--line);padding:44px 0 54px;background:#000;position:relative;z-index:6}
+footer{border-top:1px solid var(--line);padding:44px 0 54px;background:rgba(0,0,0,.9);position:relative;z-index:6}
 .cols{display:grid;gap:30px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
 footer h4{margin:0 0 10px;font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ice2)}
 footer p,footer a{color:var(--dim);font-size:14.5px;text-decoration:none;margin:0}
@@ -226,6 +234,8 @@ footer a{display:block;padding:3px 0}
 @media (hover:hover){footer a:hover{color:var(--ink)}}
 .legal{margin-top:34px;color:#5d6a63;font-size:12.5px}
 </style>
+
+<div id="space"></div>
 
 <header><div class="wrap topbar">
   <a class="mark" href="/">Solutions<span>101</span></a>
@@ -251,10 +261,15 @@ footer a{display:block;padding:3px 0}
 
 <section class="plx" id="plx">
   <div class="plx-sticky">
-    <div class="plx-layer plx-glow" data-speed="70"></div>
-    <div class="plx-layer" data-speed="55"><div class="plx-num">101</div></div>
-    <div class="plx-layer" data-speed="40"><p class="plx-line">Только практика.<br>Ноль теории.</p></div>
-    <div class="plx-layer" data-speed="10"></div>
+    <div class="plx-layer plx-glow" data-speed="8"></div>
+    <div class="plx-layer" data-speed="26" data-scale="0.12"><div class="plx-num">101</div></div>
+    <div class="plx-layer" data-speed="62"><p class="plx-line">Только практика.<br>Ноль теории.</p></div>
+    <div class="plx-layer plx-ridge" data-speed="-18">
+      <svg viewBox="0 0 1440 420" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M0 420V236l86-38 74 26 96-58 92 34 78-52 104 44 86-70 96 58 78-30 92 52 84-40 88 46 76-24 110 62v194z" fill="#04080b"/>
+        <path d="M0 420V300l120-42 96 34 110-56 94 46 96-38 118 60 92-48 104 52 86-30 92 44 96-26 116 54 120-38v210z" fill="#010304"/>
+      </svg>
+    </div>
     <div class="plx-fade"></div>
   </div>
 </section>
@@ -511,12 +526,11 @@ footer a{display:block;padding:3px 0}
   var FLOW=3.5, GLOW={l:.43,i:135};
   var stage=document.getElementById('stage');
 
-  Starfield1(stage,{quantity:700,speed:2.1,easing:1,warpFactor:10,opacity:0.1,
+  Starfield1(document.getElementById('space'),{quantity:700,speed:2.1,easing:1,warpFactor:10,opacity:0.1,
     mouseAdjust:false,clickToWarp:false,starColor:'rgba(255,255,255,1)',bgColor:'rgba(0,0,0,1)',zIndex:1});
 
   /* two lines, same timings, started in the same tick: they melt into the next phrase together */
-  var MORPH={morphTime:4.5,cooldownTime:0.45,colors:ICE,flow:FLOW,drift:FLOW*3,
-             spread:ICE.length*0.08,letters:true};
+  var MORPH={morphTime:4.5,cooldownTime:0.45,colors:ICE,flow:FLOW,drift:FLOW*3,spread:ICE.length*0.08};
   var L1=document.getElementById('liq1'), L2=document.getElementById('liq2');
   LiquidText(L1,['АВТОМАТИЗИРУЕМ','БЫСТРО','ТОЛЬКО ПРАКТИКА'],MORPH);
   LiquidText(L2,['БИЗНЕС-ПРОЦЕССЫ','НЕ ЗНАЧИТ ПЛОХО','НОЛЬ ТЕОРИИ'],MORPH);
@@ -533,51 +547,7 @@ footer a{display:block;padding:3px 0}
   TubesCursorInit(cv,{tubes:{colors:tubeSet(p0),
     lights:{intensity:GLOW.i,colors:[dim(paletteAt(ICE,p0),k),dim(paletteAt(ICE,p0+sp*0.9),k),
                                      dim(paletteAt(ICE,p0+sp*1.5),k),dim(paletteAt(ICE,p0+sp*2.1),k)]}}},
-    function(a){
-      app=a;
-      /* the library's idle path is a Lissajous figure: cos on x, sin at double frequency on y,
-         which is the figure-eight. Slowed right down and widened so it drifts across the slogan
-         instead of buzzing in the middle. */
-      app.options.sleepTimeScale1=0.22;
-      app.options.sleepTimeScale2=0.44;
-      app.options.sleepRadiusX=430;
-      app.options.sleepRadiusY=190;
-    });
-
-  /* Letters get out of the way of the tubes. The tube head is read straight off the library
-     (app.tubes.target, in world units) and converted to page pixels with the renderer's own
-     scale, so the shove always lands where the ribbons actually are. Base positions are
-     measured once per word, not per frame, so this stays cheap. */
-  var PUSH_R=200, PUSH_MAX=54;
-  function measure(sp,stageBox){
-    sp.__base=[];
-    var kids=sp.children;
-    for(var i=0;i<kids.length;i++){
-      kids[i].style.transform='none';
-      var b=kids[i].getBoundingClientRect();
-      sp.__base.push({el:kids[i],x:b.left+b.width/2-stageBox.left,y:b.top+b.height/2-stageBox.top});
-    }
-    sp.__measured=true;
-  }
-  function shove(tx,ty,stageBox){
-    [L1,L2].forEach(function(host){
-      for(var s=0;s<host.children.length;s++){
-        var sp=host.children[s];
-        if(sp.tagName!=='SPAN'||!sp.children.length) continue;
-        if(!sp.__measured||!sp.__base||sp.__base.length!==sp.children.length) measure(sp,stageBox);
-        for(var i=0;i<sp.__base.length;i++){
-          var p=sp.__base[i], dx=p.x-tx, dy=p.y-ty;
-          var d=Math.sqrt(dx*dx+dy*dy)||0.001;
-          if(d>PUSH_R){ if(p.el.style.transform!=='none') p.el.style.transform='none'; continue; }
-          var f=1-d/PUSH_R, k=f*f*PUSH_MAX;
-          p.el.style.transform='translate('+(dx/d*k).toFixed(1)+'px,'+(dy/d*k*0.7).toFixed(1)+'px)';
-        }
-      }
-    });
-  }
-
-  /* callable by hand so the shove can be checked without waiting for animation frames */
-  window.__shove=function(x,y){ shove(x,y,stage.getBoundingClientRect()); };
+    function(a){app=a;});
 
   /* tubes walk the same palette as the text, one step behind it */
   var hue=0,last=0;
@@ -586,16 +556,6 @@ footer a{display:block;padding:3px 0}
     if(!app){last=now;return;}
     if(now-last<62) return;
     hue=(hue+360*(now-last)/1000/(FLOW*3))%360; last=now;
-    var sz=app.three&&app.three.size, t=app.tubes&&app.tubes.target;
-    if(sz&&t&&sz.wWidth){
-      var box=stage.getBoundingClientRect();
-      var px=box.width/2+t.x*(sz.width/sz.wWidth), py=box.height/2-t.y*(sz.height/sz.wHeight);
-      shove(px,py,box);
-      window.__hero={shoves:(window.__hero?window.__hero.shoves:0)+1,head:[Math.round(px),Math.round(py)],
-                     world:[+t.x.toFixed(1),+t.y.toFixed(1)],size:[sz.width,sz.wWidth]};
-    } else {
-      window.__hero={shoves:0,why:{size:!!sz,target:!!t,wWidth:sz&&sz.wWidth}};
-    }
     var p=hue/360*ICE.length+p0;
     try{
       app.tubes.setColors(tubeSet(p));
@@ -611,7 +571,8 @@ footer a{display:block;padding:3px 0}
 (function(){
   var sec=document.getElementById('plx'); if(!sec) return;
   var layers=[].map.call(sec.querySelectorAll('.plx-layer'),function(el){
-    return {el:el, sp:parseFloat(el.getAttribute('data-speed'))||0, cur:0};
+    return {el:el, sp:parseFloat(el.getAttribute('data-speed'))||0,
+            sc:parseFloat(el.getAttribute('data-scale'))||0, cur:0};
   });
   var target=0, ticking=false;
   function measure(){
@@ -623,7 +584,9 @@ footer a{display:block;padding:3px 0}
     layers.forEach(function(L){
       L.cur+=(target-L.cur)*0.14;
       if(Math.abs(target-L.cur)>0.0006) busy=true;
-      L.el.style.transform='translateY('+(L.cur*L.sp).toFixed(3)+'%)';
+      var t='translateY('+(L.cur*L.sp).toFixed(3)+'%)';
+      if(L.sc) t+=' scale('+(1+L.cur*L.sc).toFixed(4)+')';
+      L.el.style.transform=t;
     });
     if(busy) requestAnimationFrame(frame); else ticking=false;
   }
