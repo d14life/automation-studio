@@ -91,8 +91,8 @@ header{border-bottom:1px solid var(--rule)}
 .section-head .idx{font-size:13px;color:var(--ink-soft);letter-spacing:.1em;text-transform:uppercase}
 .section-sub{color:var(--ink-soft);margin:10px 0 32px;max-width:64ch}
 
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start}
-@media (max-width:820px){.grid{grid-template-columns:1fr}}
+.grid{display:grid;grid-template-columns:1fr;gap:28px}
+
 
 /* ---------- service card ---------- */
 .card{background:var(--card);border:1px solid var(--rule);border-radius:8px;
@@ -101,7 +101,7 @@ header{border-bottom:1px solid var(--rule)}
 .js .grid .card{opacity:0;transform:translateY(22px);
   transition:opacity 600ms var(--ease-out), transform 600ms var(--ease-out), box-shadow 180ms var(--ease-out)}
 .js .grid .card.vis{opacity:1;transform:none}
-.js .grid .card:nth-child(2n).vis{transition-delay:90ms}
+
 @media print{.js .grid .card{opacity:1;transform:none}}
 @media (hover:hover) and (pointer:fine){
 .card:hover{transform:translateY(-2px);box-shadow:0 3px 8px rgba(28,37,32,.12)}
@@ -111,16 +111,16 @@ header{border-bottom:1px solid var(--rule)}
 .card h3{margin:0;font-size:20px;line-height:1.3;font-family:"Fraunces",Charter,Georgia,serif;font-weight:600}
 .card h3 .num{color:var(--rule-blue);font-weight:400;margin-right:8px;font-size:15px}
 .card p{margin:0;color:var(--ink-soft);font-size:15.5px}
-.kills{margin-top:auto;padding-top:12px;border-top:1px dashed var(--rule);
+.kills{margin-top:4px;padding-top:12px;border-top:1px dashed var(--rule);
   font-size:13.5px;display:flex;gap:8px;align-items:baseline}
 .kills b{color:var(--green);white-space:nowrap;font-size:12px;letter-spacing:.08em;text-transform:uppercase}
-.card.wide{grid-column:1/-1;display:grid;grid-template-columns:1.08fr 1fr}
-.card.wide .mock{border-bottom:0;border-right:1px solid var(--rule);min-height:250px}
-.card.wide .body{padding:26px 28px}
-.card.wide h3{font-size:23px}
+.grid .card{display:grid;grid-template-columns:1.12fr 1fr}
+.grid .card .mock{border-bottom:0;border-right:1px solid var(--rule);min-height:230px;display:flex;flex-direction:column;justify-content:center}
+.grid .card .body{padding:26px 28px;justify-content:center;gap:12px}
+.grid .card h3{font-size:22px}
 @media (max-width:820px){
-  .card.wide{display:flex;flex-direction:column}
-  .card.wide .mock{border-right:0;border-bottom:1px solid var(--rule)}
+  .grid .card{display:flex;flex-direction:column}
+  .grid .card .mock{border-right:0;border-bottom:1px solid var(--rule)}
 }
 
 /* ---------- mockups ---------- */
@@ -292,16 +292,16 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 </header>
 <nav class="secnav"><div class="progressline" id="progressline"></div><div class="wrap secnav-in">
-<input class="finder" id="finder" type="search" placeholder="Type what annoys you: invoices, rota, leads..." aria-label="Search the 56 services">
+<input class="finder" id="finder" type="search" placeholder="Type what annoys you: invoices, rota, leads..." aria-label="Search the 60 services">
 <a href="#s-data">Data</a><a href="#s-fin">Finance</a><a href="#s-crm">Sales and CRM</a><a href="#s-ai">AI</a><a href="#s-ops">Operations</a><a href="#s-web">Web and clients</a><a href="#s-rep">Reporting</a><a href="#s-infra">Infrastructure</a>
 </div></nav>
 
 <div class="hero">
   <div class="wrap">
-    <span class="kicker">Services catalogue · all 56</span>
+    <span class="kicker">Services catalogue · all 60</span>
     <h1 class="serif">We build your tool in days. You try it on real work. <em>If it does not help, you do not pay.</em></h1>
     <p>Fast does not mean rough. We build a working first version of your automation, you run it on your actual invoices, orders and spreadsheets, and you pay only when it earns its place. Nothing upfront, the risk stays on us.</p>
-    <p>Below are fifty-six things we build, for any department of any business: sales, finance, operations, warehouse, support, delivery. Each one removes a named chore and pays for itself in a measurable way.</p>
+    <p>Below are sixty things we build, for any department of any business: sales, finance, operations, warehouse, support, delivery. Each one removes a named chore and pays for itself in a measurable way.</p>
     <p class="hint">▶ Every card below is a working demo. Press a button and watch the chore disappear.</p>
     <p class="hero-line mono">No upfront cost. First version in days. Typically pays for itself inside a quarter.</p>
   </div>
@@ -315,7 +315,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   <div class="grid" id="g-data">
 
     <!-- 1 -->
-    <article class="card wide">
+    <article class="card">
       <div class="mock demo">
         <div class="mtitle"><span>Marketplace alerts</span><button class="runbtn" type="button">▶ go live</button></div>
         <div class="nodes"><div class="node" data-lit>Amazon</div><div class="link" data-lit></div><div class="node" data-lit>Ozon</div><div class="link" data-lit></div><div class="node" data-lit>eBay</div><div class="link" data-lit></div><div class="node" data-lit>Telegram</div></div>
@@ -448,7 +448,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   <div class="grid" id="g-fin">
 
     <!-- 8 -->
-    <article class="card wide">
+    <article class="card">
       <div class="mock demo">
         <div class="mtitle"><span>Deal won → paperwork</span><button class="runbtn" type="button">▶ mark deal won</button></div>
         <div class="nodes"><div class="node" data-lit>Deal won</div><div class="link" data-lit></div><div class="node" data-lit>Documents</div><div class="link" data-lit></div><div class="node" data-lit>Client inbox</div></div>
@@ -574,7 +574,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   <div class="section-head" id="s-crm"><span class="idx serif">8 services</span><h2 class="serif">Sales and CRM</h2></div>
   <p class="section-sub">Leads answered in minutes, proposals in seconds, and a client history that stays when a salesperson leaves.</p>
   <div class="grid" id="g-crm">
-<article class="card wide">
+<article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Funnel · this month</span><button class="runbtn" type="button">▶ show the funnel</button></div>
     <div class="mrow" data-step><span class="grow">Qualified</span><span class="bar"><i data-w="100"></i></span><span class="mono"><span data-count="212">0</span></span></div>
@@ -689,7 +689,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 </article>
 
-    <article class="card wide">
+    <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Loyalty and partners</span><button class="runbtn" type="button">▶ close the month</button></div>
     <div class="nodes"><div class="node" data-lit>Purchase</div><div class="link" data-lit></div><div class="node" data-lit>Points</div><div class="link" data-lit></div><div class="node" data-lit>Tier</div></div>
@@ -715,7 +715,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   <div class="section-head" id="s-ai"><span class="idx serif">10 services</span><h2 class="serif">Artificial intelligence</h2></div>
   <p class="section-sub">Bots that answer from your own documents, calls that write themselves into the CRM, and forecasts that order stock before it runs out.</p>
   <div class="grid" id="g-ai">
-<article class="card wide">
+<article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Purchase plan · week 12</span><button class="runbtn" type="button">▶ run the forecast</button></div>
     <div class="mrow" data-step><span class="grow">Sales history, seasonality, promos, supplier lead times</span><span class="mono">36 months</span></div>
@@ -881,7 +881,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 </article>
 
-    <article class="card wide">
+    <article class="card">
       <div class="mock demo">
         <div class="mtitle"><span>Content factory · this week</span><button class="runbtn" type="button">▶ run the week</button></div>
         <div class="doc" data-step><b>Blog: choosing 18mm panel, 5 mistakes buyers make</b><div class="dline"></div><div class="dline"></div><div class="dline short"></div></div>
@@ -909,10 +909,10 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <a class="cta" href="mailto:tagir.zalyatov@gmail.com?subject=Automation%20enquiry">Get a quote</a>
   </div>
 
-  <div class="section-head" id="s-ops"><span class="idx serif">8 services</span><h2 class="serif">Operations and internal workflow</h2></div>
+  <div class="section-head" id="s-ops"><span class="idx serif">10 services</span><h2 class="serif">Operations and internal workflow</h2></div>
   <p class="section-sub">Approvals that move, rotas that build themselves, crews that report from the road, stock counts that match the shelf.</p>
   <div class="grid" id="g-ops">
-<article class="card wide">
+<article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Booking desk</span><button class="runbtn" type="button">▶ take the booking</button></div>
     <div class="mrow mono" data-step><span class="grow">Mon 14 Apr</span><div class="bar"><i data-w="83"></i></div><span data-count="11">0</span></div>
@@ -1031,7 +1031,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 </article>
 
-    <article class="card wide">
+    <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Tomorrow's routes</span><button class="runbtn" type="button">▶ plan the runs</button></div>
     <div class="mrow" data-step><span class="grow">28 drops, 4 vans, capacity and time windows applied</span></div>
@@ -1046,13 +1046,53 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="kills"><b>Removes</b><span>an hour of manual route juggling each evening and the calls asking where the van is.</span></div>
   </div>
 </article>
+
+    <article class="card">
+  <div class="mock demo">
+    <div class="mtitle"><span>New hire packet · M. Reinholt , logistics</span><button class="runbtn" type="button">▶ open day one</button></div>
+    <div class="filechips">
+      <span class="fchip" data-eat>signed offer.pdf</span>
+      <span class="fchip" data-eat>role: dispatcher</span>
+      <span class="fchip" data-eat>start 04.09</span>
+      <span class="fchip" data-eat>site: Bremen depot</span>
+      <span class="fchip" data-eat>manager: A. Koss</span>
+    </div>
+    <div class="arrowdown">▼ provisioning ▼</div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Mailbox , CRM , dispatch board created</span><span class="chip g">3 accounts</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Laptop and scanner reserved from stock</span><span class="chip g">assigned</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Day one schedule sent to buddy and manager</span><span class="mono">08:30</span><span class="chip g">booked</span></div>
+    <div class="mrow" data-step><span class="dot r"></span><span class="grow">Leaver: T. Brandes , 7 accesses revoked at once</span><span class="mono">17:00</span><span class="chip g">clean</span></div>
+  </div>
+  <div class="body">
+    <h3><span class="num mono">58</span>Staff onboarding and offboarding</h3>
+    <p>The moment a hire is accepted, accounts, accesses, equipment, checklists and the day-one schedule are created without anyone chasing IT. When someone leaves, every access dies in one click.</p>
+    <div class="kills"><b>Removes</b><span>the first week where a new employee has no laptop, no logins and nobody assigned to them, and the ex-employee who still knows the CRM password.</span></div>
+  </div>
+</article>
+
+    <article class="card">
+  <div class="mock demo">
+    <div class="mtitle"><span>Fleet and machines · service due</span><button class="runbtn" type="button">▶ raise work orders</button></div>
+    <div class="mrow mono" data-step><span class="grow">Press line 2 · hours to service</span><div class="bar"><i data-w="94"></i></div><span data-count="470">0</span></div>
+    <div class="mrow mono" data-step><span class="grow">Van MB-317 · km to service</span><div class="bar"><i data-w="81"></i></div><span data-count="12400">0</span></div>
+    <div class="mrow mono" data-step><span class="grow">Forklift F-6 · days to inspection</span><div class="bar"><i data-w="62"></i></div><span data-count="23">0</span></div>
+    <div class="mrow" data-step><span class="dot a"></span><span class="grow">Press line 2 hits 500 h on Thursday</span><span class="chip a">order raised</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Filter set and belts reserved , 214 EUR</span><span class="chip g">parts held</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Booked Sunday 06:00 , zero production lost</span><span class="mono">06:00</span><span class="chip g">planned</span></div>
+  </div>
+  <div class="body">
+    <h3><span class="num mono">59</span>Equipment and vehicle maintenance scheduler</h3>
+    <p>Service intervals are tracked from running hours, mileage or the calendar, whichever comes first. Work orders are raised before the breakdown, with parts, cost and downtime logged per machine.</p>
+    <div class="kills"><b>Removes</b><span>the production line that stops on the busiest day because nobody remembered the 500-hour service.</span></div>
+  </div>
+</article>
   </div>
 
   <div class="band">
-  <div class="section-head" id="s-web"><span class="idx serif">7 services</span><h2 class="serif">Web and customer-facing</h2></div>
+  <div class="section-head" id="s-web"><span class="idx serif">8 services</span><h2 class="serif">Web and customer-facing</h2></div>
   <p class="section-sub">Sites that convert, stores that sync, payments that reconcile themselves, and a sales channel inside the client's messenger.</p>
   <div class="grid" id="g-web">
-<article class="card wide">
+<article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Online store</span><button class="runbtn" type="button">▶ place an order</button></div>
     <div class="nodes"><div class="node" data-lit>Catalogue</div><div class="link" data-lit></div><div class="node" data-lit>Payment</div><div class="link" data-lit></div><div class="node" data-lit>Warehouse</div></div>
@@ -1169,13 +1209,37 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="kills"><b>Removes</b><span>Setting next month's budget on numbers that stop at the form.</span></div>
   </div>
 </article>
+
+    <article class="card">
+  <div class="mock demo">
+    <div class="mtitle"><span>Review watch · Google, Trustpilot, marketplace</span><button class="runbtn" type="button">▶ run the autopilot</button></div>
+    <div class="nodes">
+      <div class="node" data-lit>Order closed</div>
+      <div class="link" data-lit></div>
+      <div class="node" data-lit>Ask at the right hour</div>
+      <div class="link" data-lit></div>
+      <div class="node" data-lit>Review lands</div>
+      <div class="link" data-lit></div>
+      <div class="node" data-lit>Reply drafted</div>
+    </div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Northgate Ltd · 5 stars on Google</span><span class="mono">21:14</span><span class="chip g">posted</span></div>
+    <div class="mrow" data-step><span class="dot r"></span><span class="grow">Vellmar Handel · 2 stars , late delivery</span><span class="mono">09:03</span><span class="chip r">alert in 4 min</span></div>
+    <div class="mrow" data-step><span class="dot a"></span><span class="grow">Calm reply drafted , waiting for your yes</span><span class="mono">09:07</span><span class="chip a">approve</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Reply published , client raised to 4 stars</span><span class="mono">11:41</span><span class="chip g">recovered</span></div>
+  </div>
+  <div class="body">
+    <h3><span class="num mono">57</span>Reviews and reputation autopilot</h3>
+    <p>After each completed order the system asks the happy client for a review at the moment they are most likely to leave one. A bad review pings you within minutes with a calm reply already drafted for your approval.</p>
+    <div class="kills"><b>Removes</b><span>the silence that lets one angry review sit unanswered for a month while it quietly costs you clients.</span></div>
+  </div>
+</article>
   </div>
   </div><!-- /band -->
 
-  <div class="section-head" id="s-rep"><span class="idx serif">4 services</span><h2 class="serif">Reporting and management visibility</h2></div>
+  <div class="section-head" id="s-rep"><span class="idx serif">5 services</span><h2 class="serif">Reporting and management visibility</h2></div>
   <p class="section-sub">One screen of truth for the director, and an alert the hour something goes wrong instead of a surprise at month end.</p>
   <div class="grid" id="g-rep">
-<article class="card wide">
+<article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Director's screen</span><button class="runbtn" type="button">▶ refresh the board</button></div>
     <div class="mrow" data-step><span class="grow">Revenue, month to date</span><span class="mono">€<span data-count="418500">0</span></span><span class="up">▲</span></div>
@@ -1223,7 +1287,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 </article>
 
-    <article class="card wide">
+    <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Anomaly watch</span><button class="runbtn" type="button">▶ watch the numbers</button></div>
     <div class="nodes"><div class="node" data-lit>Live data</div><div class="link" data-lit></div><div class="node" data-lit>42 checks</div><div class="link" data-lit></div><div class="node" data-lit>Alerts</div></div>
@@ -1243,13 +1307,32 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="kills"><b>Removes</b><span>finding out about a month-old problem when the month-end figures land.</span></div>
   </div>
 </article>
+
+    <article class="card">
+  <div class="mock demo">
+    <div class="mtitle"><span>Churn radar · last 90 days</span><button class="runbtn" type="button">▶ scan the base</button></div>
+    <div class="bigstat mono">
+      <div data-step><b data-count="312">0</b><span>active clients</span></div>
+      <div data-step><b data-count="9">0</b><span>going quiet</span></div>
+      <div data-step><b data-count="87400">0</b><span>EUR at risk</span></div>
+    </div>
+    <div class="mrow" data-step><span class="dot r"></span><span class="grow">Northgate Ltd · orders 4 per month , now 1</span><span class="chip r">cooling</span></div>
+    <div class="mrow" data-step><span class="dot a"></span><span class="grow">Vellmar Handel · volume down 41 percent</span><span class="chip a">watch</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Win-back task to A. Koss , full history attached</span><span class="mono">10:26</span><span class="chip g">assigned</span></div>
+  </div>
+  <div class="body">
+    <h3><span class="num mono">60</span>Client churn radar</h3>
+    <p>Order frequency and volume are watched per client, so the ones drifting away are flagged weeks before they stop answering. The manager gets a win-back task with the client's whole history attached.</p>
+    <div class="kills"><b>Removes</b><span>finding out a top-20 client left only when the annual numbers are compared.</span></div>
+  </div>
+</article>
   </div>
 
   <div class="band">
   <div class="section-head" id="s-infra"><span class="idx serif">5 services</span><h2 class="serif">Infrastructure and support</h2></div>
   <p class="section-sub">The critical spreadsheet retired, the legacy program tamed, backups that are actually tested, and training so it all gets used.</p>
   <div class="grid" id="g-infra">
-<article class="card wide">
+<article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Spreadsheet to application</span><button class="runbtn" type="button">▶ retire the file</button></div>
     <div class="filechips" data-step><span class="fchip" data-eat>plan_final_v7.xlsx</span><span class="fchip" data-eat>plan_final_v7 (copy).xlsx</span><span class="fchip" data-eat>Anna's version</span></div>
@@ -1357,17 +1440,17 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 
 <div class="final">
   <div class="wrap">
-    <h2 class="serif">Fifty-six demos, one studio. If your chore is not here, it is still probably automatable.</h2>
+    <h2 class="serif">Sixty demos, one studio. If your chore is not here, it is still probably automatable.</h2>
     <p>If a person in your company does something repeatedly on a computer, following rules, it can usually be automated, and there's normally a week of someone's month hiding in it. Tell us what annoys you, try the fix on your real work, and pay only if you keep it.</p>
     <a class="cta" href="mailto:tagir.zalyatov@gmail.com?subject=Automation%20enquiry">Tell us what annoys you</a>
     <p class="note">Or write directly: <span class="mono" style="user-select:all">tagir.zalyatov@gmail.com</span> · first reply within one business day. Nothing to pay until the tool proves itself.</p>
     <p class="note">Recent work includes accounting software and a parcel-tracking board built end to end for a trading company.</p>
-    <p class="note">Proof of speed: this page, with all 56 working demos on it, was designed and built in one day.</p>
+    <p class="note">Proof of speed: this page, with all 60 working demos on it, was designed and built in two days.</p>
   </div>
 </div>
 
 <footer>
-  <div class="wrap">Custom software and automation for any business. All 56 services shown above.</div>
+  <div class="wrap">Custom software and automation for any business. All 60 services shown above.</div>
 </footer>
 
 <script>
