@@ -561,7 +561,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 .hero .wrap{display:grid;grid-template-columns:1.12fr .88fr;gap:46px;align-items:center}
 .heroleft{min-width:0}
 .morphline{position:relative;height:76px;margin:6px 0 2px;
-  font:800 54px/1 "Instrument Sans",system-ui,sans-serif;letter-spacing:.02em}
+  font:800 44px/1 "Instrument Sans",system-ui,sans-serif;letter-spacing:.02em}
 .heromock{min-width:0;background:var(--card);border:1px solid rgba(255,255,255,.14);border-radius:14px;
   box-shadow:0 24px 70px rgba(0,0,0,.5);overflow:hidden;transform:rotate(.6deg)}
 .heromock .mock{border:0;min-height:0;padding:16px 18px 18px}
@@ -575,16 +575,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 /* border beam: comet ring on containers (ported to vanilla from the shadcn panel) */
 .beam{position:relative;isolation:isolate}
 .beam .beam-ring,.beam .beam-glow{content:"";position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;
-  background:conic-gradient(from var(--beam-a,0deg),
-    transparent 0deg,
-    color-mix(in srgb,#4CC28F 4%,transparent) 18deg,
-    color-mix(in srgb,#4CC28F 55%,transparent) 46deg,
-    #9FE8C6 56deg, #d9fff0 60deg, transparent 63deg,
-    transparent 198deg,
-    color-mix(in srgb,#5C82C9 4%,transparent) 216deg,
-    color-mix(in srgb,#5C82C9 50%,transparent) 244deg,
-    #5C82C9 254deg, #cfe0ff 258deg, transparent 261deg,
-    transparent 360deg)}
+  background:conic-gradient(from var(--beam-a,40deg), transparent 0deg, color-mix(in srgb, #4CC28F 4%, transparent) 18deg, color-mix(in srgb, #4CC28F 55%, transparent) 46deg, #9FE8C6 56deg, color-mix(in srgb, #9FE8C6 22%, #ffffff) 60deg, transparent 63deg, transparent 198deg, color-mix(in srgb, #5C82C9 4%, transparent) 216deg, color-mix(in srgb, #5C82C9 50%, transparent) 244deg, #5C82C9 254deg, color-mix(in srgb, #5C82C9 26%, #ffffff) 258deg, transparent 261deg, transparent 360deg)}
 .beam .beam-ring{padding:2px;
   -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
   -webkit-mask-composite:xor;mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);mask-composite:exclude}
@@ -602,7 +593,66 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   padding:16px;gap:6px;text-decoration:none;background:linear-gradient(180deg,transparent 55%,rgba(5,10,8,.82));z-index:3}
 .heromock .demo-overlay i{font-style:normal;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#9FE8C6;font-weight:700}
 .heromock .demo-overlay b{font-family:"Fraunces",Georgia,serif;font-size:21px;color:#F4F6F0}
-.morphline{display:none}
+
+
+
+/* landing sections v4 */
+.about{display:grid;grid-template-columns:1.25fr 1fr;gap:44px;align-items:start}
+@media (max-width:900px){.about{grid-template-columns:1fr}}
+.about p{font-size:16.5px;line-height:1.7;color:var(--ink-soft);max-width:58ch;margin:0 0 14px}
+.about .astats{display:flex;flex-direction:column;gap:14px}
+.astat{border:1px solid var(--rule);border-radius:10px;background:var(--card);padding:16px 20px;position:relative;isolation:isolate}
+.astat b{font:700 30px/1.05 "JetBrains Mono",ui-monospace,monospace;color:var(--green);display:block}
+.astat span{font-size:13.5px;color:var(--ink-soft)}
+.projgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin:26px 0 8px}
+@media (max-width:960px){.projgrid{grid-template-columns:1fr}}
+.projcard{position:relative;border:1px solid var(--rule);border-radius:12px;background:var(--card);
+  padding:24px;display:flex;flex-direction:column;gap:10px;isolation:isolate}
+.projcard i.tag{font-style:normal;font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--green);font-weight:700}
+.projcard b{font-family:"Fraunces",Georgia,serif;font-size:21px;line-height:1.25}
+.projcard p{margin:0;font-size:14.5px;line-height:1.6;color:var(--ink-soft);flex:1}
+.projcard a.plink{color:var(--green);text-decoration:none;font-weight:700;font-size:14.5px}
+.projcard a.plink:hover{text-decoration:underline}
+.reqwrap{display:grid;grid-template-columns:1.05fr .95fr;gap:40px;align-items:start}
+@media (max-width:900px){.reqwrap{grid-template-columns:1fr}}
+.reqform{position:relative;isolation:isolate;border:1px solid var(--rule);border-radius:14px;background:var(--card);
+  padding:28px;display:flex;flex-direction:column;gap:14px}
+.reqform label{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);font-weight:700;margin-bottom:-8px}
+.reqform input,.reqform textarea{border:1px solid var(--rule);border-radius:9px;background:var(--paper);color:var(--ink);
+  padding:13px 14px;font:500 15px/1.45 "Instrument Sans",system-ui,sans-serif;width:100%}
+.reqform textarea{min-height:110px;resize:vertical}
+.reqform input:focus-visible,.reqform textarea:focus-visible{outline:2px solid var(--green)}
+.reqform button{background:var(--green);color:#F4F6F0;border:none;border-radius:10px;padding:15px 22px;
+  font:700 15.5px/1 "Instrument Sans",sans-serif;cursor:pointer;transition:transform 150ms var(--ease-out)}
+.reqform button:hover{transform:translateY(-1px)}
+.reqform button:active{transform:scale(.97)}
+.reqform .alt{text-align:center;font-size:14px}
+.reqform .alt a{color:var(--green);font-weight:700;text-decoration:none}
+.morphline{overflow:hidden}
+.heromock{overflow:hidden}
+
+
+/* project fan (vanilla port of the card-fan carousel, 3 square cards) */
+.fanwrap{position:relative;height:min(430px,64vw);margin:30px 0 6px}
+.fan-card{position:absolute;left:50%;top:50%;width:min(330px,72vw);aspect-ratio:1;
+  margin:calc(min(330px,72vw)/-2) 0 0 calc(min(330px,72vw)/-2);
+  border:1px solid var(--rule);border-radius:18px;background:var(--card);
+  padding:24px;display:flex;flex-direction:column;gap:10px;isolation:isolate;
+  box-shadow:0 18px 50px rgba(0,0,0,.35);cursor:default;
+  transform:translate(var(--fx,0),var(--fy,0)) rotate(var(--fr,0deg)) scale(var(--fs,1));
+  transition:transform .55s cubic-bezier(.34,1.45,.5,1), opacity .5s ease;
+  z-index:var(--fz,1)}
+.js .fan-card{opacity:0}
+.js .fan-card.in{opacity:1}
+.fan-card i.tag{font-style:normal;font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--green);font-weight:700}
+.fan-card b{font-family:"Fraunces",Georgia,serif;font-size:20px;line-height:1.25}
+.fan-card p{margin:0;font-size:13.5px;line-height:1.55;color:var(--ink-soft);flex:1;
+  display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
+.fan-card a.plink{color:var(--green);text-decoration:none;font-weight:700;font-size:14px}
+@media (max-width:760px){
+  .fanwrap{height:auto;display:flex;flex-direction:column;gap:16px}
+  .fan-card{position:static;margin:0;width:100%;aspect-ratio:auto;transform:none;transition:none}
+}
 
 </style>
 
@@ -613,8 +663,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 </header><nav class="secnav"><div class="progressline" id="progressline"></div><div class="wrap secnav-in">
 <input class="finder" id="finder" type="search" placeholder="Escriba qué le molesta: facturas, turnos, leads..." aria-label="Buscar entre los 60 servicios">
-<a href="../industries.html">Industrias</a><a href="../data.html">Datos</a><a href="../finance.html">Finanzas</a><a href="../sales.html">Ventas y CRM</a><a href="../ai.html">IA</a><a href="../operations.html">Operaciones</a><a href="../web.html">Web y clientes</a><a href="../reporting.html">Informes</a><a href="../infrastructure.html">Infraestructura</a>
-<div class="tools"><button class="themebtn" type="button" id="themebtn" aria-label="Cambiar tema claro y oscuro" title="Cambiar tema claro y oscuro"><svg viewBox="0 0 24 24" aria-hidden="true"><g class="sun"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/></g><g class="moon"><path d="M20 14.2A8.4 8.4 0 0 1 9.8 4 8.4 8.4 0 1 0 20 14.2z"/></g></svg></button><select class="langsel" id="langsel" aria-label="Idioma"><option value="/index.html">EN</option><option value="/ru/index.html">RU</option><option value="/de/index.html">DE</option><option value="/zh/index.html">ZH</option><option value="/es/index.html" selected>ES</option></select></div></div></nav><div class="hero">
+<a href="#about">Nosotros</a><a href="#projects">Proyectos</a><a href="../industries.html">Sectores</a><a href="#solutions">Soluciones</a><a href="../ai.html">IA</a><a href="#request">Solicitud</a><div class="tools"><button class="themebtn" type="button" id="themebtn" aria-label="Cambiar tema claro y oscuro" title="Cambiar tema claro y oscuro"><svg viewBox="0 0 24 24" aria-hidden="true"><g class="sun"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/></g><g class="moon"><path d="M20 14.2A8.4 8.4 0 0 1 9.8 4 8.4 8.4 0 1 0 20 14.2z"/></g></svg></button><select class="langsel" id="langsel" aria-label="Idioma"><option value="/index.html">EN</option><option value="/ru/index.html">RU</option><option value="/de/index.html">DE</option><option value="/zh/index.html">ZH</option><option value="/es/index.html" selected>ES</option></select></div></div></nav><div class="hero">
   <div class="wrap"><div class="heroleft">
     <span class="kicker">Catálogo de servicios · los 60</span>
     <h1 class="serif">Creamos su herramienta en días. La prueba con trabajo real. <em>Si no ayuda, no paga.</em></h1>
@@ -631,7 +680,11 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 </div><aside class="heromock beam"><i class="beam-ring" aria-hidden="true"></i><i class="beam-glow" aria-hidden="true"></i><iframe src="../demo/index.html" loading="lazy" title="demo"></iframe><a class="demo-overlay" href="../demo/index.html" target="_blank" rel="noopener"><i>Producto real, construido en un día</i><b>Abrir la demo en vivo →</b></a></aside></div></div>
 
 <main class="wrap">
-<div class="section-head"><span class="idx serif">9</span><h2 class="serif">Elija su área</h2></div><p class="section-sub">Nueve áreas, sesenta ejemplos. Cada tarjeta es una demo en vivo.</p><div class="dirgrid"><a class="dircard beam" id="s-ind" href="industries.html"><i class="beam-ring" aria-hidden="true"></i><i class="beam-glow" aria-hidden="true"></i><i>2 ejemplos</i><b>Diseñado para su sector</b><span>Primero, dos ejemplos terminados: los sesenta servicios de abajo son piezas modulares, y así es como se combin</span></a><a class="dircard beam" id="s-data" href="data.html"><i class="beam-ring" aria-hidden="true"></i><i class="beam-glow" aria-hidden="true"></i><i>7 ejemplos</i><b>Recopilación e integración de datos</b><span>La rutina matutina de revisar las obras, las listas de precios en doce formatos distintos, los sistemas que ca</span></a><a class="dircard beam" id="s-fin" href="finance.html"><i class="beam-ring" aria-hidden="true"></i><i class="beam-glow" aria-hidden="true"></i><i>7 ejemplos</i><b>Contabilidad y finanzas</b><span>Facturas, conciliación, nómina, caja. El papeleo que consume la primera semana de cada mes.</span></a><a class="dircard beam" id="s-crm" href="sales.html"><i class="beam-ring" aria-hidden="true"></i><i class="beam-glow" aria-hidden="true"></i><i>8 ejemplos</i><b>Ventas y CRM</b><span>Leads atendidos en minutos, propuestas en segundos, y un historial de cliente que permanece cuando un comercia</span></a><a class="dircard beam" id="s-ai" href="ai.html"><i class="beam-ring" aria-hidden="true"></i><i class="beam-glow" aria-hidden="true"></i><i>10 ejemplos</i><b>Inteligencia artificial</b><span>Bots que responden a partir de sus propios documentos, llamadas que se registran solas en el CRM, y pronóstico</span></a><a class="dircard beam" id="s-ops" href="operations.html"><i class="beam-ring" aria-hidden="true"></i><i class="beam-glow" aria-hidden="true"></i><i>10 ejemplos</i><b>Operaciones y flujo de trabajo interno</b><span>Aprobaciones que avanzan, turnos que se generan solos, cuadrillas que informan desde la carretera, y recuentos</span></a><a class="dircard beam" id="s-web" href="web.html"><i class="beam-ring" aria-hidden="true"></i><i class="beam-glow" aria-hidden="true"></i><i>8 ejemplos</i><b>Web y orientado al cliente</b><span>Sitios que convierten, tiendas que se sincronizan, pagos que se concilian solos, y un canal de ventas dentro d</span></a><a class="dircard beam" id="s-rep" href="reporting.html"><i class="beam-ring" aria-hidden="true"></i><i class="beam-glow" aria-hidden="true"></i><i>5 ejemplos</i><b>Informes y visibilidad para la dirección</b><span>Una sola pantalla de verdad para la dirección, y una alerta en la hora en que algo falla, en lugar de una sorp</span></a><a class="dircard beam" id="s-infra" href="infrastructure.html"><i class="beam-ring" aria-hidden="true"></i><i class="beam-glow" aria-hidden="true"></i><i>5 ejemplos</i><b>Infraestructura y soporte</b><span>La hoja de cálculo crítica jubilada, el programa heredado domado, copias de seguridad realmente probadas, y fo</span></a></div>
+<div class="section-head" id="about"><span class="idx serif">Sobre nosotros</span><h2 class="serif">Un estudio hecho para la velocidad</h2></div><div class="about"><div><p>Somos un estudio de software a medida: un ingeniero senior con máster, multiplicado por una línea de producción de IA seria. Por eso una primera versión funcional tarda días, no meses.</p><p>No vendemos horas ni promesas. Usted trae la rutina, nosotros una herramienta funcionando, y la prueba con sus facturas y pedidos reales. Si no se gana su lugar, no debe nada.</p></div><div class="astats"><div class="astat beam"><i class="beam-ring" aria-hidden="true"></i><b>60</b><span>soluciones funcionando en este sitio</span></div><div class="astat beam"><i class="beam-ring" aria-hidden="true"></i><b>1 día</b><span>para el producto contable de arriba</span></div><div class="astat beam"><i class="beam-ring" aria-hidden="true"></i><b>0 €</b><span>por adelantado, siempre</span></div></div></div>
+<div class="section-head" id="projects"><span class="idx serif">Proyectos</span><h2 class="serif">Trabajo real en el que puede hacer clic</h2></div><div class="fanwrap"><div class="fan-card beam"><i class="beam-ring" aria-hidden="true"></i><i class="beam-glow" aria-hidden="true"></i><i class="tag">Fintech · Kazajistán</i><b>Control de saldos para construcción</b><p>Cobros y pagos contra 1C para un grupo constructor: 48 contrapartes, 3 sociedades, multidivisa, antigüedad, calendario de pagos. Construido en un día, desplegado en la red del cliente.</p><a class="plink" href="../demo/index.html" target="_blank" rel="noopener">Abrir la demo en vivo →</a></div><div class="fan-card beam"><i class="beam-ring" aria-hidden="true"></i><i class="beam-glow" aria-hidden="true"></i><i class="tag">Logística · en producción</i><b>Automatización contable para una comercial</b><p>Flujo documental y tablero de paquetes de punta a punta: los documentos nacen del estado del trato y los paquetes se ven del pedido a la puerta.</p></div><div class="fan-card beam"><i class="beam-ring" aria-hidden="true"></i><i class="beam-glow" aria-hidden="true"></i><i class="tag">Meta · 2 días</i><b>Este sitio web</b><p>Sesenta demos interactivas, buscador de soluciones con IA, cinco idiomas y el espacio por el que vuela ahora. Publicado en dos días por la misma línea que usted contrataría.</p><a class="plink" href="../finance.html">Vea cómo funcionan las demos →</a></div></div>
+
+<div class="section-head" id="solutions"><span class="idx serif">9</span><h2 class="serif">Elija su área</h2></div><p class="section-sub">Nueve áreas, sesenta ejemplos. Cada tarjeta es una demo en vivo.</p><div class="dirgrid"><a class="dircard beam" id="s-ind" href="industries.html"><i class="beam-ring" aria-hidden="true"></i><i class="beam-glow" aria-hidden="true"></i><i>2 ejemplos</i><b>Diseñado para su sector</b><span>Primero, dos ejemplos terminados: los sesenta servicios de abajo son piezas modulares, y así es como se combin</span></a><a class="dircard beam" id="s-data" href="data.html"><i class="beam-ring" aria-hidden="true"></i><i class="beam-glow" aria-hidden="true"></i><i>7 ejemplos</i><b>Recopilación e integración de datos</b><span>La rutina matutina de revisar las obras, las listas de precios en doce formatos distintos, los sistemas que ca</span></a><a class="dircard beam" id="s-fin" href="finance.html"><i class="beam-ring" aria-hidden="true"></i><i class="beam-glow" aria-hidden="true"></i><i>7 ejemplos</i><b>Contabilidad y finanzas</b><span>Facturas, conciliación, nómina, caja. El papeleo que consume la primera semana de cada mes.</span></a><a class="dircard beam" id="s-crm" href="sales.html"><i class="beam-ring" aria-hidden="true"></i><i class="beam-glow" aria-hidden="true"></i><i>8 ejemplos</i><b>Ventas y CRM</b><span>Leads atendidos en minutos, propuestas en segundos, y un historial de cliente que permanece cuando un comercia</span></a><a class="dircard beam" id="s-ai" href="ai.html"><i class="beam-ring" aria-hidden="true"></i><i class="beam-glow" aria-hidden="true"></i><i>10 ejemplos</i><b>Inteligencia artificial</b><span>Bots que responden a partir de sus propios documentos, llamadas que se registran solas en el CRM, y pronóstico</span></a><a class="dircard beam" id="s-ops" href="operations.html"><i class="beam-ring" aria-hidden="true"></i><i class="beam-glow" aria-hidden="true"></i><i>10 ejemplos</i><b>Operaciones y flujo de trabajo interno</b><span>Aprobaciones que avanzan, turnos que se generan solos, cuadrillas que informan desde la carretera, y recuentos</span></a><a class="dircard beam" id="s-web" href="web.html"><i class="beam-ring" aria-hidden="true"></i><i class="beam-glow" aria-hidden="true"></i><i>8 ejemplos</i><b>Web y orientado al cliente</b><span>Sitios que convierten, tiendas que se sincronizan, pagos que se concilian solos, y un canal de ventas dentro d</span></a><a class="dircard beam" id="s-rep" href="reporting.html"><i class="beam-ring" aria-hidden="true"></i><i class="beam-glow" aria-hidden="true"></i><i>5 ejemplos</i><b>Informes y visibilidad para la dirección</b><span>Una sola pantalla de verdad para la dirección, y una alerta en la hora en que algo falla, en lugar de una sorp</span></a><a class="dircard beam" id="s-infra" href="infrastructure.html"><i class="beam-ring" aria-hidden="true"></i><i class="beam-glow" aria-hidden="true"></i><i>5 ejemplos</i><b>Infraestructura y soporte</b><span>La hoja de cálculo crítica jubilada, el programa heredado domado, copias de seguridad realmente probadas, y fo</span></a></div>
+<div class="section-head" id="request"><span class="idx serif">Solicitud</span><h2 class="serif">Cuéntenos qué le duele</h2></div><div class="reqwrap"><p class="section-sub" style="margin:6px 0">Un minuto para escribir, respuesta en un día laborable y una primera versión funcionando en días. Sin llamadas hasta que usted quiera.</p><form class="reqform beam" id="reqform"><i class="beam-ring" aria-hidden="true"></i><i class="beam-glow" aria-hidden="true"></i><label>Su nombre</label><input id="rq-name" required><label>Empresa</label><input id="rq-co"><label>Teléfono o WhatsApp</label><input id="rq-ct" required><label>¿Qué rutina se come su tiempo?</label><textarea id="rq-pain" required></textarea><button type="submit">Enviar la solicitud</button><div class="alt">o escriba por WhatsApp: <a href="https://wa.me/447756115516" rel="noopener">+44 7756 115516</a></div></form></div>
 <div class="section-head"><span class="idx serif">Proceso</span><h2 class="serif">Cómo funciona el trabajo</h2></div>
   <p class="section-sub">Precio fijo por etapa cuando el alcance está claro, por horas cuando de verdad no lo está. Las automatizaciones pequeñas suelen ser cuestión de unos días de trabajo y se pagan solas en menos de un trimestre.</p>
   <div class="steps">
@@ -1035,7 +1088,7 @@ function Starfield(host, opts) {
    `threshold` filter re-hardens the edges — blur + contrast = liquid. Nothing is drawn per-letter.
 
    Usage:
-     const stop = MorphingText(el, ['ТАЙГА', 'СВОБОДА', 'БЕЗ ЦЕНЗУРЫ'], { morphTime: 1.5, cooldownTime: 0.9 });
+     const stop = MorphingText(el, ["LA IMAGINACIÓN","ES SU ÚNICO","LÍMITE"], { morphTime: 1.5, cooldownTime: 0.9 });
      stop();
 
    Options: morphTime (sec of melting), cooldownTime (sec of holding a word), gradient (CSS), shine (sec).
@@ -1140,9 +1193,77 @@ function MorphingText(host, words, opts) {
 (function(){
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   var el=document.getElementById('morphline');
-  if (el) MorphingText(el, ["PARSERS", "CRM", "BOTS IA", "PANELES", "AUTOMATIZACIÓN"], {morphTime:1.4, cooldownTime:1.1,
+  if (el) MorphingText(el, ["LA IMAGINACIÓN","ES SU ÚNICO","LÍMITE"], {morphTime:1.4, cooldownTime:1.1,
     gradient:'linear-gradient(90deg,#4CC28F,#9FE8C6 30%,#5C82C9 60%,#4CC28F)'});
   var hm=document.querySelector('.heromock .runbtn');
   if (hm) setInterval(function(){ hm.click(); }, 14000);
+})();
+</script>
+<script>
+/* Border beam engine: sprung angular velocity (k=30 d=11), idle 42deg/s, hover 240deg/s. */
+(function(){
+  var reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var root=document.documentElement;
+  if(reduced){ root.style.setProperty('--beam-a','40deg'); return; }
+  var angle=40, sp={x:42,v:0,t:42,k:30,d:11}, last=0, running=true;
+  document.querySelectorAll('.beam').forEach(function(el){
+    el.addEventListener('mouseenter',function(){sp.t=240;});
+    el.addEventListener('mouseleave',function(){sp.t=42;});
+    el.addEventListener('focusin',function(){sp.t=240;});
+    el.addEventListener('focusout',function(){sp.t=42;});
+  });
+  function step(now){
+    if(!last) last=now;
+    var dt=Math.min((now-last)/1000,0.05); last=now;
+    var a=sp.k*(sp.t-sp.x)-sp.d*sp.v; sp.v+=a*dt; sp.x+=sp.v*dt;
+    angle=(angle+sp.x*dt)%360;
+    root.style.setProperty('--beam-a',angle.toFixed(2)+'deg');
+  }
+  window.__beamTick=step;
+  function frame(now){ if(!running) return; step(now); requestAnimationFrame(frame); }
+  document.addEventListener('visibilitychange',function(){
+    if(document.hidden){running=false;last=0;}
+    else if(!running){running=true;requestAnimationFrame(frame);}
+  });
+  requestAnimationFrame(frame);
+})();
+</script><script>
+(function(){
+  var wrap=document.querySelector('.fanwrap'); if(!wrap) return;
+  var cards=Array.prototype.slice.call(wrap.querySelectorAll('.fan-card'));
+  if(matchMedia('(max-width:760px)').matches){cards.forEach(function(c){c.classList.add('in');});return;}
+  var reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var N=cards.length, center=(N-1)/2;
+  function slotCfg(slot){
+    var d=N>1?(slot-center)/center:0, ad=Math.abs(d);
+    return {rot:d*21, scale:1-0.2244*ad*ad, x:d*15, y:ad*ad*4.5, z:10-Math.abs(slot-center)};
+  }
+  function apply(slot,extra){
+    var c=slotCfg(slot), el=cards[slot];
+    extra=extra||{};
+    el.style.setProperty('--fx',((c.x+(extra.dx||0)))+'rem');
+    el.style.setProperty('--fy',((c.y+(extra.dy||0)))+'rem');
+    el.style.setProperty('--fr',(c.rot+(extra.dr||0))+'deg');
+    el.style.setProperty('--fs',(c.scale*(extra.ds||1)).toFixed(4));
+    el.style.setProperty('--fz',extra.z!=null?extra.z:c.z);
+  }
+  function layout(hover){
+    cards.forEach(function(el,slot){
+      if(hover==null){apply(slot);return;}
+      if(slot===hover){apply(slot,{dy:-2.2,ds:1.08,z:20});return;}
+      var dist=Math.abs(slot-hover), push=5*(1+0.2*Math.max(0,3-dist));
+      apply(slot,{dx:slot<hover?-push:push, dr:(slot<hover?-3:3)/(dist), z:slotCfg(slot).z});
+    });
+  }
+  cards.forEach(function(el,slot){
+    el.addEventListener('mouseenter',function(){layout(slot);});
+  });
+  wrap.addEventListener('mouseleave',function(){layout(null);});
+  // entry: rise from below with stagger
+  cards.forEach(function(el,slot){
+    if(reduced){el.classList.add('in');apply(slot);return;}
+    el.style.setProperty('--fy','12rem');el.style.setProperty('--fs','0.5');
+    setTimeout(function(){el.classList.add('in');apply(slot);},250+slot*90);
+  });
 })();
 </script>
