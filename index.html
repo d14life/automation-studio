@@ -272,7 +272,7 @@ footer a{display:block;padding:3px 0}
   <div class="plx-sticky">
     <div class="plx-layer plx-glow" data-speed="8"></div>
     <div class="plx-layer" data-speed="26" data-scale="0.12"><div class="plx-num">101</div></div>
-    <div class="plx-layer" data-speed="62"><p class="plx-line">Только практика.<br>Ноль теории.</p></div>
+    <div class="plx-layer" data-speed="62"><p class="plx-line">Не консультируем.<br>Делаем.</p></div>
     <div class="plx-layer plx-ridge" data-speed="-18"></div>
     <div class="plx-fade"></div>
   </div>
@@ -280,11 +280,11 @@ footer a{display:block;padding:3px 0}
 
 <section class="band" id="about"><div class="wrap">
   <p class="eyebrow">О нас</p>
-  <h2>Только практика. Теории у нас нет</h2>
+  <h2>Не консультируем. Делаем</h2>
   <div class="about">
     <div>
-      <p class="claim">Мы не учим и не консультируем. Мы отдаём программу, которая делает работу
-        вместо человека.</p>
+      <p class="claim">Никаких обследований, презентаций и часов консультаций. Мы отдаём программу,
+        которая делает работу вместо человека.</p>
       <ul class="does">
         <li><b>Никакой теории и обучения.</b><span>Отдаём программу, а не знания о том, как её сделать</span></li>
         <li><b>Никаких часов и почасовой оплаты.</b><span>Цена за результат, а не за время в календаре</span></li>
@@ -607,7 +607,8 @@ footer a{display:block;padding:3px 0}
    screen gains depth as you scroll instead of sliding away as one flat sheet. */
 (function(){
   var l1=document.getElementById('liq1'), l2=document.getElementById('liq2'),
-      acts=document.querySelector('.acts'), hint=document.querySelector('.scrollhint');
+      acts=document.querySelector('.acts'), hint=document.querySelector('.scrollhint'),
+      tubes=null;   /* the canvas arrives a moment later, so it is looked up lazily */
   if(!l1||!l2) return;
   if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   /* written straight from the scroll handler: it only writes styles, never reads layout, and
@@ -623,6 +624,10 @@ footer a{display:block;padding:3px 0}
     if(acts){ acts.style.transform='translateY('+(-y*0.34).toFixed(1)+'px)';
               acts.style.opacity=(1-f*1.5).toFixed(3); }
     if(hint) hint.style.opacity=(1-f*2.4).toFixed(3);
+    /* the ribbons sit behind the words, so they travel slower: that difference is the depth */
+    if(!tubes) tubes=document.querySelector('canvas.tubes');
+    if(tubes){ tubes.style.transform='translateY('+(y*0.26).toFixed(1)+'px)';
+               tubes.style.opacity=(1-f*1.1).toFixed(3); }
   }
   addEventListener('scroll',paint,{passive:true});
   addEventListener('resize',paint,{passive:true});
