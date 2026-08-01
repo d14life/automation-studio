@@ -558,67 +558,249 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 
 </style>
 
-<div class="space-wrap"><canvas id="stars"></canvas><div class="inner"><header>
+<header>
   <div class="wrap topbar">
     <a class="wordmark serif" style="text-decoration:none;color:inherit" href="index.html">Custom Software <span class="tick">and</span> Automation Studio</a>
     <a class="cta" href="mailto:tagir.zalyatov@gmail.com">Get a quote</a>
   </div>
 </header><nav class="secnav"><div class="progressline" id="progressline"></div><div class="wrap secnav-in">
 <input class="finder" id="finder" type="search" placeholder="Type what annoys you: invoices, rota, leads..." aria-label="Search the 60 services">
-<a href="industries.html">Industries</a><a href="data.html">Data</a><a href="finance.html">Finance</a><a href="sales.html">Sales and CRM</a><a href="ai.html">AI</a><a href="operations.html">Operations</a><a href="web.html">Web and clients</a><a href="reporting.html">Reporting</a><a href="infrastructure.html">Infrastructure</a>
-<div class="tools"><button class="themebtn" type="button" id="themebtn" aria-label="Switch light and dark theme" title="Switch light and dark theme"><svg viewBox="0 0 24 24" aria-hidden="true"><g class="sun"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/></g><g class="moon"><path d="M20 14.2A8.4 8.4 0 0 1 9.8 4 8.4 8.4 0 1 0 20 14.2z"/></g></svg></button><select class="langsel" id="langsel" aria-label="Language"><option value="/index.html" selected>EN</option><option value="/ru/index.html">RU</option><option value="/de/index.html">DE</option><option value="/zh/index.html">ZH</option><option value="/es/index.html">ES</option></select></div></div></nav><div class="hero">
-  <div class="wrap">
-    <span class="kicker">Services catalogue · all 60</span>
-    <h1 class="serif">We build your tool in days. You try it on real work. <em>If it does not help, you do not pay.</em></h1>
-    <p>Fast does not mean rough. We build a working first version of your automation, you run it on your actual invoices, orders and spreadsheets, and you pay only when it earns its place. Nothing upfront, the risk stays on us.</p>
-    <p>Below are sixty things we build, for any department of any business: sales, finance, operations, warehouse, support, delivery. Each one removes a named chore and pays for itself in a measurable way.</p>
-    <p class="hint">▶ Every card below is a working demo. Press a button and watch the chore disappear.</p>
-    <form class="aisearch" id="aisearchform"><input id="aisearchq" type="search" placeholder="Describe what annoys you, the assistant finds the solution..." autocomplete="off"><button type="submit">Find my solution</button></form><p class="aihint">For example: "we lose track of invoices" or "drivers waste fuel"</p><div class="hero-stats">
-      <div class="stat"><b class="mono" data-count="60">0</b><span>solutions, all with working demos</span></div>
-      <div class="stat"><b class="mono">days</b><span>to your first version, not months</span></div>
-      <div class="stat"><b class="mono">€0</b><span>upfront, pay only if it helps</span></div>
+<a href="industries.html">Industries</a><a href="data.html">Data</a><a href="finance.html">Finance</a><a href="sales.html">Sales and CRM</a><a href="ai.html">AI</a><a href="operations.html">Operations</a><a href="web.html" class="active">Web and clients</a><a href="reporting.html">Reporting</a><a href="infrastructure.html">Infrastructure</a>
+<div class="tools"><button class="themebtn" type="button" id="themebtn" aria-label="Switch light and dark theme" title="Switch light and dark theme"><svg viewBox="0 0 24 24" aria-hidden="true"><g class="sun"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/></g><g class="moon"><path d="M20 14.2A8.4 8.4 0 0 1 9.8 4 8.4 8.4 0 1 0 20 14.2z"/></g></svg></button><select class="langsel" id="langsel" aria-label="Language"><option value="/web.html" selected>EN</option><option value="/ru/web.html">RU</option><option value="/de/web.html">DE</option><option value="/zh/web.html">ZH</option><option value="/es/web.html">ES</option></select></div></div></nav>
+<main class="wrap">
+<div class="section-head" id="s-web"><span class="idx serif">8 examples</span><h2 class="serif">Web and customer-facing</h2></div>
+  <p class="section-sub">Sites that convert, stores that sync, payments that reconcile themselves, and a sales channel inside the client's messenger.</p>
+  <div class="grid" id="g-web">
+<article class="card" id="svc-43">
+  <div class="mock demo">
+    <div class="mtitle"><span>Landing page to CRM</span><button class="runbtn" type="button">▶ send an enquiry</button></div>
+    <div class="chartwrap" data-step>
+      <div class="clegend"><span class="c1"><i></i>Enquiries</span><span class="c2"><i></i>Mobile visits</span></div>
+      <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="Enquiries rise sharply after the new landing page goes live, faster than visits">
+        <line x1="0" y1="28" x2="420" y2="28"></line>
+        <line x1="0" y1="56" x2="420" y2="56"></line>
+        <line x1="0" y1="84" x2="420" y2="84"></line>
+        <polyline class="s2" points="0,30 42,34 84,32 126,36 168,34 210,38 252,36 294,40 336,38 418,42"></polyline>
+        <polyline class="s1" points="0,62 42,38 84,70 126,44 168,76 210,48 252,80 294,52 336,72 418,46"></polyline>
+        <circle class="p2" cx="418" cy="42" r="5"></circle>
+        <circle class="p1" cx="418" cy="46" r="5"></circle>
+      <circle class="pt d1" cx="0" cy="62"></circle><circle class="pt d1" cx="42" cy="38"></circle><circle class="pt d1" cx="84" cy="70"></circle><circle class="pt d1" cx="126" cy="44"></circle><circle class="pt d1" cx="168" cy="76"></circle><circle class="pt d1" cx="210" cy="48"></circle><circle class="pt d1" cx="252" cy="80"></circle><circle class="pt d1" cx="294" cy="52"></circle><circle class="pt d1" cx="336" cy="72"></circle><circle class="pt d2" cx="0" cy="30"></circle><circle class="pt d2" cx="42" cy="34"></circle><circle class="pt d2" cx="84" cy="32"></circle><circle class="pt d2" cx="126" cy="36"></circle><circle class="pt d2" cx="168" cy="34"></circle><circle class="pt d2" cx="210" cy="38"></circle><circle class="pt d2" cx="252" cy="36"></circle><circle class="pt d2" cx="294" cy="40"></circle><circle class="pt d2" cx="336" cy="38"></circle></svg>
+    </div>
+    <div class="mrow" data-step><span class="grow">Mobile load time</span><span class="mono"><span data-count="9">0</span>00 ms</span><span class="chip g">fast</span></div>
+    <div class="nodes"><div class="node" data-lit>Landing form</div><div class="link" data-lit></div><div class="node" data-lit>CRM</div><div class="link" data-lit></div><div class="node" data-lit>Sales rep</div></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Form submitted · Northgate Ltd, quote request</span><span class="mono">10:12</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Lead assigned to Anna K. · source: paid search, first reply in <span class="mono">4 min</span></span><span class="chip g">in CRM</span></div>
+  </div>
+      <div class="body">
+    <h3><span class="num mono">43</span>Corporate site and landing pages</h3>
+    <p>Fast, mobile-correct pages built to convert instead of to look busy. Forms are wired into your CRM from the first day live.</p>
+    <div class="kills"><b>Removes</b><span>Enquiries sitting unread in a shared mailbox nobody owns.</span></div>
+  </div>
+</article>
+
+    <article class="card" id="svc-44">
+  <div class="mock demo">
+    <div class="mtitle"><span>Online store</span><button class="runbtn" type="button">▶ place an order</button></div>
+    <div class="kanban">
+      <div class="kcol done" data-step><div class="khead"><span>Basket</span><b>✓</b></div><div class="ktask">Oak desk, lamp, cable tray <span class="chip g">€ 486,00</span></div></div>
+      <div class="kcol done" data-step><div class="khead"><span>Paid</span><b>✓</b></div><div class="ktask">Card charged, receipt emailed <span class="chip g">€ 500,50</span></div><div class="ktask">Delivery Lyon, 2 days <span class="chip g">€ 14,50</span></div></div>
+      <div class="kcol" data-step><div class="khead"><span>Warehouse</span><b>1</b></div><div class="ktask">SKU 4471 reserved <span class="chip a">7 left</span></div></div>
+    </div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Order <span class="mono">#10842</span> in the same list as shop-floor sales</span><span class="chip g">paid</span></div>
+    <div class="mrow" data-step><span class="grow">Stock, prices and customers, one set of numbers</span><span class="chip g">no re-keying</span></div>
+    <div class="bigstat mono" style="margin-top:8px">
+      <div data-step><b data-count="1840">0</b><span>orders placed without a phone call</span></div>
+      <div data-step><b data-count="9">0</b><span>minutes from click to picking list</span></div>
     </div>
   </div>
-</div>
+      <div class="body">
+    <h3><span class="num mono">44</span>Online store</h3>
+    <p>Catalogue, payments, delivery calculation and stock tied to the warehouse, with online orders landing in the same system your offline sales already use.</p>
+    <div class="kills"><b>Removes</b><span>Calling a developer every time you want to add a product.</span></div>
+  </div>
+</article>
 
-</div></div>
-<main class="wrap">
-<div class="section-head"><span class="idx serif">9</span><h2 class="serif">Pick your area</h2></div><p class="section-sub">Nine areas, sixty worked examples. Every card is a live demo.</p><div class="dirgrid"><a class="dircard" id="s-ind" href="industries.html"><i>2 packages</i><b>Built for your industry</b><span>Two finished examples first: the sixty services below are building blocks, and this is how they assemble for t</span></a><a class="dircard" id="s-data" href="data.html"><i>7 examples</i><b>Data collection and integration</b><span>The morning routine of checking sites, the price lists in twelve formats, the systems that each hold their own</span></a><a class="dircard" id="s-fin" href="finance.html"><i>7 examples</i><b>Accounting and finance</b><span>Invoices, reconciliation, payroll, cash. The paperwork that eats the first week of every month.</span></a><a class="dircard" id="s-crm" href="sales.html"><i>8 examples</i><b>Sales and CRM</b><span>Leads answered in minutes, proposals in seconds, and a client history that stays when a salesperson leaves.</span></a><a class="dircard" id="s-ai" href="ai.html"><i>10 examples</i><b>Artificial intelligence</b><span>Bots that answer from your own documents, calls that write themselves into the CRM, and forecasts that order s</span></a><a class="dircard" id="s-ops" href="operations.html"><i>10 examples</i><b>Operations and internal workflow</b><span>Approvals that move, rotas that build themselves, crews that report from the road, stock counts that match the</span></a><a class="dircard" id="s-web" href="web.html"><i>8 examples</i><b>Web and customer-facing</b><span>Sites that convert, stores that sync, payments that reconcile themselves, and a sales channel inside the clien</span></a><a class="dircard" id="s-rep" href="reporting.html"><i>5 examples</i><b>Reporting and management visibility</b><span>One screen of truth for the director, and an alert the hour something goes wrong instead of a surprise at mont</span></a><a class="dircard" id="s-infra" href="infrastructure.html"><i>5 examples</i><b>Infrastructure and support</b><span>The critical spreadsheet retired, the legacy program tamed, backups that are actually tested, and training so </span></a></div>
-<div class="section-head"><span class="idx serif">Process</span><h2 class="serif">How the work runs</h2></div>
-  <p class="section-sub">Fixed-price per stage where the scope is clear, hourly where it genuinely isn't. Small automations are often a few days of work and pay for themselves inside a quarter.</p>
-  <div class="steps">
-    <div class="step"><h3>Discovery</h3><p>A conversation and a look at how things currently run. You get a written description of what will be built, the cost, and the timeline. Free, no commitment.</p></div>
-    <div class="step"><h3>Try before you pay</h3><p>The first usable version ships in days, not at the end. You run it on real work. If it does not deliver, you walk away owing nothing.</p></div>
-    <div class="step"><h3>Handover</h3><p>Source code, documentation, training, and access to everything. No lock-in: if you want to take it elsewhere later, you can.</p></div>
-    <div class="step"><h3>Support</h3><p>Fixed monthly agreement or hourly, your choice. Or none at all. It's your system.</p></div>
+    <article class="card" id="svc-45">
+  <div class="mock demo">
+    <div class="mtitle"><span>Subscriptions</span><button class="runbtn" type="button">▶ run the monthly cycle</button></div>
+    <div class="bigstat mono">
+      <div data-step><b data-count="214">0</b><span>accounts charged</span></div>
+      <div data-step><b data-count="38460">0</b><span>euro collected this cycle</span></div>
+      <div data-step><b data-count="3">0</b><span>cards declined</span></div>
+    </div>
+    <div class="kanban">
+      <div class="kcol done" data-step><div class="khead"><span>Charged</span><b>✓</b></div><div class="ktask">211 accounts, first attempt <span class="chip g">ok</span></div><div class="ktask">Proration on 6 upgrades <span class="chip g">exact</span></div></div>
+      <div class="kcol done" data-step><div class="khead"><span>Chased</span><b>✓</b></div><div class="ktask">Kessler GmbH, card expired <span class="chip r">€ 349,00</span></div><div class="ktask">Dunning 1 of 3 sent <span class="chip a">14:07</span></div></div>
+      <div class="kcol done" data-step><div class="khead"><span>Recovered</span><b>✓</b></div><div class="ktask">Card updated by client <span class="chip g">retried</span></div><div class="ktask">Plan upgraded to Pro <span class="chip g">live</span></div></div>
+    </div>
+    <div class="doc" data-step><b>Invoice INV-4471 · Kessler GmbH · € 349,00</b><div class="dline"></div><div class="dline"></div><div class="dline short"></div></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Cycle closed, nobody opened a spreadsheet</span><span class="chip g">done</span></div>
   </div>
-<div class="section-head"><span class="idx serif">Self-diagnosis</span><h2 class="serif">Not sure what to ask for?</h2></div>
-  <div class="qs">
-    <p class="lead">Most clients don't know what to ask for. They know what annoys them. If any of these questions stings, that's the project.</p>
-    <ul>
-      <li>Which report takes the longest to prepare each month, and who prepares it?</li>
-      <li>Where does the same data get typed into two different systems?</li>
-      <li>What do clients phone and ask that they could look up themselves?</li>
-      <li>What breaks when one particular employee is on holiday?</li>
-      <li>Which decisions get made late because the numbers arrive late?</li>
-      <li>What did you decide not to do last year because it needed three more people?</li>
-      <li>Where do you lose orders: at the enquiry, the quote, or after delivery?</li>
-      <li>What does your team complain about that you've stopped hearing?</li>
-    </ul>
+      <div class="body">
+    <h3><span class="num mono">45</span>Customer accounts and subscription billing</h3>
+    <p>Recurring charges, plan changes, dunning on failed cards, usage limits and invoices issued without anyone touching them.</p>
+    <div class="kills"><b>Removes</b><span>Chasing expired cards by hand and quietly losing that revenue.</span></div>
   </div>
+</article>
+
+    <article class="card" id="svc-46">
+  <div class="mock demo">
+    <div class="mtitle"><span>Payments and reconciliation</span><button class="runbtn" type="button">▶ close the day</button></div>
+        <div class="nodes">
+      <div class="node" data-lit>Card</div>
+      <div class="link" data-lit></div>
+      <div class="node" data-lit>Bank</div>
+      <div class="link" data-lit></div>
+      <div class="node" data-lit>Instalments</div>
+      <div class="link" data-lit></div>
+      <div class="node" data-lit>Accounting</div>
+    </div>
+        
+    
+    <div class="mrow" data-step><span class="grow">Payments received today</span><span class="mono">€ <span data-count="21740">0</span></span></div>
+    <div class="mrow" data-step><span class="grow">Matched to orders</span><div class="bar"><i data-w="100"></i></div></div>
+    <div class="mrow" data-step><span class="dot a"></span><span class="grow">2 short payments flagged for the office</span><span class="chip a">review</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Posted to accounting, 0 unmatched lines</span><span class="chip g">reconciled</span></div>
+  </div>
+      <div class="body">
+    <h3><span class="num mono">46</span>Payment integration</h3>
+    <p>Card, bank transfer, instalments, invoicing and crypto where it makes sense, with every payment reconciled back into accounting.</p>
+    <div class="kills"><b>Removes</b><span>Finance matching bank lines to orders by eye each evening.</span></div>
+  </div>
+</article>
+
+    <article class="card" id="svc-47">
+  <div class="mock demo">
+    <div class="mtitle"><span>Messenger sales bot</span><button class="runbtn" type="button">▶ order in telegram</button></div>
+        <div class="bigstat mono" style="margin-top:8px">
+      <div data-step><b data-count="34">0</b><span>% better than the mobile web form</span></div>
+      <div data-step><b data-count="62">0</b><span>orders taken in chat this week</span></div>
+    </div>
+    <div class="minicols">
+      <div class="caselist">
+        <div class="caseitem active" data-step><b class="mono">19:24</b>M. Ilves · catalogue open</div>
+        <div class="caseitem" data-step><b class="mono">19:02</b>Vellmar Handel · repeat order</div>
+        <div class="caseitem" data-step><b class="mono">18:47</b>K. Sauer · where is my parcel</div>
+      </div>
+      <div class="casemain">
+        <div class="mrow" data-step><span class="grow">Client picks 2 items in chat, no website, no forms</span><span class="mono">19:24</span></div>
+        <div class="mrow" data-step><span class="dot g"></span><span class="grow">Bot: oak tray and desk lamp, <b class="mono">€ 79,00</b> with delivery</span><span class="chip g">both in stock</span></div>
+        <div class="mrow" data-step><span class="dot g"></span><span class="grow">Paid inside the messenger <span class="mono">19:26</span>, then tracked: courier <span class="mono">DPD 7741</span> before 18:00</span><span class="chip g">auto</span></div>
+      </div>
+    </div>
+    
+  </div>
+      <div class="body">
+    <h3><span class="num mono">47</span>Telegram or WhatsApp bot as a sales channel</h3>
+    <p>Catalogue, ordering, order status, support and notifications inside the messenger your customer already has open. In most consumer categories that beats a mobile web form.</p>
+    <div class="kills"><b>Removes</b><span>Staff answering the same "where is my order" message all day.</span></div>
+  </div>
+</article>
+
+    <article class="card" id="svc-48">
+  <div class="mock demo">
+    <div class="mtitle"><span>Marketplace control panel</span><button class="runbtn" type="button">▶ push price update</button></div>
+        <div class="chartwrap solo" data-step>
+      <div class="clegend"><span class="c1"><i></i>Buy box share</span></div>
+      <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="Buy box share climbs as the repricing rule tracks the cheapest rival price down">
+        <line x1="0" y1="28" x2="420" y2="28"></line>
+        <line x1="0" y1="56" x2="420" y2="56"></line>
+        <line x1="0" y1="84" x2="420" y2="84"></line>
+        
+        <polygon class="area" points="0,58 60,57 120,59 180,58 240,56 300,57 340,34 380,22 418,18 418,110 0,110"></polygon><polyline class="s1" points="0,58 60,57 120,59 180,58 240,56 300,57 340,34 380,22 418,18"></polyline>
+        <circle class="p1" cx="418" cy="18" r="5"></circle>
+        
+      <circle class="pt d1" cx="0" cy="58"></circle><circle class="pt d1" cx="60" cy="57"></circle><circle class="pt d1" cx="120" cy="59"></circle><circle class="pt d1" cx="180" cy="58"></circle><circle class="pt d1" cx="240" cy="56"></circle><circle class="pt d1" cx="300" cy="57"></circle><circle class="pt d1" cx="340" cy="34"></circle><circle class="pt d1" cx="380" cy="22"></circle></svg>
+    </div>
+    <div class="filechips"><span class="fchip" data-eat>Admin panel 1</span><span class="fchip" data-eat>Admin panel 2</span><span class="fchip" data-eat>Admin panel 3</span><span class="fchip" data-eat>Admin panel 4</span></div>
+    
+    <div class="mrow" data-step><span class="grow">Listings synced across 4 marketplaces</span><span class="mono"><span data-count="1280">0</span></span></div>
+    <div class="mrow" data-step><span class="dot a"></span><span class="grow">Repricing rule fired · SKU 2210 cut to hold the buy box</span><span class="mono">€ 41,90</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Stock and orders pulled back into one list</span><span class="chip g">in sync</span></div>
+  </div>
+      <div class="body">
+    <h3><span class="num mono">48</span>Marketplace management tool</h3>
+    <p>Listings, prices, stock and orders for several marketplaces in one place, with automatic repricing rules if you want them.</p>
+    <div class="kills"><b>Removes</b><span>Logging into four seller panels to change one price.</span></div>
+  </div>
+</article>
+
+    <article class="card" id="svc-49">
+  <div class="mock demo">
+    <div class="mtitle"><span>Attribution dashboard</span><button class="runbtn" type="button">▶ join spend to revenue</button></div>
+        <div class="chartwrap" data-step>
+      <div class="clegend"><span class="c1"><i></i>Revenue</span><span class="c2"><i></i>Ad spend</span></div>
+      <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="Revenue keeps rising after display spend is cut, while total spend falls away">
+        <line x1="0" y1="28" x2="420" y2="28"></line>
+        <line x1="0" y1="56" x2="420" y2="56"></line>
+        <line x1="0" y1="84" x2="420" y2="84"></line>
+        <polyline class="s2" points="0,66 40,64 80,66 120,62 160,64 200,60 240,62 280,58 330,60 418,56"></polyline>
+        <polyline class="s1" points="0,22 52,30 104,36 156,46 208,54 260,66 312,74 364,86 418,94"></polyline>
+        <circle class="p1" cx="418" cy="94" r="5"></circle>
+        <circle class="p2" cx="418" cy="56" r="5"></circle>
+      <circle class="pt d1" cx="0" cy="22"></circle><circle class="pt d1" cx="52" cy="30"></circle><circle class="pt d1" cx="104" cy="36"></circle><circle class="pt d1" cx="156" cy="46"></circle><circle class="pt d1" cx="208" cy="54"></circle><circle class="pt d1" cx="260" cy="66"></circle><circle class="pt d1" cx="312" cy="74"></circle><circle class="pt d1" cx="364" cy="86"></circle><circle class="pt d2" cx="0" cy="66"></circle><circle class="pt d2" cx="40" cy="64"></circle><circle class="pt d2" cx="80" cy="66"></circle><circle class="pt d2" cx="120" cy="62"></circle><circle class="pt d2" cx="160" cy="64"></circle><circle class="pt d2" cx="200" cy="60"></circle><circle class="pt d2" cx="240" cy="62"></circle><circle class="pt d2" cx="280" cy="58"></circle><circle class="pt d2" cx="330" cy="60"></circle></svg>
+    </div>
+    <div class="nodes"><div class="node" data-lit>Ad click</div><div class="link" data-lit></div><div class="node" data-lit>CRM deal</div><div class="link" data-lit></div><div class="node" data-lit>Closed revenue</div></div>
+    
+    <div class="mrow" data-step><span class="grow">Paid search · cost per client</span><span class="mono">€ 118</span><span class="chip g">keep</span></div>
+    <div class="mrow" data-step><span class="dot r"></span><span class="grow">Display · cost per client</span><span class="mono">€ 940</span><span class="chip r">cut</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Budget reallocated, forms counted as leads not sales</span><span class="chip g">tracked</span></div>
+  </div>
+      <div class="body">
+    <h3><span class="num mono">49</span>Analytics, tracking and attribution</h3>
+    <p>Event tracking done properly and ad spend joined to closed revenue rather than to form submissions, so dashboards show real cost per client by channel.</p>
+    <div class="kills"><b>Removes</b><span>Setting next month's budget on numbers that stop at the form.</span></div>
+  </div>
+</article>
+
+    <article class="card" id="svc-50">
+  <div class="mock demo">
+    <div class="mtitle"><span>Review watch · Google, Trustpilot, marketplace</span><button class="runbtn" type="button">▶ run the autopilot</button></div>
+    
+    <div class="chartwrap solo" data-step>
+      <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="Average public rating dips after a bad review, then recovers above where it started once replies go out">
+        <line x1="0" y1="28" x2="420" y2="28"></line>
+        <line x1="0" y1="56" x2="420" y2="56"></line>
+        <line x1="0" y1="84" x2="420" y2="84"></line>
+        <polygon class="area" points="0,80 46,40 92,66 138,30 184,58 230,26 276,54 322,36 368,62 418,44 418,110 0,110"></polygon>
+        <polyline class="s1" points="0,80 46,40 92,66 138,30 184,58 230,26 276,54 322,36 368,62 418,44"></polyline>
+        <circle class="p1" cx="418" cy="44" r="5"></circle>
+      <circle class="pt d1" cx="0" cy="80"></circle><circle class="pt d1" cx="46" cy="40"></circle><circle class="pt d1" cx="92" cy="66"></circle><circle class="pt d1" cx="138" cy="30"></circle><circle class="pt d1" cx="184" cy="58"></circle><circle class="pt d1" cx="230" cy="26"></circle><circle class="pt d1" cx="276" cy="54"></circle><circle class="pt d1" cx="322" cy="36"></circle><circle class="pt d1" cx="368" cy="62"></circle></svg>
+    </div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Northgate Ltd · 5 stars on Google</span><span class="mono">21:14</span><span class="chip g">posted</span></div>
+    <div class="mrow" data-step><span class="dot r"></span><span class="grow">Vellmar Handel · 2 stars , late delivery</span><span class="mono">09:03</span><span class="chip r">alert in 4 min</span></div>
+    <div class="mrow" data-step><span class="dot a"></span><span class="grow">Calm reply drafted , waiting for your yes</span><span class="mono">09:07</span><span class="chip a">approve</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Reply published , client raised to 4 stars</span><span class="mono">11:41</span><span class="chip g">recovered</span></div>
+  
+      
+        <div class="nodes">
+      <div class="node" data-lit>Order closed</div>
+      <div class="link" data-lit></div>
+      <div class="node" data-lit>Ask at the right hour</div>
+      <div class="link" data-lit></div>
+      <div class="node" data-lit>Reply drafted</div>
+    </div>
+      </div>
+      <div class="body">
+    <h3><span class="num mono">50</span>Reviews and reputation autopilot</h3>
+    <p>After each completed order the system asks the happy client for a review at the moment they are most likely to leave one. A bad review pings you within minutes with a calm reply already drafted for your approval.</p>
+    <div class="kills"><b>Removes</b><span>the silence that lets one angry review sit unanswered for a month while it quietly costs you clients.</span></div>
+  </div>
+</article>
+  </div>
+<div class="midcta">
+    <p class="serif">Halfway through the list. If something above already sounds like your Tuesday, we should talk.</p>
+    <a class="cta" href="mailto:tagir.zalyatov@gmail.com?subject=Automation%20enquiry">Get a quote</a>
+  </div>
+
+  <div class="section-head" id="s-ops"><span class="idx serif">10 examples</span><h2 class="serif">Operations and internal workflow</h2></div>
+  <p class="section-sub">Approvals that move, rotas that build themselves, crews that report from the road, stock counts that match the shelf.</p>
+  <div class="grid" id="g-ops">
+<article class="card">
+  <div class="mock demo">
+    <div class="mtitle"><span>Fit-out job board</span><button class="runbtn" type="button">▶ move the job</button></div>
+    <div class="nodes"><div class="node" data-lit>Survey</div><div class="link" data-lit></div><div class="node" data-lit>Build</div><div class="link" data-lit></div><div class="node" data-lit>Handover</div></div>
 </main>
-<div class="final">
-  <div class="wrap">
-    <h2 class="serif">Sixty demos, one studio. If your chore is not here, it is still probably automatable.</h2>
-    <p>If a person in your company does something repeatedly on a computer, following rules, it can usually be automated, and there's normally a week of someone's month hiding in it. Tell us what annoys you, try the fix on your real work, and pay only if you keep it.</p>
-    <a class="cta" href="mailto:tagir.zalyatov@gmail.com?subject=Automation%20enquiry">Tell us what annoys you</a>
-    <p class="note">Or write directly: <span class="mono" style="user-select:all">tagir.zalyatov@gmail.com</span> · first reply within one business day. Nothing to pay until the tool proves itself.</p>
-    <p class="note">Recent work includes accounting software and a parcel-tracking board built end to end for a trading company.</p>
-    <p class="note">Proof of speed: this page, with all 60 working demos on it, was designed and built in two days.</p>
-  </div>
-</div>
-
-
 <footer class="sitefooter"><div class="wrap cols">
   <div><h4>Office</h4><p>71-75 Shelton Street, Covent Garden<br>London WC2H 9JQ, United Kingdom<br>Floor 2, Office 214</p></div>
   <div class="contacts"><h4>Phone</h4>
@@ -685,35 +867,6 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   if(hero){hero.addEventListener('submit',function(e){e.preventDefault();
     var v=document.getElementById('aisearchq').value.trim(); if(!v)return;
     panel.classList.add('open'); q.value=v; ask(v);});}
-})();
-</script>
-<script>
-(function(){
-  var cv=document.getElementById('stars'); if(!cv) return;
-  var reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var ctx=cv.getContext('2d'), W,H,stars=[],mx=0,my=0,tx=0,ty=0;
-  function size(){var r=cv.parentElement.getBoundingClientRect();W=cv.width=r.width*devicePixelRatio;H=cv.height=r.height*devicePixelRatio;}
-  function seed(){stars=[];var n=Math.round(W*H/9000/devicePixelRatio/devicePixelRatio);
-    for(var i=0;i<n;i++){stars.push({x:Math.random()*W,y:Math.random()*H,z:Math.random()*0.9+0.1,
-      r:(Math.random()*1.4+0.4)*devicePixelRatio,tw:Math.random()*6.28});}}
-  function draw(t){
-    ctx.clearRect(0,0,W,H);
-    tx+=(mx-tx)*0.06; ty+=(my-ty)*0.06;
-    stars.forEach(function(s){
-      var ox=tx*s.z*36*devicePixelRatio, oy=ty*s.z*36*devicePixelRatio;
-      var a=0.35+0.65*Math.abs(Math.sin(t/1600+s.tw));
-      ctx.globalAlpha=a*(0.35+s.z*0.65);
-      ctx.fillStyle=s.z>0.75?'#9FE8C6':'#E8ECE6';
-      ctx.beginPath();ctx.arc(s.x+ox,s.y+oy,s.r*(0.7+s.z*0.6),0,6.28);ctx.fill();
-    });
-    ctx.globalAlpha=1;
-    if(!reduced) requestAnimationFrame(draw);
-  }
-  size();seed();
-  addEventListener('resize',function(){size();seed();});
-  addEventListener('mousemove',function(e){var r=cv.getBoundingClientRect();
-    mx=(e.clientX-r.left)/r.width-0.5; my=(e.clientY-r.top)/r.height-0.5;});
-  if(reduced){draw(0);} else requestAnimationFrame(draw);
 })();
 </script><script>
 
