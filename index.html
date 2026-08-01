@@ -422,6 +422,37 @@ footer a{display:block;padding:3px 0}
   </div>
 </div></section>
 
+
+<section class="band" id="request"><div class="wrap">
+  <p class="eyebrow">Заявка</p>
+  <h2>Расскажите, что съедает время</h2>
+  <div class="req">
+    <form class="form beam" id="reqform"><i class="beam-ring"></i><i class="beam-glow"></i>
+      <label for="rq-name">Как вас зовут</label>
+      <input id="rq-name" required>
+      <label for="rq-co">Компания</label>
+      <input id="rq-co">
+      <label for="rq-ct">Телефон или WhatsApp</label>
+      <input id="rq-ct" required>
+      <label for="rq-pain">Какая рутина съедает время</label>
+      <textarea id="rq-pain" required></textarea>
+      <button type="submit">Отправить заявку</button>
+      <p class="formnote">Ответим в течение рабочего дня. Звонков без вашей просьбы не будет.</p>
+    </form>
+    <div>
+      <p class="claim">Не любите формы - напишите сразу, где вам удобно.</p>
+      <div class="ways">
+        <a class="way" href="https://wa.me/447756115516" rel="noopener">WhatsApp <small>+44 7756 115516</small></a>
+        <a class="way" href="https://t.me/+447756115516" rel="noopener">Telegram <small>+44 7756 115516</small></a>
+        <a class="way" href="tel:+447756115516">Позвонить <small>+44 7756 115516</small></a>
+        <a class="way" href="mailto:tagir.zalyatov@gmail.com">Почта <small>tagir.zalyatov@gmail.com</small></a>
+        <button class="way" type="button" id="aiopen2" style="width:100%;text-align:left;background:none;
+          font:900 15px Nunito,sans-serif;cursor:pointer">Спросить ассистента <small>сразу в браузере</small></button>
+      </div>
+    </div>
+  </div>
+</div></section>
+
 <footer><div class="wrap">
   <div class="cols">
     <div><h4>Офис</h4><p>71-75 Shelton Street, Covent Garden<br>London WC2H 9JQ, United Kingdom<br>2 этаж, офис 214</p></div>
@@ -568,6 +599,17 @@ footer a{display:block;padding:3px 0}
   function open(){ wrap.classList.add('open'); setTimeout(function(){q.focus();},40); }
   function close(){ wrap.classList.remove('open'); }
   document.getElementById('aiopen').addEventListener('click',open);
+  var alt=document.getElementById('aiopen2'); if(alt) alt.addEventListener('click',open);
+
+  /* the request form hands its text to WhatsApp: no backend to run, nothing lost in transit */
+  var rf=document.getElementById('reqform');
+  if(rf) rf.addEventListener('submit',function(e){
+    e.preventDefault();
+    var v=function(id){return (document.getElementById(id).value||'').trim();};
+    var text='Заявка с сайта Solutions101\n\nИмя: '+v('rq-name')+'\nКомпания: '+(v('rq-co')||'-')+
+             '\nКонтакт: '+v('rq-ct')+'\n\nЗадача: '+v('rq-pain');
+    window.open('https://wa.me/447756115516?text='+encodeURIComponent(text),'_blank','noopener');
+  });
   document.getElementById('aiclose').addEventListener('click',close);
   wrap.addEventListener('click',function(e){ if(e.target===wrap) close(); });
   addEventListener('keydown',function(e){ if(e.key==='Escape') close(); });
