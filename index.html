@@ -104,6 +104,51 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
 .plx-fade{position:absolute;left:0;right:0;bottom:0;height:26vh;
   background:linear-gradient(180deg,transparent,#000);z-index:5}
 
+
+/* ---------- projects: big cards, each with a mock screen of what we build ---------- */
+.projects{display:grid;gap:22px;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));margin-top:38px}
+@media (max-width:820px){.projects{grid-template-columns:1fr}}
+.proj{border:1px solid var(--line);border-radius:22px;overflow:hidden;background:rgba(127,216,255,.03);
+  display:flex;flex-direction:column}
+.shot{height:230px;background:linear-gradient(160deg,#07131c,#04090d);border-bottom:1px solid var(--line);
+  padding:16px;display:flex;flex-direction:column;gap:8px;overflow:hidden}
+.shot .bar{height:9px;border-radius:99px;background:rgba(127,216,255,.16)}
+.shot .bar.w1{width:70%}.shot .bar.w2{width:46%}.shot .bar.w3{width:88%}.shot .bar.w4{width:34%}
+.shot .row{display:flex;gap:8px;align-items:center}
+.shot .row .cell{height:11px;border-radius:4px;background:rgba(223,246,255,.10);flex:1}
+.shot .row .cell.num{flex:0 0 62px;background:rgba(127,216,255,.30)}
+.shot .cols{display:flex;gap:8px;flex:1}
+.shot .col{flex:1;background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:10px;padding:8px;
+  display:flex;flex-direction:column;gap:6px}
+.shot .chip{height:22px;border-radius:7px;background:rgba(127,216,255,.14)}
+.shot .chip.hi{background:rgba(142,123,232,.30)}
+.shot .chart{flex:1;display:flex;align-items:flex-end;gap:7px}
+.shot .chart i{flex:1;border-radius:5px 5px 0 0;background:linear-gradient(180deg,var(--ice2),rgba(127,216,255,.12))}
+.shot .bubble{max-width:76%;padding:9px 12px;border-radius:12px;font-size:12px;color:var(--dim);
+  background:rgba(255,255,255,.05);border:1px solid var(--line)}
+.shot .bubble.me{align-self:flex-end;background:rgba(127,216,255,.18);color:#DFF6FF;border-color:transparent}
+.shot .stopline{display:flex;align-items:center;gap:10px;font-size:11.5px;color:var(--dim)}
+.shot .stopline i{width:9px;height:9px;border-radius:99px;background:var(--ice2);flex:none}
+.shot .tiles{flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.shot .tile{border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.03);
+  display:flex;align-items:center;justify-content:center;font:900 17px Nunito,sans-serif;color:var(--ice2)}
+.proj .body{padding:22px 24px 26px;display:flex;flex-direction:column;flex:1}
+.proj .tag{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ice2);margin-bottom:10px}
+.proj .tag em{font-style:normal;color:var(--dim)}
+.proj h3{margin:0 0 10px;font:900 21px/1.2 Nunito,sans-serif}
+.proj p{margin:0;color:var(--dim);font-size:15px}
+.proj .go{margin-top:16px;color:var(--ice1);font-weight:900;font-size:14.5px;text-decoration:none}
+@media (hover:hover){.proj .go:hover{color:var(--ice2)}}
+
+/* ---------- questions ---------- */
+.qbox{margin-top:32px;border:1px solid var(--line);border-radius:22px;padding:30px 30px 34px;
+  background:rgba(255,255,255,.02)}
+.qs{display:grid;gap:0;grid-template-columns:1fr 1fr;margin-top:20px}
+@media (max-width:820px){.qs{grid-template-columns:1fr}}
+.qs li{list-style:none;display:flex;gap:12px;padding:14px 22px 14px 0;border-bottom:1px dashed rgba(30,42,36,.9);
+  color:var(--dim);font-size:15.5px}
+.qs li b{color:var(--ice2);font-weight:900;flex:none}
+
 /* ---------- section: request ---------- */
 .req{display:grid;gap:34px;grid-template-columns:minmax(300px,1fr) minmax(300px,1fr);
   align-items:start;margin-top:32px}
@@ -238,6 +283,143 @@ footer a{display:block;padding:3px 0}
   </div>
   <!-- ждут данных от Damir: состав команды и образование, число сданных проектов и клиентов -->
 
+</div></section>
+
+
+<section class="band" id="projects"><div class="wrap">
+  <p class="eyebrow">Проекты</p>
+  <h2>Что уже собрано и как это выглядит</h2>
+  <div class="projects">
+
+    <article class="proj beam"><i class="beam-ring"></i><i class="beam-glow"></i>
+      <div class="shot">
+        <div class="bar w1"></div>
+        <div class="row"><span class="cell num"></span><span class="cell"></span><span class="cell"></span></div>
+        <div class="row"><span class="cell num"></span><span class="cell"></span><span class="cell"></span></div>
+        <div class="row"><span class="cell num"></span><span class="cell"></span><span class="cell"></span></div>
+        <div class="row"><span class="cell num"></span><span class="cell"></span><span class="cell"></span></div>
+        <div class="bar w2"></div>
+      </div>
+      <div class="body">
+        <p class="tag">Стройка · Казахстан <em>· работает у клиента</em></p>
+        <h3>Учёт взаиморасчётов</h3>
+        <p>Долги нам и наши долги против 1С: 48 контрагентов, 3 юрлица, мультивалюта, старение долга,
+          платёжный календарь. Собрано за один день, развёрнуто внутри сети клиента.</p>
+        <a class="go" href="demo/index.html" target="_blank" rel="noopener">Открыть живой продукт</a>
+      </div>
+    </article>
+
+    <article class="proj beam"><i class="beam-ring"></i><i class="beam-glow"></i>
+      <div class="shot">
+        <div class="stopline"><i></i>Заказ принят</div>
+        <div class="stopline"><i></i>Собран на складе</div>
+        <div class="stopline"><i></i>Передан перевозчику</div>
+        <div class="stopline"><i></i>В пути, Алматы</div>
+        <div class="stopline"><i></i>Ожидает выдачи</div>
+        <div class="bar w3"></div>
+      </div>
+      <div class="body">
+        <p class="tag">Логистика <em>· работает у клиента</em></p>
+        <h3>Доска отслеживания посылок</h3>
+        <p>Документы создаются из состояния сделки, а посылка видна от заказа до двери на одном экране.
+          Клиент перестал звонить менеджеру, чтобы узнать, где груз.</p>
+      </div>
+    </article>
+
+    <article class="proj beam"><i class="beam-ring"></i><i class="beam-glow"></i>
+      <div class="shot">
+        <div class="cols">
+          <div class="col"><span class="chip"></span><span class="chip hi"></span><span class="chip"></span></div>
+          <div class="col"><span class="chip hi"></span><span class="chip"></span></div>
+          <div class="col"><span class="chip"></span><span class="chip"></span><span class="chip hi"></span></div>
+        </div>
+      </div>
+      <div class="body">
+        <p class="tag">Продажи <em>· макет</em></p>
+        <h3>CRM под ваш процесс</h3>
+        <p>Не коробка, а ваши этапы: заявка, замер, счёт, отгрузка. История клиента остаётся в компании,
+          когда менеджер уходит. Сюда же телефония и автообзвон.</p>
+      </div>
+    </article>
+
+    <article class="proj beam"><i class="beam-ring"></i><i class="beam-glow"></i>
+      <div class="shot">
+        <div class="bar w4"></div>
+        <div class="chart"><i style="height:38%"></i><i style="height:62%"></i><i style="height:44%"></i>
+          <i style="height:81%"></i><i style="height:57%"></i><i style="height:93%"></i><i style="height:70%"></i></div>
+      </div>
+      <div class="body">
+        <p class="tag">Управление <em>· макет</em></p>
+        <h3>Экран для руководителя</h3>
+        <p>Деньги, долги, загрузка и просрочки на одной странице. Цифры утром, а не через месяц,
+          и письмо в тот час, когда что-то пошло не так.</p>
+      </div>
+    </article>
+
+    <article class="proj beam"><i class="beam-ring"></i><i class="beam-glow"></i>
+      <div class="shot">
+        <div class="bubble">Здравствуйте! Остался ли в наличии профиль 40х20?</div>
+        <div class="bubble me">Да, 320 метров на складе в Казани. Выставить счёт?</div>
+        <div class="bubble">Да, на ООО Ромашка</div>
+        <div class="bubble me">Счёт 1174 отправлен на почту, бронь на 3 дня</div>
+      </div>
+      <div class="body">
+        <p class="tag">ИИ <em>· макет</em></p>
+        <h3>Бот на ваших документах</h3>
+        <p>Отвечает клиенту по вашему прайсу и остаткам, выставляет счёт, заносит контакт в базу.
+          Первая линия работает ночью и в выходные.</p>
+      </div>
+    </article>
+
+    <article class="proj beam"><i class="beam-ring"></i><i class="beam-glow"></i>
+      <div class="shot">
+        <div class="tiles"><span class="tile">60</span><span class="tile">9</span><span class="tile">5</span>
+          <span class="tile">1С</span><span class="tile">API</span><span class="tile">ИИ</span></div>
+        <div class="bar w2"></div>
+      </div>
+      <div class="body">
+        <p class="tag">Витрина <em>· сделано</em></p>
+        <h3>Этот сайт</h3>
+        <p>Космос, живой продукт в витрине и ассистент, который разбирает вашу задачу прямо в браузере.
+          Собран той же линией, которую вы нанимаете. Скорость видно сразу.</p>
+      </div>
+    </article>
+
+  </div>
+</div></section>
+
+<section class="band" id="how"><div class="wrap">
+  <p class="eyebrow">Как идёт работа</p>
+  <h2>Четыре шага, никаких сюрпризов</h2>
+  <div class="steps">
+    <div class="step"><b>Разбор задачи</b><span>Разговор и взгляд на то, как работа устроена сейчас.
+      На выходе письменное описание, что именно будет собрано и в какой срок. Бесплатно, ни к чему не обязывает.</span></div>
+    <div class="step"><b>Сначала пробуете</b><span>Первая рабочая версия приходит за дни, а не в конце проекта.
+      Вы гоняете её на реальной работе. Не помогло - расходимся, вы ничего не должны.</span></div>
+    <div class="step"><b>Передача</b><span>Исходный код, документация, обучение сотрудников и доступы.
+      Ничего не заперто: захотите передать другому подрядчику - сможете.</span></div>
+    <div class="step"><b>Поддержка</b><span>Фиксированная месячная сумма или по часам, на ваш выбор.
+      Или вообще без поддержки. Это ваша система.</span></div>
+  </div>
+</div></section>
+
+<section class="band" id="check"><div class="wrap">
+  <p class="eyebrow">Проверьте себя</p>
+  <h2>Не знаете, что просить? Это нормально</h2>
+  <div class="qbox">
+    <p class="claim" style="margin-bottom:0">Клиенты редко знают, что заказывать. Зато точно знают, что бесит.
+      Если хоть один вопрос колет - это и есть проект.</p>
+    <ul class="qs">
+      <li><b>?</b>Какой отчёт дольше всего собирается каждый месяц и кто его собирает?</li>
+      <li><b>?</b>Какие решения принимаются с опозданием, потому что цифры приходят поздно?</li>
+      <li><b>?</b>Где одни и те же данные вбиваются в две разные системы?</li>
+      <li><b>?</b>От чего вы отказались в прошлом году, потому что не хватало трёх человек?</li>
+      <li><b>?</b>Что клиенты спрашивают по телефону, хотя могли бы посмотреть сами?</li>
+      <li><b>?</b>Где вы теряете заказы: на запросе, на счёте или после отгрузки?</li>
+      <li><b>?</b>Что ломается, когда один конкретный сотрудник уходит в отпуск?</li>
+      <li><b>?</b>На что команда жалуется так давно, что вы перестали это слышать?</li>
+    </ul>
+  </div>
 </div></section>
 
 <footer><div class="wrap">
