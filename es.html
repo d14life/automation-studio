@@ -146,7 +146,7 @@ header{border-bottom:1px solid var(--rule)}
   box-shadow:var(--shadow);display:flex;flex-direction:column;overflow:hidden;
   transition:transform 180ms var(--ease-out), box-shadow 180ms var(--ease-out)}
 .js .grid .card{opacity:0;transform:translateY(22px);
-  transition:opacity 600ms var(--ease-out), transform 600ms var(--ease-out), box-shadow 180ms var(--ease-out)}
+  transition:opacity 420ms var(--ease-out), transform 420ms var(--ease-out), box-shadow 180ms var(--ease-out)}
 .js .grid .card.vis{opacity:1;transform:none}
 
 @media print{.js .grid .card{opacity:1;transform:none}}
@@ -161,7 +161,7 @@ header{border-bottom:1px solid var(--rule)}
 .kills{margin-top:4px;padding-top:12px;border-top:1px dashed var(--rule);
   font-size:13.5px;display:flex;gap:8px;align-items:baseline}
 .kills b{color:var(--green);white-space:nowrap;font-size:12px;letter-spacing:.08em;text-transform:uppercase}
-.grid .card{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(330px,1fr)}
+.grid .card{display:grid;grid-template-columns:minmax(0,2.2fr) minmax(290px,1fr)}
 .grid .card .mock{border-bottom:0;border-right:1px solid var(--rule);min-height:250px;display:flex;flex-direction:column}
 .grid .card .mock > .mrow{flex:1 1 auto;min-height:36px}
 .grid .card .mock > .mtitle{flex:0 0 auto}
@@ -171,9 +171,9 @@ header{border-bottom:1px solid var(--rule)}
 .grid .card .mock > .kanban,.grid .card .mock > .minicols{flex:1 1 auto}
 .grid .card .mock > .nodes,.grid .card .mock > .filechips,.grid .card .mock > .doc{flex:0 1 auto}
 .grid .card .mock > .chartwrap .chart{height:100%;min-height:110px}
-.grid .card .body{padding:26px 28px;justify-content:center;gap:12px}
-.grid .card h3{font-size:22px}
-.grid .card:nth-child(even){grid-template-columns:minmax(330px,1fr) minmax(0,1.1fr)}
+.grid .card .body{padding:24px 24px;justify-content:center;gap:11px}
+.grid .card h3{font-size:20px;line-height:1.28}
+.grid .card:nth-child(even){grid-template-columns:minmax(290px,1fr) minmax(0,2.2fr)}
 .grid .card .mock{min-width:0;overflow-x:auto}
 .grid .card .body{min-width:0}
 .grid .card:nth-child(even) .mock{order:2;border-right:0;border-left:1px solid var(--rule)}
@@ -206,11 +206,11 @@ header{border-bottom:1px solid var(--rule)}
 .dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:6px;flex:none}
 .dot.g{background:var(--green)}.dot.r{background:var(--red)}.dot.a{background:var(--amber)}
 .bar{height:8px;border-radius:4px;background:var(--mock-line);overflow:hidden;flex:1}
-.bar i{display:block;height:100%;width:0;background:var(--acc,var(--green));transition:width 1500ms var(--ease-out)}
+.bar i{display:block;height:100%;width:0;background:var(--acc,var(--green));transition:width 1050ms var(--ease-out)}
 .filechips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
 .fchip{border:1px solid var(--mock-line);background:var(--card);border-radius:5px;
   padding:7px 12px;font-size:12px;font-weight:600;color:var(--ink-soft);
-  transition:opacity 800ms var(--ease-out), transform 800ms var(--ease-out)}
+  transition:opacity 560ms var(--ease-out), transform 560ms var(--ease-out)}
 .fchip.eaten{opacity:.35;transform:scale(.94)}
 .arrowdown{text-align:center;color:var(--rule-blue);font-size:14px;line-height:1;margin:2px 0 8px}
 .bigstat{display:flex;gap:20px;padding:10px 10px 2px}
@@ -237,8 +237,10 @@ header{border-bottom:1px solid var(--rule)}
 .chart{width:100%;height:110px;display:block}
 .chart line{stroke:var(--mock-line);stroke-width:1}
 .chart polyline{fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;
-  stroke-dasharray:460;stroke-dashoffset:460;transition:stroke-dashoffset 2000ms var(--ease-out)}
-.chart .s1{stroke:var(--ch1)}.chart .s2{stroke:var(--ch2)}
+  stroke-dasharray:460;stroke-dashoffset:460;transition:stroke-dashoffset 1400ms var(--ease-out)}
+.chart .s1{stroke:var(--ch1)}
+.chartwrap.solo .s1{stroke:var(--acc,var(--ch1))}
+.chartwrap.solo .area{fill:var(--acc,var(--ch1))}.chart .s2{stroke:var(--ch2)}
 .chart .area{fill:var(--ch1);opacity:0;transition:opacity 1200ms ease 900ms}
 .chart circle{opacity:0;transition:opacity 400ms ease 1700ms}
 .chart .p1{fill:var(--ch1)}.chart .p2{fill:var(--ch2)}
@@ -273,7 +275,7 @@ header{border-bottom:1px solid var(--rule)}
 .crew .more{margin-left:6px;font-size:11px;color:var(--ink-soft)}
 
 /* demo reveal machinery */
-.mock [data-step]{opacity:0;transform:translateY(12px);transition:opacity 460ms var(--ease-out), transform 460ms var(--ease-out)}
+.mock [data-step]{opacity:0;transform:translateY(12px);transition:opacity 320ms var(--ease-out), transform 320ms var(--ease-out)}
 .mock [data-step].shown{opacity:1;transform:none}
 .cursorline{position:absolute;bottom:8px;right:14px;font-size:10px;color:var(--rule-blue);
   letter-spacing:.08em;text-transform:uppercase}
@@ -522,7 +524,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
       </div>
       <div class="body">
         <h3>Para bufetes de abogados</h3>
-        <p>Monitorización de juzgados y registros, generación de documentos a partir de plantillas aprobadas, un asistente que responde desde el archivo de expedientes, un portal para clientes y horas facturadas según la actividad real. Ensamblado a partir de servicios <b class="mono">04 · 21 · 24 · 25 · 34</b>.</p>
+        <p>Monitorización de juzgados y registros, generación de documentos a partir de plantillas aprobadas, un asistente que responde desde el archivo de expedientes, un portal para clientes y horas facturadas según la actividad real.</p>
         <div class="kills"><b>Elimina</b><span>el plazo de prescripción vencido sin darse cuenta, y la noche dedicada a armar a mano una demanda estándar.</span></div>
       </div>
     </article>
@@ -559,7 +561,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 
   
-  <div class="section-head" id="s-data"><span class="idx serif">7 servicios</span><h2 class="serif">Recopilación e integración de datos</h2></div>
+  <div class="section-head" id="s-data"><span class="idx serif">7 ejemplos</span><h2 class="serif">Recopilación e integración de datos</h2></div>
   <p class="section-sub">La rutina matutina de revisar las obras, las listas de precios en doce formatos distintos, los sistemas que cada uno guarda su propia versión de la verdad.</p>
 
   <div class="grid" id="g-data">
@@ -567,46 +569,18 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <!-- 1 -->
     <article class="card">
       <div class="mock demo">
-        <div class="mtitle"><span>Alertas de marketplace</span><button class="runbtn" type="button">▶ publicar</button></div>
-        <div class="nodes"><div class="node" data-lit>4 marketplaces</div><div class="link" data-lit></div><div class="node" data-lit>Monitor de precios</div><div class="link" data-lit></div><div class="node" data-lit>Telegram</div></div>
-        <div class="chartwrap" data-step>
-          <div class="clegend"><span class="c1"><i></i>Su cuota de buy box</span><span class="c2"><i></i>Competidor más barato</span></div>
-          <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="La cuota de buy box cae cuando un competidor baja el precio, y vuelve a subir por encima de él cuando se activa la regla de repriciación">
-            <line x1="0" y1="28" x2="420" y2="28"></line>
-            <line x1="0" y1="56" x2="420" y2="56"></line>
-            <line x1="0" y1="84" x2="420" y2="84"></line>
-            <polyline class="s2" points="8,70 46,66 84,60 122,44 160,36 198,40 236,52 274,66 312,74 350,80 384,86 418,90"></polyline>
-            <polyline class="s1" points="8,42 46,44 84,48 122,62 160,78 198,74 236,58 274,40 312,30 350,26 384,22 418,18"></polyline>
-            <circle class="p2" cx="418" cy="90" r="3.5"></circle>
-            <circle class="p1" cx="418" cy="18" r="3.5"></circle>
-          </svg>
-        </div>
-        <div class="mrow" data-step><span class="dot r"></span><span class="grow"><b>Buy Box perdida</b> · Amazon, SKU 2210</span><span class="mono">09:41</span></div>
-        <div class="mrow" data-step><span class="dot a"></span><span class="grow">Superado en precio por <span class="mono">€1,30</span> · Ozon, SKU 1148, reseña de 2 estrellas en Wildberries</span><span class="mono">09:37</span></div>
-        <div class="mrow" data-step><span class="dot g"></span><span class="grow">Competidor sin stock, usted es el único en la página · eBay</span><span class="mono">07:52</span></div>
-        <div class="mrow" data-step><span class="grow">Buy Box recuperada a <span class="mono">71%</span>, informe de posición enviado a su teléfono</span><span class="chip g">enviado</span></div>
-      </div>
-      <div class="body">
-        <h3><span class="num mono">03</span>Monitorización de marketplaces</h3>
-        <p>Controle sus fichas y las de la competencia en Amazon, Wildberries, Ozon, eBay, Etsy: posición, precio, stock, reseñas, estado de la Buy Box. Las alertas se disparan en el momento en que un competidor baja el precio por debajo del suyo o un anuncio deja de estar activo.</p>
-        <div class="kills"><b>Elimina</b><span>enterarse de la pérdida del buy box días después. Ahora son minutos.</span></div>
-      </div>
-    </article>
-
-    <article class="card">
-      <div class="mock demo">
         <div class="mtitle"><span>Vigilancia de precios · ejecución diaria</span><button class="runbtn" type="button">▶ ejecutar rastreo 06:00</button></div>
         <div class="filechips"><span class="fchip" data-eat>Catálogo de CompetidorA</span><span class="fchip" data-eat>Catálogo de CompetitorB</span><span class="fchip" data-eat>Feed de stock del proveedor</span><span class="fchip" data-eat>Su página en el marketplace</span></div>
-        <div class="chartwrap" data-step>
-          <div class="clegend"><span class="c1"><i></i>Su precio</span><span class="c2"><i></i>CompetitorA</span></div>
+        <div class="chartwrap solo" data-step>
+          <div class="clegend"><span class="c1"><i></i>Su precio</span></div>
           <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="CompetitorA bajó su precio durante la semana mientras el suyo se mantuvo estable">
             <line x1="0" y1="28" x2="420" y2="28"></line>
             <line x1="0" y1="56" x2="420" y2="56"></line>
             <line x1="0" y1="84" x2="420" y2="84"></line>
-            <polyline class="s2" points="0,30 42,31 84,29 126,37 168,42 210,45 252,53 294,59 336,67 378,73 418,79"></polyline>
-            <polyline class="s1" points="0,26 42,26 84,27 126,27 168,28 210,28 252,29 294,29 336,30 378,30 418,31"></polyline>
-            <circle class="p1" cx="418" cy="31" r="3.5"></circle>
-            <circle class="p2" cx="418" cy="79" r="3.5"></circle>
+            
+            <polygon class="area" points="0,92 46,86 92,78 138,74 184,62 230,54 276,44 322,36 368,26 418,16 418,110 0,110"></polygon><polyline class="s1" points="0,92 46,86 92,78 138,74 184,62 230,54 276,44 322,36 368,26 418,16"></polyline>
+            <circle class="p1" cx="418" cy="16" r="3.5"></circle>
+            
           </svg>
         </div>
         <div class="mrow mono" data-step><span class="grow">CompetitorA · Widget Pro</span><span>€48.90</span><span class="down">▼ 4%</span></div>
@@ -641,6 +615,34 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <h3><span class="num mono">02</span>Importación de catálogo de proveedores</h3>
         <p>Los proveedores envían las listas de precios en el formato que prefieren. Un importador las procesa todas, hace coincidir los productos con sus propios SKU, marca lo que cambió y actualiza su sistema según un calendario que nadie vigila.</p>
         <div class="kills"><b>Elimina</b><span>el trabajo mensual de dos días de reintroducción manual de datos y los errores de precios que lo acompañan.</span></div>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="mock demo">
+        <div class="mtitle"><span>Alertas de marketplace</span><button class="runbtn" type="button">▶ publicar</button></div>
+        <div class="nodes"><div class="node" data-lit>4 marketplaces</div><div class="link" data-lit></div><div class="node" data-lit>Monitor de precios</div><div class="link" data-lit></div><div class="node" data-lit>Telegram</div></div>
+        <div class="chartwrap" data-step>
+          <div class="clegend"><span class="c1"><i></i>Su cuota de buy box</span><span class="c2"><i></i>Competidor más barato</span></div>
+          <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="La cuota de buy box cae cuando un competidor baja el precio, y vuelve a subir por encima de él cuando se activa la regla de repriciación">
+            <line x1="0" y1="28" x2="420" y2="28"></line>
+            <line x1="0" y1="56" x2="420" y2="56"></line>
+            <line x1="0" y1="84" x2="420" y2="84"></line>
+            <polyline class="s2" points="0,66 40,64 80,66 120,62 160,64 200,60 240,62 280,58 330,60 418,56"></polyline>
+            <polyline class="s1" points="0,88 40,84 80,80 120,34 160,26 200,28 240,30 280,27 330,29 418,26"></polyline>
+            <circle class="p2" cx="418" cy="56" r="3.5"></circle>
+            <circle class="p1" cx="418" cy="26" r="3.5"></circle>
+          </svg>
+        </div>
+        <div class="mrow" data-step><span class="dot r"></span><span class="grow"><b>Buy Box perdida</b> · Amazon, SKU 2210</span><span class="mono">09:41</span></div>
+        <div class="mrow" data-step><span class="dot a"></span><span class="grow">Superado en precio por <span class="mono">€1,30</span> · Ozon, SKU 1148, reseña de 2 estrellas en Wildberries</span><span class="mono">09:37</span></div>
+        <div class="mrow" data-step><span class="dot g"></span><span class="grow">Competidor sin stock, usted es el único en la página · eBay</span><span class="mono">07:52</span></div>
+        <div class="mrow" data-step><span class="grow">Buy Box recuperada a <span class="mono">71%</span>, informe de posición enviado a su teléfono</span><span class="chip g">enviado</span></div>
+      </div>
+      <div class="body">
+        <h3><span class="num mono">03</span>Monitorización de marketplaces</h3>
+        <p>Controle sus fichas y las de la competencia en Amazon, Wildberries, Ozon, eBay, Etsy: posición, precio, stock, reseñas, estado de la Buy Box. Las alertas se disparan en el momento en que un competidor baja el precio por debajo del suyo o un anuncio deja de estar activo.</p>
+        <div class="kills"><b>Elimina</b><span>enterarse de la pérdida del buy box días después. Ahora son minutos.</span></div>
       </div>
     </article>
 
@@ -743,41 +745,24 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 
   <div class="band">
-  <div class="section-head" id="s-fin"><span class="idx serif">7 servicios</span><h2 class="serif">Contabilidad y finanzas</h2></div>
+  <div class="section-head" id="s-fin"><span class="idx serif">7 ejemplos</span><h2 class="serif">Contabilidad y finanzas</h2></div>
   <p class="section-sub">Facturas, conciliación, nómina, caja. El papeleo que consume la primera semana de cada mes.</p>
   <div class="grid" id="g-fin">
 
     <!-- 8 -->
     <article class="card">
       <div class="mock demo">
-        <div class="mtitle"><span>Trato ganado → papeleo</span><button class="runbtn" type="button">▶ marcar trato ganado</button></div>
-        <div class="nodes"><div class="node" data-lit>Trato ganado</div><div class="link" data-lit></div><div class="node" data-lit>Documentos</div><div class="link" data-lit></div><div class="node" data-lit>Bandeja de entrada del cliente</div></div>
-        <div class="doc" data-step><b>Factura n.º 2041 · Northgate Ltd · €14 200</b><div class="dline"></div><div class="dline"></div><div class="dline short"></div></div>
-        <div class="mrow" data-step><span class="dot g"></span><span class="grow">Numerado y archivado, sin huecos en la serie</span><span class="mono">14:02:11</span></div>
-        <div class="mrow" data-step><span class="dot g"></span><span class="grow">Albarán + contrato a partir de su plantilla</span><span class="mono">14:02:12</span></div>
-        <div class="mrow" data-step><span class="dot g"></span><span class="grow">Enviado por correo al cliente, copia a contabilidad</span><span class="mono">14:02:14</span></div>
-        <div class="mrow" data-step><span class="grow">Intervención humana</span><span class="chip g">ninguno</span></div>
-      </div>
-      <div class="body">
-        <h3><span class="num mono">09</span>Generación automática de facturas y documentos</h3>
-        <p>Facturas, albaranes, contratos y documentos de cierre generados en el momento en que un negocio cambia de estado: numerados correctamente, archivados correctamente, enviados al cliente de forma automática.</p>
-        <div class="kills"><b>Elimina</b><span>toda la semana laboral que una empresa con 200 facturas al mes pierde en papeleo.</span></div>
-      </div>
-    </article>
-
-    <article class="card">
-      <div class="mock demo">
         <div class="mtitle"><span>Informe mensual</span><button class="runbtn" type="button">▶ generar</button></div>
-        <div class="chartwrap" data-step>
-          <div class="clegend"><span class="c1"><i></i>Margen minorista</span><span class="c2"><i></i>Margen mayorista</span></div>
+        <div class="chartwrap solo" data-step>
+          <div class="clegend"><span class="c1"><i></i>Margen minorista</span></div>
           <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="El margen minorista sube mes a mes hasta 22,4 por ciento mientras el margen mayorista cae a 11,1 por ciento">
             <line x1="0" y1="28" x2="420" y2="28"></line>
             <line x1="0" y1="56" x2="420" y2="56"></line>
             <line x1="0" y1="84" x2="420" y2="84"></line>
-            <polyline class="s2" points="8,44 60,46 112,52 164,58 216,62 268,70 320,76 372,84 418,88"></polyline>
-            <polyline class="s1" points="8,72 60,68 112,60 164,58 216,48 268,42 320,34 372,28 418,22"></polyline>
-            <circle class="p1" cx="418" cy="22" r="3.5"></circle>
-            <circle class="p2" cx="418" cy="88" r="3.5"></circle>
+            
+            <polygon class="area" points="0,34 52,46 104,64 156,84 208,90 260,76 312,58 364,40 418,24 418,110 0,110"></polygon><polyline class="s1" points="0,34 52,46 104,64 156,84 208,90 260,76 312,58 364,40 418,24"></polyline>
+            <circle class="p1" cx="418" cy="24" r="3.5"></circle>
+            
           </svg>
         </div>
         <div class="doc" data-step>
@@ -800,15 +785,32 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 
     <article class="card">
       <div class="mock demo">
+        <div class="mtitle"><span>Trato ganado → papeleo</span><button class="runbtn" type="button">▶ marcar trato ganado</button></div>
+        <div class="nodes"><div class="node" data-lit>Trato ganado</div><div class="link" data-lit></div><div class="node" data-lit>Documentos</div><div class="link" data-lit></div><div class="node" data-lit>Bandeja de entrada del cliente</div></div>
+        <div class="doc" data-step><b>Factura n.º 2041 · Northgate Ltd · €14 200</b><div class="dline"></div><div class="dline"></div><div class="dline short"></div></div>
+        <div class="mrow" data-step><span class="dot g"></span><span class="grow">Numerado y archivado, sin huecos en la serie</span><span class="mono">14:02:11</span></div>
+        <div class="mrow" data-step><span class="dot g"></span><span class="grow">Albarán + contrato a partir de su plantilla</span><span class="mono">14:02:12</span></div>
+        <div class="mrow" data-step><span class="dot g"></span><span class="grow">Enviado por correo al cliente, copia a contabilidad</span><span class="mono">14:02:14</span></div>
+        <div class="mrow" data-step><span class="grow">Intervención humana</span><span class="chip g">ninguno</span></div>
+      </div>
+      <div class="body">
+        <h3><span class="num mono">09</span>Generación automática de facturas y documentos</h3>
+        <p>Facturas, albaranes, contratos y documentos de cierre generados en el momento en que un negocio cambia de estado: numerados correctamente, archivados correctamente, enviados al cliente de forma automática.</p>
+        <div class="kills"><b>Elimina</b><span>toda la semana laboral que una empresa con 200 facturas al mes pierde en papeleo.</span></div>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="mock demo">
         <div class="mtitle"><span>Conciliación bancaria</span><button class="runbtn" type="button">▶ ejecutar conciliación</button></div>
         <div class="chartwrap" data-step>
           <div class="clegend"><span class="c1"><i></i>conciliado por el sistema</span><span class="c2"><i></i>quedan para una persona</span></div>
           <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="la cuota conciliada por el sistema aumenta mes a mes mientras el montón que queda para una persona desaparece">
             <line x1="0" y1="28" x2="420" y2="28"></line><line x1="0" y1="56" x2="420" y2="56"></line><line x1="0" y1="84" x2="420" y2="84"></line>
-            <polyline class="s2" points="0,44 46,48 92,52 138,58 184,64 230,70 276,78 322,84 368,90 418,94"></polyline>
-            <polyline class="s1" points="0,72 46,68 92,60 138,55 184,44 230,38 276,30 322,26 368,20 418,16"></polyline>
-            <circle class="p1" cx="418" cy="16" r="3.5"></circle>
-            <circle class="p2" cx="418" cy="94" r="3.5"></circle>
+            <polyline class="s2" points="0,30 42,34 84,32 126,36 168,34 210,38 252,36 294,40 336,38 418,42"></polyline>
+            <polyline class="s1" points="0,62 42,38 84,70 126,44 168,76 210,48 252,80 294,52 336,72 418,46"></polyline>
+            <circle class="p1" cx="418" cy="46" r="3.5"></circle>
+            <circle class="p2" cx="418" cy="42" r="3.5"></circle>
           </svg>
         </div>
         <div class="mrow mono" data-step><span class="grow">Coincidencia exacta de referencia</span><div class="bar"><i data-w="77"></i></div><span data-count="109">0</span></div>
@@ -837,14 +839,14 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <div class="caseitem" data-step><b class="mono">INV-4102</b>Halden Bau · € 61 400 · día 66</div>
       </div>
       <div class="casemain">
-        <div class="chartwrap" data-step>
+        <div class="chartwrap solo" data-step>
           <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="El saldo total vencido disminuye de forma constante durante once semanas de recordatorios automáticos">
             <line x1="0" y1="28" x2="420" y2="28"></line>
             <line x1="0" y1="56" x2="420" y2="56"></line>
             <line x1="0" y1="84" x2="420" y2="84"></line>
-            <polygon class="area" points="8,18 46,22 84,30 122,34 160,46 198,52 236,60 274,68 312,74 350,82 384,88 418,92 418,110 0,110"></polygon>
-            <polyline class="s1" points="8,18 46,22 84,30 122,34 160,46 198,52 236,60 274,68 312,74 350,82 384,88 418,92"></polyline>
-            <circle class="p1" cx="418" cy="92" r="3.5"></circle>
+            <polygon class="area" points="0,58 60,57 120,59 180,58 240,56 300,57 340,34 380,22 418,18 418,110 0,110"></polygon>
+            <polyline class="s1" points="0,58 60,57 120,59 180,58 240,56 300,57 340,34 380,22 418,18"></polyline>
+            <circle class="p1" cx="418" cy="18" r="3.5"></circle>
           </svg>
         </div>
         <div class="mrow" data-step><span class="dot a"></span><span class="grow">Escalado: recordatorio cordial, luego se copia a su gerente, luego se redacta una carta de abogado</span><span class="chip a">paso 2 de 3</span></div>
@@ -864,12 +866,13 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Bandeja de recibos</span><button class="runbtn" type="button">▶ ver acuses de recibo</button></div>
-    <div class="filechips"><span class="fchip" data-eat>Foto: gasolinera</span><span class="fchip" data-eat>Foto: factura de hotel</span><span class="fchip" data-eat>Factura en PDF</span></div>
-    <div class="kanban">
+        <div class="kanban">
       <div class="kcol done" data-step><div class="khead"><span>Leído</span><b>✓</b></div><div class="ktask">Shell Ostende <span class="chip g">€ 84,10</span></div><div class="ktask">Hotel Ambra <span class="chip g">€ 213,00</span></div></div>
       <div class="kcol done" data-step><div class="khead"><span>Codificado</span><b>✓</b></div><div class="ktask">combustible, IVA 21% <span class="chip g">ok</span></div><div class="ktask">viaje, 14 mar <span class="chip g">ok</span></div></div>
       <div class="kcol" data-step><div class="khead"><span>Revisión humana</span><b>1</b></div><div class="ktask">total borroso <span class="chip a">revisar</span></div></div>
     </div>
+    <div class="filechips"><span class="fchip" data-eat>Foto: gasolinera</span><span class="fchip" data-eat>Foto: factura de hotel</span><span class="fchip" data-eat>Factura en PDF</span></div>
+    
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">3 gastos registrados en marzo, IVA desglosado</span><span class="chip g">hecho</span></div>
     <div class="mrow" data-step><span class="grow">Introducido a mano el mes pasado <span class="mono">4h 20m</span></span><span class="chip g"><span class="mono">40 s</span></span></div>
   </div>
@@ -909,7 +912,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
       <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="La posición de caja de los próximos 90 días cae hacia cero en la semana once">
         <line x1="0" y1="30" x2="420" y2="30"></line><line x1="0" y1="60" x2="420" y2="60"></line><line x1="0" y1="90" x2="420" y2="90"></line>
         <polygon class="area" points="0,38 60,32 120,44 180,36 240,58 300,72 360,88 418,94 418,110 0,110"></polygon>
-        <polyline class="s1" points="0,38 60,32 120,44 180,36 240,58 300,72 360,88 418,94"></polyline>
+        <polyline class="s1" points="0,22 52,30 104,36 156,46 208,54 260,66 312,74 364,86 418,94"></polyline>
         <circle class="p1" cx="418" cy="94" r="3.5"></circle>
       </svg>
     </div>
@@ -926,35 +929,10 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
   </div><!-- /band -->
 
-  <div class="section-head" id="s-crm"><span class="idx serif">8 servicios</span><h2 class="serif">Ventas y CRM</h2></div>
+  <div class="section-head" id="s-crm"><span class="idx serif">8 ejemplos</span><h2 class="serif">Ventas y CRM</h2></div>
   <p class="section-sub">Leads atendidos en minutos, propuestas en segundos, y un historial de cliente que permanece cuando un comercial se marcha.</p>
   <div class="grid" id="g-crm">
 <article class="card">
-  <div class="mock demo">
-    <div class="mtitle"><span>Embudo · este mes</span><button class="runbtn" type="button">▶ mostrar el embudo</button></div>
-    <div class="mrow" data-step><span class="crew"><span class="avat">AP</span><span class="avat">MI</span><span class="avat">DK</span><span class="more">+4 comerciales</span></span><span class="grow">Panel de marzo, una sola pantalla</span><span class="mono">€ 341 850</span></div>
-    <div class="chartwrap" data-step>
-      <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="negocios ganados en aumento mes a mes, con una caída en la semana tres">
-        <line x1="0" y1="28" x2="420" y2="28"></line><line x1="0" y1="56" x2="420" y2="56"></line><line x1="0" y1="84" x2="420" y2="84"></line>
-        <polygon class="area" points="0,86 46,80 92,88 138,71 184,63 230,67 276,52 322,45 368,38 418,29 418,110 0,110"></polygon>
-        <polyline class="s1" points="0,86 46,80 92,88 138,71 184,63 230,67 276,52 322,45 368,38 418,29"></polyline>
-        <circle class="p1" cx="418" cy="29" r="3.5"></circle>
-      </svg>
-    </div>
-    <div class="mrow" data-step><span class="grow">calificado</span><div class="bar"><i data-w="100"></i></div><span class="mono"><span data-count="212">0</span></span></div>
-    <div class="mrow" data-step><span class="grow">Propuesta enviada</span><div class="bar"><i data-w="54"></i></div><span class="mono">114</span></div>
-    <div class="mrow" data-step><span class="grow">Ganado <span class="up">▲</span> 3 pts respecto al mes pasado</span><div class="bar"><i data-w="22"></i></div><span class="mono">47</span></div>
-    <div class="mrow" data-step><span class="dot r"></span><span class="grow">Estancado 19 días · Verrico SRL, <span class="mono">€ 88 000</span></span><span class="chip r">actuar</span></div>
-    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Dos tratos necesitan la reunión, el resto está bien</span><span class="chip g">hecho</span></div>
-  </div>
-      <div class="body">
-    <h3><span class="num mono">19</span>Panel del embudo de ventas</h3>
-    <p>Una vista en tiempo real del embudo por gestor, producto, origen y etapa, con tasas de conversión y alertas sobre negocios que han dejado de avanzar. La reunión semanal de ventas se convierte en una conversación de cinco minutos sobre los dos negocios que importan.</p>
-    <div class="kills"><b>Elimina</b><span>una hora leyendo cifras en voz alta de una hoja de cálculo que alguien rehízo el domingo por la noche.</span></div>
-  </div>
-</article>
-
-    <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Embudo · sus etapas</span><button class="runbtn" type="button">▶ abrir ficha del trato</button></div>
     <div class="kanban">
@@ -1046,6 +1024,31 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 
     <article class="card">
   <div class="mock demo">
+    <div class="mtitle"><span>Embudo · este mes</span><button class="runbtn" type="button">▶ mostrar el embudo</button></div>
+    <div class="mrow" data-step><span class="crew"><span class="avat">AP</span><span class="avat">MI</span><span class="avat">DK</span><span class="more">+4 comerciales</span></span><span class="grow">Panel de marzo, una sola pantalla</span><span class="mono">€ 341 850</span></div>
+    <div class="chartwrap solo" data-step>
+      <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="negocios ganados en aumento mes a mes, con una caída en la semana tres">
+        <line x1="0" y1="28" x2="420" y2="28"></line><line x1="0" y1="56" x2="420" y2="56"></line><line x1="0" y1="84" x2="420" y2="84"></line>
+        <polygon class="area" points="0,80 46,40 92,66 138,30 184,58 230,26 276,54 322,36 368,62 418,44 418,110 0,110"></polygon>
+        <polyline class="s1" points="0,80 46,40 92,66 138,30 184,58 230,26 276,54 322,36 368,62 418,44"></polyline>
+        <circle class="p1" cx="418" cy="44" r="3.5"></circle>
+      </svg>
+    </div>
+    <div class="mrow" data-step><span class="grow">calificado</span><div class="bar"><i data-w="100"></i></div><span class="mono"><span data-count="212">0</span></span></div>
+    <div class="mrow" data-step><span class="grow">Propuesta enviada</span><div class="bar"><i data-w="54"></i></div><span class="mono">114</span></div>
+    <div class="mrow" data-step><span class="grow">Ganado <span class="up">▲</span> 3 pts respecto al mes pasado</span><div class="bar"><i data-w="22"></i></div><span class="mono">47</span></div>
+    <div class="mrow" data-step><span class="dot r"></span><span class="grow">Estancado 19 días · Verrico SRL, <span class="mono">€ 88 000</span></span><span class="chip r">actuar</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Dos tratos necesitan la reunión, el resto está bien</span><span class="chip g">hecho</span></div>
+  </div>
+      <div class="body">
+    <h3><span class="num mono">19</span>Panel del embudo de ventas</h3>
+    <p>Una vista en tiempo real del embudo por gestor, producto, origen y etapa, con tasas de conversión y alertas sobre negocios que han dejado de avanzar. La reunión semanal de ventas se convierte en una conversación de cinco minutos sobre los dos negocios que importan.</p>
+    <div class="kills"><b>Elimina</b><span>una hora leyendo cifras en voz alta de una hoja de cálculo que alguien rehízo el domingo por la noche.</span></div>
+  </div>
+</article>
+
+    <article class="card">
+  <div class="mock demo">
     <div class="mtitle"><span>Motor de campañas</span><button class="runbtn" type="button">▶ reactivar clientes inactivos</button></div>
     <div class="bigstat mono"><div data-step><b data-count="1840">0</b><span>sin pedidos en 9 meses</span></div><div data-step><b data-count="167">0</b><span>respondida</span></div><div data-step><b data-count="18900">0</b><span>euros repedidos</span></div></div>
     <div class="chartwrap" data-step>
@@ -1054,10 +1057,10 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <line x1="0" y1="28" x2="420" y2="28"></line>
         <line x1="0" y1="56" x2="420" y2="56"></line>
         <line x1="0" y1="84" x2="420" y2="84"></line>
-        <polyline class="s2" points="8,96 46,92 84,88 122,84 160,76 198,72 236,68 274,62 312,58 350,54 384,50 418,46"></polyline>
-        <polyline class="s1" points="8,80 46,72 84,66 122,58 160,54 198,46 236,40 274,34 312,30 350,26 384,22 418,18"></polyline>
-        <circle class="p2" cx="418" cy="46" r="3.5"></circle>
-        <circle class="p1" cx="418" cy="18" r="3.5"></circle>
+        <polyline class="s2" points="0,30 42,34 84,32 126,36 168,34 210,38 252,36 294,40 336,38 418,42"></polyline>
+        <polyline class="s1" points="0,40 52,38 104,41 156,39 208,42 236,88 264,84 316,44 368,40 418,38"></polyline>
+        <circle class="p2" cx="418" cy="42" r="3.5"></circle>
+        <circle class="p1" cx="418" cy="38" r="3.5"></circle>
       </svg>
     </div>
     <div class="mrow mono" data-step><span class="grow">Correo 1 abierto <span class="mono">10:00</span></span><div class="bar"><i data-w="43"></i></div><span data-count="791">0</span></div>
@@ -1090,18 +1093,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Fidelización y socios</span><button class="runbtn" type="button">▶ cerrar el mes</button></div>
-    <div class="chartwrap" data-step>
-      <div class="clegend"><span class="c1"><i></i>Puntos emitidos</span><span class="c2"><i></i>Ventas de socios</span></div>
-      <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="Los puntos emitidos y las ventas de socios aumentan mes a mes, con un salto en julio">
-        <line x1="0" y1="28" x2="420" y2="28"></line>
-        <line x1="0" y1="56" x2="420" y2="56"></line>
-        <line x1="0" y1="84" x2="420" y2="84"></line>
-        <polyline class="s2" points="0,92 52,89 104,84 156,80 208,73 260,68 312,60 364,49 418,38"></polyline>
-        <polyline class="s1" points="0,86 52,80 104,77 156,68 208,60 260,52 312,41 364,28 418,16"></polyline>
-        <circle class="p1" cx="418" cy="16" r="3.5"></circle>
-        <circle class="p2" cx="418" cy="38" r="3.5"></circle>
-      </svg>
-    </div>
+    
     <div class="mrow" data-step><span class="grow">Northgate Ltd · 3 pedidos en julio</span><span class="mono">€ 18 940</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Nivel oro alcanzado el <span class="mono">45 000</span> puntos <span class="up">▲</span></span><span class="chip g">mejorado</span></div>
     <div class="mrow" data-step><span class="dot a"></span><span class="grow">Comisión de socio retenida, faltan datos bancarios</span><span class="chip a">revisar</span></div>
@@ -1111,7 +1103,19 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
       <div data-step><b data-count="23">0</b><span>estados de cuenta de socios enviados</span></div>
     </div>
   </div>
-      <div class="body">
+      
+        <div class="chartwrap solo" data-step>
+      <div class="clegend"><span class="c1"><i></i>Puntos emitidos</span></div>
+      <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="Los puntos emitidos y las ventas de socios aumentan mes a mes, con un salto en julio">
+        <line x1="0" y1="28" x2="420" y2="28"></line>
+        <line x1="0" y1="56" x2="420" y2="56"></line>
+        <line x1="0" y1="84" x2="420" y2="84"></line>
+        
+        <polygon class="area" points="0,92 46,86 92,78 138,74 184,62 230,54 276,44 322,36 368,26 418,16 418,110 0,110"></polygon><polyline class="s1" points="0,92 46,86 92,78 138,74 184,62 230,54 276,44 322,36 368,26 418,16"></polyline>
+        <circle class="p1" cx="418" cy="16" r="3.5"></circle>
+        
+      </svg>
+    </div><div class="body">
     <h3><span class="num mono">22</span>Seguimiento de fidelización, referidos y socios</h3>
     <p>Los puntos, niveles, códigos de referido y comisiones de socios se calculan y se informan de forma automática, y lo que no está claro se retiene en lugar de pagarse por error. Los socios ven las mismas cifras que usted.</p>
     <div class="kills"><b>Elimina</b><span>la hoja de cálculo de comisiones que solo una persona en la empresa entiende.</span></div>
@@ -1120,41 +1124,10 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 
   <div class="band">
-  <div class="section-head" id="s-ai"><span class="idx serif">10 servicios</span><h2 class="serif">Inteligencia artificial</h2></div>
+  <div class="section-head" id="s-ai"><span class="idx serif">10 ejemplos</span><h2 class="serif">Inteligencia artificial</h2></div>
   <p class="section-sub">Bots que responden a partir de sus propios documentos, llamadas que se registran solas en el CRM, y pronósticos que piden stock antes de que se agote.</p>
   <div class="grid" id="g-ai">
 <article class="card">
-  <div class="mock demo">
-    <div class="mtitle"><span>Plan de compras · semana 12</span><button class="runbtn" type="button">▶ ejecutar la previsión</button></div>
-    <div class="chartwrap" data-step>
-      <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="La demanda, con 36 meses de historial, estacionalidad y promociones, sube de forma constante hasta la semana 12">
-        <line x1="0" y1="28" x2="420" y2="28"></line>
-        <line x1="0" y1="56" x2="420" y2="56"></line>
-        <line x1="0" y1="84" x2="420" y2="84"></line>
-        <polygon class="area" points="8,86 60,78 112,70 164,74 216,58 268,46 320,52 372,34 418,24 418,110 0,110"></polygon>
-        <polyline class="s1" points="8,86 60,78 112,70 164,74 216,58 268,46 320,52 372,34 418,24"></polyline>
-        <circle class="p1" cx="418" cy="24" r="3.5"></circle>
-      </svg>
-    </div>
-    <div class="mrow mono" data-step><span class="grow">Cobertura SKU 2210</span><div class="bar"><i data-w="11"></i></div><span data-count="9">0</span></div>
-    <div class="mrow mono" data-step><span class="grow">Cobertura SKU 3105</span><div class="bar"><i data-w="47"></i></div><span data-count="38">0</span></div>
-    <div class="mrow mono" data-step><span class="grow">cobertura SKU 4188</span><div class="bar"><i data-w="96"></i></div><span data-count="97">0</span></div>
-    <div class="mrow" data-step><span class="dot r"></span><span class="grow"><b>SKU 2210</b> · quiebre de stock en 9 días, pedido <b class="mono">640</b> unidades ahora</span><span class="chip r">urgente</span></div>
-    <div class="mrow" data-step><span class="dot a"></span><span class="grow"><b>SKU 4188</b> · 14 semanas de cobertura, pausar compras</span><span class="chip a">exceso de stock</span></div>
-    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Orden de compra redactada para Lehmann Handel</span><span class="chip g">aprobado</span></div>
-    <div class="bigstat mono" style="margin-top:8px">
-      <div data-step><b data-count="86400">0</b><span>euros liberados de stock muerto</span></div>
-      <div data-step><b data-count="3">0</b><span>quiebres de stock evitados este trimestre</span></div>
-    </div>
-  </div>
-      <div class="body">
-    <h3><span class="num mono">29</span>Previsión de demanda e inventario</h3>
-    <p>Un modelo entrenado con su propio historial de ventas, estacionalidad, promociones y plazos de entrega de proveedores le indica qué pedir y cuándo. Se centra en los dos fallos que cuestan dinero real y nunca aparecen con claridad en las cuentas: capital inmovilizado en stock muerto y ventas perdidas por estanterías vacías.</p>
-    <div class="kills"><b>Elimina</b><span>pedir por intuición a partir de una hoja de cálculo que ya lleva una semana desactualizada.</span></div>
-  </div>
-</article>
-
-    <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Bot de soporte, WhatsApp</span><button class="runbtn" type="button">▶ preguntar al bot</button></div>
     <div class="filechips">
@@ -1245,6 +1218,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Generación de catálogo</span><button class="runbtn" type="button">▶ redactar el catálogo</button></div>
+        <div class="doc" data-step><b>Encimera de roble, 3 m, 40 mm</b><div class="dline"></div><div class="dline"></div><div class="dline short"></div></div>
     <div class="minicols">
       <div class="caselist">
         <div class="caseitem active" data-step><b class="mono">OW 3040</b>Encimera de roble, 3 m</div>
@@ -1252,7 +1226,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <div class="caseitem" data-step><b class="mono">SK 2210</b>Kit de recorte para fregadero</div>
       </div>
       <div class="casemain">
-        <div class="doc" data-step><b>Encimera de roble, 3 m, 40 mm</b><div class="dline"></div><div class="dline"></div><div class="dline short"></div></div>
+        
         <div class="mrow" data-step style="margin-top:8px"><span class="dot g"></span><span class="grow">Descripción, especificaciones y etiquetas meta en su tono de voz</span><span class="chip g">acorde a marca</span></div>
       </div>
     </div>
@@ -1295,6 +1269,39 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <h3><span class="num mono">28</span>Cribado de CV y clasificación de candidatos</h3>
     <p>Las candidaturas se analizan, se comparan con los requisitos, se clasifican y se resumen para el responsable de contratación, con un mensaje de primer contacto redactado para cada persona preseleccionada. Esto elimina los días muertos entre que un buen candidato se postula y alguien finalmente abre el CV.</p>
     <div class="kills"><b>Elimina</b><span>leer doscientos currículums para encontrar ocho, momento en el que el mejor candidato ya aceptó otra oferta.</span></div>
+  </div>
+</article>
+
+    <article class="card">
+  <div class="mock demo">
+    <div class="mtitle"><span>Plan de compras · semana 12</span><button class="runbtn" type="button">▶ ejecutar la previsión</button></div>
+    
+    <div class="mrow mono" data-step><span class="grow">Cobertura SKU 2210</span><div class="bar"><i data-w="11"></i></div><span data-count="9">0</span></div>
+    <div class="mrow mono" data-step><span class="grow">Cobertura SKU 3105</span><div class="bar"><i data-w="47"></i></div><span data-count="38">0</span></div>
+    <div class="mrow mono" data-step><span class="grow">cobertura SKU 4188</span><div class="bar"><i data-w="96"></i></div><span data-count="97">0</span></div>
+    <div class="mrow" data-step><span class="dot r"></span><span class="grow"><b>SKU 2210</b> · quiebre de stock en 9 días, pedido <b class="mono">640</b> unidades ahora</span><span class="chip r">urgente</span></div>
+    <div class="mrow" data-step><span class="dot a"></span><span class="grow"><b>SKU 4188</b> · 14 semanas de cobertura, pausar compras</span><span class="chip a">exceso de stock</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Orden de compra redactada para Lehmann Handel</span><span class="chip g">aprobado</span></div>
+    
+  </div>
+      
+        <div class="chartwrap" data-step>
+      <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="La demanda, con 36 meses de historial, estacionalidad y promociones, sube de forma constante hasta la semana 12">
+        <line x1="0" y1="28" x2="420" y2="28"></line>
+        <line x1="0" y1="56" x2="420" y2="56"></line>
+        <line x1="0" y1="84" x2="420" y2="84"></line>
+        <polygon class="area" points="8,86 60,78 112,70 164,74 216,58 268,46 320,52 372,34 418,24 418,110 0,110"></polygon>
+        <polyline class="s1" points="0,88 40,84 80,80 120,34 160,26 200,28 240,30 280,27 330,29 418,26"></polyline>
+        <circle class="p1" cx="418" cy="26" r="3.5"></circle>
+      </svg>
+    </div>
+        <div class="bigstat mono" style="margin-top:8px">
+      <div data-step><b data-count="86400">0</b><span>euros liberados de stock muerto</span></div>
+      <div data-step><b data-count="3">0</b><span>quiebres de stock evitados este trimestre</span></div>
+    </div><div class="body">
+    <h3><span class="num mono">29</span>Previsión de demanda e inventario</h3>
+    <p>Un modelo entrenado con su propio historial de ventas, estacionalidad, promociones y plazos de entrega de proveedores le indica qué pedir y cuándo. Se centra en los dos fallos que cuestan dinero real y nunca aparecen con claridad en las cuentas: capital inmovilizado en stock muerto y ventas perdidas por estanterías vacías.</p>
+    <div class="kills"><b>Elimina</b><span>pedir por intuición a partir de una hoja de cálculo que ya lleva una semana desactualizada.</span></div>
   </div>
 </article>
 
@@ -1366,7 +1373,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         </div>
       </div>
       <div class="body">
-        <h3><span class="num mono">56</span>Fábrica de contenido</h3>
+        <h3><span class="num mono">32</span>Fábrica de contenido</h3>
         <p>Un flujo que convierte su catálogo, su experiencia y las preguntas reales de sus clientes en un flujo constante de publicaciones, artículos y guiones de vídeo en su tono de voz, según un calendario, sin publicar nada hasta que usted lo apruebe.</p>
         <div class="kills"><b>Elimina</b><span>los meses de silencio que le cuestan clientes que nunca oyen hablar de usted, y el contrato con la agencia que produjo cuatro publicaciones.</span></div>
       </div>
@@ -1379,31 +1386,10 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <a class="cta" href="mailto:tagir.zalyatov@gmail.com?subject=Automation%20enquiry">Solicitar presupuesto</a>
   </div>
 
-  <div class="section-head" id="s-ops"><span class="idx serif">10 servicios</span><h2 class="serif">Operaciones y flujo de trabajo interno</h2></div>
+  <div class="section-head" id="s-ops"><span class="idx serif">10 ejemplos</span><h2 class="serif">Operaciones y flujo de trabajo interno</h2></div>
   <p class="section-sub">Aprobaciones que avanzan, turnos que se generan solos, cuadrillas que informan desde la carretera, y recuentos de stock que coinciden con la estantería.</p>
   <div class="grid" id="g-ops">
 <article class="card">
-  <div class="mock demo">
-    <div class="mtitle"><span>Mostrador de reservas</span><button class="runbtn" type="button">▶ registrar la reserva</button></div>
-    <div class="calstrip" data-step><div class="day">Lun<b>14</b></div><div class="day due">mar<b>15</b></div><div class="day">Mié<b>16</b></div><div class="day">jue<b>17</b></div><div class="day">Vie<b>18</b></div></div>
-    <div class="mrow mono" data-step><span class="grow">lun 14 abr</span><div class="bar"><i data-w="83"></i></div><span data-count="11">0</span></div>
-    <div class="mrow mono" data-step><span class="grow">mar 15 abr</span><div class="bar"><i data-w="58"></i></div><span data-count="7">0</span></div>
-    <div class="mrow mono" data-step><span class="grow">mié 16 abr</span><div class="bar"><i data-w="31"></i></div><span data-count="4">0</span></div>
-    <div class="mrow" data-step><span class="grow">Horarios libres mar, sala 2</span><span class="mono">11:30 · 14:00 · 16:15</span></div>
-    <div class="mrow" data-step><span class="dot g"></span><span class="grow">E. Marchetti reservado <span class="mono">14:00</span> · 45 min, depósito <span class="mono">€ 25</span> en línea</span><span class="chip g">pagado</span></div>
-    <div class="bigstat mono" style="margin-top:8px">
-      <div data-step><b data-count="4">0</b><span>ausencias este mes, antes 19</span></div>
-      <div data-step><b data-count="137">0</b><span>reservas realizadas sin una llamada</span></div>
-    </div>
-  </div>
-      <div class="body">
-    <h3><span class="num mono">38</span>Sistema de reservas y citas</h3>
-    <p>Reservas online contra la disponibilidad real, recordatorios automáticos que reducen las ausencias, asignación de salas y recursos, depósitos cobrados por adelantado. Pensado para clínicas, salones, estudios, talleres, consultorías y alquiler de equipos.</p>
-    <div class="kills"><b>Elimina</b><span>la agenda de teléfono y papel, y el hueco vacío que a nadie se le recordó.</span></div>
-  </div>
-</article>
-
-    <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Panel de proyectos de acondicionamiento</span><button class="runbtn" type="button">▶ mover el trabajo</button></div>
     <div class="nodes"><div class="node" data-lit>Encuesta</div><div class="link" data-lit></div><div class="node" data-lit>Obra</div><div class="link" data-lit></div><div class="node" data-lit>Entrega</div></div>
@@ -1414,7 +1400,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">La vista del cliente se actualiza en el momento del cambio, sin necesidad de correo</span><span class="chip g">en vivo</span></div>
   </div>
       <div class="body">
-    <h3><span class="num mono">32</span>Seguimiento personalizado de tareas y proyectos</h3>
+    <h3><span class="num mono">33</span>Seguimiento personalizado de tareas y proyectos</h3>
     <p>Los gestores de tareas genéricos obligan a que su trabajo encaje en el molde de otro. Este se construye alrededor de sus etapas, listas de verificación, puntos de traspaso y plazos, con la vista adecuada para cada persona que la necesita. Rinde mejor en producción, construcción, instalación y trabajo de agencia.</p>
     <div class="kills"><b>Elimina</b><span>perseguir cada actualización de fase por teléfono y rehacer la misma lista de estados en una hoja de cálculo.</span></div>
   </div>
@@ -1423,17 +1409,18 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Enrutamiento de aprobaciones</span><button class="runbtn" type="button">▶ enviar para aprobación</button></div>
-    <div class="mrow" data-step><span class="grow">Aprobadores en rotación, derivado por importe y tipo</span><span class="crew"><span class="avat">LK</span><span class="avat">FD</span><span class="avat">AM</span><span class="more">+2 suplentes</span></span></div>
-    <div class="kanban">
+        <div class="kanban">
       <div class="kcol done" data-step><div class="khead"><span>Jefe directo</span><b>✓</b></div><div class="ktask">Compra <span class="mono">€1,240</span> <span class="chip g">09:41</span></div><div class="ktask">Gastos <span class="mono">€380</span> <span class="chip g">política ok</span></div></div>
       <div class="kcol" data-step><div class="khead"><span>Director financiero</span><b>1</b></div><div class="ktask">Descuento 18% <span class="chip a">recordatorio enviado</span></div></div>
       <div class="kcol done" data-step><div class="khead"><span>Archivado</span><b>✓</b></div><div class="ktask">Solicitud de permiso <span class="chip g">reservado</span></div></div>
     </div>
+    <div class="mrow" data-step><span class="grow">Aprobadores en rotación, derivado por importe y tipo</span><span class="crew"><span class="avat">LK</span><span class="avat">FD</span><span class="avat">AM</span><span class="more">+2 suplentes</span></span></div>
+    
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">El suplente se hizo cargo mientras F. Dorner estaba en la obra</span><span class="chip g">sin demora</span></div>
     <div class="mrow" data-step><span class="grow">Registro de auditoría generado, 4 de 4 aprobados en <span class="mono">6h</span></span><span class="chip g">hecho</span></div>
   </div>
       <div class="body">
-    <h3><span class="num mono">33</span>Flujos de aprobación y visto bueno</h3>
+    <h3><span class="num mono">34</span>Flujos de aprobación y visto bueno</h3>
     <p>Las solicitudes de compra, descuentos, ausencias, gastos y contratos llegan de forma automática al aprobador correcto según el importe y el tipo, con recordatorios, plazos y un registro de auditoría completo detrás de cada decisión.</p>
     <div class="kills"><b>Elimina</b><span>la carpeta de papel que pasa cuatro días en el escritorio de un director mientras el trato espera.</span></div>
   </div>
@@ -1450,7 +1437,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Numerado, versionado y guardado en el expediente en <span class="mono">9 s</span></span><span class="chip g">listo para firmar</span></div>
   </div>
       <div class="body">
-    <h3><span class="num mono">34</span>Generación de documentos a partir de plantillas</h3>
+    <h3><span class="num mono">35</span>Generación de documentos a partir de plantillas</h3>
     <p>Contratos, actas, poderes, especificaciones e informes generados a partir de datos que ya tiene, numerados y versionados correctamente, con cláusulas variables seleccionadas según reglas. Legal aprueba la plantilla una vez, en lugar de leer cada documento.</p>
     <div class="kills"><b>Elimina</b><span>copiar el archivo del mes pasado, editar los nombres a mano y esperar que no falte nada.</span></div>
   </div>
@@ -1477,7 +1464,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Publicado en 46 teléfonos a las <span class="mono">16:20</span></span><span class="chip g">publicado</span></div>
   </div>
       <div class="body">
-    <h3><span class="num mono">35</span>Programación y planificación de turnos</h3>
+    <h3><span class="num mono">36</span>Programación y planificación de turnos</h3>
     <p>El turno se genera solo según disponibilidad, competencias, normativa laboral y demanda prevista, y se publica directamente en los teléfonos del personal, gestionando también las solicitudes de cambio. En retail, hostelería y logística, esto ocupa todo el viernes de un gestor.</p>
     <div class="kills"><b>Elimina</b><span>el horario en la pizarra que se rehace cada semana y las llamadas para cubrir un hueco.</span></div>
   </div>
@@ -1510,7 +1497,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Firma del cliente registrada <span class="mono">10:48</span>, factura emitida antes de que la furgoneta saliera</span><span class="chip g">cerrado</span></div>
   </div>
       <div class="body">
-    <h3><span class="num mono">36</span>App de servicio técnico y cuadrillas móviles</h3>
+    <h3><span class="num mono">37</span>App de servicio técnico y cuadrillas móviles</h3>
     <p>Los trabajos llegan al teléfono del técnico con ruta, historial del cliente, listas de verificación, captura de fotos, piezas utilizadas y firma del cliente, y el informe de finalización llega a la oficina en el momento en que termina el trabajo.</p>
     <div class="kills"><b>Elimina</b><span>llamar a toda la cuadrilla para preguntar dónde están y qué han instalado.</span></div>
   </div>
@@ -1532,7 +1519,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="nodes"><div class="node" data-lit>Escáner</div><div class="link" data-lit></div><div class="node" data-lit>Existencias</div><div class="link" data-lit></div><div class="node" data-lit>Sitio web y contabilidad</div></div>
   </div>
       <div class="body">
-    <h3><span class="num mono">37</span>Gestión de almacén e inventario</h3>
+    <h3><span class="num mono">38</span>Gestión de almacén e inventario</h3>
     <p>Recepción, picking, movimientos e inventario realizados con código de barras o QR en un teléfono o escáner, con niveles de stock en tiempo real que alimentan la web y la contabilidad al mismo tiempo.</p>
     <div class="kills"><b>Elimina</b><span>la diferencia entre lo que el sistema dice que tiene y lo que realmente hay en la estantería.</span></div>
   </div>
@@ -1540,21 +1527,43 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 
     <article class="card">
   <div class="mock demo">
+    <div class="mtitle"><span>Mostrador de reservas</span><button class="runbtn" type="button">▶ registrar la reserva</button></div>
+    <div class="calstrip" data-step><div class="day">Lun<b>14</b></div><div class="day due">mar<b>15</b></div><div class="day">Mié<b>16</b></div><div class="day">jue<b>17</b></div><div class="day">Vie<b>18</b></div></div>
+    <div class="mrow mono" data-step><span class="grow">lun 14 abr</span><div class="bar"><i data-w="83"></i></div><span data-count="11">0</span></div>
+    <div class="mrow mono" data-step><span class="grow">mar 15 abr</span><div class="bar"><i data-w="58"></i></div><span data-count="7">0</span></div>
+    <div class="mrow mono" data-step><span class="grow">mié 16 abr</span><div class="bar"><i data-w="31"></i></div><span data-count="4">0</span></div>
+    <div class="mrow" data-step><span class="grow">Horarios libres mar, sala 2</span><span class="mono">11:30 · 14:00 · 16:15</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">E. Marchetti reservado <span class="mono">14:00</span> · 45 min, depósito <span class="mono">€ 25</span> en línea</span><span class="chip g">pagado</span></div>
+    <div class="bigstat mono" style="margin-top:8px">
+      <div data-step><b data-count="4">0</b><span>ausencias este mes, antes 19</span></div>
+      <div data-step><b data-count="137">0</b><span>reservas realizadas sin una llamada</span></div>
+    </div>
+  </div>
+      <div class="body">
+    <h3><span class="num mono">39</span>Sistema de reservas y citas</h3>
+    <p>Reservas online contra la disponibilidad real, recordatorios automáticos que reducen las ausencias, asignación de salas y recursos, depósitos cobrados por adelantado. Pensado para clínicas, salones, estudios, talleres, consultorías y alquiler de equipos.</p>
+    <div class="kills"><b>Elimina</b><span>la agenda de teléfono y papel, y el hueco vacío que a nadie se le recordó.</span></div>
+  </div>
+</article>
+
+    <article class="card">
+  <div class="mock demo">
     <div class="mtitle"><span>Rutas de mañana</span><button class="runbtn" type="button">▶ planificar las rutas</button></div>
+        <div class="chartwrap solo" data-step>
+          <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="kilómetros por ruta de furgoneta bajando de 141 a 112 al secuenciar las rutas">
+            <line x1="0" y1="28" x2="420" y2="28"></line><line x1="0" y1="56" x2="420" y2="56"></line><line x1="0" y1="84" x2="420" y2="84"></line>
+            <polygon class="area" points="0,34 52,46 104,64 156,84 208,90 260,76 312,58 364,40 418,24 418,110 0,110"></polygon>
+            <polyline class="s1" points="0,34 52,46 104,64 156,84 208,90 260,76 312,58 364,40 418,24"></polyline>
+            <circle class="p1" cx="418" cy="24" r="3.5"></circle>
+          </svg>
+        </div>
     <div class="minicols">
       <div class="caselist">
         <div class="caseitem active" data-step><b class="mono">FURGONETA 2</b>9 paradas · ruta norte</div>
         <div class="caseitem" data-step><b class="mono">VAN 3</b>7 entregas · centro de la ciudad</div>
       </div>
       <div class="casemain">
-        <div class="chartwrap" data-step>
-          <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="kilómetros por ruta de furgoneta bajando de 141 a 112 al secuenciar las rutas">
-            <line x1="0" y1="28" x2="420" y2="28"></line><line x1="0" y1="56" x2="420" y2="56"></line><line x1="0" y1="84" x2="420" y2="84"></line>
-            <polygon class="area" points="0,22 52,26 104,21 156,34 208,48 260,44 312,58 364,72 418,80 418,110 0,110"></polygon>
-            <polyline class="s1" points="0,22 52,26 104,21 156,34 208,48 260,44 312,58 364,72 418,80"></polyline>
-            <circle class="p1" cx="418" cy="80" r="3.5"></circle>
-          </svg>
-        </div>
+        
       </div>
     </div>
     <div class="mrow" data-step style="margin-top:8px"><span class="grow">28 paradas, 4 furgonetas, con capacidad y franjas horarias aplicadas</span></div>
@@ -1563,7 +1572,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mrow" data-step><span class="grow">Clientes avisados por SMS de la franja de llegada, combustible ahorrado <span class="mono">€310</span></span><span class="chip g">28 enviados</span></div>
   </div>
       <div class="body">
-    <h3><span class="num mono">39</span>Planificación de rutas y seguimiento de flota</h3>
+    <h3><span class="num mono">40</span>Planificación de rutas y seguimiento de flota</h3>
     <p>Las entregas se secuencian para la ruta más corta respetando las ventanas horarias y la capacidad del vehículo, los conductores se rastrean en tiempo real y a los clientes se les avisa cuándo esperar la furgoneta. El combustible y las horas de los conductores suelen ser los dos mayores costes controlables en una operación de reparto.</p>
     <div class="kills"><b>Elimina</b><span>una hora cada noche haciendo malabares manuales con las rutas, y las llamadas preguntando dónde está la furgoneta.</span></div>
   </div>
@@ -1585,7 +1594,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mrow" data-step><span class="dot r"></span><span class="grow">Baja: T. Brandes, 7 accesos revocados a la vez <span class="mono">17:00</span></span><span class="chip g">limpio</span></div>
   </div>
       <div class="body">
-    <h3><span class="num mono">58</span>Incorporación y baja de personal</h3>
+    <h3><span class="num mono">41</span>Incorporación y baja de personal</h3>
     <p>En el momento en que se acepta una contratación, se crean las cuentas, los accesos, el equipo, las listas de verificación y la agenda del primer día sin que nadie tenga que perseguir a TI. Cuando alguien se va, todos los accesos se eliminan con un clic.</p>
     <div class="kills"><b>Elimina</b><span>la primera semana en la que un empleado nuevo no tiene portátil, no tiene accesos y nadie se ha hecho cargo de él, y el extrabajador que aún sabe la contraseña del CRM.</span></div>
   </div>
@@ -1594,18 +1603,20 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Flota y maquinaria · mantenimiento pendiente</span><button class="runbtn" type="button">▶ generar órdenes de trabajo</button></div>
-    <div class="mrow mono" data-step><span class="grow">Línea de prensa 2 · horas para servicio</span><div class="bar"><i data-w="94"></i></div><span data-count="470">0</span></div>
-    <div class="mrow mono" data-step><span class="grow">Furgoneta MB-317 · km para revisión</span><div class="bar"><i data-w="81"></i></div><span data-count="12400">0</span></div>
-    <div class="mrow mono" data-step><span class="grow">Carretilla elevadora F-6 · días para la inspección</span><div class="bar"><i data-w="62"></i></div><span data-count="23">0</span></div>
-    <div class="kanban">
+        <div class="kanban">
       <div class="kcol done" data-step><div class="khead"><span>Vence</span><b>✓</b></div><div class="ktask">La línea de prensa 2 alcanza 500 h el jueves <span class="chip a">pedido generado</span></div></div>
       <div class="kcol done" data-step><div class="khead"><span>Repuestos</span><b>✓</b></div><div class="ktask">Juego de filtros y correas reservado <span class="chip g">€ 214</span></div></div>
       <div class="kcol done" data-step><div class="khead"><span>Reservado</span><b>✓</b></div><div class="ktask">Domingo <span class="mono">06:00</span>, técnico asignado <span class="chip g">planificado</span></div></div>
     </div>
+        
+    <div class="mrow mono" data-step><span class="grow">Línea de prensa 2 · horas para servicio</span><div class="bar"><i data-w="94"></i></div><span data-count="470">0</span></div>
+    <div class="mrow mono" data-step><span class="grow">Furgoneta MB-317 · km para revisión</span><div class="bar"><i data-w="81"></i></div><span data-count="12400">0</span></div>
+    <div class="mrow mono" data-step><span class="grow">Carretilla elevadora F-6 · días para la inspección</span><div class="bar"><i data-w="62"></i></div><span data-count="23">0</span></div>
+    
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Cero producción perdida, averías reducidas de 11 a 2 este trimestre</span><span class="chip g">planificado</span></div>
   </div>
       <div class="body">
-    <h3><span class="num mono">59</span>Planificador de mantenimiento de equipos y vehículos</h3>
+    <h3><span class="num mono">42</span>Planificador de mantenimiento de equipos y vehículos</h3>
     <p>Los intervalos de mantenimiento se controlan por horas de funcionamiento, kilometraje o calendario, lo que ocurra primero. Las órdenes de trabajo se generan antes de la avería, con repuestos, coste y tiempo de inactividad registrados por máquina.</p>
     <div class="kills"><b>Elimina</b><span>la línea de producción que se detiene en el día de mayor actividad porque nadie recordó el mantenimiento de las 500 horas.</span></div>
   </div>
@@ -1613,10 +1624,37 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 
   <div class="band">
-  <div class="section-head" id="s-web"><span class="idx serif">8 servicios</span><h2 class="serif">Web y orientado al cliente</h2></div>
+  <div class="section-head" id="s-web"><span class="idx serif">8 ejemplos</span><h2 class="serif">Web y orientado al cliente</h2></div>
   <p class="section-sub">Sitios que convierten, tiendas que se sincronizan, pagos que se concilian solos, y un canal de ventas dentro del mensajero del cliente.</p>
   <div class="grid" id="g-web">
 <article class="card">
+  <div class="mock demo">
+    <div class="mtitle"><span>Página de aterrizaje a CRM</span><button class="runbtn" type="button">▶ enviar una consulta</button></div>
+    <div class="chartwrap" data-step>
+      <div class="clegend"><span class="c1"><i></i>Consultas</span><span class="c2"><i></i>Visitas desde móvil</span></div>
+      <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="Las consultas aumentan con fuerza tras el lanzamiento de la nueva landing, más rápido que las visitas">
+        <line x1="0" y1="28" x2="420" y2="28"></line>
+        <line x1="0" y1="56" x2="420" y2="56"></line>
+        <line x1="0" y1="84" x2="420" y2="84"></line>
+        <polyline class="s2" points="0,30 42,34 84,32 126,36 168,34 210,38 252,36 294,40 336,38 418,42"></polyline>
+        <polyline class="s1" points="0,62 42,38 84,70 126,44 168,76 210,48 252,80 294,52 336,72 418,46"></polyline>
+        <circle class="p2" cx="418" cy="42" r="3.5"></circle>
+        <circle class="p1" cx="418" cy="46" r="3.5"></circle>
+      </svg>
+    </div>
+    <div class="mrow" data-step><span class="grow">Tiempo de carga en móvil</span><span class="mono"><span data-count="9">0</span>00 ms</span><span class="chip g">rápido</span></div>
+    <div class="nodes"><div class="node" data-lit>Formulario de la landing</div><div class="link" data-lit></div><div class="node" data-lit>CRM</div><div class="link" data-lit></div><div class="node" data-lit>Comercial</div></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Formulario enviado · Northgate Ltd, solicitud de presupuesto</span><span class="mono">10:12</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Lead asignado a Anna K. · origen: búsqueda de pago, primera respuesta en <span class="mono">4 min</span></span><span class="chip g">en CRM</span></div>
+  </div>
+      <div class="body">
+    <h3><span class="num mono">43</span>Sitio corporativo y páginas de destino</h3>
+    <p>Páginas rápidas y correctamente adaptadas a móvil, hechas para convertir en vez de para parecer ocupadas. Los formularios están conectados a su CRM desde el primer día en producción.</p>
+    <div class="kills"><b>Elimina</b><span>Consultas sin leer en un correo compartido que nadie gestiona.</span></div>
+  </div>
+</article>
+
+    <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Tienda online</span><button class="runbtn" type="button">▶ hacer un pedido</button></div>
     <div class="kanban">
@@ -1632,36 +1670,9 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     </div>
   </div>
       <div class="body">
-    <h3><span class="num mono">41</span>Tienda online</h3>
+    <h3><span class="num mono">44</span>Tienda online</h3>
     <p>Catálogo, pagos, cálculo de envíos y stock vinculados al almacén, con los pedidos online llegando al mismo sistema que ya usan sus ventas offline.</p>
     <div class="kills"><b>Elimina</b><span>Llamar a un desarrollador cada vez que quiere añadir un producto.</span></div>
-  </div>
-</article>
-
-    <article class="card">
-  <div class="mock demo">
-    <div class="mtitle"><span>Página de aterrizaje a CRM</span><button class="runbtn" type="button">▶ enviar una consulta</button></div>
-    <div class="chartwrap" data-step>
-      <div class="clegend"><span class="c1"><i></i>Consultas</span><span class="c2"><i></i>Visitas desde móvil</span></div>
-      <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="Las consultas aumentan con fuerza tras el lanzamiento de la nueva landing, más rápido que las visitas">
-        <line x1="0" y1="28" x2="420" y2="28"></line>
-        <line x1="0" y1="56" x2="420" y2="56"></line>
-        <line x1="0" y1="84" x2="420" y2="84"></line>
-        <polyline class="s2" points="8,74 46,70 84,68 122,60 160,58 198,52 236,50 274,44 312,42 350,38 384,34 418,30"></polyline>
-        <polyline class="s1" points="8,88 46,86 84,82 122,64 160,54 198,48 236,42 274,36 312,30 350,26 384,20 418,16"></polyline>
-        <circle class="p2" cx="418" cy="30" r="3.5"></circle>
-        <circle class="p1" cx="418" cy="16" r="3.5"></circle>
-      </svg>
-    </div>
-    <div class="mrow" data-step><span class="grow">Tiempo de carga en móvil</span><span class="mono"><span data-count="9">0</span>00 ms</span><span class="chip g">rápido</span></div>
-    <div class="nodes"><div class="node" data-lit>Formulario de la landing</div><div class="link" data-lit></div><div class="node" data-lit>CRM</div><div class="link" data-lit></div><div class="node" data-lit>Comercial</div></div>
-    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Formulario enviado · Northgate Ltd, solicitud de presupuesto</span><span class="mono">10:12</span></div>
-    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Lead asignado a Anna K. · origen: búsqueda de pago, primera respuesta en <span class="mono">4 min</span></span><span class="chip g">en CRM</span></div>
-  </div>
-      <div class="body">
-    <h3><span class="num mono">40</span>Sitio corporativo y páginas de destino</h3>
-    <p>Páginas rápidas y correctamente adaptadas a móvil, hechas para convertir en vez de para parecer ocupadas. Los formularios están conectados a su CRM desde el primer día en producción.</p>
-    <div class="kills"><b>Elimina</b><span>Consultas sin leer en un correo compartido que nadie gestiona.</span></div>
   </div>
 </article>
 
@@ -1682,7 +1693,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Ciclo cerrado, nadie abrió una hoja de cálculo</span><span class="chip g">hecho</span></div>
   </div>
       <div class="body">
-    <h3><span class="num mono">42</span>Cuentas de clientes y facturación por suscripción</h3>
+    <h3><span class="num mono">45</span>Cuentas de clientes y facturación por suscripción</h3>
     <p>Cobros recurrentes, cambios de plan, avisos de impago por tarjetas rechazadas, límites de uso y facturas emitidas sin que nadie intervenga.</p>
     <div class="kills"><b>Elimina</b><span>Perseguir tarjetas caducadas a mano y perder silenciosamente esos ingresos.</span></div>
   </div>
@@ -1691,7 +1702,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Pagos y conciliación</span><button class="runbtn" type="button">▶ cerrar el día</button></div>
-    <div class="nodes">
+        <div class="nodes">
       <div class="node" data-lit>Tarjeta</div>
       <div class="link" data-lit></div>
       <div class="node" data-lit>Banco</div>
@@ -1700,13 +1711,15 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
       <div class="link" data-lit></div>
       <div class="node" data-lit>Contabilidad</div>
     </div>
+        
+    
     <div class="mrow" data-step><span class="grow">Pagos recibidos hoy</span><span class="mono">€ <span data-count="21740">0</span></span></div>
     <div class="mrow" data-step><span class="grow">Conciliado con los pedidos</span><div class="bar"><i data-w="100"></i></div></div>
     <div class="mrow" data-step><span class="dot a"></span><span class="grow">2 pagos incompletos señalados para la oficina</span><span class="chip a">revisión</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Contabilizado, 0 líneas sin conciliar</span><span class="chip g">conciliado</span></div>
   </div>
       <div class="body">
-    <h3><span class="num mono">43</span>Integración de pagos</h3>
+    <h3><span class="num mono">46</span>Integración de pagos</h3>
     <p>Tarjeta, transferencia bancaria, plazos, facturación y cripto cuando tiene sentido, con cada pago conciliado de nuevo en contabilidad.</p>
     <div class="kills"><b>Elimina</b><span>El equipo financiero conciliando líneas bancarias con pedidos a simple vista cada noche.</span></div>
   </div>
@@ -1715,6 +1728,10 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Bot de ventas por mensajería</span><button class="runbtn" type="button">▶ pedir por Telegram</button></div>
+        <div class="bigstat mono" style="margin-top:8px">
+      <div data-step><b data-count="34">0</b><span>% mejor que el formulario web móvil</span></div>
+      <div data-step><b data-count="62">0</b><span>pedidos realizados por chat esta semana</span></div>
+    </div>
     <div class="minicols">
       <div class="caselist">
         <div class="caseitem active" data-step><b class="mono">19:24</b>M. Ilves · catálogo abierto</div>
@@ -1727,13 +1744,10 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <div class="mrow" data-step><span class="dot g"></span><span class="grow">Pagado dentro de la mensajería <span class="mono">19:26</span>, luego seguimiento: mensajería <span class="mono">DPD 7741</span> antes de las 18:00</span><span class="chip g">auto</span></div>
       </div>
     </div>
-    <div class="bigstat mono" style="margin-top:8px">
-      <div data-step><b data-count="34">0</b><span>% mejor que el formulario web móvil</span></div>
-      <div data-step><b data-count="62">0</b><span>pedidos realizados por chat esta semana</span></div>
-    </div>
+    
   </div>
       <div class="body">
-    <h3><span class="num mono">44</span>Bot de Telegram o WhatsApp como canal de ventas</h3>
+    <h3><span class="num mono">47</span>Bot de Telegram o WhatsApp como canal de ventas</h3>
     <p>Catálogo, pedidos, estado del pedido, soporte y notificaciones dentro de la app de mensajería que su cliente ya tiene abierta. En la mayoría de categorías de consumo, esto supera a un formulario web móvil.</p>
     <div class="kills"><b>Elimina</b><span>Personal respondiendo todo el día al mismo mensaje de "dónde está mi pedido".</span></div>
   </div>
@@ -1742,25 +1756,26 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Panel de control de marketplace</span><button class="runbtn" type="button">▶ enviar actualización de precios</button></div>
-    <div class="filechips"><span class="fchip" data-eat>Panel de administración 1</span><span class="fchip" data-eat>Panel de administración 2</span><span class="fchip" data-eat>Panel de administración 3</span><span class="fchip" data-eat>Panel de administración 4</span></div>
-    <div class="chartwrap" data-step>
-      <div class="clegend"><span class="c1"><i></i>Cuota de buy box</span><span class="c2"><i></i>Precio del competidor más barato</span></div>
+        <div class="chartwrap solo" data-step>
+      <div class="clegend"><span class="c1"><i></i>Cuota de buy box</span></div>
       <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="La cuota de buy box sube a medida que la regla de repriciación sigue a la baja el precio del competidor más barato">
         <line x1="0" y1="28" x2="420" y2="28"></line>
         <line x1="0" y1="56" x2="420" y2="56"></line>
         <line x1="0" y1="84" x2="420" y2="84"></line>
-        <polyline class="s2" points="8,32 60,36 112,34 164,42 216,48 268,52 320,60 372,64 418,70"></polyline>
-        <polyline class="s1" points="8,84 60,80 112,72 164,66 216,52 268,44 320,36 372,30 418,24"></polyline>
-        <circle class="p1" cx="418" cy="24" r="3.5"></circle>
-        <circle class="p2" cx="418" cy="70" r="3.5"></circle>
+        
+        <polygon class="area" points="0,58 60,57 120,59 180,58 240,56 300,57 340,34 380,22 418,18 418,110 0,110"></polygon><polyline class="s1" points="0,58 60,57 120,59 180,58 240,56 300,57 340,34 380,22 418,18"></polyline>
+        <circle class="p1" cx="418" cy="18" r="3.5"></circle>
+        
       </svg>
     </div>
+    <div class="filechips"><span class="fchip" data-eat>Panel de administración 1</span><span class="fchip" data-eat>Panel de administración 2</span><span class="fchip" data-eat>Panel de administración 3</span><span class="fchip" data-eat>Panel de administración 4</span></div>
+    
     <div class="mrow" data-step><span class="grow">Anuncios sincronizados en 4 marketplaces</span><span class="mono"><span data-count="1280">0</span></span></div>
     <div class="mrow" data-step><span class="dot a"></span><span class="grow">Regla de reprecio activada · SKU 2210 bajado para conservar la Buy Box</span><span class="mono">€ 41,90</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Stock y pedidos reunidos en una sola lista</span><span class="chip g">sincronizado</span></div>
   </div>
       <div class="body">
-    <h3><span class="num mono">45</span>Herramienta de gestión de marketplace</h3>
+    <h3><span class="num mono">48</span>Herramienta de gestión de marketplace</h3>
     <p>Anuncios, precios, existencias y pedidos de varios marketplaces en un solo lugar, con reglas de repricing automático si las desea.</p>
     <div class="kills"><b>Elimina</b><span>Iniciar sesión en cuatro paneles de vendedor para cambiar un precio.</span></div>
   </div>
@@ -1769,25 +1784,26 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Panel de atribución</span><button class="runbtn" type="button">▶ vincular gasto con ingresos</button></div>
-    <div class="nodes"><div class="node" data-lit>Clic en anuncio</div><div class="link" data-lit></div><div class="node" data-lit>Negocio en el CRM</div><div class="link" data-lit></div><div class="node" data-lit>Ingresos cerrados</div></div>
-    <div class="chartwrap" data-step>
+        <div class="chartwrap" data-step>
       <div class="clegend"><span class="c1"><i></i>Ingresos</span><span class="c2"><i></i>Gasto en anuncios</span></div>
       <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="Los ingresos siguen subiendo tras reducir el gasto en display, mientras el gasto total cae">
         <line x1="0" y1="28" x2="420" y2="28"></line>
         <line x1="0" y1="56" x2="420" y2="56"></line>
         <line x1="0" y1="84" x2="420" y2="84"></line>
-        <polyline class="s2" points="0,44 46,42 92,40 138,43 184,48 230,58 276,66 322,72 368,77 418,81"></polyline>
-        <polyline class="s1" points="0,74 46,71 92,72 138,64 184,57 230,49 276,40 322,32 368,24 418,18"></polyline>
-        <circle class="p1" cx="418" cy="18" r="3.5"></circle>
-        <circle class="p2" cx="418" cy="81" r="3.5"></circle>
+        <polyline class="s2" points="0,66 40,64 80,66 120,62 160,64 200,60 240,62 280,58 330,60 418,56"></polyline>
+        <polyline class="s1" points="0,22 52,30 104,36 156,46 208,54 260,66 312,74 364,86 418,94"></polyline>
+        <circle class="p1" cx="418" cy="94" r="3.5"></circle>
+        <circle class="p2" cx="418" cy="56" r="3.5"></circle>
       </svg>
     </div>
+    <div class="nodes"><div class="node" data-lit>Clic en anuncio</div><div class="link" data-lit></div><div class="node" data-lit>Negocio en el CRM</div><div class="link" data-lit></div><div class="node" data-lit>Ingresos cerrados</div></div>
+    
     <div class="mrow" data-step><span class="grow">Búsqueda de pago · coste por cliente</span><span class="mono">€ 118</span><span class="chip g">retenido</span></div>
     <div class="mrow" data-step><span class="dot r"></span><span class="grow">Display · coste por cliente</span><span class="mono">€ 940</span><span class="chip r">reducido</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Presupuesto reasignado, los formularios cuentan como leads, no como ventas</span><span class="chip g">monitorizado</span></div>
   </div>
       <div class="body">
-    <h3><span class="num mono">46</span>Analítica, seguimiento y atribución</h3>
+    <h3><span class="num mono">49</span>Analítica, seguimiento y atribución</h3>
     <p>Seguimiento de eventos hecho correctamente y gasto publicitario vinculado a los ingresos cerrados en lugar de a los formularios enviados, de modo que los paneles muestran el coste real por cliente y canal.</p>
     <div class="kills"><b>Elimina</b><span>Fijar el presupuesto del mes siguiente con cifras que se detienen en el formulario.</span></div>
   </div>
@@ -1796,21 +1812,15 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Vigilancia de reseñas · Google, Trustpilot, marketplace</span><button class="runbtn" type="button">▶ activar el piloto automático</button></div>
-    <div class="nodes">
-      <div class="node" data-lit>Pedido cerrado</div>
-      <div class="link" data-lit></div>
-      <div class="node" data-lit>Preguntar a la hora adecuada</div>
-      <div class="link" data-lit></div>
-      <div class="node" data-lit>Respuesta redactada</div>
-    </div>
-    <div class="chartwrap" data-step>
+    
+    <div class="chartwrap solo" data-step>
       <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="La valoración pública media baja tras una mala reseña, y luego se recupera por encima del punto de partida una vez enviadas las respuestas">
         <line x1="0" y1="28" x2="420" y2="28"></line>
         <line x1="0" y1="56" x2="420" y2="56"></line>
         <line x1="0" y1="84" x2="420" y2="84"></line>
-        <polygon class="area" points="8,30 46,28 84,34 122,52 160,66 198,72 236,60 274,48 312,40 350,34 384,28 418,24 418,110 0,110"></polygon>
-        <polyline class="s1" points="8,30 46,28 84,34 122,52 160,66 198,72 236,60 274,48 312,40 350,34 384,28 418,24"></polyline>
-        <circle class="p1" cx="418" cy="24" r="3.5"></circle>
+        <polygon class="area" points="0,80 46,40 92,66 138,30 184,58 230,26 276,54 322,36 368,62 418,44 418,110 0,110"></polygon>
+        <polyline class="s1" points="0,80 46,40 92,66 138,30 184,58 230,26 276,54 322,36 368,62 418,44"></polyline>
+        <circle class="p1" cx="418" cy="44" r="3.5"></circle>
       </svg>
     </div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Northgate Ltd · 5 estrellas en Google</span><span class="mono">21:14</span><span class="chip g">registrado</span></div>
@@ -1818,8 +1828,15 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mrow" data-step><span class="dot a"></span><span class="grow">Respuesta serena redactada, a la espera de su aprobación</span><span class="mono">09:07</span><span class="chip a">aprobar</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Respuesta publicada, el cliente subió a 4 estrellas</span><span class="mono">11:41</span><span class="chip g">recuperado</span></div>
   </div>
-      <div class="body">
-    <h3><span class="num mono">57</span>Piloto automático de reseñas y reputación</h3>
+      
+        <div class="nodes">
+      <div class="node" data-lit>Pedido cerrado</div>
+      <div class="link" data-lit></div>
+      <div class="node" data-lit>Preguntar a la hora adecuada</div>
+      <div class="link" data-lit></div>
+      <div class="node" data-lit>Respuesta redactada</div>
+    </div><div class="body">
+    <h3><span class="num mono">50</span>Piloto automático de reseñas y reputación</h3>
     <p>Tras cada pedido completado, el sistema pide una reseña al cliente satisfecho en el momento en que es más probable que la deje. Una reseña negativa le avisa en minutos, con una respuesta serena ya redactada para su aprobación.</p>
     <div class="kills"><b>Elimina</b><span>el silencio que deja una reseña negativa sin respuesta durante un mes mientras le cuesta clientes en silencio.</span></div>
   </div>
@@ -1827,27 +1844,29 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
   </div><!-- /band -->
 
-  <div class="section-head" id="s-rep"><span class="idx serif">5 servicios</span><h2 class="serif">Informes y visibilidad para la dirección</h2></div>
+  <div class="section-head" id="s-rep"><span class="idx serif">5 ejemplos</span><h2 class="serif">Informes y visibilidad para la dirección</h2></div>
   <p class="section-sub">Una sola pantalla de verdad para la dirección, y una alerta en la hora en que algo falla, en lugar de una sorpresa a fin de mes.</p>
   <div class="grid" id="g-rep">
 <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Pantalla de dirección</span><button class="runbtn" type="button">▶ actualizar el panel</button></div>
-    <div class="mrow" data-step><span class="grow">Ingresos, acumulado del mes</span><span class="mono">€<span data-count="418500">0</span></span><span class="up">▲</span></div>
-    <div class="mrow" data-step><span class="grow">Margen bruto</span><div class="bar"><i data-w="34"></i></div><span class="mono">34%</span></div>
-    <div class="chartwrap" data-step>
+        <div class="chartwrap" data-step>
       <div class="clegend"><span class="c1"><i></i>Ingresos</span><span class="c2"><i></i>Costos</span></div>
       <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="Los ingresos suben por encima de unos costes que se estabilizan a lo largo de doce meses">
         <line x1="0" y1="28" x2="420" y2="28"></line><line x1="0" y1="56" x2="420" y2="56"></line><line x1="0" y1="84" x2="420" y2="84"></line>
-        <polyline class="s2" points="0,62 38,58 76,60 114,54 152,56 190,50 228,52 266,48 304,50 342,46 380,47 418,45"></polyline>
-        <polyline class="s1" points="0,84 38,78 76,72 114,74 152,64 190,58 228,52 266,46 304,40 342,34 380,28 418,20"></polyline>
-        <circle class="p1" cx="418" cy="20" r="3.5"></circle><circle class="p2" cx="418" cy="45" r="3.5"></circle>
+        <polyline class="s2" points="0,30 42,34 84,32 126,36 168,34 210,38 252,36 294,40 336,38 418,42"></polyline>
+        <polyline class="s1" points="0,40 52,38 104,41 156,39 208,42 236,88 264,84 316,44 368,40 418,38"></polyline>
+        <circle class="p1" cx="418" cy="38" r="3.5"></circle><circle class="p2" cx="418" cy="42" r="3.5"></circle>
       </svg>
     </div>
+        
+    <div class="mrow" data-step><span class="grow">Ingresos, acumulado del mes</span><span class="mono">€<span data-count="418500">0</span></span><span class="up">▲</span></div>
+    <div class="mrow" data-step><span class="grow">Margen bruto</span><div class="bar"><i data-w="34"></i></div><span class="mono">34%</span></div>
+    
     <div class="mrow" data-step><span class="grow">Extraído de los sistemas de origen <span class="mono">08:00</span>, actualizado cada hora</span><span class="chip g">actual</span></div>
   </div>
   <div class="body">
-    <h3><span class="num mono">47</span>Paneles de gestión</h3>
+    <h3><span class="num mono">51</span>Paneles de gestión</h3>
     <p>Ingresos, margen, caja, pipeline, stock, producción y desempeño del personal en una sola pantalla, actualizados automáticamente desde los sistemas que contienen los datos. La versión de la verdad que el director lee antes de la reunión, no durante ella.</p>
     <div class="kills"><b>Elimina</b><span>la carrera previa al consejo para conciliar cinco hojas de cálculo distintas en una sola cifra.</span></div>
   </div>
@@ -1868,7 +1887,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Cifras cerradas y compartidas con el equipo a las <span class="mono">17:05</span></span><span class="chip g">acordado</span></div>
   </div>
       <div class="body">
-    <h3><span class="num mono">48</span>Seguimiento de KPI del personal</h3>
+    <h3><span class="num mono">52</span>Seguimiento de KPI del personal</h3>
     <p>El rendimiento individual y de equipo se mide a partir de los registros del propio sistema, no de lo que cada persona informa sobre sí misma, y alimenta directamente el cálculo de bonos.</p>
     <div class="kills"><b>Elimina</b><span>la discusión mensual sobre qué cifras son las reales.</span></div>
   </div>
@@ -1891,7 +1910,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mrow" data-step><span class="grow">Tiempo de elaboración manual ahorrado <span class="mono">3h</span> a la semana</span><span class="down">▼</span><span class="chip g">nadie lo reclamó</span></div>
   </div>
       <div class="body">
-    <h3><span class="num mono">49</span>Informes programados</h3>
+    <h3><span class="num mono">53</span>Informes programados</h3>
     <p>El informe que alguien monta a mano cada lunes por la mañana se genera y se entrega puntualmente por correo o Telegram, ya formateado y listo para reenviar. Un cambio pequeño que se nota de inmediato.</p>
     <div class="kills"><b>Elimina</b><span>la tarea fija de cada lunes de exportar, pegar y dar formato a las mismas cifras.</span></div>
   </div>
@@ -1900,11 +1919,15 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Vigilancia de anomalías</span><button class="runbtn" type="button">▶ vigilar las cifras</button></div>
-    <div class="minicols">
+    
+    
+  </div>
+      
+        <div class="minicols">
       <div class="caselist">
         <div class="caseitem active" data-step><b class="mono">42</b>comprobaciones, cada 15 minutos</div>
-        <div class="caseitem" data-step><b class="mono">09:41</b>Margen, SKU 2210</div>
-        <div class="caseitem" data-step><b class="mono">09:44</b>Cliente inactivo, Northgate</div>
+        <div class="caseitem" data-step>Margen, SKU 2210</div>
+        <div class="caseitem" data-step>Cliente inactivo, Northgate</div>
       </div>
       <div class="casemain">
         <div class="mrow" data-step><span class="dot r"></span><span class="grow"><b>Margen a la baja</b> en SKU 2210 · 31% a 18% <span class="down">▼</span></span><span class="chip r">ahora</span></div>
@@ -1913,13 +1936,11 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <div class="mrow" data-step><span class="dot g"></span><span class="grow">Todo detectado la misma mañana, no a fin de mes</span><span class="chip g">marcado</span></div>
       </div>
     </div>
-    <div class="bigstat mono" style="margin-top:8px">
+        <div class="bigstat mono" style="margin-top:8px">
       <div data-step><b data-count="17">0</b><span>incidencias detectadas este mes</span></div>
       <div data-step><b data-count="11300">0</b><span>euros de margen protegidos</span></div>
-    </div>
-  </div>
-      <div class="body">
-    <h3><span class="num mono">50</span>Alertas y detección de anomalías</h3>
+    </div><div class="body">
+    <h3><span class="num mono">54</span>Alertas y detección de anomalías</h3>
     <p>Se le avisa en el momento en que algo se sale de su rango normal: el margen bajando en un producto, un cliente habitual sin actividad, existencias por debajo de la cobertura mínima, un servidor caído, un pago fallido, gastos que se disparan.</p>
     <div class="kills"><b>Elimina</b><span>enterarse de un problema de hace un mes cuando llegan las cifras de cierre de mes.</span></div>
   </div>
@@ -1928,32 +1949,33 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Radar de bajas · últimos 90 días</span><button class="runbtn" type="button">▶ escanear la base</button></div>
-    <div class="minicols">
+    
+    <div class="mrow mono" data-step style="margin-top:8px"><span class="grow">Clientes activos analizados</span><span data-count="312">0</span><span class="chip a">9 en silencio</span></div>
+    <div class="mrow" data-step><span class="dot r"></span><span class="grow">Northgate Ltd · 4 pedidos al mes, ahora 1 · <span class="mono">€ 87 400</span> en riesgo</span><span class="chip r">enfriándose</span></div>
+    <div class="mrow" data-step><span class="dot a"></span><span class="grow">Vellmar Handel · volumen baja 41 por ciento</span><span class="chip a">vigilar</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Tarea de recuperación asignada a A. Koss, historial completo adjunto</span><span class="mono">10:26</span><span class="chip g">asignado</span></div>
+  </div>
+      
+        <div class="minicols">
       <div class="caselist">
         <div class="caseitem active" data-step><b class="mono">C 0412</b>Northgate Ltd · enfriándose</div>
         <div class="caseitem" data-step><b class="mono">C 0871</b>Vellmar Handel · vigilancia</div>
         <div class="caseitem" data-step><b class="mono">C 1140</b>Kressen BV · estable</div>
       </div>
       <div class="casemain">
-        <div class="chartwrap" data-step>
-          <div class="clegend"><span class="c1"><i></i>pedidos al mes</span><span class="c2"><i></i>valor por mes</span></div>
+        <div class="chartwrap solo" data-step>
+          <div class="clegend"><span class="c1"><i></i>pedidos al mes</span></div>
           <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="Los pedidos y el gasto de Northgate caen de forma sostenida durante noventa días">
             <line x1="0" y1="28" x2="420" y2="28"></line><line x1="0" y1="56" x2="420" y2="56"></line><line x1="0" y1="84" x2="420" y2="84"></line>
-            <polyline class="s2" points="0,44 46,40 92,46 138,52 184,58 230,66 276,72 322,80 368,88 418,96"></polyline>
-            <polyline class="s1" points="0,24 46,20 92,28 138,36 184,48 230,52 276,66 322,74 368,84 418,90"></polyline>
-            <circle class="p1" cx="418" cy="90" r="3.5"></circle>
-            <circle class="p2" cx="418" cy="96" r="3.5"></circle>
+            
+            <polygon class="area" points="0,92 46,86 92,78 138,74 184,62 230,54 276,44 322,36 368,26 418,16 418,110 0,110"></polygon><polyline class="s1" points="0,92 46,86 92,78 138,74 184,62 230,54 276,44 322,36 368,26 418,16"></polyline>
+            <circle class="p1" cx="418" cy="16" r="3.5"></circle>
+            
           </svg>
         </div>
       </div>
-    </div>
-    <div class="mrow mono" data-step style="margin-top:8px"><span class="grow">Clientes activos analizados</span><span data-count="312">0</span><span class="chip a">9 en silencio</span></div>
-    <div class="mrow" data-step><span class="dot r"></span><span class="grow">Northgate Ltd · 4 pedidos al mes, ahora 1 · <span class="mono">€ 87 400</span> en riesgo</span><span class="chip r">enfriándose</span></div>
-    <div class="mrow" data-step><span class="dot a"></span><span class="grow">Vellmar Handel · volumen baja 41 por ciento</span><span class="chip a">vigilar</span></div>
-    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Tarea de recuperación asignada a A. Koss, historial completo adjunto</span><span class="mono">10:26</span><span class="chip g">asignado</span></div>
-  </div>
-      <div class="body">
-    <h3><span class="num mono">60</span>Radar de abandono de clientes</h3>
+    </div><div class="body">
+    <h3><span class="num mono">55</span>Radar de abandono de clientes</h3>
     <p>La frecuencia y el volumen de pedidos se vigilan por cliente, de modo que los que se están alejando se marcan semanas antes de que dejen de responder. El gestor recibe una tarea de recuperación con todo el historial del cliente adjunto.</p>
     <div class="kills"><b>Elimina</b><span>enterarse de que un cliente del top 20 se fue solo al comparar las cifras anuales.</span></div>
   </div>
@@ -1961,7 +1983,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 
   <div class="band">
-  <div class="section-head" id="s-infra"><span class="idx serif">5 servicios</span><h2 class="serif">Infraestructura y soporte</h2></div>
+  <div class="section-head" id="s-infra"><span class="idx serif">5 ejemplos</span><h2 class="serif">Infraestructura y soporte</h2></div>
   <p class="section-sub">La hoja de cálculo crítica jubilada, el programa heredado domado, copias de seguridad realmente probadas, y formación para que todo se use de verdad.</p>
   <div class="grid" id="g-infra">
 <article class="card">
@@ -1982,7 +2004,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     </div>
   </div>
       <div class="body">
-    <h3><span class="num mono">51</span>Excel sustituido por una aplicación real</h3>
+    <h3><span class="num mono">56</span>Excel sustituido por una aplicación real</h3>
     <p>La hoja de cálculo crítica que mantiene una sola persona, que se rompe cuando la abren dos personas a la vez y no guarda historial, se convierte en una aplicación multiusuario con permisos y copias de seguridad.</p>
     <div class="kills"><b>Elimina</b><span>Un archivo crítico para el negocio que solo un empleado puede tocar con seguridad.</span></div>
   </div>
@@ -2004,7 +2026,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Resultados exportados para el nuevo sistema</span><span class="chip g">hecho</span></div>
   </div>
       <div class="body">
-    <h3><span class="num mono">52</span>Automatizar un viejo programa de escritorio que nadie puede modificar</h3>
+    <h3><span class="num mono">57</span>Automatizar un viejo programa de escritorio que nadie puede modificar</h3>
     <p>Cuando una aplicación Windows heredada no tiene API ni proveedor que la respalde, automatizamos los clics y la escritura en su lugar. Poco elegante, eficaz y a menudo la única vía.</p>
     <div class="kills"><b>Elimina</b><span>Personal volviendo a escribir los mismos registros en un programa que nadie puede modificar.</span></div>
   </div>
@@ -2024,7 +2046,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Copia de seguridad a las <span class="mono">14:26</span>, y la baja del empleado se tramitó en 9 sistemas con un clic</span><span class="chip g">restaurado</span></div>
   </div>
       <div class="body">
-    <h3><span class="num mono">53</span>Copias de seguridad, recuperación ante desastres y control de acceso</h3>
+    <h3><span class="num mono">58</span>Copias de seguridad, recuperación ante desastres y control de acceso</h3>
     <p>Copias de seguridad automáticas realmente probadas, permisos basados en roles, un registro de quién vio y modificó qué, y baja de personal que revoca todo de una vez.</p>
     <div class="kills"><b>Elimina</b><span>Descubrir que las copias de seguridad nunca funcionaron el día que las necesita.</span></div>
   </div>
@@ -2044,8 +2066,8 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <line x1="0" y1="56" x2="420" y2="56"></line>
         <line x1="0" y1="84" x2="420" y2="84"></line>
         <polygon class="area" points="8,80 60,78 112,76 164,30 216,20 268,44 320,72 372,78 418,80 418,110 0,110"></polygon>
-        <polyline class="s1" points="8,80 60,78 112,76 164,30 216,20 268,44 320,72 372,78 418,80"></polyline>
-        <circle class="p1" cx="418" cy="80" r="3.5"></circle>
+        <polyline class="s1" points="0,88 40,84 80,80 120,34 160,26 200,28 240,30 280,27 330,29 418,26"></polyline>
+        <circle class="p1" cx="418" cy="26" r="3.5"></circle>
       </svg>
     </div>
     <div class="mrow" data-step><span class="dot a"></span><span class="grow">El tiempo de respuesta superó el umbral de alerta, guardia notificado</span><span class="mono">03:14</span></div>
@@ -2053,7 +2075,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mrow" data-step><span class="grow">Disponibilidad últimos 90 días</span><span class="mono"><span data-count="99">0</span>,9%</span><span class="chip g">operativo</span></div>
   </div>
       <div class="body">
-    <h3><span class="num mono">54</span>Alojamiento, despliegue y monitorización</h3>
+    <h3><span class="num mono">59</span>Alojamiento, despliegue y monitorización</h3>
     <p>Servidores configurados, despliegues automatizados, disponibilidad y rendimiento vigilados con alertas que llegan a una persona. Esto es lo que mantiene todo funcionando después del lanzamiento.</p>
     <div class="kills"><b>Elimina</b><span>Enterarse por un cliente de que el sitio lleva caído desde la noche.</span></div>
   </div>
@@ -2062,15 +2084,16 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Paquete de entrega</span><button class="runbtn" type="button">▶ entregarlo</button></div>
+        <div class="doc" data-step><b>Manual de operación · módulo de almacén</b><div class="dline"></div><div class="dline short"></div></div>
     <div class="calstrip" data-step><div class="day">Lun<b>06</b></div><div class="day due">mar<b>07</b></div><div class="day">Mié<b>08</b></div><div class="day due">jue<b>09</b></div><div class="day">Vie<b>10</b></div></div>
-    <div class="doc" data-step><b>Manual de operación · módulo de almacén</b><div class="dline"></div><div class="dline short"></div></div>
+    
     <div class="mrow" data-step><span class="grow">Vídeos explicativos grabados</span><span class="mono"><span data-count="12">0</span></span></div>
     <div class="mrow" data-step><span class="grow">Dos sesiones a las <span class="mono">11:00</span> <span class="crew"><span class="avat">DK</span><span class="avat">MR</span><span class="avat">EL</span><span class="more">+15 empleados</span></span></span><span class="chip g">18 de 18</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Derechos de administrador y código fuente entregados a su equipo</span><span class="chip g">suyo</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Usuarios activos diarios en el tercer mes</span><span class="mono"><span class="up">▲</span> 18 de 18</span><span class="chip g">en uso</span></div>
   </div>
       <div class="body">
-    <h3><span class="num mono">55</span>Formación, documentación y entrega</h3>
+    <h3><span class="num mono">60</span>Formación, documentación y entrega</h3>
     <p>Instrucciones escritas, tutoriales en vídeo y formación del personal, para que el sistema se use en lugar de abandonarse silenciosamente al tercer mes. Contrato de soporte disponible para cambios continuos.</p>
     <div class="kills"><b>Elimina</b><span>Pagar por un sistema que su equipo termina esquivando de todas formas.</span></div>
   </div>
@@ -2161,8 +2184,8 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   function countUp(el){
     var target = parseInt(el.getAttribute('data-count'), 10);
     if (reduced){ el.textContent = target.toLocaleString('en-US'); return; }
-    var t0 = performance.now(), dur = 1600;
-    setTimeout(function(){ el.textContent = target.toLocaleString('en-US'); }, dur + 200);
+    var t0 = performance.now(), dur = 1100;
+    setTimeout(function(){ el.textContent = target.toLocaleString('en-US'); }, dur + 150);
     function tick(t){
       var p = Math.min((t - t0) / dur, 1);
       p = 1 - Math.pow(1 - p, 3);
@@ -2188,22 +2211,22 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     var delay = reduced ? 0 : 120;
 
     eats.forEach(function(f, i){
-      setTimeout(function(){ f.classList.add('eaten'); }, delay + i * 450);
+      setTimeout(function(){ f.classList.add('eaten'); }, delay + i * 315);
     });
-    var base = delay + eats.length * 450;
+    var base = delay + eats.length * 315;
     lits.forEach(function(n, i){
-      setTimeout(function(){ n.classList.add('lit'); }, base + i * 420);
+      setTimeout(function(){ n.classList.add('lit'); }, base + i * 295);
     });
-    base += lits.length * 420;
+    base += lits.length * 295;
     steps.forEach(function(s, i){
       setTimeout(function(){
         s.classList.add('shown');
         s.querySelectorAll('[data-count]').forEach(countUp);
         if (s.hasAttribute('data-count')) countUp(s);
         s.querySelectorAll('.bar i').forEach(function(b){ b.style.width = b.getAttribute('data-w') + '%'; });
-      }, base + i * (reduced ? 0 : 480));
+      }, base + i * (reduced ? 0 : 335));
     });
-    var total = base + steps.length * 480 + 600;
+    var total = base + steps.length * 335 + 420;
     setTimeout(function(){ if (btn) btn.classList.remove('busy'); mock.classList.remove('playing'); }, reduced ? 200 : total);
   }
 

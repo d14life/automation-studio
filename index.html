@@ -146,7 +146,7 @@ header{border-bottom:1px solid var(--rule)}
   box-shadow:var(--shadow);display:flex;flex-direction:column;overflow:hidden;
   transition:transform 180ms var(--ease-out), box-shadow 180ms var(--ease-out)}
 .js .grid .card{opacity:0;transform:translateY(22px);
-  transition:opacity 600ms var(--ease-out), transform 600ms var(--ease-out), box-shadow 180ms var(--ease-out)}
+  transition:opacity 420ms var(--ease-out), transform 420ms var(--ease-out), box-shadow 180ms var(--ease-out)}
 .js .grid .card.vis{opacity:1;transform:none}
 
 @media print{.js .grid .card{opacity:1;transform:none}}
@@ -161,7 +161,7 @@ header{border-bottom:1px solid var(--rule)}
 .kills{margin-top:4px;padding-top:12px;border-top:1px dashed var(--rule);
   font-size:13.5px;display:flex;gap:8px;align-items:baseline}
 .kills b{color:var(--green);white-space:nowrap;font-size:12px;letter-spacing:.08em;text-transform:uppercase}
-.grid .card{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(330px,1fr)}
+.grid .card{display:grid;grid-template-columns:minmax(0,2.2fr) minmax(290px,1fr)}
 .grid .card .mock{border-bottom:0;border-right:1px solid var(--rule);min-height:250px;display:flex;flex-direction:column}
 .grid .card .mock > .mrow{flex:1 1 auto;min-height:36px}
 .grid .card .mock > .mtitle{flex:0 0 auto}
@@ -171,9 +171,9 @@ header{border-bottom:1px solid var(--rule)}
 .grid .card .mock > .kanban,.grid .card .mock > .minicols{flex:1 1 auto}
 .grid .card .mock > .nodes,.grid .card .mock > .filechips,.grid .card .mock > .doc{flex:0 1 auto}
 .grid .card .mock > .chartwrap .chart{height:100%;min-height:110px}
-.grid .card .body{padding:26px 28px;justify-content:center;gap:12px}
-.grid .card h3{font-size:22px}
-.grid .card:nth-child(even){grid-template-columns:minmax(330px,1fr) minmax(0,1.1fr)}
+.grid .card .body{padding:24px 24px;justify-content:center;gap:11px}
+.grid .card h3{font-size:20px;line-height:1.28}
+.grid .card:nth-child(even){grid-template-columns:minmax(290px,1fr) minmax(0,2.2fr)}
 .grid .card .mock{min-width:0;overflow-x:auto}
 .grid .card .body{min-width:0}
 .grid .card:nth-child(even) .mock{order:2;border-right:0;border-left:1px solid var(--rule)}
@@ -206,11 +206,11 @@ header{border-bottom:1px solid var(--rule)}
 .dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:6px;flex:none}
 .dot.g{background:var(--green)}.dot.r{background:var(--red)}.dot.a{background:var(--amber)}
 .bar{height:8px;border-radius:4px;background:var(--mock-line);overflow:hidden;flex:1}
-.bar i{display:block;height:100%;width:0;background:var(--acc,var(--green));transition:width 1500ms var(--ease-out)}
+.bar i{display:block;height:100%;width:0;background:var(--acc,var(--green));transition:width 1050ms var(--ease-out)}
 .filechips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
 .fchip{border:1px solid var(--mock-line);background:var(--card);border-radius:5px;
   padding:7px 12px;font-size:12px;font-weight:600;color:var(--ink-soft);
-  transition:opacity 800ms var(--ease-out), transform 800ms var(--ease-out)}
+  transition:opacity 560ms var(--ease-out), transform 560ms var(--ease-out)}
 .fchip.eaten{opacity:.35;transform:scale(.94)}
 .arrowdown{text-align:center;color:var(--rule-blue);font-size:14px;line-height:1;margin:2px 0 8px}
 .bigstat{display:flex;gap:20px;padding:10px 10px 2px}
@@ -237,8 +237,10 @@ header{border-bottom:1px solid var(--rule)}
 .chart{width:100%;height:110px;display:block}
 .chart line{stroke:var(--mock-line);stroke-width:1}
 .chart polyline{fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;
-  stroke-dasharray:460;stroke-dashoffset:460;transition:stroke-dashoffset 2000ms var(--ease-out)}
-.chart .s1{stroke:var(--ch1)}.chart .s2{stroke:var(--ch2)}
+  stroke-dasharray:460;stroke-dashoffset:460;transition:stroke-dashoffset 1400ms var(--ease-out)}
+.chart .s1{stroke:var(--ch1)}
+.chartwrap.solo .s1{stroke:var(--acc,var(--ch1))}
+.chartwrap.solo .area{fill:var(--acc,var(--ch1))}.chart .s2{stroke:var(--ch2)}
 .chart .area{fill:var(--ch1);opacity:0;transition:opacity 1200ms ease 900ms}
 .chart circle{opacity:0;transition:opacity 400ms ease 1700ms}
 .chart .p1{fill:var(--ch1)}.chart .p2{fill:var(--ch2)}
@@ -273,7 +275,7 @@ header{border-bottom:1px solid var(--rule)}
 .crew .more{margin-left:6px;font-size:11px;color:var(--ink-soft)}
 
 /* demo reveal machinery */
-.mock [data-step]{opacity:0;transform:translateY(12px);transition:opacity 460ms var(--ease-out), transform 460ms var(--ease-out)}
+.mock [data-step]{opacity:0;transform:translateY(12px);transition:opacity 320ms var(--ease-out), transform 320ms var(--ease-out)}
 .mock [data-step].shown{opacity:1;transform:none}
 .cursorline{position:absolute;bottom:8px;right:14px;font-size:10px;color:var(--rule-blue);
   letter-spacing:.08em;text-transform:uppercase}
@@ -522,7 +524,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
       </div>
       <div class="body">
         <h3>For law firms</h3>
-        <p>Court and registry monitoring, document assembly from approved templates, an assistant that answers from the case archive, a client portal, and hours billed from real activity. Assembled from services <b class="mono">04 · 21 · 24 · 25 · 34</b>.</p>
+        <p>Court and registry monitoring, document assembly from approved templates, an assistant that answers from the case archive, a client portal, and hours billed from real activity.</p>
         <div class="kills"><b>Removes</b><span>the missed limitation deadline, and the evening spent assembling a standard claim by hand.</span></div>
       </div>
     </article>
@@ -551,7 +553,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
       </div>
       <div class="body">
         <h3>For construction companies</h3>
-        <p>Site check-ins and daily reports from the crew's phones, purchase approvals by amount, equipment service before the breakdown, and estimate-versus-actual per object. Assembled from services <b class="mono">18 · 32 · 33 · 36 · 59</b>.</p>
+        <p>Site check-ins and daily reports from the crew's phones, purchase approvals by amount, equipment service before the breakdown, and estimate-versus-actual per object.</p>
         <div class="kills"><b>Removes</b><span>the evening phone-around to find out what actually happened on site today.</span></div>
       </div>
     </article>
@@ -559,7 +561,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 
   
-  <div class="section-head" id="s-data"><span class="idx serif">7 services</span><h2 class="serif">Data collection and integration</h2></div>
+  <div class="section-head" id="s-data"><span class="idx serif">7 examples</span><h2 class="serif">Data collection and integration</h2></div>
   <p class="section-sub">The morning routine of checking sites, the price lists in twelve formats, the systems that each hold their own version of the truth.</p>
 
   <div class="grid" id="g-data">
@@ -567,46 +569,18 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <!-- 1 -->
     <article class="card">
       <div class="mock demo">
-        <div class="mtitle"><span>Marketplace alerts</span><button class="runbtn" type="button">▶ go live</button></div>
-        <div class="nodes"><div class="node" data-lit>4 marketplaces</div><div class="link" data-lit></div><div class="node" data-lit>Price watcher</div><div class="link" data-lit></div><div class="node" data-lit>Telegram</div></div>
-        <div class="chartwrap" data-step>
-          <div class="clegend"><span class="c1"><i></i>Your buy-box share</span><span class="c2"><i></i>Cheapest rival</span></div>
-          <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="Buy-box share drops when a rival undercuts, then climbs back above them after the repricing rule fires">
-            <line x1="0" y1="28" x2="420" y2="28"></line>
-            <line x1="0" y1="56" x2="420" y2="56"></line>
-            <line x1="0" y1="84" x2="420" y2="84"></line>
-            <polyline class="s2" points="8,70 46,66 84,60 122,44 160,36 198,40 236,52 274,66 312,74 350,80 384,86 418,90"></polyline>
-            <polyline class="s1" points="8,42 46,44 84,48 122,62 160,78 198,74 236,58 274,40 312,30 350,26 384,22 418,18"></polyline>
-            <circle class="p2" cx="418" cy="90" r="3.5"></circle>
-            <circle class="p1" cx="418" cy="18" r="3.5"></circle>
-          </svg>
-        </div>
-        <div class="mrow" data-step><span class="dot r"></span><span class="grow"><b>Buy-box lost</b> · Amazon, SKU 2210</span><span class="mono">09:41</span></div>
-        <div class="mrow" data-step><span class="dot a"></span><span class="grow">Undercut by <span class="mono">€1,30</span> · Ozon, SKU 1148 , 2 stars review on Wildberries</span><span class="mono">09:37</span></div>
-        <div class="mrow" data-step><span class="dot g"></span><span class="grow">Competitor out of stock, you are alone on the page · eBay</span><span class="mono">07:52</span></div>
-        <div class="mrow" data-step><span class="grow">Buy-box back at <span class="mono">71%</span>, position report pushed to your phone</span><span class="chip g">sent</span></div>
-      </div>
-      <div class="body">
-        <h3><span class="num mono">03</span>Marketplace monitoring</h3>
-        <p>Track your own and competitor cards on Amazon, Wildberries, Ozon, eBay, Etsy: position, price, stock, reviews, buy-box status. Alerts fire the moment a competitor undercuts you or a listing dies.</p>
-        <div class="kills"><b>Removes</b><span>finding out about a lost buy-box days later. Now it's minutes.</span></div>
-      </div>
-    </article>
-
-    <article class="card">
-      <div class="mock demo">
         <div class="mtitle"><span>Price watch · daily run</span><button class="runbtn" type="button">▶ run 06:00 scrape</button></div>
         <div class="filechips"><span class="fchip" data-eat>CompetitorA catalogue</span><span class="fchip" data-eat>CompetitorB catalogue</span><span class="fchip" data-eat>Supplier stock feed</span><span class="fchip" data-eat>Your marketplace page</span></div>
-        <div class="chartwrap" data-step>
-          <div class="clegend"><span class="c1"><i></i>Your price</span><span class="c2"><i></i>CompetitorA</span></div>
+        <div class="chartwrap solo" data-step>
+          <div class="clegend"><span class="c1"><i></i>Your price</span></div>
           <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="CompetitorA cut its price through the week while your price held flat">
             <line x1="0" y1="28" x2="420" y2="28"></line>
             <line x1="0" y1="56" x2="420" y2="56"></line>
             <line x1="0" y1="84" x2="420" y2="84"></line>
-            <polyline class="s2" points="0,30 42,31 84,29 126,37 168,42 210,45 252,53 294,59 336,67 378,73 418,79"></polyline>
-            <polyline class="s1" points="0,26 42,26 84,27 126,27 168,28 210,28 252,29 294,29 336,30 378,30 418,31"></polyline>
-            <circle class="p1" cx="418" cy="31" r="3.5"></circle>
-            <circle class="p2" cx="418" cy="79" r="3.5"></circle>
+            
+            <polygon class="area" points="0,92 46,86 92,78 138,74 184,62 230,54 276,44 322,36 368,26 418,16 418,110 0,110"></polygon><polyline class="s1" points="0,92 46,86 92,78 138,74 184,62 230,54 276,44 322,36 368,26 418,16"></polyline>
+            <circle class="p1" cx="418" cy="16" r="3.5"></circle>
+            
           </svg>
         </div>
         <div class="mrow mono" data-step><span class="grow">CompetitorA · Widget Pro</span><span>€48.90</span><span class="down">▼ 4%</span></div>
@@ -641,6 +615,34 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <h3><span class="num mono">02</span>Supplier catalogue import</h3>
         <p>Suppliers send price lists in whatever format they feel like. One importer takes all of them, matches products to your own SKUs, flags what changed, and updates your system on a schedule nobody watches.</p>
         <div class="kills"><b>Removes</b><span>the two-day monthly re-keying job and the pricing errors that ride along with it.</span></div>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="mock demo">
+        <div class="mtitle"><span>Marketplace alerts</span><button class="runbtn" type="button">▶ go live</button></div>
+        <div class="nodes"><div class="node" data-lit>4 marketplaces</div><div class="link" data-lit></div><div class="node" data-lit>Price watcher</div><div class="link" data-lit></div><div class="node" data-lit>Telegram</div></div>
+        <div class="chartwrap" data-step>
+          <div class="clegend"><span class="c1"><i></i>Your buy-box share</span><span class="c2"><i></i>Cheapest rival</span></div>
+          <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="Buy-box share drops when a rival undercuts, then climbs back above them after the repricing rule fires">
+            <line x1="0" y1="28" x2="420" y2="28"></line>
+            <line x1="0" y1="56" x2="420" y2="56"></line>
+            <line x1="0" y1="84" x2="420" y2="84"></line>
+            <polyline class="s2" points="0,66 40,64 80,66 120,62 160,64 200,60 240,62 280,58 330,60 418,56"></polyline>
+            <polyline class="s1" points="0,88 40,84 80,80 120,34 160,26 200,28 240,30 280,27 330,29 418,26"></polyline>
+            <circle class="p2" cx="418" cy="56" r="3.5"></circle>
+            <circle class="p1" cx="418" cy="26" r="3.5"></circle>
+          </svg>
+        </div>
+        <div class="mrow" data-step><span class="dot r"></span><span class="grow"><b>Buy-box lost</b> · Amazon, SKU 2210</span><span class="mono">09:41</span></div>
+        <div class="mrow" data-step><span class="dot a"></span><span class="grow">Undercut by <span class="mono">€1,30</span> · Ozon, SKU 1148 , 2 stars review on Wildberries</span><span class="mono">09:37</span></div>
+        <div class="mrow" data-step><span class="dot g"></span><span class="grow">Competitor out of stock, you are alone on the page · eBay</span><span class="mono">07:52</span></div>
+        <div class="mrow" data-step><span class="grow">Buy-box back at <span class="mono">71%</span>, position report pushed to your phone</span><span class="chip g">sent</span></div>
+      </div>
+      <div class="body">
+        <h3><span class="num mono">03</span>Marketplace monitoring</h3>
+        <p>Track your own and competitor cards on Amazon, Wildberries, Ozon, eBay, Etsy: position, price, stock, reviews, buy-box status. Alerts fire the moment a competitor undercuts you or a listing dies.</p>
+        <div class="kills"><b>Removes</b><span>finding out about a lost buy-box days later. Now it's minutes.</span></div>
       </div>
     </article>
 
@@ -743,41 +745,24 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 
   <div class="band">
-  <div class="section-head" id="s-fin"><span class="idx serif">7 services</span><h2 class="serif">Accounting and finance</h2></div>
+  <div class="section-head" id="s-fin"><span class="idx serif">7 examples</span><h2 class="serif">Accounting and finance</h2></div>
   <p class="section-sub">Invoices, reconciliation, payroll, cash. The paperwork that eats the first week of every month.</p>
   <div class="grid" id="g-fin">
 
     <!-- 8 -->
     <article class="card">
       <div class="mock demo">
-        <div class="mtitle"><span>Deal won → paperwork</span><button class="runbtn" type="button">▶ mark deal won</button></div>
-        <div class="nodes"><div class="node" data-lit>Deal won</div><div class="link" data-lit></div><div class="node" data-lit>Documents</div><div class="link" data-lit></div><div class="node" data-lit>Client inbox</div></div>
-        <div class="doc" data-step><b>Invoice #2041 · Northgate Ltd · €14 200</b><div class="dline"></div><div class="dline"></div><div class="dline short"></div></div>
-        <div class="mrow" data-step><span class="dot g"></span><span class="grow">Numbered and filed, no gaps in the series</span><span class="mono">14:02:11</span></div>
-        <div class="mrow" data-step><span class="dot g"></span><span class="grow">Delivery note + contract from your template</span><span class="mono">14:02:12</span></div>
-        <div class="mrow" data-step><span class="dot g"></span><span class="grow">Emailed to client, copy to accounting</span><span class="mono">14:02:14</span></div>
-        <div class="mrow" data-step><span class="grow">Human involvement</span><span class="chip g">none</span></div>
-      </div>
-      <div class="body">
-        <h3><span class="num mono">09</span>Automatic invoice and document generation</h3>
-        <p>Invoices, delivery notes, contracts and closing documents generated the moment a deal changes state: numbered correctly, filed correctly, sent to the client automatically.</p>
-        <div class="kills"><b>Removes</b><span>the full working week a 200-invoice-a-month company loses to paperwork.</span></div>
-      </div>
-    </article>
-
-    <article class="card">
-      <div class="mock demo">
         <div class="mtitle"><span>Monthly report</span><button class="runbtn" type="button">▶ generate</button></div>
-        <div class="chartwrap" data-step>
-          <div class="clegend"><span class="c1"><i></i>Retail margin</span><span class="c2"><i></i>Wholesale margin</span></div>
+        <div class="chartwrap solo" data-step>
+          <div class="clegend"><span class="c1"><i></i>Retail margin</span></div>
           <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="Retail margin climbs month by month to 22,4 per cent while wholesale margin slides to 11,1 per cent">
             <line x1="0" y1="28" x2="420" y2="28"></line>
             <line x1="0" y1="56" x2="420" y2="56"></line>
             <line x1="0" y1="84" x2="420" y2="84"></line>
-            <polyline class="s2" points="8,44 60,46 112,52 164,58 216,62 268,70 320,76 372,84 418,88"></polyline>
-            <polyline class="s1" points="8,72 60,68 112,60 164,58 216,48 268,42 320,34 372,28 418,22"></polyline>
-            <circle class="p1" cx="418" cy="22" r="3.5"></circle>
-            <circle class="p2" cx="418" cy="88" r="3.5"></circle>
+            
+            <polygon class="area" points="0,34 52,46 104,64 156,84 208,90 260,76 312,58 364,40 418,24 418,110 0,110"></polygon><polyline class="s1" points="0,34 52,46 104,64 156,84 208,90 260,76 312,58 364,40 418,24"></polyline>
+            <circle class="p1" cx="418" cy="24" r="3.5"></circle>
+            
           </svg>
         </div>
         <div class="doc" data-step>
@@ -800,15 +785,32 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 
     <article class="card">
       <div class="mock demo">
+        <div class="mtitle"><span>Deal won → paperwork</span><button class="runbtn" type="button">▶ mark deal won</button></div>
+        <div class="nodes"><div class="node" data-lit>Deal won</div><div class="link" data-lit></div><div class="node" data-lit>Documents</div><div class="link" data-lit></div><div class="node" data-lit>Client inbox</div></div>
+        <div class="doc" data-step><b>Invoice #2041 · Northgate Ltd · €14 200</b><div class="dline"></div><div class="dline"></div><div class="dline short"></div></div>
+        <div class="mrow" data-step><span class="dot g"></span><span class="grow">Numbered and filed, no gaps in the series</span><span class="mono">14:02:11</span></div>
+        <div class="mrow" data-step><span class="dot g"></span><span class="grow">Delivery note + contract from your template</span><span class="mono">14:02:12</span></div>
+        <div class="mrow" data-step><span class="dot g"></span><span class="grow">Emailed to client, copy to accounting</span><span class="mono">14:02:14</span></div>
+        <div class="mrow" data-step><span class="grow">Human involvement</span><span class="chip g">none</span></div>
+      </div>
+      <div class="body">
+        <h3><span class="num mono">09</span>Automatic invoice and document generation</h3>
+        <p>Invoices, delivery notes, contracts and closing documents generated the moment a deal changes state: numbered correctly, filed correctly, sent to the client automatically.</p>
+        <div class="kills"><b>Removes</b><span>the full working week a 200-invoice-a-month company loses to paperwork.</span></div>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="mock demo">
         <div class="mtitle"><span>Bank reconciliation</span><button class="runbtn" type="button">▶ run matching</button></div>
         <div class="chartwrap" data-step>
           <div class="clegend"><span class="c1"><i></i>matched by the system</span><span class="c2"><i></i>left for a human</span></div>
           <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="share matched by the system rising month by month while the pile left for a human falls away">
             <line x1="0" y1="28" x2="420" y2="28"></line><line x1="0" y1="56" x2="420" y2="56"></line><line x1="0" y1="84" x2="420" y2="84"></line>
-            <polyline class="s2" points="0,44 46,48 92,52 138,58 184,64 230,70 276,78 322,84 368,90 418,94"></polyline>
-            <polyline class="s1" points="0,72 46,68 92,60 138,55 184,44 230,38 276,30 322,26 368,20 418,16"></polyline>
-            <circle class="p1" cx="418" cy="16" r="3.5"></circle>
-            <circle class="p2" cx="418" cy="94" r="3.5"></circle>
+            <polyline class="s2" points="0,30 42,34 84,32 126,36 168,34 210,38 252,36 294,40 336,38 418,42"></polyline>
+            <polyline class="s1" points="0,62 42,38 84,70 126,44 168,76 210,48 252,80 294,52 336,72 418,46"></polyline>
+            <circle class="p1" cx="418" cy="46" r="3.5"></circle>
+            <circle class="p2" cx="418" cy="42" r="3.5"></circle>
           </svg>
         </div>
         <div class="mrow mono" data-step><span class="grow">Exact reference match</span><div class="bar"><i data-w="77"></i></div><span data-count="109">0</span></div>
@@ -837,14 +839,14 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <div class="caseitem" data-step><b class="mono">INV-4102</b>Halden Bau · € 61 400 · day 66</div>
       </div>
       <div class="casemain">
-        <div class="chartwrap" data-step>
+        <div class="chartwrap solo" data-step>
           <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="Total overdue balance falls steadily over eleven weeks of automatic reminders">
             <line x1="0" y1="28" x2="420" y2="28"></line>
             <line x1="0" y1="56" x2="420" y2="56"></line>
             <line x1="0" y1="84" x2="420" y2="84"></line>
-            <polygon class="area" points="8,18 46,22 84,30 122,34 160,46 198,52 236,60 274,68 312,74 350,82 384,88 418,92 418,110 0,110"></polygon>
-            <polyline class="s1" points="8,18 46,22 84,30 122,34 160,46 198,52 236,60 274,68 312,74 350,82 384,88 418,92"></polyline>
-            <circle class="p1" cx="418" cy="92" r="3.5"></circle>
+            <polygon class="area" points="0,58 60,57 120,59 180,58 240,56 300,57 340,34 380,22 418,18 418,110 0,110"></polygon>
+            <polyline class="s1" points="0,58 60,57 120,59 180,58 240,56 300,57 340,34 380,22 418,18"></polyline>
+            <circle class="p1" cx="418" cy="18" r="3.5"></circle>
           </svg>
         </div>
         <div class="mrow" data-step><span class="dot a"></span><span class="grow">Ladder: polite nudge, then their manager copied in, then a lawyer letter drafted</span><span class="chip a">step 2 of 3</span></div>
@@ -864,12 +866,13 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Receipt inbox</span><button class="runbtn" type="button">▶ read receipts</button></div>
-    <div class="filechips"><span class="fchip" data-eat>Photo: fuel station</span><span class="fchip" data-eat>Photo: hotel bill</span><span class="fchip" data-eat>PDF invoice</span></div>
-    <div class="kanban">
+        <div class="kanban">
       <div class="kcol done" data-step><div class="khead"><span>Read</span><b>✓</b></div><div class="ktask">Shell Ostend <span class="chip g">€ 84,10</span></div><div class="ktask">Hotel Ambra <span class="chip g">€ 213,00</span></div></div>
       <div class="kcol done" data-step><div class="khead"><span>Coded</span><b>✓</b></div><div class="ktask">fuel, VAT 21% <span class="chip g">ok</span></div><div class="ktask">travel, 14 Mar <span class="chip g">ok</span></div></div>
       <div class="kcol" data-step><div class="khead"><span>Human look</span><b>1</b></div><div class="ktask">blurred total <span class="chip a">check</span></div></div>
     </div>
+    <div class="filechips"><span class="fchip" data-eat>Photo: fuel station</span><span class="fchip" data-eat>Photo: hotel bill</span><span class="fchip" data-eat>PDF invoice</span></div>
+    
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">3 expenses filed to March, VAT split out</span><span class="chip g">done</span></div>
     <div class="mrow" data-step><span class="grow">Keyed by hand last month <span class="mono">4h 20m</span></span><span class="chip g"><span class="mono">40 s</span></span></div>
   </div>
@@ -909,7 +912,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
       <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="Cash position over the next 90 days dipping toward zero in week eleven">
         <line x1="0" y1="30" x2="420" y2="30"></line><line x1="0" y1="60" x2="420" y2="60"></line><line x1="0" y1="90" x2="420" y2="90"></line>
         <polygon class="area" points="0,38 60,32 120,44 180,36 240,58 300,72 360,88 418,94 418,110 0,110"></polygon>
-        <polyline class="s1" points="0,38 60,32 120,44 180,36 240,58 300,72 360,88 418,94"></polyline>
+        <polyline class="s1" points="0,22 52,30 104,36 156,46 208,54 260,66 312,74 364,86 418,94"></polyline>
         <circle class="p1" cx="418" cy="94" r="3.5"></circle>
       </svg>
     </div>
@@ -926,35 +929,10 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
   </div><!-- /band -->
 
-  <div class="section-head" id="s-crm"><span class="idx serif">8 services</span><h2 class="serif">Sales and CRM</h2></div>
+  <div class="section-head" id="s-crm"><span class="idx serif">8 examples</span><h2 class="serif">Sales and CRM</h2></div>
   <p class="section-sub">Leads answered in minutes, proposals in seconds, and a client history that stays when a salesperson leaves.</p>
   <div class="grid" id="g-crm">
 <article class="card">
-  <div class="mock demo">
-    <div class="mtitle"><span>Funnel · this month</span><button class="runbtn" type="button">▶ show the funnel</button></div>
-    <div class="mrow" data-step><span class="crew"><span class="avat">AP</span><span class="avat">MI</span><span class="avat">DK</span><span class="more">+4 reps</span></span><span class="grow">March board, one screen</span><span class="mono">€ 341 850</span></div>
-    <div class="chartwrap" data-step>
-      <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="won deals climbing month on month with a dip in week three">
-        <line x1="0" y1="28" x2="420" y2="28"></line><line x1="0" y1="56" x2="420" y2="56"></line><line x1="0" y1="84" x2="420" y2="84"></line>
-        <polygon class="area" points="0,86 46,80 92,88 138,71 184,63 230,67 276,52 322,45 368,38 418,29 418,110 0,110"></polygon>
-        <polyline class="s1" points="0,86 46,80 92,88 138,71 184,63 230,67 276,52 322,45 368,38 418,29"></polyline>
-        <circle class="p1" cx="418" cy="29" r="3.5"></circle>
-      </svg>
-    </div>
-    <div class="mrow" data-step><span class="grow">Qualified</span><div class="bar"><i data-w="100"></i></div><span class="mono"><span data-count="212">0</span></span></div>
-    <div class="mrow" data-step><span class="grow">Proposal sent</span><div class="bar"><i data-w="54"></i></div><span class="mono">114</span></div>
-    <div class="mrow" data-step><span class="grow">Won <span class="up">▲</span> 3 pts on last month</span><div class="bar"><i data-w="22"></i></div><span class="mono">47</span></div>
-    <div class="mrow" data-step><span class="dot r"></span><span class="grow">Stalled 19 days · Verrico SRL, <span class="mono">€ 88 000</span></span><span class="chip r">act</span></div>
-    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Two deals need the meeting, the rest is fine</span><span class="chip g">done</span></div>
-  </div>
-      <div class="body">
-    <h3><span class="num mono">19</span>Sales pipeline dashboard</h3>
-    <p>A live view of the funnel by manager, product, source and stage, with conversion rates and alerts on deals that have stopped moving. The weekly sales meeting becomes a five minute conversation about the two deals that matter.</p>
-    <div class="kills"><b>Removes</b><span>an hour of reading numbers aloud from a spreadsheet somebody rebuilt on Sunday night.</span></div>
-  </div>
-</article>
-
-    <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Pipeline · your stages</span><button class="runbtn" type="button">▶ open deal card</button></div>
     <div class="kanban">
@@ -1046,6 +1024,31 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 
     <article class="card">
   <div class="mock demo">
+    <div class="mtitle"><span>Funnel · this month</span><button class="runbtn" type="button">▶ show the funnel</button></div>
+    <div class="mrow" data-step><span class="crew"><span class="avat">AP</span><span class="avat">MI</span><span class="avat">DK</span><span class="more">+4 reps</span></span><span class="grow">March board, one screen</span><span class="mono">€ 341 850</span></div>
+    <div class="chartwrap solo" data-step>
+      <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="won deals climbing month on month with a dip in week three">
+        <line x1="0" y1="28" x2="420" y2="28"></line><line x1="0" y1="56" x2="420" y2="56"></line><line x1="0" y1="84" x2="420" y2="84"></line>
+        <polygon class="area" points="0,80 46,40 92,66 138,30 184,58 230,26 276,54 322,36 368,62 418,44 418,110 0,110"></polygon>
+        <polyline class="s1" points="0,80 46,40 92,66 138,30 184,58 230,26 276,54 322,36 368,62 418,44"></polyline>
+        <circle class="p1" cx="418" cy="44" r="3.5"></circle>
+      </svg>
+    </div>
+    <div class="mrow" data-step><span class="grow">Qualified</span><div class="bar"><i data-w="100"></i></div><span class="mono"><span data-count="212">0</span></span></div>
+    <div class="mrow" data-step><span class="grow">Proposal sent</span><div class="bar"><i data-w="54"></i></div><span class="mono">114</span></div>
+    <div class="mrow" data-step><span class="grow">Won <span class="up">▲</span> 3 pts on last month</span><div class="bar"><i data-w="22"></i></div><span class="mono">47</span></div>
+    <div class="mrow" data-step><span class="dot r"></span><span class="grow">Stalled 19 days · Verrico SRL, <span class="mono">€ 88 000</span></span><span class="chip r">act</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Two deals need the meeting, the rest is fine</span><span class="chip g">done</span></div>
+  </div>
+      <div class="body">
+    <h3><span class="num mono">19</span>Sales pipeline dashboard</h3>
+    <p>A live view of the funnel by manager, product, source and stage, with conversion rates and alerts on deals that have stopped moving. The weekly sales meeting becomes a five minute conversation about the two deals that matter.</p>
+    <div class="kills"><b>Removes</b><span>an hour of reading numbers aloud from a spreadsheet somebody rebuilt on Sunday night.</span></div>
+  </div>
+</article>
+
+    <article class="card">
+  <div class="mock demo">
     <div class="mtitle"><span>Campaign engine</span><button class="runbtn" type="button">▶ wake dormant clients</button></div>
     <div class="bigstat mono"><div data-step><b data-count="1840">0</b><span>no order in 9 months</span></div><div data-step><b data-count="167">0</b><span>came back</span></div><div data-step><b data-count="18900">0</b><span>euro reordered</span></div></div>
     <div class="chartwrap" data-step>
@@ -1054,10 +1057,10 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <line x1="0" y1="28" x2="420" y2="28"></line>
         <line x1="0" y1="56" x2="420" y2="56"></line>
         <line x1="0" y1="84" x2="420" y2="84"></line>
-        <polyline class="s2" points="8,96 46,92 84,88 122,84 160,76 198,72 236,68 274,62 312,58 350,54 384,50 418,46"></polyline>
-        <polyline class="s1" points="8,80 46,72 84,66 122,58 160,54 198,46 236,40 274,34 312,30 350,26 384,22 418,18"></polyline>
-        <circle class="p2" cx="418" cy="46" r="3.5"></circle>
-        <circle class="p1" cx="418" cy="18" r="3.5"></circle>
+        <polyline class="s2" points="0,30 42,34 84,32 126,36 168,34 210,38 252,36 294,40 336,38 418,42"></polyline>
+        <polyline class="s1" points="0,40 52,38 104,41 156,39 208,42 236,88 264,84 316,44 368,40 418,38"></polyline>
+        <circle class="p2" cx="418" cy="42" r="3.5"></circle>
+        <circle class="p1" cx="418" cy="38" r="3.5"></circle>
       </svg>
     </div>
     <div class="mrow mono" data-step><span class="grow">Email 1 opened <span class="mono">10:00</span></span><div class="bar"><i data-w="43"></i></div><span data-count="791">0</span></div>
@@ -1090,18 +1093,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Loyalty and partners</span><button class="runbtn" type="button">▶ close the month</button></div>
-    <div class="chartwrap" data-step>
-      <div class="clegend"><span class="c1"><i></i>Points issued</span><span class="c2"><i></i>Partner sales</span></div>
-      <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="Points issued and partner sales both climb month after month, with a jump in July">
-        <line x1="0" y1="28" x2="420" y2="28"></line>
-        <line x1="0" y1="56" x2="420" y2="56"></line>
-        <line x1="0" y1="84" x2="420" y2="84"></line>
-        <polyline class="s2" points="0,92 52,89 104,84 156,80 208,73 260,68 312,60 364,49 418,38"></polyline>
-        <polyline class="s1" points="0,86 52,80 104,77 156,68 208,60 260,52 312,41 364,28 418,16"></polyline>
-        <circle class="p1" cx="418" cy="16" r="3.5"></circle>
-        <circle class="p2" cx="418" cy="38" r="3.5"></circle>
-      </svg>
-    </div>
+    
     <div class="mrow" data-step><span class="grow">Northgate Ltd · 3 orders in July</span><span class="mono">€ 18 940</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Gold tier reached at <span class="mono">45 000</span> points <span class="up">▲</span></span><span class="chip g">upgraded</span></div>
     <div class="mrow" data-step><span class="dot a"></span><span class="grow">Partner commission held, missing bank details</span><span class="chip a">check</span></div>
@@ -1111,7 +1103,19 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
       <div data-step><b data-count="23">0</b><span>partner statements sent</span></div>
     </div>
   </div>
-      <div class="body">
+      
+        <div class="chartwrap solo" data-step>
+      <div class="clegend"><span class="c1"><i></i>Points issued</span></div>
+      <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="Points issued and partner sales both climb month after month, with a jump in July">
+        <line x1="0" y1="28" x2="420" y2="28"></line>
+        <line x1="0" y1="56" x2="420" y2="56"></line>
+        <line x1="0" y1="84" x2="420" y2="84"></line>
+        
+        <polygon class="area" points="0,92 46,86 92,78 138,74 184,62 230,54 276,44 322,36 368,26 418,16 418,110 0,110"></polygon><polyline class="s1" points="0,92 46,86 92,78 138,74 184,62 230,54 276,44 322,36 368,26 418,16"></polyline>
+        <circle class="p1" cx="418" cy="16" r="3.5"></circle>
+        
+      </svg>
+    </div><div class="body">
     <h3><span class="num mono">22</span>Loyalty, referral and partner tracking</h3>
     <p>Points, tiers, referral codes and partner commissions are calculated and reported on their own, with anything unclear held back rather than paid out wrong. Partners see the same numbers you do.</p>
     <div class="kills"><b>Removes</b><span>the commission spreadsheet only one person in the company understands.</span></div>
@@ -1120,41 +1124,10 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 
   <div class="band">
-  <div class="section-head" id="s-ai"><span class="idx serif">10 services</span><h2 class="serif">Artificial intelligence</h2></div>
+  <div class="section-head" id="s-ai"><span class="idx serif">10 examples</span><h2 class="serif">Artificial intelligence</h2></div>
   <p class="section-sub">Bots that answer from your own documents, calls that write themselves into the CRM, and forecasts that order stock before it runs out.</p>
   <div class="grid" id="g-ai">
 <article class="card">
-  <div class="mock demo">
-    <div class="mtitle"><span>Purchase plan · week 12</span><button class="runbtn" type="button">▶ run the forecast</button></div>
-    <div class="chartwrap" data-step>
-      <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="Demand across 36 months of history, seasonality and promotions rises steadily into week 12">
-        <line x1="0" y1="28" x2="420" y2="28"></line>
-        <line x1="0" y1="56" x2="420" y2="56"></line>
-        <line x1="0" y1="84" x2="420" y2="84"></line>
-        <polygon class="area" points="8,86 60,78 112,70 164,74 216,58 268,46 320,52 372,34 418,24 418,110 0,110"></polygon>
-        <polyline class="s1" points="8,86 60,78 112,70 164,74 216,58 268,46 320,52 372,34 418,24"></polyline>
-        <circle class="p1" cx="418" cy="24" r="3.5"></circle>
-      </svg>
-    </div>
-    <div class="mrow mono" data-step><span class="grow">SKU 2210 cover</span><div class="bar"><i data-w="11"></i></div><span data-count="9">0</span></div>
-    <div class="mrow mono" data-step><span class="grow">SKU 3105 cover</span><div class="bar"><i data-w="47"></i></div><span data-count="38">0</span></div>
-    <div class="mrow mono" data-step><span class="grow">SKU 4188 cover</span><div class="bar"><i data-w="96"></i></div><span data-count="97">0</span></div>
-    <div class="mrow" data-step><span class="dot r"></span><span class="grow"><b>SKU 2210</b> · stockout in 9 days, order <b class="mono">640</b> units now</span><span class="chip r">urgent</span></div>
-    <div class="mrow" data-step><span class="dot a"></span><span class="grow"><b>SKU 4188</b> · 14 weeks of cover, pause purchasing</span><span class="chip a">overstocked</span></div>
-    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Purchase order drafted for Lehmann Handel</span><span class="chip g">approved</span></div>
-    <div class="bigstat mono" style="margin-top:8px">
-      <div data-step><b data-count="86400">0</b><span>euro freed from dead stock</span></div>
-      <div data-step><b data-count="3">0</b><span>stockouts avoided this quarter</span></div>
-    </div>
-  </div>
-      <div class="body">
-    <h3><span class="num mono">29</span>Demand and inventory forecasting</h3>
-    <p>A model trained on your own sales history, seasonality, promotions and supplier lead times tells you what to order and when. It targets the two failures that cost real money and never show up cleanly in the accounts: capital frozen in dead stock, and sales lost to an empty shelf.</p>
-    <div class="kills"><b>Removes</b><span>ordering by gut feel from a spreadsheet that is already a week out of date.</span></div>
-  </div>
-</article>
-
-    <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Support bot, WhatsApp</span><button class="runbtn" type="button">▶ ask the bot</button></div>
     <div class="filechips">
@@ -1162,7 +1135,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     </div>
     <div class="mrow" data-step><span class="grow">Customer: is the 18mm panel in stock and what does delivery to Lyon cost?</span><span class="mono">21:14</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Bot: in stock, <b class="mono">€ 42,60</b> per sheet. Lyon delivery <b class="mono">€ 19</b>, 2 days.</span><span class="chip g">price list v14</span></div>
-    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Bot: cutting is same day up to <b class="mono">12</b> sheets, <b class="mono">€ 3,40</b> per cut.</span><span class="chip g">service sheet</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">sheets, <b class="mono">€ 3,40</b> per cut.</span><span class="chip g">service sheet</span></div>
     <div class="mrow" data-step><span class="dot a"></span><span class="grow">Credit terms need a human. Passed to Elena at <span class="mono">21:16</span> with the full thread.</span><span class="chip a">handover</span></div>
     <div class="bigstat mono" style="margin-top:8px">
       <div data-step><b data-count="71">0</b><span>% answered without a human</span></div>
@@ -1245,6 +1218,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Catalogue generation</span><button class="runbtn" type="button">▶ write the catalogue</button></div>
+        <div class="doc" data-step><b>Oak worktop, 3m, 40mm</b><div class="dline"></div><div class="dline"></div><div class="dline short"></div></div>
     <div class="minicols">
       <div class="caselist">
         <div class="caseitem active" data-step><b class="mono">OW 3040</b>Oak worktop, 3m</div>
@@ -1252,7 +1226,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <div class="caseitem" data-step><b class="mono">SK 2210</b>Sink cutout kit</div>
       </div>
       <div class="casemain">
-        <div class="doc" data-step><b>Oak worktop, 3m, 40mm</b><div class="dline"></div><div class="dline"></div><div class="dline short"></div></div>
+        
         <div class="mrow" data-step style="margin-top:8px"><span class="dot g"></span><span class="grow">Description, specs and meta tags in your tone of voice</span><span class="chip g">on brand</span></div>
       </div>
     </div>
@@ -1272,9 +1246,9 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mtitle"><span>Vacancy · Warehouse supervisor</span><button class="runbtn" type="button">▶ rank applicants</button></div>
     <div class="minicols">
       <div class="caselist">
-        <div class="caseitem active" data-step><b class="mono">94</b>A. Marchetti · 6 yrs, WMS, forklift</div>
-        <div class="caseitem" data-step><b class="mono">78</b>J. Okafor · 4 yrs, shift lead</div>
-        <div class="caseitem" data-step><b class="mono">51</b>P. Novak · strong, wrong sector</div>
+        <div class="caseitem active" data-step>A. Marchetti · 6 yrs, WMS, forklift</div>
+        <div class="caseitem" data-step>J. Okafor · 4 yrs, shift lead</div>
+        <div class="caseitem" data-step>P. Novak · strong, wrong sector</div>
       </div>
       <div class="casemain">
         <div class="mrow" data-step><span class="grow">Applications parsed and matched to requirements</span><span class="mono"><span data-count="184">0</span></span></div>
@@ -1300,6 +1274,39 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 
     <article class="card">
   <div class="mock demo">
+    <div class="mtitle"><span>Purchase plan · week 12</span><button class="runbtn" type="button">▶ run the forecast</button></div>
+    
+    <div class="mrow mono" data-step><span class="grow">SKU 2210 cover</span><div class="bar"><i data-w="11"></i></div><span data-count="9">0</span></div>
+    <div class="mrow mono" data-step><span class="grow">SKU 3105 cover</span><div class="bar"><i data-w="47"></i></div><span data-count="38">0</span></div>
+    <div class="mrow mono" data-step><span class="grow">SKU 4188 cover</span><div class="bar"><i data-w="96"></i></div><span data-count="97">0</span></div>
+    <div class="mrow" data-step><span class="dot r"></span><span class="grow"><b>SKU 2210</b>units now</span><span class="chip r">urgent</span></div>
+    <div class="mrow" data-step><span class="dot a"></span><span class="grow"><b>SKU 4188</b> · 14 weeks of cover, pause purchasing</span><span class="chip a">overstocked</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Purchase order drafted for Lehmann Handel</span><span class="chip g">approved</span></div>
+    
+  </div>
+      
+        <div class="chartwrap" data-step>
+      <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="Demand across 36 months of history, seasonality and promotions rises steadily into week 12">
+        <line x1="0" y1="28" x2="420" y2="28"></line>
+        <line x1="0" y1="56" x2="420" y2="56"></line>
+        <line x1="0" y1="84" x2="420" y2="84"></line>
+        <polygon class="area" points="8,86 60,78 112,70 164,74 216,58 268,46 320,52 372,34 418,24 418,110 0,110"></polygon>
+        <polyline class="s1" points="0,88 40,84 80,80 120,34 160,26 200,28 240,30 280,27 330,29 418,26"></polyline>
+        <circle class="p1" cx="418" cy="26" r="3.5"></circle>
+      </svg>
+    </div>
+        <div class="bigstat mono" style="margin-top:8px">
+      <div data-step><b data-count="86400">0</b><span>euro freed from dead stock</span></div>
+      <div data-step><b data-count="3">0</b><span>stockouts avoided this quarter</span></div>
+    </div><div class="body">
+    <h3><span class="num mono">29</span>Demand and inventory forecasting</h3>
+    <p>A model trained on your own sales history, seasonality, promotions and supplier lead times tells you what to order and when. It targets the two failures that cost real money and never show up cleanly in the accounts: capital frozen in dead stock, and sales lost to an empty shelf.</p>
+    <div class="kills"><b>Removes</b><span>ordering by gut feel from a spreadsheet that is already a week out of date.</span></div>
+  </div>
+</article>
+
+    <article class="card">
+  <div class="mock demo">
     <div class="mtitle"><span>Shelf and line checks</span><button class="runbtn" type="button">▶ read the photos</button></div>
     <div class="minicols">
       <div class="caselist">
@@ -1308,7 +1315,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <div class="caseitem" data-step><b class="mono">CAM 22</b>Yard gate · pallet labels</div>
       </div>
       <div class="casemain">
-        <div class="mrow" data-step><span class="dot g"></span><span class="grow">Stock counted from photo: <b class="mono">312</b> units on shelf</span><span class="chip g">matches system</span></div>
+        <div class="mrow" data-step><span class="dot g"></span><span class="grow">units on shelf</span><span class="chip g">matches system</span></div>
         <div class="mrow" data-step><span class="dot r"></span><span class="grow">Planogram breach, store 14: competitor product in your bay</span><span class="chip r">flagged</span></div>
         <div class="mrow" data-step><span class="dot a"></span><span class="grow">Line: 3 units with edge defect, serial <span class="mono">MX-70412</span> read</span><span class="chip a">pulled</span></div>
         <div class="mrow" data-step><span class="dot g"></span><span class="grow">Report sent to the field manager at <span class="mono">09:41</span></span><span class="chip g">done</span></div>
@@ -1366,7 +1373,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         </div>
       </div>
       <div class="body">
-        <h3><span class="num mono">56</span>Content factory</h3>
+        <h3><span class="num mono">32</span>Content factory</h3>
         <p>A pipeline that turns your catalogue, your expertise and your clients' real questions into a steady stream of posts, articles and video scripts in your tone of voice, on a schedule, with nothing published until you approve it.</p>
         <div class="kills"><b>Removes</b><span>the months of silence that cost you clients who never hear about you, and the agency retainer that produced four posts.</span></div>
       </div>
@@ -1379,31 +1386,10 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <a class="cta" href="mailto:tagir.zalyatov@gmail.com?subject=Automation%20enquiry">Get a quote</a>
   </div>
 
-  <div class="section-head" id="s-ops"><span class="idx serif">10 services</span><h2 class="serif">Operations and internal workflow</h2></div>
+  <div class="section-head" id="s-ops"><span class="idx serif">10 examples</span><h2 class="serif">Operations and internal workflow</h2></div>
   <p class="section-sub">Approvals that move, rotas that build themselves, crews that report from the road, stock counts that match the shelf.</p>
   <div class="grid" id="g-ops">
 <article class="card">
-  <div class="mock demo">
-    <div class="mtitle"><span>Booking desk</span><button class="runbtn" type="button">▶ take the booking</button></div>
-    <div class="calstrip" data-step><div class="day">Mon<b>14</b></div><div class="day due">Tue<b>15</b></div><div class="day">Wed<b>16</b></div><div class="day">Thu<b>17</b></div><div class="day">Fri<b>18</b></div></div>
-    <div class="mrow mono" data-step><span class="grow">Mon 14 Apr</span><div class="bar"><i data-w="83"></i></div><span data-count="11">0</span></div>
-    <div class="mrow mono" data-step><span class="grow">Tue 15 Apr</span><div class="bar"><i data-w="58"></i></div><span data-count="7">0</span></div>
-    <div class="mrow mono" data-step><span class="grow">Wed 16 Apr</span><div class="bar"><i data-w="31"></i></div><span data-count="4">0</span></div>
-    <div class="mrow" data-step><span class="grow">Free slots Tue, room 2</span><span class="mono">11:30 · 14:00 · 16:15</span></div>
-    <div class="mrow" data-step><span class="dot g"></span><span class="grow">E. Marchetti booked <span class="mono">14:00</span> · 45 min, deposit <span class="mono">€ 25</span> taken online</span><span class="chip g">paid</span></div>
-    <div class="bigstat mono" style="margin-top:8px">
-      <div data-step><b data-count="4">0</b><span>no-shows this month, was 19</span></div>
-      <div data-step><b data-count="137">0</b><span>bookings taken without a call</span></div>
-    </div>
-  </div>
-      <div class="body">
-    <h3><span class="num mono">38</span>Booking and appointment system</h3>
-    <p>Online booking against real availability, automatic reminders that cut no-shows, room and resource allocation, deposits taken up front. Built for clinics, salons, studios, workshops, consultancies and equipment hire.</p>
-    <div class="kills"><b>Removes</b><span>the phone-and-paper diary and the empty slot nobody was reminded about.</span></div>
-  </div>
-</article>
-
-    <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Fit-out job board</span><button class="runbtn" type="button">▶ move the job</button></div>
     <div class="nodes"><div class="node" data-lit>Survey</div><div class="link" data-lit></div><div class="node" data-lit>Build</div><div class="link" data-lit></div><div class="node" data-lit>Handover</div></div>
@@ -1414,7 +1400,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Client view updated the moment it moved, no email needed</span><span class="chip g">live</span></div>
   </div>
       <div class="body">
-    <h3><span class="num mono">32</span>Custom task and project tracking</h3>
+    <h3><span class="num mono">33</span>Custom task and project tracking</h3>
     <p>Generic trackers force your work into someone else's shape. This one is built around your stages, checklists, handover points and deadlines, with the right view for each person who needs it. Strongest in production, construction, installation and agency work.</p>
     <div class="kills"><b>Removes</b><span>chasing every stage update by phone and rebuilding the same status list in a spreadsheet.</span></div>
   </div>
@@ -1423,17 +1409,18 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Approval routing</span><button class="runbtn" type="button">▶ route for sign-off</button></div>
-    <div class="mrow" data-step><span class="grow">Approvers on rota, routed by amount and type</span><span class="crew"><span class="avat">LK</span><span class="avat">FD</span><span class="avat">AM</span><span class="more">+2 deputies</span></span></div>
-    <div class="kanban">
+        <div class="kanban">
       <div class="kcol done" data-step><div class="khead"><span>Line manager</span><b>✓</b></div><div class="ktask">Purchase <span class="mono">€1,240</span> <span class="chip g">09:41</span></div><div class="ktask">Expenses <span class="mono">€380</span> <span class="chip g">policy ok</span></div></div>
       <div class="kcol" data-step><div class="khead"><span>Finance director</span><b>1</b></div><div class="ktask">Discount 18% <span class="chip a">reminder sent</span></div></div>
       <div class="kcol done" data-step><div class="khead"><span>Filed</span><b>✓</b></div><div class="ktask">Leave request <span class="chip g">booked</span></div></div>
     </div>
+    <div class="mrow" data-step><span class="grow">Approvers on rota, routed by amount and type</span><span class="crew"><span class="avat">LK</span><span class="avat">FD</span><span class="avat">AM</span><span class="more">+2 deputies</span></span></div>
+    
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Deputy picked it up while F. Dorner was on site</span><span class="chip g">no stall</span></div>
     <div class="mrow" data-step><span class="grow">Audit trail written, 4 of 4 cleared in <span class="mono">6h</span></span><span class="chip g">done</span></div>
   </div>
       <div class="body">
-    <h3><span class="num mono">33</span>Approval and sign-off workflows</h3>
+    <h3><span class="num mono">34</span>Approval and sign-off workflows</h3>
     <p>Purchase requests, discounts, leave, expenses and contracts go to the right approver automatically by amount and type, with reminders, deadlines and a complete audit trail behind every decision.</p>
     <div class="kills"><b>Removes</b><span>the paper folder that sits four days on a director's desk while the deal waits.</span></div>
   </div>
@@ -1450,7 +1437,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Numbered, versioned, stored to file in <span class="mono">9 sec</span></span><span class="chip g">ready to sign</span></div>
   </div>
       <div class="body">
-    <h3><span class="num mono">34</span>Document generation from templates</h3>
+    <h3><span class="num mono">35</span>Document generation from templates</h3>
     <p>Contracts, acts, powers of attorney, specifications and reports built from data you already hold, correctly numbered and versioned, with variable clauses picked by rule. Legal approves the template once instead of reading every document.</p>
     <div class="kills"><b>Removes</b><span>copying last month's file, editing the names by hand and hoping nothing was missed.</span></div>
   </div>
@@ -1477,7 +1464,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Published to 46 phones at <span class="mono">16:20</span></span><span class="chip g">published</span></div>
   </div>
       <div class="body">
-    <h3><span class="num mono">35</span>Shift scheduling and rostering</h3>
+    <h3><span class="num mono">36</span>Shift scheduling and rostering</h3>
     <p>The rota builds itself against availability, skills, labour rules and forecast demand, then publishes straight to staff phones and handles swap requests. In retail, hospitality and logistics this is a manager's entire Friday.</p>
     <div class="kills"><b>Removes</b><span>the whiteboard rota rebuilt every week and the phone calls to fill a gap.</span></div>
   </div>
@@ -1510,7 +1497,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Client signature captured <span class="mono">10:48</span>, invoice raised before the van left</span><span class="chip g">closed</span></div>
   </div>
       <div class="body">
-    <h3><span class="num mono">36</span>Field service and mobile crew app</h3>
+    <h3><span class="num mono">37</span>Field service and mobile crew app</h3>
     <p>Jobs land on the engineer's phone with route, client history, checklists, photo capture, parts used and a client signature, and the completion report reaches the office the moment the job ends.</p>
     <div class="kills"><b>Removes</b><span>ringing round the crew to ask where they are and what they fitted.</span></div>
   </div>
@@ -1532,7 +1519,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="nodes"><div class="node" data-lit>Scanner</div><div class="link" data-lit></div><div class="node" data-lit>Stock</div><div class="link" data-lit></div><div class="node" data-lit>Website and accounts</div></div>
   </div>
       <div class="body">
-    <h3><span class="num mono">37</span>Warehouse and inventory management</h3>
+    <h3><span class="num mono">38</span>Warehouse and inventory management</h3>
     <p>Receiving, picking, moving and stocktaking done by barcode or QR on a phone or scanner, with live stock levels feeding the website and the accounts at the same moment.</p>
     <div class="kills"><b>Removes</b><span>the gap between what the system says you hold and what is actually on the shelf.</span></div>
   </div>
@@ -1540,21 +1527,43 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 
     <article class="card">
   <div class="mock demo">
+    <div class="mtitle"><span>Booking desk</span><button class="runbtn" type="button">▶ take the booking</button></div>
+    <div class="calstrip" data-step><div class="day">Mon<b>14</b></div><div class="day due">Tue<b>15</b></div><div class="day">Wed<b>16</b></div><div class="day">Thu<b>17</b></div><div class="day">Fri<b>18</b></div></div>
+    <div class="mrow mono" data-step><span class="grow">Mon 14 Apr</span><div class="bar"><i data-w="83"></i></div><span data-count="11">0</span></div>
+    <div class="mrow mono" data-step><span class="grow">Tue 15 Apr</span><div class="bar"><i data-w="58"></i></div><span data-count="7">0</span></div>
+    <div class="mrow mono" data-step><span class="grow">Wed 16 Apr</span><div class="bar"><i data-w="31"></i></div><span data-count="4">0</span></div>
+    <div class="mrow" data-step><span class="grow">Free slots Tue, room 2</span><span class="mono">11:30 · 14:00 · 16:15</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">E. Marchetti booked <span class="mono">14:00</span> · 45 min, deposit <span class="mono">€ 25</span> taken online</span><span class="chip g">paid</span></div>
+    <div class="bigstat mono" style="margin-top:8px">
+      <div data-step><b data-count="4">0</b><span>no-shows this month, was 19</span></div>
+      <div data-step><b data-count="137">0</b><span>bookings taken without a call</span></div>
+    </div>
+  </div>
+      <div class="body">
+    <h3><span class="num mono">39</span>Booking and appointment system</h3>
+    <p>Online booking against real availability, automatic reminders that cut no-shows, room and resource allocation, deposits taken up front. Built for clinics, salons, studios, workshops, consultancies and equipment hire.</p>
+    <div class="kills"><b>Removes</b><span>the phone-and-paper diary and the empty slot nobody was reminded about.</span></div>
+  </div>
+</article>
+
+    <article class="card">
+  <div class="mock demo">
     <div class="mtitle"><span>Tomorrow's routes</span><button class="runbtn" type="button">▶ plan the runs</button></div>
+        <div class="chartwrap solo" data-step>
+          <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="kilometres per van run falling from 141 to 112 once the routes are sequenced">
+            <line x1="0" y1="28" x2="420" y2="28"></line><line x1="0" y1="56" x2="420" y2="56"></line><line x1="0" y1="84" x2="420" y2="84"></line>
+            <polygon class="area" points="0,34 52,46 104,64 156,84 208,90 260,76 312,58 364,40 418,24 418,110 0,110"></polygon>
+            <polyline class="s1" points="0,34 52,46 104,64 156,84 208,90 260,76 312,58 364,40 418,24"></polyline>
+            <circle class="p1" cx="418" cy="24" r="3.5"></circle>
+          </svg>
+        </div>
     <div class="minicols">
       <div class="caselist">
         <div class="caseitem active" data-step><b class="mono">VAN 2</b>9 drops · north loop</div>
         <div class="caseitem" data-step><b class="mono">VAN 3</b>7 drops · city centre</div>
       </div>
       <div class="casemain">
-        <div class="chartwrap" data-step>
-          <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="kilometres per van run falling from 141 to 112 once the routes are sequenced">
-            <line x1="0" y1="28" x2="420" y2="28"></line><line x1="0" y1="56" x2="420" y2="56"></line><line x1="0" y1="84" x2="420" y2="84"></line>
-            <polygon class="area" points="0,22 52,26 104,21 156,34 208,48 260,44 312,58 364,72 418,80 418,110 0,110"></polygon>
-            <polyline class="s1" points="0,22 52,26 104,21 156,34 208,48 260,44 312,58 364,72 418,80"></polyline>
-            <circle class="p1" cx="418" cy="80" r="3.5"></circle>
-          </svg>
-        </div>
+        
       </div>
     </div>
     <div class="mrow" data-step style="margin-top:8px"><span class="grow">28 drops, 4 vans, capacity and time windows applied</span></div>
@@ -1563,7 +1572,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mrow" data-step><span class="grow">Clients texted an arrival window, fuel saved <span class="mono">€310</span></span><span class="chip g">28 sent</span></div>
   </div>
       <div class="body">
-    <h3><span class="num mono">39</span>Route planning and fleet tracking</h3>
+    <h3><span class="num mono">40</span>Route planning and fleet tracking</h3>
     <p>Deliveries sequenced for the shortest run with time windows and vehicle capacity respected, drivers tracked live, clients told when to expect the van. Fuel and driver hours are usually the two largest controllable costs in a delivery operation.</p>
     <div class="kills"><b>Removes</b><span>an hour of manual route juggling each evening and the calls asking where the van is.</span></div>
   </div>
@@ -1585,7 +1594,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mrow" data-step><span class="dot r"></span><span class="grow">Leaver: T. Brandes , 7 accesses revoked at once <span class="mono">17:00</span></span><span class="chip g">clean</span></div>
   </div>
       <div class="body">
-    <h3><span class="num mono">58</span>Staff onboarding and offboarding</h3>
+    <h3><span class="num mono">41</span>Staff onboarding and offboarding</h3>
     <p>The moment a hire is accepted, accounts, accesses, equipment, checklists and the day-one schedule are created without anyone chasing IT. When someone leaves, every access dies in one click.</p>
     <div class="kills"><b>Removes</b><span>the first week where a new employee has no laptop, no logins and nobody assigned to them, and the ex-employee who still knows the CRM password.</span></div>
   </div>
@@ -1594,18 +1603,20 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Fleet and machines · service due</span><button class="runbtn" type="button">▶ raise work orders</button></div>
-    <div class="mrow mono" data-step><span class="grow">Press line 2 · hours to service</span><div class="bar"><i data-w="94"></i></div><span data-count="470">0</span></div>
-    <div class="mrow mono" data-step><span class="grow">Van MB-317 · km to service</span><div class="bar"><i data-w="81"></i></div><span data-count="12400">0</span></div>
-    <div class="mrow mono" data-step><span class="grow">Forklift F-6 · days to inspection</span><div class="bar"><i data-w="62"></i></div><span data-count="23">0</span></div>
-    <div class="kanban">
+        <div class="kanban">
       <div class="kcol done" data-step><div class="khead"><span>Due</span><b>✓</b></div><div class="ktask">Press line 2 hits 500 h Thursday <span class="chip a">order raised</span></div></div>
       <div class="kcol done" data-step><div class="khead"><span>Parts</span><b>✓</b></div><div class="ktask">Filter set and belts reserved <span class="chip g">€ 214</span></div></div>
       <div class="kcol done" data-step><div class="khead"><span>Booked</span><b>✓</b></div><div class="ktask">Sunday <span class="mono">06:00</span>, engineer assigned <span class="chip g">planned</span></div></div>
     </div>
+        
+    <div class="mrow mono" data-step><span class="grow">Press line 2 · hours to service</span><div class="bar"><i data-w="94"></i></div><span data-count="470">0</span></div>
+    <div class="mrow mono" data-step><span class="grow">Van MB-317 · km to service</span><div class="bar"><i data-w="81"></i></div><span data-count="12400">0</span></div>
+    <div class="mrow mono" data-step><span class="grow">Forklift F-6 · days to inspection</span><div class="bar"><i data-w="62"></i></div><span data-count="23">0</span></div>
+    
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Zero production lost, breakdowns down from 11 to 2 this quarter</span><span class="chip g">planned</span></div>
   </div>
       <div class="body">
-    <h3><span class="num mono">59</span>Equipment and vehicle maintenance scheduler</h3>
+    <h3><span class="num mono">42</span>Equipment and vehicle maintenance scheduler</h3>
     <p>Service intervals are tracked from running hours, mileage or the calendar, whichever comes first. Work orders are raised before the breakdown, with parts, cost and downtime logged per machine.</p>
     <div class="kills"><b>Removes</b><span>the production line that stops on the busiest day because nobody remembered the 500-hour service.</span></div>
   </div>
@@ -1613,10 +1624,37 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 
   <div class="band">
-  <div class="section-head" id="s-web"><span class="idx serif">8 services</span><h2 class="serif">Web and customer-facing</h2></div>
+  <div class="section-head" id="s-web"><span class="idx serif">8 examples</span><h2 class="serif">Web and customer-facing</h2></div>
   <p class="section-sub">Sites that convert, stores that sync, payments that reconcile themselves, and a sales channel inside the client's messenger.</p>
   <div class="grid" id="g-web">
 <article class="card">
+  <div class="mock demo">
+    <div class="mtitle"><span>Landing page to CRM</span><button class="runbtn" type="button">▶ send an enquiry</button></div>
+    <div class="chartwrap" data-step>
+      <div class="clegend"><span class="c1"><i></i>Enquiries</span><span class="c2"><i></i>Mobile visits</span></div>
+      <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="Enquiries rise sharply after the new landing page goes live, faster than visits">
+        <line x1="0" y1="28" x2="420" y2="28"></line>
+        <line x1="0" y1="56" x2="420" y2="56"></line>
+        <line x1="0" y1="84" x2="420" y2="84"></line>
+        <polyline class="s2" points="0,30 42,34 84,32 126,36 168,34 210,38 252,36 294,40 336,38 418,42"></polyline>
+        <polyline class="s1" points="0,62 42,38 84,70 126,44 168,76 210,48 252,80 294,52 336,72 418,46"></polyline>
+        <circle class="p2" cx="418" cy="42" r="3.5"></circle>
+        <circle class="p1" cx="418" cy="46" r="3.5"></circle>
+      </svg>
+    </div>
+    <div class="mrow" data-step><span class="grow">Mobile load time</span><span class="mono"><span data-count="9">0</span>00 ms</span><span class="chip g">fast</span></div>
+    <div class="nodes"><div class="node" data-lit>Landing form</div><div class="link" data-lit></div><div class="node" data-lit>CRM</div><div class="link" data-lit></div><div class="node" data-lit>Sales rep</div></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Form submitted · Northgate Ltd, quote request</span><span class="mono">10:12</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Lead assigned to Anna K. · source: paid search, first reply in <span class="mono">4 min</span></span><span class="chip g">in CRM</span></div>
+  </div>
+      <div class="body">
+    <h3><span class="num mono">43</span>Corporate site and landing pages</h3>
+    <p>Fast, mobile-correct pages built to convert instead of to look busy. Forms are wired into your CRM from the first day live.</p>
+    <div class="kills"><b>Removes</b><span>Enquiries sitting unread in a shared mailbox nobody owns.</span></div>
+  </div>
+</article>
+
+    <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Online store</span><button class="runbtn" type="button">▶ place an order</button></div>
     <div class="kanban">
@@ -1632,36 +1670,9 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     </div>
   </div>
       <div class="body">
-    <h3><span class="num mono">41</span>Online store</h3>
+    <h3><span class="num mono">44</span>Online store</h3>
     <p>Catalogue, payments, delivery calculation and stock tied to the warehouse, with online orders landing in the same system your offline sales already use.</p>
     <div class="kills"><b>Removes</b><span>Calling a developer every time you want to add a product.</span></div>
-  </div>
-</article>
-
-    <article class="card">
-  <div class="mock demo">
-    <div class="mtitle"><span>Landing page to CRM</span><button class="runbtn" type="button">▶ send an enquiry</button></div>
-    <div class="chartwrap" data-step>
-      <div class="clegend"><span class="c1"><i></i>Enquiries</span><span class="c2"><i></i>Mobile visits</span></div>
-      <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="Enquiries rise sharply after the new landing page goes live, faster than visits">
-        <line x1="0" y1="28" x2="420" y2="28"></line>
-        <line x1="0" y1="56" x2="420" y2="56"></line>
-        <line x1="0" y1="84" x2="420" y2="84"></line>
-        <polyline class="s2" points="8,74 46,70 84,68 122,60 160,58 198,52 236,50 274,44 312,42 350,38 384,34 418,30"></polyline>
-        <polyline class="s1" points="8,88 46,86 84,82 122,64 160,54 198,48 236,42 274,36 312,30 350,26 384,20 418,16"></polyline>
-        <circle class="p2" cx="418" cy="30" r="3.5"></circle>
-        <circle class="p1" cx="418" cy="16" r="3.5"></circle>
-      </svg>
-    </div>
-    <div class="mrow" data-step><span class="grow">Mobile load time</span><span class="mono"><span data-count="9">0</span>00 ms</span><span class="chip g">fast</span></div>
-    <div class="nodes"><div class="node" data-lit>Landing form</div><div class="link" data-lit></div><div class="node" data-lit>CRM</div><div class="link" data-lit></div><div class="node" data-lit>Sales rep</div></div>
-    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Form submitted · Northgate Ltd, quote request</span><span class="mono">10:12</span></div>
-    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Lead assigned to Anna K. · source: paid search, first reply in <span class="mono">4 min</span></span><span class="chip g">in CRM</span></div>
-  </div>
-      <div class="body">
-    <h3><span class="num mono">40</span>Corporate site and landing pages</h3>
-    <p>Fast, mobile-correct pages built to convert instead of to look busy. Forms are wired into your CRM from the first day live.</p>
-    <div class="kills"><b>Removes</b><span>Enquiries sitting unread in a shared mailbox nobody owns.</span></div>
   </div>
 </article>
 
@@ -1682,7 +1693,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Cycle closed, nobody opened a spreadsheet</span><span class="chip g">done</span></div>
   </div>
       <div class="body">
-    <h3><span class="num mono">42</span>Customer accounts and subscription billing</h3>
+    <h3><span class="num mono">45</span>Customer accounts and subscription billing</h3>
     <p>Recurring charges, plan changes, dunning on failed cards, usage limits and invoices issued without anyone touching them.</p>
     <div class="kills"><b>Removes</b><span>Chasing expired cards by hand and quietly losing that revenue.</span></div>
   </div>
@@ -1691,7 +1702,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Payments and reconciliation</span><button class="runbtn" type="button">▶ close the day</button></div>
-    <div class="nodes">
+        <div class="nodes">
       <div class="node" data-lit>Card</div>
       <div class="link" data-lit></div>
       <div class="node" data-lit>Bank</div>
@@ -1700,13 +1711,15 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
       <div class="link" data-lit></div>
       <div class="node" data-lit>Accounting</div>
     </div>
+        
+    
     <div class="mrow" data-step><span class="grow">Payments received today</span><span class="mono">€ <span data-count="21740">0</span></span></div>
     <div class="mrow" data-step><span class="grow">Matched to orders</span><div class="bar"><i data-w="100"></i></div></div>
     <div class="mrow" data-step><span class="dot a"></span><span class="grow">2 short payments flagged for the office</span><span class="chip a">review</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Posted to accounting, 0 unmatched lines</span><span class="chip g">reconciled</span></div>
   </div>
       <div class="body">
-    <h3><span class="num mono">43</span>Payment integration</h3>
+    <h3><span class="num mono">46</span>Payment integration</h3>
     <p>Card, bank transfer, instalments, invoicing and crypto where it makes sense, with every payment reconciled back into accounting.</p>
     <div class="kills"><b>Removes</b><span>Finance matching bank lines to orders by eye each evening.</span></div>
   </div>
@@ -1715,6 +1728,10 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Messenger sales bot</span><button class="runbtn" type="button">▶ order in telegram</button></div>
+        <div class="bigstat mono" style="margin-top:8px">
+      <div data-step><b data-count="34">0</b><span>% better than the mobile web form</span></div>
+      <div data-step><b data-count="62">0</b><span>orders taken in chat this week</span></div>
+    </div>
     <div class="minicols">
       <div class="caselist">
         <div class="caseitem active" data-step><b class="mono">19:24</b>M. Ilves · catalogue open</div>
@@ -1727,13 +1744,10 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <div class="mrow" data-step><span class="dot g"></span><span class="grow">Paid inside the messenger <span class="mono">19:26</span>, then tracked: courier <span class="mono">DPD 7741</span> before 18:00</span><span class="chip g">auto</span></div>
       </div>
     </div>
-    <div class="bigstat mono" style="margin-top:8px">
-      <div data-step><b data-count="34">0</b><span>% better than the mobile web form</span></div>
-      <div data-step><b data-count="62">0</b><span>orders taken in chat this week</span></div>
-    </div>
+    
   </div>
       <div class="body">
-    <h3><span class="num mono">44</span>Telegram or WhatsApp bot as a sales channel</h3>
+    <h3><span class="num mono">47</span>Telegram or WhatsApp bot as a sales channel</h3>
     <p>Catalogue, ordering, order status, support and notifications inside the messenger your customer already has open. In most consumer categories that beats a mobile web form.</p>
     <div class="kills"><b>Removes</b><span>Staff answering the same "where is my order" message all day.</span></div>
   </div>
@@ -1742,25 +1756,26 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Marketplace control panel</span><button class="runbtn" type="button">▶ push price update</button></div>
-    <div class="filechips"><span class="fchip" data-eat>Admin panel 1</span><span class="fchip" data-eat>Admin panel 2</span><span class="fchip" data-eat>Admin panel 3</span><span class="fchip" data-eat>Admin panel 4</span></div>
-    <div class="chartwrap" data-step>
-      <div class="clegend"><span class="c1"><i></i>Buy box share</span><span class="c2"><i></i>Cheapest rival price</span></div>
+        <div class="chartwrap solo" data-step>
+      <div class="clegend"><span class="c1"><i></i>Buy box share</span></div>
       <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="Buy box share climbs as the repricing rule tracks the cheapest rival price down">
         <line x1="0" y1="28" x2="420" y2="28"></line>
         <line x1="0" y1="56" x2="420" y2="56"></line>
         <line x1="0" y1="84" x2="420" y2="84"></line>
-        <polyline class="s2" points="8,32 60,36 112,34 164,42 216,48 268,52 320,60 372,64 418,70"></polyline>
-        <polyline class="s1" points="8,84 60,80 112,72 164,66 216,52 268,44 320,36 372,30 418,24"></polyline>
-        <circle class="p1" cx="418" cy="24" r="3.5"></circle>
-        <circle class="p2" cx="418" cy="70" r="3.5"></circle>
+        
+        <polygon class="area" points="0,58 60,57 120,59 180,58 240,56 300,57 340,34 380,22 418,18 418,110 0,110"></polygon><polyline class="s1" points="0,58 60,57 120,59 180,58 240,56 300,57 340,34 380,22 418,18"></polyline>
+        <circle class="p1" cx="418" cy="18" r="3.5"></circle>
+        
       </svg>
     </div>
+    <div class="filechips"><span class="fchip" data-eat>Admin panel 1</span><span class="fchip" data-eat>Admin panel 2</span><span class="fchip" data-eat>Admin panel 3</span><span class="fchip" data-eat>Admin panel 4</span></div>
+    
     <div class="mrow" data-step><span class="grow">Listings synced across 4 marketplaces</span><span class="mono"><span data-count="1280">0</span></span></div>
     <div class="mrow" data-step><span class="dot a"></span><span class="grow">Repricing rule fired · SKU 2210 cut to hold the buy box</span><span class="mono">€ 41,90</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Stock and orders pulled back into one list</span><span class="chip g">in sync</span></div>
   </div>
       <div class="body">
-    <h3><span class="num mono">45</span>Marketplace management tool</h3>
+    <h3><span class="num mono">48</span>Marketplace management tool</h3>
     <p>Listings, prices, stock and orders for several marketplaces in one place, with automatic repricing rules if you want them.</p>
     <div class="kills"><b>Removes</b><span>Logging into four seller panels to change one price.</span></div>
   </div>
@@ -1769,25 +1784,26 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Attribution dashboard</span><button class="runbtn" type="button">▶ join spend to revenue</button></div>
-    <div class="nodes"><div class="node" data-lit>Ad click</div><div class="link" data-lit></div><div class="node" data-lit>CRM deal</div><div class="link" data-lit></div><div class="node" data-lit>Closed revenue</div></div>
-    <div class="chartwrap" data-step>
+        <div class="chartwrap" data-step>
       <div class="clegend"><span class="c1"><i></i>Revenue</span><span class="c2"><i></i>Ad spend</span></div>
       <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="Revenue keeps rising after display spend is cut, while total spend falls away">
         <line x1="0" y1="28" x2="420" y2="28"></line>
         <line x1="0" y1="56" x2="420" y2="56"></line>
         <line x1="0" y1="84" x2="420" y2="84"></line>
-        <polyline class="s2" points="0,44 46,42 92,40 138,43 184,48 230,58 276,66 322,72 368,77 418,81"></polyline>
-        <polyline class="s1" points="0,74 46,71 92,72 138,64 184,57 230,49 276,40 322,32 368,24 418,18"></polyline>
-        <circle class="p1" cx="418" cy="18" r="3.5"></circle>
-        <circle class="p2" cx="418" cy="81" r="3.5"></circle>
+        <polyline class="s2" points="0,66 40,64 80,66 120,62 160,64 200,60 240,62 280,58 330,60 418,56"></polyline>
+        <polyline class="s1" points="0,22 52,30 104,36 156,46 208,54 260,66 312,74 364,86 418,94"></polyline>
+        <circle class="p1" cx="418" cy="94" r="3.5"></circle>
+        <circle class="p2" cx="418" cy="56" r="3.5"></circle>
       </svg>
     </div>
+    <div class="nodes"><div class="node" data-lit>Ad click</div><div class="link" data-lit></div><div class="node" data-lit>CRM deal</div><div class="link" data-lit></div><div class="node" data-lit>Closed revenue</div></div>
+    
     <div class="mrow" data-step><span class="grow">Paid search · cost per client</span><span class="mono">€ 118</span><span class="chip g">keep</span></div>
     <div class="mrow" data-step><span class="dot r"></span><span class="grow">Display · cost per client</span><span class="mono">€ 940</span><span class="chip r">cut</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Budget reallocated, forms counted as leads not sales</span><span class="chip g">tracked</span></div>
   </div>
       <div class="body">
-    <h3><span class="num mono">46</span>Analytics, tracking and attribution</h3>
+    <h3><span class="num mono">49</span>Analytics, tracking and attribution</h3>
     <p>Event tracking done properly and ad spend joined to closed revenue rather than to form submissions, so dashboards show real cost per client by channel.</p>
     <div class="kills"><b>Removes</b><span>Setting next month's budget on numbers that stop at the form.</span></div>
   </div>
@@ -1796,21 +1812,15 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Review watch · Google, Trustpilot, marketplace</span><button class="runbtn" type="button">▶ run the autopilot</button></div>
-    <div class="nodes">
-      <div class="node" data-lit>Order closed</div>
-      <div class="link" data-lit></div>
-      <div class="node" data-lit>Ask at the right hour</div>
-      <div class="link" data-lit></div>
-      <div class="node" data-lit>Reply drafted</div>
-    </div>
-    <div class="chartwrap" data-step>
+    
+    <div class="chartwrap solo" data-step>
       <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="Average public rating dips after a bad review, then recovers above where it started once replies go out">
         <line x1="0" y1="28" x2="420" y2="28"></line>
         <line x1="0" y1="56" x2="420" y2="56"></line>
         <line x1="0" y1="84" x2="420" y2="84"></line>
-        <polygon class="area" points="8,30 46,28 84,34 122,52 160,66 198,72 236,60 274,48 312,40 350,34 384,28 418,24 418,110 0,110"></polygon>
-        <polyline class="s1" points="8,30 46,28 84,34 122,52 160,66 198,72 236,60 274,48 312,40 350,34 384,28 418,24"></polyline>
-        <circle class="p1" cx="418" cy="24" r="3.5"></circle>
+        <polygon class="area" points="0,80 46,40 92,66 138,30 184,58 230,26 276,54 322,36 368,62 418,44 418,110 0,110"></polygon>
+        <polyline class="s1" points="0,80 46,40 92,66 138,30 184,58 230,26 276,54 322,36 368,62 418,44"></polyline>
+        <circle class="p1" cx="418" cy="44" r="3.5"></circle>
       </svg>
     </div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Northgate Ltd · 5 stars on Google</span><span class="mono">21:14</span><span class="chip g">posted</span></div>
@@ -1818,8 +1828,15 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mrow" data-step><span class="dot a"></span><span class="grow">Calm reply drafted , waiting for your yes</span><span class="mono">09:07</span><span class="chip a">approve</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Reply published , client raised to 4 stars</span><span class="mono">11:41</span><span class="chip g">recovered</span></div>
   </div>
-      <div class="body">
-    <h3><span class="num mono">57</span>Reviews and reputation autopilot</h3>
+      
+        <div class="nodes">
+      <div class="node" data-lit>Order closed</div>
+      <div class="link" data-lit></div>
+      <div class="node" data-lit>Ask at the right hour</div>
+      <div class="link" data-lit></div>
+      <div class="node" data-lit>Reply drafted</div>
+    </div><div class="body">
+    <h3><span class="num mono">50</span>Reviews and reputation autopilot</h3>
     <p>After each completed order the system asks the happy client for a review at the moment they are most likely to leave one. A bad review pings you within minutes with a calm reply already drafted for your approval.</p>
     <div class="kills"><b>Removes</b><span>the silence that lets one angry review sit unanswered for a month while it quietly costs you clients.</span></div>
   </div>
@@ -1827,27 +1844,29 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
   </div><!-- /band -->
 
-  <div class="section-head" id="s-rep"><span class="idx serif">5 services</span><h2 class="serif">Reporting and management visibility</h2></div>
+  <div class="section-head" id="s-rep"><span class="idx serif">5 examples</span><h2 class="serif">Reporting and management visibility</h2></div>
   <p class="section-sub">One screen of truth for the director, and an alert the hour something goes wrong instead of a surprise at month end.</p>
   <div class="grid" id="g-rep">
 <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Director's screen</span><button class="runbtn" type="button">▶ refresh the board</button></div>
-    <div class="mrow" data-step><span class="grow">Revenue, month to date</span><span class="mono">€<span data-count="418500">0</span></span><span class="up">▲</span></div>
-    <div class="mrow" data-step><span class="grow">Gross margin</span><div class="bar"><i data-w="34"></i></div><span class="mono">34%</span></div>
-    <div class="chartwrap" data-step>
+        <div class="chartwrap" data-step>
       <div class="clegend"><span class="c1"><i></i>Revenue</span><span class="c2"><i></i>Costs</span></div>
       <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="Revenue rising above flattening costs over twelve months">
         <line x1="0" y1="28" x2="420" y2="28"></line><line x1="0" y1="56" x2="420" y2="56"></line><line x1="0" y1="84" x2="420" y2="84"></line>
-        <polyline class="s2" points="0,62 38,58 76,60 114,54 152,56 190,50 228,52 266,48 304,50 342,46 380,47 418,45"></polyline>
-        <polyline class="s1" points="0,84 38,78 76,72 114,74 152,64 190,58 228,52 266,46 304,40 342,34 380,28 418,20"></polyline>
-        <circle class="p1" cx="418" cy="20" r="3.5"></circle><circle class="p2" cx="418" cy="45" r="3.5"></circle>
+        <polyline class="s2" points="0,30 42,34 84,32 126,36 168,34 210,38 252,36 294,40 336,38 418,42"></polyline>
+        <polyline class="s1" points="0,40 52,38 104,41 156,39 208,42 236,88 264,84 316,44 368,40 418,38"></polyline>
+        <circle class="p1" cx="418" cy="38" r="3.5"></circle><circle class="p2" cx="418" cy="42" r="3.5"></circle>
       </svg>
     </div>
+        
+    <div class="mrow" data-step><span class="grow">Revenue, month to date</span><span class="mono">€<span data-count="418500">0</span></span><span class="up">▲</span></div>
+    <div class="mrow" data-step><span class="grow">Gross margin</span><div class="bar"><i data-w="34"></i></div><span class="mono">34%</span></div>
+    
     <div class="mrow" data-step><span class="grow">Pulled from source systems <span class="mono">08:00</span>, refreshed every hour</span><span class="chip g">current</span></div>
   </div>
   <div class="body">
-    <h3><span class="num mono">47</span>Management dashboards</h3>
+    <h3><span class="num mono">51</span>Management dashboards</h3>
     <p>Revenue, margin, cash, pipeline, stock, production and staff performance on one screen, refreshed automatically from the systems that hold the data. The version of the truth the director reads before the meeting, not during it.</p>
     <div class="kills"><b>Removes</b><span>the pre-board scramble to reconcile five different spreadsheets into one number.</span></div>
   </div>
@@ -1868,7 +1887,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Figures locked and shared with the team at <span class="mono">17:05</span></span><span class="chip g">agreed</span></div>
   </div>
       <div class="body">
-    <h3><span class="num mono">48</span>Staff KPI tracking</h3>
+    <h3><span class="num mono">52</span>Staff KPI tracking</h3>
     <p>Individual and team performance measured from the system's own records rather than what people report about themselves, feeding straight into the bonus calculation.</p>
     <div class="kills"><b>Removes</b><span>the monthly argument about whose numbers are the real ones.</span></div>
   </div>
@@ -1891,7 +1910,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mrow" data-step><span class="grow">Manual build time saved <span class="mono">3h</span> a week</span><span class="down">▼</span><span class="chip g">no one chased</span></div>
   </div>
       <div class="body">
-    <h3><span class="num mono">49</span>Scheduled reports</h3>
+    <h3><span class="num mono">53</span>Scheduled reports</h3>
     <p>The report someone assembles by hand every Monday morning is generated and delivered on schedule to email or Telegram, already formatted and ready to forward. A small change that is felt immediately.</p>
     <div class="kills"><b>Removes</b><span>the standing Monday job of exporting, pasting and formatting the same figures.</span></div>
   </div>
@@ -1900,11 +1919,15 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Anomaly watch</span><button class="runbtn" type="button">▶ watch the numbers</button></div>
-    <div class="minicols">
+    
+    
+  </div>
+      
+        <div class="minicols">
       <div class="caselist">
-        <div class="caseitem active" data-step><b class="mono">42</b>checks, every 15 minutes</div>
-        <div class="caseitem" data-step><b class="mono">09:41</b>Margin, SKU 2210</div>
-        <div class="caseitem" data-step><b class="mono">09:44</b>Quiet customer, Northgate</div>
+        <div class="caseitem active" data-step>checks, every 15 minutes</div>
+        <div class="caseitem" data-step>Margin, SKU 2210</div>
+        <div class="caseitem" data-step>Quiet customer, Northgate</div>
       </div>
       <div class="casemain">
         <div class="mrow" data-step><span class="dot r"></span><span class="grow"><b>Margin down</b> on SKU 2210 · 31% to 18% <span class="down">▼</span></span><span class="chip r">now</span></div>
@@ -1913,13 +1936,11 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <div class="mrow" data-step><span class="dot g"></span><span class="grow">All raised the same morning, not at month end</span><span class="chip g">flagged</span></div>
       </div>
     </div>
-    <div class="bigstat mono" style="margin-top:8px">
+        <div class="bigstat mono" style="margin-top:8px">
       <div data-step><b data-count="17">0</b><span>issues caught this month</span></div>
       <div data-step><b data-count="11300">0</b><span>euro of margin protected</span></div>
-    </div>
-  </div>
-      <div class="body">
-    <h3><span class="num mono">50</span>Alerting and anomaly detection</h3>
+    </div><div class="body">
+    <h3><span class="num mono">54</span>Alerting and anomaly detection</h3>
     <p>You get told the moment something leaves its normal range: margin slipping on a product, a regular client going quiet, stock under cover, a server down, a payment failing, expenses spiking.</p>
     <div class="kills"><b>Removes</b><span>finding out about a month-old problem when the month-end figures land.</span></div>
   </div>
@@ -1928,32 +1949,33 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Churn radar · last 90 days</span><button class="runbtn" type="button">▶ scan the base</button></div>
-    <div class="minicols">
+    
+    <div class="mrow mono" data-step style="margin-top:8px"><span class="grow">Active clients scanned</span><span data-count="312">0</span><span class="chip a">9 going quiet</span></div>
+    <div class="mrow" data-step><span class="dot r"></span><span class="grow">Northgate Ltd · 4 orders a month, now 1 · <span class="mono">€ 87 400</span> at risk</span><span class="chip r">cooling</span></div>
+    <div class="mrow" data-step><span class="dot a"></span><span class="grow">Vellmar Handel · volume down 41 percent</span><span class="chip a">watch</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Win back task to A. Koss, full history attached</span><span class="mono">10:26</span><span class="chip g">assigned</span></div>
+  </div>
+      
+        <div class="minicols">
       <div class="caselist">
         <div class="caseitem active" data-step><b class="mono">C 0412</b>Northgate Ltd · cooling</div>
         <div class="caseitem" data-step><b class="mono">C 0871</b>Vellmar Handel · watch</div>
         <div class="caseitem" data-step><b class="mono">C 1140</b>Kressen BV · steady</div>
       </div>
       <div class="casemain">
-        <div class="chartwrap" data-step>
-          <div class="clegend"><span class="c1"><i></i>orders per month</span><span class="c2"><i></i>value per month</span></div>
+        <div class="chartwrap solo" data-step>
+          <div class="clegend"><span class="c1"><i></i>orders per month</span></div>
           <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="Northgate orders and spend both sliding away over ninety days">
             <line x1="0" y1="28" x2="420" y2="28"></line><line x1="0" y1="56" x2="420" y2="56"></line><line x1="0" y1="84" x2="420" y2="84"></line>
-            <polyline class="s2" points="0,44 46,40 92,46 138,52 184,58 230,66 276,72 322,80 368,88 418,96"></polyline>
-            <polyline class="s1" points="0,24 46,20 92,28 138,36 184,48 230,52 276,66 322,74 368,84 418,90"></polyline>
-            <circle class="p1" cx="418" cy="90" r="3.5"></circle>
-            <circle class="p2" cx="418" cy="96" r="3.5"></circle>
+            
+            <polygon class="area" points="0,92 46,86 92,78 138,74 184,62 230,54 276,44 322,36 368,26 418,16 418,110 0,110"></polygon><polyline class="s1" points="0,92 46,86 92,78 138,74 184,62 230,54 276,44 322,36 368,26 418,16"></polyline>
+            <circle class="p1" cx="418" cy="16" r="3.5"></circle>
+            
           </svg>
         </div>
       </div>
-    </div>
-    <div class="mrow mono" data-step style="margin-top:8px"><span class="grow">Active clients scanned</span><span data-count="312">0</span><span class="chip a">9 going quiet</span></div>
-    <div class="mrow" data-step><span class="dot r"></span><span class="grow">Northgate Ltd · 4 orders a month, now 1 · <span class="mono">€ 87 400</span> at risk</span><span class="chip r">cooling</span></div>
-    <div class="mrow" data-step><span class="dot a"></span><span class="grow">Vellmar Handel · volume down 41 percent</span><span class="chip a">watch</span></div>
-    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Win back task to A. Koss, full history attached</span><span class="mono">10:26</span><span class="chip g">assigned</span></div>
-  </div>
-      <div class="body">
-    <h3><span class="num mono">60</span>Client churn radar</h3>
+    </div><div class="body">
+    <h3><span class="num mono">55</span>Client churn radar</h3>
     <p>Order frequency and volume are watched per client, so the ones drifting away are flagged weeks before they stop answering. The manager gets a win-back task with the client's whole history attached.</p>
     <div class="kills"><b>Removes</b><span>finding out a top-20 client left only when the annual numbers are compared.</span></div>
   </div>
@@ -1961,7 +1983,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 
   <div class="band">
-  <div class="section-head" id="s-infra"><span class="idx serif">5 services</span><h2 class="serif">Infrastructure and support</h2></div>
+  <div class="section-head" id="s-infra"><span class="idx serif">5 examples</span><h2 class="serif">Infrastructure and support</h2></div>
   <p class="section-sub">The critical spreadsheet retired, the legacy program tamed, backups that are actually tested, and training so it all gets used.</p>
   <div class="grid" id="g-infra">
 <article class="card">
@@ -1982,7 +2004,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     </div>
   </div>
       <div class="body">
-    <h3><span class="num mono">51</span>Excel replaced with a real application</h3>
+    <h3><span class="num mono">56</span>Excel replaced with a real application</h3>
     <p>The critical spreadsheet one person maintains, that breaks when two people open it and keeps no history, becomes a multi-user application with permissions and backups.</p>
     <div class="kills"><b>Removes</b><span>A business-critical file that only one employee can safely touch.</span></div>
   </div>
@@ -2004,7 +2026,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Results exported for the new system</span><span class="chip g">done</span></div>
   </div>
       <div class="body">
-    <h3><span class="num mono">52</span>Automating an old desktop program nobody can change</h3>
+    <h3><span class="num mono">57</span>Automating an old desktop program nobody can change</h3>
     <p>When a legacy Windows application has no API and no vendor left, we automate the clicking and typing instead. Ugly, effective, and often the only route.</p>
     <div class="kills"><b>Removes</b><span>Staff retyping the same records into a program nobody can modify.</span></div>
   </div>
@@ -2024,7 +2046,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Back up at <span class="mono">14:26</span>, and the leaver was offboarded from 9 systems in one click</span><span class="chip g">restored</span></div>
   </div>
       <div class="body">
-    <h3><span class="num mono">53</span>Backup, disaster recovery and access control</h3>
+    <h3><span class="num mono">58</span>Backup, disaster recovery and access control</h3>
     <p>Automated backups that are actually tested, role-based permissions, a log of who saw and changed what, and offboarding that revokes everything at once.</p>
     <div class="kills"><b>Removes</b><span>Discovering the backups never worked on the day you need them.</span></div>
   </div>
@@ -2044,8 +2066,8 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <line x1="0" y1="56" x2="420" y2="56"></line>
         <line x1="0" y1="84" x2="420" y2="84"></line>
         <polygon class="area" points="8,80 60,78 112,76 164,30 216,20 268,44 320,72 372,78 418,80 418,110 0,110"></polygon>
-        <polyline class="s1" points="8,80 60,78 112,76 164,30 216,20 268,44 320,72 372,78 418,80"></polyline>
-        <circle class="p1" cx="418" cy="80" r="3.5"></circle>
+        <polyline class="s1" points="0,88 40,84 80,80 120,34 160,26 200,28 240,30 280,27 330,29 418,26"></polyline>
+        <circle class="p1" cx="418" cy="26" r="3.5"></circle>
       </svg>
     </div>
     <div class="mrow" data-step><span class="dot a"></span><span class="grow">Response time crossed the alert threshold, on-call notified</span><span class="mono">03:14</span></div>
@@ -2053,7 +2075,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <div class="mrow" data-step><span class="grow">Uptime last 90 days</span><span class="mono"><span data-count="99">0</span>,9%</span><span class="chip g">healthy</span></div>
   </div>
       <div class="body">
-    <h3><span class="num mono">54</span>Hosting, deployment and monitoring</h3>
+    <h3><span class="num mono">59</span>Hosting, deployment and monitoring</h3>
     <p>Servers set up, releases automated, uptime and performance watched with alerts that reach a human. This is what keeps the thing running after launch.</p>
     <div class="kills"><b>Removes</b><span>Finding out from a customer that the site has been down since night.</span></div>
   </div>
@@ -2062,15 +2084,16 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Handover pack</span><button class="runbtn" type="button">▶ hand it over</button></div>
+        <div class="doc" data-step><b>Operating manual · warehouse module</b><div class="dline"></div><div class="dline short"></div></div>
     <div class="calstrip" data-step><div class="day">Mon<b>06</b></div><div class="day due">Tue<b>07</b></div><div class="day">Wed<b>08</b></div><div class="day due">Thu<b>09</b></div><div class="day">Fri<b>10</b></div></div>
-    <div class="doc" data-step><b>Operating manual · warehouse module</b><div class="dline"></div><div class="dline short"></div></div>
+    
     <div class="mrow" data-step><span class="grow">Video walkthroughs recorded</span><span class="mono"><span data-count="12">0</span></span></div>
     <div class="mrow" data-step><span class="grow">Two sessions at <span class="mono">11:00</span> <span class="crew"><span class="avat">DK</span><span class="avat">MR</span><span class="avat">EL</span><span class="more">+15 staff</span></span></span><span class="chip g">18 of 18</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Admin rights and source code handed to your team</span><span class="chip g">yours</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Daily active users in month three</span><span class="mono"><span class="up">▲</span> 18 of 18</span><span class="chip g">in use</span></div>
   </div>
       <div class="body">
-    <h3><span class="num mono">55</span>Training, documentation and handover</h3>
+    <h3><span class="num mono">60</span>Training, documentation and handover</h3>
     <p>Written instructions, video walkthroughs and staff training, so the system is used rather than quietly abandoned in month three. Support agreement available for ongoing changes.</p>
     <div class="kills"><b>Removes</b><span>Paying for a system your team goes back to working around.</span></div>
   </div>
@@ -2161,8 +2184,8 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   function countUp(el){
     var target = parseInt(el.getAttribute('data-count'), 10);
     if (reduced){ el.textContent = target.toLocaleString('en-US'); return; }
-    var t0 = performance.now(), dur = 1600;
-    setTimeout(function(){ el.textContent = target.toLocaleString('en-US'); }, dur + 200);
+    var t0 = performance.now(), dur = 1100;
+    setTimeout(function(){ el.textContent = target.toLocaleString('en-US'); }, dur + 150);
     function tick(t){
       var p = Math.min((t - t0) / dur, 1);
       p = 1 - Math.pow(1 - p, 3);
@@ -2188,22 +2211,22 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     var delay = reduced ? 0 : 120;
 
     eats.forEach(function(f, i){
-      setTimeout(function(){ f.classList.add('eaten'); }, delay + i * 450);
+      setTimeout(function(){ f.classList.add('eaten'); }, delay + i * 315);
     });
-    var base = delay + eats.length * 450;
+    var base = delay + eats.length * 315;
     lits.forEach(function(n, i){
-      setTimeout(function(){ n.classList.add('lit'); }, base + i * 420);
+      setTimeout(function(){ n.classList.add('lit'); }, base + i * 295);
     });
-    base += lits.length * 420;
+    base += lits.length * 295;
     steps.forEach(function(s, i){
       setTimeout(function(){
         s.classList.add('shown');
         s.querySelectorAll('[data-count]').forEach(countUp);
         if (s.hasAttribute('data-count')) countUp(s);
         s.querySelectorAll('.bar i').forEach(function(b){ b.style.width = b.getAttribute('data-w') + '%'; });
-      }, base + i * (reduced ? 0 : 480));
+      }, base + i * (reduced ? 0 : 335));
     });
-    var total = base + steps.length * 480 + 600;
+    var total = base + steps.length * 335 + 420;
     setTimeout(function(){ if (btn) btn.classList.remove('busy'); mock.classList.remove('playing'); }, reduced ? 200 : total);
   }
 
