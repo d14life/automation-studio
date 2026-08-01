@@ -81,7 +81,7 @@ body{margin:0;background:#000;color:#EDF2EC;font:15px/1.55 system-ui,-apple-syst
 <section id="stage">
   <div id="stageui">
     <div id="liquid"></div>
-    <p class="sub">Цвет текста и трубок меняется сам. Мышь только водит трубки.</p>
+    <p class="sub">Цвет текста и трубок меняется сам. Трубки живут своей жизнью, за мышью не ходят.</p>
     <p class="sub" id="tubereadout" style="font:12px/1 ui-monospace,monospace;opacity:.55">трубки: ждут запуска</p>
   </div>
 </section>
@@ -391,9 +391,13 @@ function hslHex(h,s,l){
     if(!tubesApp||!tubesApp.tubes) return;
     var l=glow.l;
     try{
-      tubesApp.tubes.setColors([hslHex(tubeHue,.8,l),hslHex(tubeHue+35,.8,l),hslHex(tubeHue+70,.8,l)]);
-      tubesApp.tubes.setLightsColors([hslHex(tubeHue+10,.8,l+.02),hslHex(tubeHue+30,.8,l+.02),
-                                      hslHex(tubeHue+50,.8,l+.02),hslHex(tubeHue+70,.8,l+.02)]);
+      /* +180 keeps the tubes on the opposite side of the wheel from the text, so the two are
+         never the same colour. The library spreads the list across the tubes, so three stops
+         means three visibly different tubes. */
+      var h=tubeHue+180;
+      tubesApp.tubes.setColors([hslHex(h,.8,l),hslHex(h+55,.8,l),hslHex(h+110,.8,l)]);
+      tubesApp.tubes.setLightsColors([hslHex(h+15,.8,l+.02),hslHex(h+50,.8,l+.02),
+                                      hslHex(h+85,.8,l+.02),hslHex(h+120,.8,l+.02)]);
       tubePaints++;
     }catch(e){ if(!paintTubes.warned){paintTubes.warned=1;console.warn('tube colours:',e);} }
     /* separate guard: a missing or unhappy intensity setter must not stop the recolouring */
@@ -409,7 +413,14 @@ function hslHex(h,s,l){
     tubeLast=now;
     paintTubes();
   }
+  /* The library listens for pointermove on document.body and lerps the tubes toward the
+     cursor. Swallowing the event in the capture phase means it never arrives, the target
+     stays where it started, and the tubes keep the drifting figure-eight they run on their
+     own. Nothing else on this page needs pointermove. */
+  function swallowPointer(e){ e.stopPropagation(); }
   function tubes(on){
+    window.removeEventListener('pointermove', swallowPointer, true);
+    if(on) window.addEventListener('pointermove', swallowPointer, true);
     if(tubesCancel){tubesCancel();tubesCancel=null;}
     if(tubesRaf){cancelAnimationFrame(tubesRaf);tubesRaf=0;}
     if(tubesApp&&tubesApp.dispose){try{tubesApp.dispose();}catch(e){}}
@@ -419,9 +430,9 @@ function hslHex(h,s,l){
     tubesCv=document.createElement('canvas'); tubesCv.className='tubes';
     stage.appendChild(tubesCv);
     tubesCancel=TubesCursorInit(tubesCv,{tubes:{
-      colors:[hslHex(0,.8,glow.l),hslHex(35,.8,glow.l),hslHex(70,.8,glow.l)],
-      lights:{intensity:glow.i,colors:[hslHex(10,.8,glow.l+.02),hslHex(30,.8,glow.l+.02),
-                                       hslHex(50,.8,glow.l+.02),hslHex(70,.8,glow.l+.02)]}}},
+      colors:[hslHex(180,.8,glow.l),hslHex(235,.8,glow.l),hslHex(290,.8,glow.l)],
+      lights:{intensity:glow.i,colors:[hslHex(195,.8,glow.l+.02),hslHex(230,.8,glow.l+.02),
+                                       hslHex(265,.8,glow.l+.02),hslHex(300,.8,glow.l+.02)]}}},
       function(app){tubesApp=app;});
     tubeLast=performance.now();
     tubesRaf=requestAnimationFrame(cycleTubes);
