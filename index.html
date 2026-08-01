@@ -193,6 +193,31 @@ header{border-bottom:1px solid var(--rule)}
 .mock [data-step].shown circle{opacity:1}
 @media print{.chart polyline{stroke-dashoffset:0}.chart .area{opacity:.1}.chart circle{opacity:1}}
 
+/* bespoke industry screens */
+.minicols{display:flex;gap:12px;flex:1 1 auto;min-height:0}
+.caselist{flex:0 0 34%;display:flex;flex-direction:column;gap:6px}
+.caseitem{border:1px solid var(--mock-line);border-radius:6px;padding:8px 10px;font-size:12px;color:var(--ink-soft)}
+.caseitem b{display:block;color:var(--ink)}
+.caseitem.active{border-color:var(--acc,var(--green));background:color-mix(in srgb, var(--acc,var(--green)) 8%, transparent)}
+.casemain{flex:1;display:flex;flex-direction:column;gap:8px;min-width:0}
+.calstrip{display:flex;gap:5px}
+.day{flex:1;border:1px solid var(--mock-line);border-radius:5px;text-align:center;padding:6px 2px;font-size:10.5px;color:var(--ink-soft)}
+.day b{display:block;font-size:13px;color:var(--ink)}
+.day.due{border-color:var(--amber);background:var(--amber-soft)}
+.day.due b{color:var(--amber)}
+.kanban{display:flex;gap:10px;flex:1 1 auto;align-items:stretch}
+.kcol{flex:1;border:1px solid var(--mock-line);border-radius:6px;padding:9px 10px;display:flex;flex-direction:column;gap:7px;background:color-mix(in srgb, var(--card) 55%, transparent)}
+.kcol .khead{font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-soft);display:flex;justify-content:space-between}
+.ktask{border:1px solid var(--mock-line);background:var(--card);border-radius:5px;padding:6px 8px;font-size:11.5px;color:var(--ink)}
+.ktask .mono{color:var(--ink-soft)}
+.kcol.done .khead b{color:var(--green)}
+.crew{display:flex;align-items:center;padding-left:6px}
+.avat{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font:700 10px/1 "Instrument Sans",sans-serif;color:var(--card);background:var(--acc,var(--green));
+  margin-left:-7px;border:2px solid var(--mock-bg)}
+.avat:first-child{margin-left:0}
+.crew .more{margin-left:6px;font-size:11px;color:var(--ink-soft)}
+
 /* demo reveal machinery */
 .mock [data-step]{opacity:0;transform:translateY(12px);transition:opacity 460ms var(--ease-out), transform 460ms var(--ease-out)}
 .mock [data-step].shown{opacity:1;transform:none}
@@ -657,13 +682,14 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Incoming enquiries</span><button class="runbtn" type="button">▶ route leads</button></div>
+    <div class="mrow" data-step><span class="grow">Sales desk on duty, Tuesday</span><span class="crew"><span class="avat">AN</span><span class="avat">MK</span><span class="avat">SF</span><span class="avat">DL</span><span class="more">+3 reps</span></span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow"><b>Score 92</b> · 400 units, budget stated · Milan</span><span class="chip g">Anna, south</span></div>
     <div class="mrow" data-step><span class="dot a"></span><span class="grow"><b>Score 61</b> · repeat visitor, no volume given</span><span class="chip a">queue</span></div>
     <div class="mrow" data-step><span class="dot r"></span><span class="grow"><b>Score 14</b> · student research request</span><span class="chip r">parked</span></div>
     <div class="mrow" data-step><span class="grow">Load balanced, Marek at capacity</span><span class="bar"><i data-w="100"></i></span></div>
     <div class="mrow" data-step><span class="grow">First response time</span><span class="chip g"><span class="mono">3 min</span></span></div>
   </div>
-  <div class="body">
+      <div class="body">
     <h3><span class="num mono">17</span>Lead routing and scoring</h3>
     <p>Enquiries are assigned automatically by region, product, current load and skill, and a scoring model pushes the serious buyers to the front of the queue. How fast you answer a web lead predicts whether it closes better than anything else you control.</p>
     <div class="kills"><b>Removes</b><span>good leads sitting unclaimed in a shared inbox while someone decides whose turn it is.</span></div>
@@ -807,13 +833,21 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Call · Northgate Ltd</span><button class="runbtn" type="button">▶ transcribe call</button></div>
-    <div class="mrow" data-step><span class="grow">Sales call, 14 min, recorded</span><span class="mono">10:26</span></div>
-    <div class="mrow" data-step><span class="grow">Transcribing and summarising</span><div class="bar"><i data-w="100"></i></div></div>
-    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Outcome: quote requested, <b class="mono">€ 24,800</b>, decision by 14 Mar</span><span class="chip g">tagged</span></div>
-    <div class="mrow" data-step><span class="dot a"></span><span class="grow">Objection raised: lead time longer than current supplier</span><span class="chip a">follow up</span></div>
-    <div class="mrow" data-step><span class="grow">Summary and next step written to CRM deal <span class="mono">#4471</span></span><span class="chip g">filed</span></div>
+    <div class="minicols">
+      <div class="caselist">
+        <div class="caseitem active" data-step><b class="mono">14:26</b>Northgate Ltd, 14 min</div>
+        <div class="caseitem" data-step><b class="mono">13:07</b>Vaskur OU, 6 min</div>
+        <div class="caseitem" data-step><b class="mono">11:41</b>Dorner GmbH, 22 min</div>
+      </div>
+      <div class="casemain">
+        <div class="doc" data-step><b>Summary, written by the system</b><div class="dline"></div><div class="dline"></div><div class="dline short"></div></div>
+        <div class="mrow" data-step><span class="dot g"></span><span class="grow">Quote requested, <b class="mono">€ 24,800</b>, decision by 14 Mar</span><span class="chip g">tagged</span></div>
+        <div class="mrow" data-step><span class="dot a"></span><span class="grow">Objection: lead time longer than current supplier</span><span class="chip a">follow up</span></div>
+        <div class="mrow" data-step><span class="grow">Filed to CRM deal <span class="mono">#4471</span></span><span class="chip g">filed</span></div>
+      </div>
+    </div>
   </div>
-  <div class="body">
+      <div class="body">
     <h3><span class="num mono">25</span>Call transcription, summary and follow-up</h3>
     <p>Every sales and support call is transcribed, summarised and tagged with the outcome, the next step and the objections raised, then written straight into the CRM. Managers listen instead of taking notes, and a director can review a hundred calls a week without playing a single recording.</p>
     <div class="kills"><b>Removes</b><span>the call notes nobody writes properly, and the deals that go cold because the next step was never logged.</span></div>
@@ -1015,14 +1049,20 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Week 11 rota</span><button class="runbtn" type="button">▶ build the rota</button></div>
+    <div class="calstrip" data-step>
+      <div class="day">Mon<b>09</b></div>
+      <div class="day">Tue<b>10</b></div>
+      <div class="day">Wed<b>11</b></div>
+      <div class="day">Thu<b>12</b></div>
+      <div class="day due">Sat<b>14</b></div>
+    </div>
     <div class="mrow" data-step><span class="grow">Forecast demand: <span data-count="312">0</span> covers Fri evening</span><span class="up">▲</span></div>
     <div class="mrow" data-step><span class="grow">Shifts filled</span><div class="bar"><i data-w="96"></i></div><span class="mono">44/46</span></div>
     <div class="mrow" data-step><span class="dot a"></span><span class="grow">Sat late · needs a keyholder</span><span class="chip a">1 gap</span></div>
-    <div class="mrow" data-step><span class="grow">Swap request: A. Petrova to M. Ilves</span><span class="chip g">accepted</span></div>
-    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Rest rules and contract hours respected</span><span class="chip g">compliant</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Swap accepted, rest rules and contract hours respected</span><span class="chip g">compliant</span></div>
     <div class="mrow" data-step><span class="grow">Published to 46 phones at <span class="mono">16:20</span></span><span class="chip g">published</span></div>
   </div>
-  <div class="body">
+      <div class="body">
     <h3><span class="num mono">35</span>Shift scheduling and rostering</h3>
     <p>The rota builds itself against availability, skills, labour rules and forecast demand, then publishes straight to staff phones and handles swap requests. In retail, hospitality and logistics this is a manager's entire Friday.</p>
     <div class="kills"><b>Removes</b><span>the whiteboard rota rebuilt every week and the phone calls to fill a gap.</span></div>
@@ -1032,13 +1072,26 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Crew app · van 7</span><button class="runbtn" type="button">▶ dispatch jobs</button></div>
-    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Job <span class="mono">J-2210</span> · boiler service, Riverside 14</span><span class="mono">09:15</span></div>
-    <div class="mrow" data-step><span class="grow">Route sent, client history on screen</span><span class="chip g">on the way</span></div>
-    <div class="mrow" data-step><span class="grow">Checklist complete, 6 photos attached</span><div class="bar"><i data-w="100"></i></div></div>
+    <div class="kanban">
+      <div class="kcol" data-step>
+        <div class="khead"><span>Dispatched</span><b>2</b></div>
+        <div class="ktask">J-2214 leak check <span class="chip a">09:40</span></div>
+        <div class="ktask">J-2217 filter swap <span class="chip a">11:05</span></div>
+      </div>
+      <div class="kcol" data-step>
+        <div class="khead"><span>On site</span><b>1</b></div>
+        <div class="ktask">J-2210 boiler service, Riverside 14 <span class="chip a">6 photos</span></div>
+      </div>
+      <div class="kcol done" data-step>
+        <div class="khead"><span>Closed</span><b>✓</b></div>
+        <div class="ktask">J-2208 pump seal <span class="chip g">signed</span></div>
+      </div>
+    </div>
+    <div class="mrow" data-step><span class="grow">Checklist and client history on the phone, offline safe</span><div class="bar"><i data-w="100"></i></div></div>
     <div class="mrow" data-step><span class="grow">Parts used: pump seal, filter <span class="mono">€64</span></span><span class="chip g">booked out</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Client signature captured <span class="mono">10:48</span></span><span class="chip g">closed</span></div>
   </div>
-  <div class="body">
+      <div class="body">
     <h3><span class="num mono">36</span>Field service and mobile crew app</h3>
     <p>Jobs land on the engineer's phone with route, client history, checklists, photo capture, parts used and a client signature, and the completion report reaches the office the moment the job ends.</p>
     <div class="kills"><b>Removes</b><span>ringing round the crew to ask where they are and what they fitted.</span></div>
@@ -1064,13 +1117,20 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Tomorrow's routes</span><button class="runbtn" type="button">▶ plan the runs</button></div>
+    <div class="chartwrap" data-step>
+      <svg class="chart" viewBox="0 0 420 110" preserveAspectRatio="none" role="img" aria-label="kilometres per van run falling from 141 to 112 once the routes are sequenced">
+        <line x1="0" y1="28" x2="420" y2="28"></line><line x1="0" y1="56" x2="420" y2="56"></line><line x1="0" y1="84" x2="420" y2="84"></line>
+        <polygon class="area" points="0,22 52,26 104,21 156,34 208,48 260,44 312,58 364,72 418,80 418,110 0,110"></polygon>
+        <polyline class="s1" points="0,22 52,26 104,21 156,34 208,48 260,44 312,58 364,72 418,80"></polyline>
+        <circle class="p1" cx="418" cy="80" r="3.5"></circle>
+      </svg>
+    </div>
     <div class="mrow" data-step><span class="grow">28 drops, 4 vans, capacity and time windows applied</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Van 2 sequenced · <span class="mono">112 km</span>, was 141</span><span class="down">▼</span></div>
     <div class="mrow" data-step><span class="grow">Driver hours within limit</span><div class="bar"><i data-w="83"></i></div><span class="chip g">legal</span></div>
-    <div class="mrow" data-step><span class="grow">Clients texted an arrival window</span><span class="chip g">28 sent</span></div>
-    <div class="mrow" data-step><span class="grow">Fuel saved this week <span class="mono">€310</span></span><span class="chip g">dispatched</span></div>
+    <div class="mrow" data-step><span class="grow">Clients texted an arrival window, fuel saved <span class="mono">€310</span></span><span class="chip g">28 sent</span></div>
   </div>
-  <div class="body">
+      <div class="body">
     <h3><span class="num mono">39</span>Route planning and fleet tracking</h3>
     <p>Deliveries sequenced for the shortest run with time windows and vehicle capacity respected, drivers tracked live, clients told when to expect the van. Fuel and driver hours are usually the two largest controllable costs in a delivery operation.</p>
     <div class="kills"><b>Removes</b><span>an hour of manual route juggling each evening and the calls asking where the van is.</span></div>
@@ -1177,12 +1237,21 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Payments and reconciliation</span><button class="runbtn" type="button">▶ close the day</button></div>
-    <div class="mrow" data-step><span class="grow">Card, transfer, instalments, invoice</span><span class="chip g">all live</span></div>
+    <div class="nodes">
+      <div class="node" data-lit>Card</div>
+      <div class="link" data-lit></div>
+      <div class="node" data-lit>Bank</div>
+      <div class="link" data-lit></div>
+      <div class="node" data-lit>Instalments</div>
+      <div class="link" data-lit></div>
+      <div class="node" data-lit>Accounting</div>
+    </div>
     <div class="mrow" data-step><span class="grow">Payments received today</span><span class="mono">€ <span data-count="21740">0</span></span></div>
     <div class="mrow" data-step><span class="grow">Matched to orders</span><div class="bar"><i data-w="100"></i></div></div>
+    <div class="mrow" data-step><span class="dot a"></span><span class="grow">2 short payments flagged for the office</span><span class="chip a">review</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Posted to accounting, 0 unmatched lines</span><span class="chip g">reconciled</span></div>
   </div>
-  <div class="body">
+      <div class="body">
     <h3><span class="num mono">43</span>Payment integration</h3>
     <p>Card, bank transfer, instalments, invoicing and crypto where it makes sense, with every payment reconciled back into accounting.</p>
     <div class="kills"><b>Removes</b><span>Finance matching bank lines to orders by eye each evening.</span></div>
@@ -1388,12 +1457,20 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Legacy Windows program</span><button class="runbtn" type="button">▶ run the robot</button></div>
+    <div class="filechips">
+      <span class="fchip" data-eat>Login screen</span>
+      <span class="fchip" data-eat>Invoice form</span>
+      <span class="fchip" data-eat>Price lookup</span>
+      <span class="fchip" data-eat>Print dialog</span>
+      <span class="fchip" data-eat>Export window</span>
+    </div>
+    <div class="arrowdown">▼ robot clicks and types, screen by screen ▼</div>
     <div class="mrow" data-step><span class="dot a"></span><span class="grow">No API, vendor gone since 2011</span><span class="chip a">as is</span></div>
-    <div class="mrow" data-step><span class="grow">Robot opens the app, types 240 invoices</span><div class="bar"><i data-w="100"></i></div></div>
+    <div class="mrow" data-step><span class="grow">240 invoices keyed overnight</span><div class="bar"><i data-w="100"></i></div></div>
     <div class="mrow" data-step><span class="grow">Clerk time saved per week</span><span class="mono"><span data-count="11">0</span> h</span></div>
-    <div class="mrow" data-step><span class="grow">Results exported for the new system</span><span class="chip g">done</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Results exported for the new system</span><span class="chip g">done</span></div>
   </div>
-  <div class="body">
+      <div class="body">
     <h3><span class="num mono">52</span>Automating an old desktop program nobody can change</h3>
     <p>When a legacy Windows application has no API and no vendor left, we automate the clicking and typing instead. Ugly, effective, and often the only route.</p>
     <div class="kills"><b>Removes</b><span>Staff retyping the same records into a program nobody can modify.</span></div>
@@ -1403,12 +1480,17 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
   <div class="mock demo">
     <div class="mtitle"><span>Backup and access</span><button class="runbtn" type="button">▶ run the recovery drill</button></div>
-    <div class="mrow" data-step><span class="grow">Backup taken · 02:00, verified by restore test</span><span class="mono">4,2 GB</span></div>
-    <div class="mrow" data-step><span class="dot r"></span><span class="grow">Drill: main database wiped</span><span class="chip r">down</span></div>
+    <div class="bigstat mono">
+      <div data-step><b data-count="4">0</b><span>GB last night</span></div>
+      <div data-step><b data-count="6">0</b><span>min to restore</span></div>
+      <div data-step><b data-count="9">0</b><span>systems revoked</span></div>
+    </div>
+    <div class="mrow" data-step><span class="grow">Backup taken <span class="mono">02:00</span>, verified by restore test</span><span class="chip g">verified</span></div>
+    <div class="mrow" data-step><span class="dot r"></span><span class="grow">Drill: main database wiped on purpose</span><span class="chip r">down</span></div>
     <div class="mrow" data-step><span class="grow">Restore in progress</span><div class="bar"><i data-w="100"></i></div><span class="mono">6 min</span></div>
-    <div class="mrow" data-step><span class="grow">Leaver offboarded · 9 systems revoked in one click</span><span class="chip g">restored</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Leaver offboarded, 9 systems revoked in one click</span><span class="chip g">restored</span></div>
   </div>
-  <div class="body">
+      <div class="body">
     <h3><span class="num mono">53</span>Backup, disaster recovery and access control</h3>
     <p>Automated backups that are actually tested, role-based permissions, a log of who saw and changed what, and offboarding that revokes everything at once.</p>
     <div class="kills"><b>Removes</b><span>Discovering the backups never worked on the day you need them.</span></div>
@@ -1457,12 +1539,23 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
       <div class="mock demo">
         <div class="mtitle"><span>Case desk · Monday 08:30</span><button class="runbtn" type="button">▶ run the case desk</button></div>
-        <div class="mrow" data-step><span class="dot a"></span><span class="grow">Court registry: hearing on case <b class="mono">A-1182</b> moved to <b class="mono">14 Oct</b></span><span class="chip a">calendar updated</span></div>
-        <div class="mrow" data-step><span class="grow">Claim and power of attorney assembled from template</span><span class="mono">28 sec</span></div>
-        <div class="mrow" data-step><span class="dot a"></span><span class="grow">Limitation radar: 3 deadlines inside 30 days, owners assigned</span><span class="chip a">watch</span></div>
-        <div class="mrow" data-step><span class="grow">Client portal: Mr Veldman downloads his case file himself</span><span class="chip g">no call taken</span></div>
-        <div class="mrow mono" data-step><span class="grow">Billable hours captured from calendar and calls</span><span data-count="34">0</span><span>h this week</span></div>
-        <div class="mrow" data-step><span class="grow">Nothing missed, nothing retyped</span><span class="chip g">done</span></div>
+        <div class="minicols">
+          <div class="caselist">
+            <div class="caseitem active" data-step><b class="mono">A-1182</b>hearing 14 Oct</div>
+            <div class="caseitem" data-step><b class="mono">B-2210</b>reply due in 6 days</div>
+            <div class="caseitem" data-step><b class="mono">C-0071</b>waiting on expert</div>
+          </div>
+          <div class="casemain">
+            <div class="calstrip" data-step>
+              <div class="day">Mon<b>10</b></div><div class="day">Tue<b>11</b></div><div class="day">Wed<b>12</b></div>
+              <div class="day">Thu<b>13</b></div><div class="day due">Fri<b>14</b></div>
+            </div>
+            <div class="mrow" data-step style="border:0;padding:4px 2px"><span class="dot a"></span><span class="grow">Registry: hearing <b class="mono">A-1182</b> moved to Fri <b class="mono">14 Oct</b></span><span class="chip a">calendar updated</span></div>
+            <div class="doc" data-step><b>Claim + power of attorney · Veldman</b><div class="dline"></div><div class="dline short"></div></div>
+            <div class="mrow mono" data-step style="border:0;padding:4px 2px"><span class="grow">Assembled from template, billable hours captured</span><span data-count="34">0</span><span>h</span></div>
+          </div>
+        </div>
+        <div class="mrow" data-step><span class="grow">Limitation radar: 3 deadlines inside 30 days, owners assigned</span><span class="chip g">nothing missed</span></div>
       </div>
       <div class="body">
         <h3>For law firms</h3>
@@ -1474,12 +1567,24 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     <article class="card">
       <div class="mock demo">
         <div class="mtitle"><span>Site board · Object 7</span><button class="runbtn" type="button">▶ open the site board</button></div>
-        <div class="mrow" data-step><span class="dot g"></span><span class="grow">Crew of 14 checked in on site, geotagged</span><span class="mono">07:58</span></div>
-        <div class="mrow" data-step><span class="grow">Materials request routed by amount, approved by PM</span><span class="chip g">approved</span></div>
-        <div class="mrow" data-step><span class="dot a"></span><span class="grow">Excavator <b class="mono">E-3</b>: 500-hour service due Friday, work order raised</span><span class="chip a">scheduled</span></div>
-        <div class="mrow" data-step><span class="grow">Daily report filed from the foreman's phone, 6 photos</span><span class="chip g">filed</span></div>
+        <div class="mrow" data-step style="border:0;padding:4px 2px"><span class="crew"><span class="avat">DK</span><span class="avat">MI</span><span class="avat">AP</span><span class="avat">RT</span><span class="more">+10 checked in, geotagged</span></span><span class="mono">07:58</span></div>
+        <div class="kanban">
+          <div class="kcol done" data-step>
+            <div class="khead"><span>Foundations</span><b>✓</b></div>
+            <div class="ktask">Pour accepted <span class="mono">28 Jul</span></div>
+          </div>
+          <div class="kcol" data-step>
+            <div class="khead"><span>Frame</span><span class="mono">wk 2/3</span></div>
+            <div class="ktask">Materials request <span class="chip g">approved</span></div>
+            <div class="ktask">Excavator <span class="mono">E-3</span> service <span class="chip a">Fri</span></div>
+          </div>
+          <div class="kcol" data-step>
+            <div class="khead"><span>Roofing</span><span class="mono">queued</span></div>
+            <div class="ktask">Crew booked <span class="mono">from 21 Aug</span></div>
+          </div>
+        </div>
         <div class="mrow mono" data-step><span class="grow">Estimate vs actual: concrete</span><div class="bar"><i data-w="104"></i></div><span class="down">+4%</span></div>
-        <div class="mrow" data-step><span class="grow">Client sees the live timeline, stops calling for updates</span><span class="chip g">done</span></div>
+        <div class="mrow" data-step><span class="grow">Daily report filed from the foreman's phone, client sees the timeline</span><span class="chip g">done</span></div>
       </div>
       <div class="body">
         <h3>For construction companies</h3>
