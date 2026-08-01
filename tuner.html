@@ -270,11 +270,11 @@ function MorphingText(host, words, opts) {
 
 
 (function(){
-  var DEF={bg:'tubes',tubes:['#2AA173','#4CC28F','#1E7A55'],lights:['#4CC28F','#5C82C9','#9FE8C6','#2AA173'],
+  var DEF={bg:'both',tubes:['#2AA173','#4CC28F','#1E7A55'],lights:['#4CC28F','#5C82C9','#9FE8C6','#2AA173'],
     intensity:200,qty:950,spd:0.6,fol:1,
     words:['IMAGINATION','IS YOUR','ONLY LIMIT'],mt:1.4,ct:1.1,fs:56,
     grad:'linear-gradient(90deg,#4CC28F,#9FE8C6 30%,#5C82C9 60%,#4CC28F)'};
-  var cfg; try{cfg=JSON.parse(localStorage.getItem('herocfg'))||null;}catch(e){cfg=null;}
+  var cfg; try{cfg=JSON.parse(localStorage.getItem('herocfg2'))||null;}catch(e){cfg=null;}
   cfg=cfg||JSON.parse(JSON.stringify(DEF));
 
   var stage=document.getElementById('stage');
@@ -310,7 +310,7 @@ function MorphingText(host, words, opts) {
     var w=cfg.words.filter(function(x){return x.trim();});
     if(w.length>=2) stopMorph=MorphingText(host,w,{morphTime:cfg.mt,cooldownTime:cfg.ct,gradient:cfg.grad});
   }
-  function save(){try{localStorage.setItem('herocfg',JSON.stringify(cfg));}catch(e){}
+  function save(){try{localStorage.setItem('herocfg2',JSON.stringify(cfg));}catch(e){}
     document.getElementById('cfgout').value=JSON.stringify(cfg,null,1);}
   function bind(id,out,key,fn,isInt){
     var el=document.getElementById(id);
@@ -345,7 +345,7 @@ function MorphingText(host, words, opts) {
     setTimeout(function(){document.getElementById('okmsg').textContent='';},4000);
   });
   document.getElementById('reset').addEventListener('click',function(){
-    cfg=JSON.parse(JSON.stringify(DEF));localStorage.removeItem('herocfg');location.reload();});
+    cfg=JSON.parse(JSON.stringify(DEF));localStorage.removeItem('herocfg2');location.reload();});
   applyBg();applyMorph();save();
 })();
 </script>
