@@ -32,6 +32,12 @@ const first=spans[0].style.backgroundImage;
 console.assert(first && first.startsWith('linear-gradient(90deg,'), 'a gradient is painted at once, not on the second tick');
 const shown=new Set(first.slice(0,-1).split(',').slice(1).map(s=>s.trim().split(' ')[0]));
 console.assert(shown.size===3, 'three neighbouring colours across the letters, not the whole palette: got '+shown.size);
+/* the whole point: the three must be far enough apart to read as different colours */
+const rgb=c=>[1,3,5].map(i=>parseInt(c.substr(i,2),16));
+const far=(a,b)=>Math.max(...rgb(a).map((v,i)=>Math.abs(v-rgb(b)[i])));
+const list=[...shown];
+console.assert(Math.min(far(list[0],list[1]),far(list[1],list[2]),far(list[0],list[2]))>60,
+  'stops are visibly different colours, not three shades of one: '+list.join(' '));
 console.assert([...shown].every(c=>/^#[0-9a-f]{6}$/.test(c)), 'stops are real colours');
 console.assert(spans[0].style.backgroundImage===spans[1].style.backgroundImage, 'both copies share one gradient');
 console.log('LiquidText flowing window: all checks passed');
