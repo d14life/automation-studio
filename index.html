@@ -125,9 +125,6 @@ header{border-bottom:1px solid var(--rule)}
 
 /* ---------- mockups ---------- */
 .mock{background:var(--mock-bg);border-bottom:1px solid var(--rule);padding:12px 16px 16px;min-height:225px;position:relative}
-.mock-chrome{display:flex;gap:5px;margin-bottom:10px}
-.mock-chrome i{width:8px;height:8px;border-radius:50%;background:var(--rule);display:block}
-.mock-chrome i:first-child{background:color-mix(in srgb, var(--acc,var(--green)) 55%, var(--rule))}
 .mtitle{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);
   display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}
 .runbtn{font:600 11px/1 "Instrument Sans",system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;
@@ -153,7 +150,7 @@ header{border-bottom:1px solid var(--rule)}
 .filechips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
 .fchip{border:1px solid var(--mock-line);background:var(--card);border-radius:5px;
   padding:5px 10px;font-size:11.5px;font-weight:600;color:var(--ink-soft);
-  transition:opacity .4s, transform .4s}
+  transition:opacity 800ms var(--ease-out), transform 800ms var(--ease-out)}
 .fchip.eaten{opacity:.35;transform:scale(.94)}
 .arrowdown{text-align:center;color:var(--rule-blue);font-size:14px;line-height:1;margin:2px 0 8px}
 .bigstat{display:flex;gap:20px;padding:10px 10px 2px}
@@ -318,13 +315,15 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   <div class="grid" id="g-data">
 
     <!-- 1 -->
-    <article class="card wide">
-      <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+    <article class="card">
+      <div class="mock demo">
         <div class="mtitle"><span>Price watch · daily run</span><button class="runbtn" type="button">▶ run 06:00 scrape</button></div>
+        <div class="filechips"><span class="fchip" data-eat>CompetitorA catalogue</span><span class="fchip" data-eat>CompetitorB catalogue</span><span class="fchip" data-eat>Supplier stock feed</span><span class="fchip" data-eat>Your marketplace page</span></div>
+        <div class="arrowdown">▼ compared against your price list ▼</div>
         <div class="mrow mono" data-step><span class="grow">CompetitorA · Widget Pro</span><span>€48.90</span><span class="down">▼ 4%</span></div>
-        <div class="mrow mono" data-step><span class="grow">CompetitorB · Widget Pro</span><span>€51.20</span><span style="color:var(--ink-soft)">no change</span></div>
+        <div class="mrow mono" data-step><span class="grow">CompetitorB · Widget Pro</span><span>€51.20</span><span class="chip g">holding</span></div>
         <div class="mrow mono" data-step><span class="grow">Supplier stock · SKU 1148</span><span>212 pcs</span><span class="up">▲</span></div>
-        <div class="mrow mono" data-step><span class="grow">Marketplace listing · yours</span><span>€49.99</span><span class="chip a">review</span></div>
+        <div class="mrow mono" data-step><span class="grow">Your price now 2nd cheapest</span><span>€49.99</span><span class="chip a">review</span></div>
         <div class="mrow" data-step><span class="grow">Written to CRM &amp; spreadsheet</span><span class="chip g">done</span></div>
         <span class="cursorline mono">06:00:04 · 4 sources</span>
       </div>
@@ -337,7 +336,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 
     <!-- 2 -->
     <article class="card">
-      <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+      <div class="mock demo">
         <div class="mtitle"><span>Supplier import</span><button class="runbtn" type="button">▶ import 4 files</button></div>
         <div class="filechips">
           <span class="fchip" data-eat>XLSX pricelist</span><span class="fchip" data-eat>PDF catalogue</span>
@@ -359,14 +358,15 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     </article>
 
     <!-- 3 -->
-    <article class="card">
-      <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+    <article class="card wide">
+      <div class="mock demo">
         <div class="mtitle"><span>Marketplace alerts</span><button class="runbtn" type="button">▶ go live</button></div>
+        <div class="nodes"><div class="node" data-lit>Amazon</div><div class="link" data-lit></div><div class="node" data-lit>Ozon</div><div class="link" data-lit></div><div class="node" data-lit>eBay</div><div class="link" data-lit></div><div class="node" data-lit>Telegram</div></div>
         <div class="mrow" data-step><span class="dot r"></span><span class="grow"><b>Buy-box lost</b> · Amazon, SKU 2210</span><span class="mono">09:41</span></div>
-        <div class="mrow" data-step><span class="dot a"></span><span class="grow">Competitor undercut you by 4% · Ozon</span><span class="mono">09:37</span></div>
+        <div class="mrow" data-step><span class="dot a"></span><span class="grow">Undercut by <span class="mono">€1.30</span> · Ozon, SKU 1148</span><span class="mono">09:37</span></div>
         <div class="mrow" data-step><span class="dot a"></span><span class="grow">Review ★2 posted · Wildberries</span><span class="mono">08:15</span></div>
-        <div class="mrow" data-step><span class="dot g"></span><span class="grow">Competitor out of stock · eBay</span><span class="mono">07:52</span></div>
-        <div class="mrow" data-step><span class="grow">Position report → Telegram</span><span class="chip g">sent</span></div>
+        <div class="mrow" data-step><span class="dot g"></span><span class="grow">Competitor out of stock, you are alone on the page · eBay</span><span class="mono">07:52</span></div>
+        <div class="mrow" data-step><span class="grow">Position report pushed to your phone</span><span class="chip g">sent</span></div>
       </div>
       <div class="body">
         <h3><span class="num mono">03</span>Marketplace monitoring</h3>
@@ -377,13 +377,14 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 
     <!-- 4 -->
     <article class="card">
-      <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+      <div class="mock demo">
         <div class="mtitle"><span>Registry watch → Telegram</span><button class="runbtn" type="button">▶ overnight scan</button></div>
-        <div class="mrow" data-step><span class="grow">Portals scanned</span><span class="mono" data-count="14">0</span><span class="mono">/14 ✓</span></div>
-        <div class="mrow" data-step><span class="dot g"></span><span class="grow"><b>New tender</b> · IT services, matches your criteria</span><span class="chip g">bid?</span></div>
-        <div class="mrow" data-step><span class="dot a"></span><span class="grow">Counterparty LLC "Vega": court case filed</span><span class="chip a">check</span></div>
-        <div class="mrow" data-step><span class="dot r"></span><span class="grow">Supplier OJSC "Trakt": bankruptcy notice</span><span class="chip r">alert</span></div>
-        <div class="mrow" data-step><span class="grow">3 matches pushed to your phone</span><span class="chip g">sent</span></div>
+        <div class="doc" data-step><b>Tender notice · IT support, 18 months</b><div class="dline"></div><div class="dline"></div><div class="dline short"></div></div>
+        <div class="mrow" data-step><span class="grow">Portals scanned overnight</span><span class="mono" data-count="14">0</span><span class="mono">/14 ✓</span></div>
+        <div class="mrow" data-step><span class="dot g"></span><span class="grow"><b>Matches your criteria</b> · start price <span class="mono">€187 400</span></span><span class="chip g">bid?</span></div>
+        <div class="mrow" data-step><span class="dot a"></span><span class="grow">Counterparty Vega LLC: court case filed <span class="mono">03:12</span></span><span class="chip a">check</span></div>
+        <div class="mrow" data-step><span class="dot r"></span><span class="grow">Supplier Trakt OJSC: bankruptcy notice</span><span class="chip r">alert</span></div>
+        <div class="mrow" data-step><span class="grow">3 matches on your phone before you woke up</span><span class="chip g">sent</span></div>
       </div>
       <div class="body">
         <h3><span class="num mono">04</span>Tender &amp; registry monitoring</h3>
@@ -394,12 +395,13 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 
     <!-- 5 -->
     <article class="card">
-      <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+      <div class="mock demo">
         <div class="mtitle"><span>Lead harvest → CRM</span><button class="runbtn" type="button">▶ scrape</button></div>
-        <div class="mrow mono" data-step><span class="grow">Google Maps: "dental clinics, Manchester"</span><span data-count="312">0</span></div>
-        <div class="mrow mono" data-step><span class="grow">Trade association member list</span><span data-count="88">0</span></div>
-        <div class="mrow" data-step><span class="grow">Cleaned &amp; deduplicated vs your base</span><span class="chip a">−107 dupes</span></div>
-        <div class="mrow" data-step><span class="grow"><b>Loaded to CRM, ready to call</b></span><span class="chip g">293 new</span></div>
+        <div class="filechips"><span class="fchip" data-eat>Google Maps · dental clinics, Manchester</span><span class="fchip" data-eat>Trade association members</span><span class="fchip" data-eat>Yellow pages listings</span></div>
+        <div class="arrowdown">▼ cleaned, deduplicated, enriched ▼</div>
+        <div class="bigstat mono"><div data-step><b data-count="412">0</b><span>records pulled</span></div><div data-step><b data-count="107">0</b><span>dupes killed</span></div><div data-step><b data-count="293">0</b><span>new leads</span></div></div>
+        <div class="mrow" data-step><span class="grow">Phone and email verified, no dead numbers</span><span class="chip g">clean</span></div>
+        <div class="mrow" data-step><span class="grow"><b>Loaded to CRM, ready to call</b> at <span class="mono">08:40</span></span><span class="chip g">293 new</span></div>
       </div>
       <div class="body">
         <h3><span class="num mono">05</span>Lead scraping from directories &amp; maps</h3>
@@ -410,7 +412,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 
     <!-- 6 -->
     <article class="card">
-      <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+      <div class="mock demo">
         <div class="mtitle"><span>Systems, connected</span><button class="runbtn" type="button">▶ new order</button></div>
         <div class="nodes">
           <div class="node" data-lit>CRM</div><div class="link" data-lit></div>
@@ -430,7 +432,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 
     <!-- 7 -->
     <article class="card">
-      <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+      <div class="mock demo">
         <div class="mtitle"><span>Legacy migration</span><button class="runbtn" type="button">▶ migrate 12 years</button></div>
         <div class="mrow mono" data-step><span class="grow">Clients</span><div class="bar"><i data-w="100"></i></div><span data-count="48102">0</span></div>
         <div class="mrow mono" data-step><span class="grow">Orders</span><div class="bar"><i data-w="100"></i></div><span data-count="310556">0</span></div>
@@ -452,8 +454,8 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   <div class="grid" id="g-fin">
 
     <!-- 8 -->
-    <article class="card wide">
-      <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+    <article class="card">
+      <div class="mock demo">
         <div class="mtitle"><span>Monthly report</span><button class="runbtn" type="button">▶ generate</button></div>
         <div class="doc" data-step>
           <b>P&amp;L by division · May</b>
@@ -472,11 +474,13 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     </article>
 
     <!-- 9 -->
-    <article class="card">
-      <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+    <article class="card wide">
+      <div class="mock demo">
         <div class="mtitle"><span>Deal won → paperwork</span><button class="runbtn" type="button">▶ mark deal won</button></div>
-        <div class="mrow" data-step><span class="dot g"></span><span class="grow">Invoice <b class="mono">#2041</b>: generated, numbered, filed</span><span class="mono">14:02:11</span></div>
-        <div class="mrow" data-step><span class="dot g"></span><span class="grow">Delivery note + contract from template</span><span class="mono">14:02:12</span></div>
+        <div class="nodes"><div class="node" data-lit>Deal won</div><div class="link" data-lit></div><div class="node" data-lit>Documents</div><div class="link" data-lit></div><div class="node" data-lit>Client inbox</div></div>
+        <div class="doc" data-step><b>Invoice #2041 · Northgate Ltd · €14 200</b><div class="dline"></div><div class="dline"></div><div class="dline short"></div></div>
+        <div class="mrow" data-step><span class="dot g"></span><span class="grow">Numbered and filed, no gaps in the series</span><span class="mono">14:02:11</span></div>
+        <div class="mrow" data-step><span class="dot g"></span><span class="grow">Delivery note + contract from your template</span><span class="mono">14:02:12</span></div>
         <div class="mrow" data-step><span class="dot g"></span><span class="grow">Emailed to client, copy to accounting</span><span class="mono">14:02:14</span></div>
         <div class="mrow" data-step><span class="grow">Human involvement</span><span class="chip g">none</span></div>
       </div>
@@ -489,12 +493,13 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 
     <!-- 10 -->
     <article class="card">
-      <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+      <div class="mock demo">
         <div class="mtitle"><span>Bank reconciliation</span><button class="runbtn" type="button">▶ run matching</button></div>
-        <div class="mrow mono" data-step><span class="grow">€4,120.00 → inv #1988</span><span class="chip g">matched</span></div>
-        <div class="mrow mono" data-step><span class="grow">€900.00 → inv #2003 (partial 2/3)</span><span class="chip g">matched</span></div>
-        <div class="mrow mono" data-step><span class="grow">€1,275.50 → "pmnt for goods thx"</span><span class="chip g">matched</span></div>
-        <div class="mrow mono" data-step><span class="grow">€510.00 · no reference found</span><span class="chip a">review</span></div>
+        <div class="mrow mono" data-step><span class="grow">Exact reference match</span><div class="bar"><i data-w="77"></i></div><span data-count="109">0</span></div>
+        <div class="mrow mono" data-step><span class="grow">Payer name, messy reference</span><div class="bar"><i data-w="17"></i></div><span data-count="24">0</span></div>
+        <div class="mrow mono" data-step><span class="grow">Split across 2 invoices</span><div class="bar"><i data-w="4"></i></div><span data-count="4">0</span></div>
+        <div class="mrow mono" data-step><span class="grow">€1 275,50 · "pmnt for goods thx"</span><span class="chip g">matched to #2003</span></div>
+        <div class="mrow mono" data-step><span class="grow">€510,00 · no reference found anywhere</span><span class="chip a">review</span></div>
         <div class="mrow" data-step><span class="grow">142 payments in, for human eyes:</span><span class="chip a">5 items</span></div>
       </div>
       <div class="body">
@@ -505,15 +510,16 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     </article>
 
 <article class="card">
-  <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+  <div class="mock demo">
     <div class="mtitle"><span>Overdue ledger</span><button class="runbtn" type="button">▶ chase debtors</button></div>
-    <div class="mrow" data-step><span class="dot a"></span><span class="grow"><b>Northgate Ltd</b> · <span class="mono">€ 14 200</span> · 12 days late</span><span class="chip a">reminder 1</span></div>
-    <div class="mrow" data-step><span class="dot r"></span><span class="grow"><b>Verrico SRL</b> · <span class="mono">€ 38 950</span> · 34 days late</span><span class="chip r">manager cc</span></div>
-    <div class="mrow" data-step><span class="dot r"></span><span class="grow"><b>Halden Bau</b> · <span class="mono">€ 61 400</span> · 66 days late</span><span class="chip r">lawyer cc</span></div>
-    <div class="mrow" data-step><span class="grow">Outstanding under chase</span><span class="mono">€ <span data-count="114550">0</span></span></div>
-    <div class="mrow" data-step><span class="grow">9 letters sent at <span class="mono">09:00</span>, next run tomorrow</span><span class="chip g">sent</span></div>
+    <div class="mrow" data-step><span class="dot a"></span><span class="grow"><b>Northgate Ltd</b> · <span class="mono">€ 14 200</span> · polite nudge</span><span class="chip a">day 12</span></div>
+    <div class="mrow" data-step><span class="dot r"></span><span class="grow"><b>Verrico SRL</b> · <span class="mono">€ 38 950</span> · their manager copied in</span><span class="chip r">day 34</span></div>
+    <div class="mrow" data-step><span class="dot r"></span><span class="grow"><b>Halden Bau</b> · <span class="mono">€ 61 400</span> · lawyer letter drafted</span><span class="chip r">day 66</span></div>
+    <div class="bigstat mono"><div data-step><b data-count="114550">0</b><span>euro under chase</span></div><div data-step><b data-count="9">0</b><span>letters at 09:00</span></div></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Kessler GmbH paid after reminder 2 <span class="mono">€ 7 380</span></span><span class="chip g">cleared</span></div>
+    <div class="mrow" data-step><span class="grow">Nobody in your office made a single awkward call</span><span class="chip g">sent</span></div>
   </div>
-  <div class="body">
+      <div class="body">
     <h3><span class="num mono">11</span>Receivables chasing</h3>
     <p>The system tracks who owes what and how overdue it is, then sends the reminders on your schedule, hardening the tone as days pass and copying the account manager at day 30, the lawyer at day 60. Companies sit on six figures outstanding purely because nobody had time to chase.</p>
     <div class="kills"><b>Removes</b><span>the weekly job of reading the aged debt report and writing polite letters by hand.</span></div>
@@ -521,7 +527,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 </article>
 
 <article class="card">
-  <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+  <div class="mock demo">
     <div class="mtitle"><span>Receipt inbox</span><button class="runbtn" type="button">▶ read receipts</button></div>
     <div class="filechips"><span class="fchip" data-eat>Photo: fuel station</span><span class="fchip" data-eat>Photo: hotel bill</span><span class="fchip" data-eat>PDF invoice</span></div>
     <div class="arrowdown">▼ read ▼</div>
@@ -538,7 +544,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 </article>
 
 <article class="card">
-  <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+  <div class="mock demo">
     <div class="mtitle"><span>Payroll run · March</span><button class="runbtn" type="button">▶ run payroll</button></div>
     <div class="nodes"><div class="node" data-lit>Time clock</div><div class="link" data-lit></div><div class="node" data-lit>Payroll</div><div class="link" data-lit></div><div class="node" data-lit>Accounting</div></div>
     <div class="mrow" data-step><span class="grow">Shifts imported</span><span class="mono"><span data-count="1284">0</span> hrs</span></div>
@@ -555,15 +561,16 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 </article>
 
 <article class="card">
-  <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+  <div class="mock demo">
     <div class="mtitle"><span>Cash position</span><button class="runbtn" type="button">▶ look 90 days ahead</button></div>
-    <div class="mrow" data-step><span class="grow">Cash today</span><span class="mono">€ <span data-count="128400">0</span></span></div>
-    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Day 30 · receivables in, payroll out <span class="up">▲</span></span><span class="mono">€ 141 700</span></div>
-    <div class="mrow" data-step><span class="dot a"></span><span class="grow">Day 60 · VAT and rent cluster <span class="down">▼</span></span><span class="mono">€ 52 300</span></div>
-    <div class="mrow" data-step><span class="dot r"></span><span class="grow">Day 82 · shortfall if Halden Bau slips again</span><span class="chip r">gap</span></div>
-    <div class="mrow" data-step><span class="grow">Alert set, finance notified <span class="mono">08:15</span></span><span class="chip g">sent</span></div>
+    <div class="mrow mono" data-step><span class="grow">Cash today</span><div class="bar"><i data-w="72"></i></div><span data-count="128400">0</span></div>
+    <div class="mrow mono" data-step><span class="grow">Day 30 · receivables in, payroll out</span><div class="bar"><i data-w="81"></i></div><span data-count="141700">0</span></div>
+    <div class="mrow mono" data-step><span class="grow">Day 60 · VAT and rent cluster</span><div class="bar"><i data-w="29"></i></div><span data-count="52300">0</span></div>
+    <div class="mrow mono" data-step><span class="grow">Day 82 · if Halden Bau slips again</span><div class="bar"><i data-w="6"></i></div><span data-count="11800">0</span></div>
+    <div class="mrow" data-step><span class="dot r"></span><span class="grow">Shortfall of <span class="mono">€ 26 400</span> that week <span class="down">▼</span></span><span class="chip r">gap</span></div>
+    <div class="mrow" data-step><span class="grow">Alert set, finance notified <span class="mono">08:15</span>, 11 weeks to fix it</span><span class="chip g">sent</span></div>
   </div>
-  <div class="body">
+      <div class="body">
     <h3><span class="num mono">14</span>Cash flow forecasting</h3>
     <p>One dashboard takes confirmed receivables, scheduled payables, payroll dates and recurring costs and shows where the cash stands 30, 60 and 90 days out. Small businesses usually fly blind here and meet the gap in the week it lands.</p>
     <div class="kills"><b>Removes</b><span>finding out about a shortfall from the bank balance instead of two months in advance.</span></div>
@@ -575,16 +582,18 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   <div class="section-head" id="s-crm"><span class="idx serif">8 services</span><h2 class="serif">Sales &amp; CRM</h2></div>
   <p class="section-sub">Leads answered in minutes, proposals in seconds, and a client history that stays when a salesperson leaves.</p>
   <div class="grid" id="g-crm">
-<article class="card wide">
-  <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+<article class="card">
+  <div class="mock demo">
     <div class="mtitle"><span>Pipeline · your stages</span><button class="runbtn" type="button">▶ open deal card</button></div>
+    <div class="nodes"><div class="node" data-lit>Enquiry</div><div class="link" data-lit></div><div class="node" data-lit>Survey</div><div class="link" data-lit></div><div class="node" data-lit>Drawing</div><div class="link" data-lit></div><div class="node" data-lit>Quote</div></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow"><b>Survey booked</b> · custom stage, not a preset</span><span class="mono">18</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow"><b>Site drawing approved</b> · your field: drawing ref</span><span class="mono">DR 4471</span></div>
     <div class="mrow" data-step><span class="dot a"></span><span class="grow">Rule: no quote until survey signed off</span><span class="chip a">enforced</span></div>
+    <div class="mrow mono" data-step><span class="grow">Open value in your stages</span><span>€ 341 850</span><span class="up">▲</span></div>
     <div class="mrow" data-step><span class="grow">Seats licensed</span><span class="mono">0 per user fees</span></div>
     <div class="mrow" data-step><span class="grow">Report built to your board format</span><span class="chip g">done</span></div>
   </div>
-  <div class="body">
+      <div class="body">
     <h3><span class="num mono">15</span>Custom CRM</h3>
     <p>When the off the shelf systems do not fit the way you actually sell, we build one that does: your stages, your fields, your rules, your reports. Over three years it costs less than per seat licensing for a 20 person sales team, and the business stops reshaping itself around someone else's assumptions.</p>
     <div class="kills"><b>Removes</b><span>the shadow spreadsheet everyone keeps because the real system will not hold their process.</span></div>
@@ -592,7 +601,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 </article>
 
 <article class="card">
-  <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+  <div class="mock demo">
     <div class="mtitle"><span>Client card · Northgate Ltd</span><button class="runbtn" type="button">▶ open history</button></div>
     <div class="nodes"><div class="node" data-lit>Phone</div><div class="link" data-lit></div><div class="node" data-lit>CRM</div><div class="link" data-lit></div><div class="node" data-lit>Email</div></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Call recorded, <span class="mono">6:12</span>, attached to card</span><span class="chip g">saved</span></div>
@@ -608,7 +617,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 </article>
 
 <article class="card">
-  <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+  <div class="mock demo">
     <div class="mtitle"><span>Incoming enquiries</span><button class="runbtn" type="button">▶ route leads</button></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow"><b>Score 92</b> · 400 units, budget stated · Milan</span><span class="chip g">Anna, south</span></div>
     <div class="mrow" data-step><span class="dot a"></span><span class="grow"><b>Score 61</b> · repeat visitor, no volume given</span><span class="chip a">queue</span></div>
@@ -624,7 +633,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 </article>
 
 <article class="card">
-  <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+  <div class="mock demo">
     <div class="mtitle"><span>Proposal builder</span><button class="runbtn" type="button">▶ build proposal</button></div>
     <div class="mrow" data-step><span class="grow">Picked: 3 line items, 12% volume discount</span><span class="mono">€ 47 300</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Prices pulled live, VAT and delivery added</span><span class="chip g">checked</span></div>
@@ -639,8 +648,8 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 </article>
 
-<article class="card">
-  <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+<article class="card wide">
+  <div class="mock demo">
     <div class="mtitle"><span>Funnel · this month</span><button class="runbtn" type="button">▶ show the funnel</button></div>
     <div class="mrow" data-step><span class="grow">Qualified</span><span class="bar"><i data-w="100"></i></span><span class="mono"><span data-count="212">0</span></span></div>
     <div class="mrow" data-step><span class="grow">Proposal sent</span><span class="bar"><i data-w="54"></i></span><span class="mono">114</span></div>
@@ -656,15 +665,15 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 </article>
 
 <article class="card">
-  <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+  <div class="mock demo">
     <div class="mtitle"><span>Campaign engine</span><button class="runbtn" type="button">▶ wake dormant clients</button></div>
-    <div class="mrow" data-step><span class="grow">Segment: no order in 9 months</span><span class="mono"><span data-count="1840">0</span></span></div>
-    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Email 1 sent <span class="mono">10:00</span>, SMS to non openers on day 4</span><span class="chip g">running</span></div>
-    <div class="mrow" data-step><span class="dot a"></span><span class="grow">Abandoned cart series, 62 active right now</span><span class="chip a">live</span></div>
-    <div class="mrow" data-step><span class="grow">Replies and orders back</span><span class="mono">€ 18 900</span></div>
-    <div class="mrow" data-step><span class="grow">Birthday and renewal reminders queued</span><span class="chip g">sent</span></div>
+    <div class="bigstat mono"><div data-step><b data-count="1840">0</b><span>no order in 9 months</span></div><div data-step><b data-count="167">0</b><span>came back</span></div><div data-step><b data-count="18900">0</b><span>euro reordered</span></div></div>
+    <div class="mrow mono" data-step><span class="grow">Email 1 opened <span class="mono">10:00</span></span><div class="bar"><i data-w="43"></i></div><span data-count="791">0</span></div>
+    <div class="mrow mono" data-step><span class="grow">SMS to non openers, day 4</span><div class="bar"><i data-w="26"></i></div><span data-count="478">0</span></div>
+    <div class="mrow" data-step><span class="dot a"></span><span class="grow">Abandoned cart series, 62 people inside it right now</span><span class="chip a">live</span></div>
+    <div class="mrow" data-step><span class="grow">Birthday and renewal reminders queued for next week</span><span class="chip g">sent</span></div>
   </div>
-  <div class="body">
+      <div class="body">
     <h3><span class="num mono">20</span>Email and SMS campaign automation</h3>
     <p>Segmented, triggered sequences that run themselves: welcome series, abandoned cart, dormant client re-engagement, birthday and renewal reminders. The dormant client list is usually the cheapest revenue in the building and nobody is working it.</p>
     <div class="kills"><b>Removes</b><span>the campaign that never goes out because someone has to export the list by hand first.</span></div>
@@ -672,31 +681,37 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 </article>
 
 <article class="card">
-  <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+  <div class="mock demo">
     <div class="mtitle"><span>Client portal · Northgate Ltd</span><button class="runbtn" type="button">▶ log in as client</button></div>
-    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Order <span class="mono">SO 8842</span> · dispatched, arrives Thu</span><span class="chip g">tracked</span></div>
-    <div class="mrow" data-step><span class="grow">Balance</span><span class="mono">€ 14 200</span></div>
+    <div class="mrow" data-step><span class="grow">Client asks: where is my order, and what do I owe?</span><span class="mono">08:41</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Portal answers instantly, dispatched, arrives Thu</span><span class="chip g">SO 8842</span></div>
+    <div class="doc" data-step><b>Invoice #2041 · balance € 14 200</b><div class="dline"></div><div class="dline"></div><div class="dline short"></div></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Invoices and delivery notes, self download</span><span class="chip g">ready</span></div>
-    <div class="mrow" data-step><span class="grow">Repeat order placed from history</span><span class="mono">€ 6 750</span></div>
+    <div class="mrow mono" data-step><span class="grow">Repeat order placed from history <span class="mono">08:44</span></span><span>€ 6 750</span><span class="up">▲</span></div>
     <div class="mrow" data-step><span class="grow">Calls to your office about this order</span><span class="chip g">0</span></div>
   </div>
-  <div class="body">
+      <div class="body">
     <h3><span class="num mono">21</span>Client self-service portal</h3>
     <p>Clients log in to see their orders, documents, balance, delivery status and full history, and place repeat orders without asking anyone. Every question the portal answers is a phone call your staff never takes.</p>
     <div class="kills"><b>Removes</b><span>the daily round of "where is my order" and "can you resend the invoice" calls.</span></div>
   </div>
 </article>
 
-<article class="card">
-  <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+<article class="card wide">
+  <div class="mock demo">
     <div class="mtitle"><span>Loyalty and partners</span><button class="runbtn" type="button">▶ close the month</button></div>
-    <div class="mrow" data-step><span class="grow">Points issued in July</span><span class="mono"><span data-count="94500">0</span></span></div>
-    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Northgate Ltd moves to Gold tier <span class="up">▲</span></span><span class="chip g">upgraded</span></div>
-    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Referral code <span class="mono">ANNA 12</span> · 7 new clients</span><span class="chip g">credited</span></div>
+    <div class="nodes"><div class="node" data-lit>Purchase</div><div class="link" data-lit></div><div class="node" data-lit>Points</div><div class="link" data-lit></div><div class="node" data-lit>Tier</div></div>
+    <div class="mrow" data-step><span class="grow">Northgate Ltd · 3 orders in July</span><span class="mono">€ 18 940</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Gold tier reached at <span class="mono">45 000</span> points <span class="up">▲</span></span><span class="chip g">upgraded</span></div>
     <div class="mrow" data-step><span class="dot a"></span><span class="grow">Partner commission held, missing bank details</span><span class="chip a">check</span></div>
-    <div class="mrow" data-step><span class="grow">Commission statements sent to 23 partners</span><span class="chip g">done</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Referral code <span class="mono">ANNA 12</span> credited to Anna Ruiz</span><span class="chip g">paid out</span></div>
+    <div class="bigstat mono" style="margin-top:8px">
+      <div data-step><b data-count="94500">0</b><span>points issued in July</span></div>
+      <div data-step><b data-count="7">0</b><span>clients from code ANNA 12</span></div>
+      <div data-step><b data-count="23">0</b><span>partner statements sent</span></div>
+    </div>
   </div>
-  <div class="body">
+      <div class="body">
     <h3><span class="num mono">22</span>Loyalty, referral and partner tracking</h3>
     <p>Points, tiers, referral codes and partner commissions are calculated and reported on their own, with anything unclear held back rather than paid out wrong. Partners see the same numbers you do.</p>
     <div class="kills"><b>Removes</b><span>the commission spreadsheet only one person in the company understands.</span></div>
@@ -708,16 +723,21 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   <div class="section-head" id="s-ai"><span class="idx serif">10 services</span><h2 class="serif">Artificial intelligence</h2></div>
   <p class="section-sub">Bots that answer from your own documents, calls that write themselves into the CRM, and forecasts that order stock before it runs out.</p>
   <div class="grid" id="g-ai">
-<article class="card wide">
-  <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+<article class="card">
+  <div class="mock demo">
     <div class="mtitle"><span>Support bot, WhatsApp</span><button class="runbtn" type="button">▶ ask the bot</button></div>
     <div class="mrow" data-step><span class="grow">Customer: is the 18mm panel in stock and what does delivery to Lyon cost?</span><span class="mono">21:14</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Bot: in stock, <b class="mono">€ 42.60</b> per sheet. Lyon delivery <b class="mono">€ 19</b>, 2 days.</span><span class="chip g">from price list v14</span></div>
-    <div class="mrow" data-step><span class="grow">Customer: can I pay on account?</span><span class="mono">21:15</span></div>
+    <div class="mrow" data-step><span class="grow">Customer: and the cutting service, same day?</span><span class="mono">21:15</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Bot: cutting is same day up to <b class="mono">12</b> sheets, <b class="mono">€ 3.40</b> per cut.</span><span class="chip g">from service sheet</span></div>
+    <div class="mrow" data-step><span class="grow">Customer: can I pay on account?</span><span class="mono">21:16</span></div>
     <div class="mrow" data-step><span class="dot a"></span><span class="grow">Credit terms need a human. Passed to Elena with the full thread.</span><span class="chip a">handover</span></div>
-    <div class="mrow" data-step><span class="grow">Repeat questions handled this week</span><span class="mono"><span data-count="71">0</span>%</span><span class="chip g">answered</span></div>
+    <div class="bigstat mono" style="margin-top:8px">
+      <div data-step><b data-count="71">0</b><span>% answered without a human</span></div>
+      <div data-step><b data-count="418">0</b><span>chats handled this week</span></div>
+    </div>
   </div>
-  <div class="body">
+      <div class="body">
     <h3><span class="num mono">23</span>Support chatbot on your own materials</h3>
     <p>The bot answers from your documentation, price list, policies and past tickets instead of inventing an answer, and passes the thread to a person the moment it is out of its depth. It runs on the site, in WhatsApp and in Telegram, and typically takes 60-80% of repeat questions off the queue.</p>
     <div class="kills"><b>Removes</b><span>agents typing the same delivery and pricing answer several hundred times a month.</span></div>
@@ -725,7 +745,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 </article>
 
 <article class="card">
-  <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+  <div class="mock demo">
     <div class="mtitle"><span>Internal assistant</span><button class="runbtn" type="button">▶ ask about the contract</button></div>
     <div class="filechips"><span class="fchip" data-eat>Supply contracts</span><span class="fchip" data-eat>Internal policy</span><span class="fchip" data-eat>Tech manuals</span><span class="fchip" data-eat>Project archive</span></div>
     <div class="arrowdown">▼ indexed ▼</div>
@@ -741,7 +761,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 </article>
 
 <article class="card">
-  <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+  <div class="mock demo">
     <div class="mtitle"><span>Call · Northgate Ltd</span><button class="runbtn" type="button">▶ transcribe call</button></div>
     <div class="mrow" data-step><span class="grow">Sales call, 14 min, recorded</span><span class="mono">10:26</span></div>
     <div class="mrow" data-step><span class="grow">Transcribing and summarising</span><div class="bar"><i data-w="100"></i></div></div>
@@ -757,15 +777,25 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 </article>
 
 <article class="card">
-  <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+  <div class="mock demo">
     <div class="mtitle"><span>Inbox · incoming documents</span><button class="runbtn" type="button">▶ sort the mailbox</button></div>
+    <div class="filechips">
+      <span class="fchip" data-eat>PDF invoice</span>
+      <span class="fchip" data-eat>Supply contract</span>
+      <span class="fchip" data-eat>Scanned certificate</span>
+      <span class="fchip" data-eat>Signed application</span>
+    </div>
+    <div class="arrowdown">▼ read, classified, routed ▼</div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow"><b>Invoice</b> · Northgate Ltd, <span class="mono">€ 3,412.00</span>, due <span class="mono">28 Feb</span></span><span class="chip g">to accounts</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow"><b>Supply contract</b> · term 24 months, notice 60 days</span><span class="chip g">to legal</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow"><b>Certificate</b> · expires <span class="mono">11 Sep</span>, reminder set</span><span class="chip g">to quality</span></div>
     <div class="mrow" data-step><span class="dot r"></span><span class="grow"><b>Application</b> · missing signature page</span><span class="chip r">held for review</span></div>
-    <div class="mrow" data-step><span class="grow">Documents routed today</span><span class="mono"><span data-count="248">0</span></span><span class="chip g">done</span></div>
+    <div class="bigstat mono" style="margin-top:8px">
+      <div data-step><b data-count="248">0</b><span>documents routed today</span></div>
+      <div data-step><b data-count="94">0</b><span>% needed no human touch</span></div>
+    </div>
   </div>
-  <div class="body">
+      <div class="body">
     <h3><span class="num mono">26</span>Document classification and data extraction</h3>
     <p>Incoming contracts, invoices, certificates, applications and correspondence are read on arrival: the type is identified, the key terms are pulled out, and the document is routed to the right person or system. Anything ambiguous is held rather than guessed at.</p>
     <div class="kills"><b>Removes</b><span>the person whose morning is opening the shared mailbox and deciding where each attachment goes.</span></div>
@@ -773,7 +803,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 </article>
 
 <article class="card">
-  <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+  <div class="mock demo">
     <div class="mtitle"><span>Catalogue generation</span><button class="runbtn" type="button">▶ write the catalogue</button></div>
     <div class="mrow" data-step><span class="grow">Source attributes read from your PIM</span><span class="mono">5,000 items</span></div>
     <div class="doc" data-step><b>Oak worktop, 3m, 40mm</b><div class="dline"></div><div class="dline short"></div></div>
@@ -789,7 +819,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 </article>
 
 <article class="card">
-  <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+  <div class="mock demo">
     <div class="mtitle"><span>Vacancy · Warehouse supervisor</span><button class="runbtn" type="button">▶ rank applicants</button></div>
     <div class="mrow" data-step><span class="grow">Applications parsed and matched to requirements</span><span class="mono"><span data-count="184">0</span></span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow"><b>A. Marchetti</b> · 6 yrs, WMS, forklift licence</span><div class="bar"><i data-w="94"></i></div><span class="mono">94</span></div>
@@ -804,16 +834,22 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 </article>
 
-<article class="card">
-  <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+<article class="card wide">
+  <div class="mock demo">
     <div class="mtitle"><span>Purchase plan · week 12</span><button class="runbtn" type="button">▶ run the forecast</button></div>
-    <div class="mrow" data-step><span class="grow">Model reads sales history, seasonality, promos, lead times</span><span class="mono">36 months</span></div>
+    <div class="mrow" data-step><span class="grow">Sales history, seasonality, promos, supplier lead times</span><span class="mono">36 months</span></div>
+    <div class="mrow mono" data-step><span class="grow">SKU 2210 cover</span><div class="bar"><i data-w="11"></i></div><span data-count="9">0</span></div>
+    <div class="mrow mono" data-step><span class="grow">SKU 3105 cover</span><div class="bar"><i data-w="47"></i></div><span data-count="38">0</span></div>
+    <div class="mrow mono" data-step><span class="grow">SKU 4188 cover</span><div class="bar"><i data-w="96"></i></div><span data-count="97">0</span></div>
     <div class="mrow" data-step><span class="dot r"></span><span class="grow"><b>SKU 2210</b> · stockout in 9 days, order <b class="mono">640</b> units now</span><span class="chip r">urgent</span></div>
     <div class="mrow" data-step><span class="dot a"></span><span class="grow"><b>SKU 4188</b> · 14 weeks of cover, pause purchasing</span><span class="chip a">overstocked</span></div>
-    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Capital freed from dead stock</span><span class="mono">€ <span data-count="86400">0</span></span></div>
-    <div class="mrow" data-step><span class="grow">Purchase order drafted for the supplier</span><span class="chip g">approved</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Purchase order drafted for Lehmann Handel</span><span class="chip g">approved</span></div>
+    <div class="bigstat mono" style="margin-top:8px">
+      <div data-step><b data-count="86400">0</b><span>euro freed from dead stock</span></div>
+      <div data-step><b data-count="3">0</b><span>stockouts avoided this quarter</span></div>
+    </div>
   </div>
-  <div class="body">
+      <div class="body">
     <h3><span class="num mono">29</span>Demand and inventory forecasting</h3>
     <p>A model trained on your own sales history, seasonality, promotions and supplier lead times tells you what to order and when. It targets the two failures that cost real money and never show up cleanly in the accounts: capital frozen in dead stock, and sales lost to an empty shelf.</p>
     <div class="kills"><b>Removes</b><span>ordering by gut feel from a spreadsheet that is already a week out of date.</span></div>
@@ -821,7 +857,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 </article>
 
 <article class="card">
-  <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+  <div class="mock demo">
     <div class="mtitle"><span>Shelf and line checks</span><button class="runbtn" type="button">▶ read the photos</button></div>
     <div class="filechips"><span class="fchip" data-eat>Store 14 shelf</span><span class="fchip" data-eat>Line camera</span><span class="fchip" data-eat>Pallet label</span></div>
     <div class="arrowdown">▼ analysed ▼</div>
@@ -838,7 +874,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 </article>
 
 <article class="card">
-  <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+  <div class="mock demo">
     <div class="mtitle"><span>Voice bot · Sunday 23:04</span><button class="runbtn" type="button">▶ take the call</button></div>
     <div class="nodes"><div class="node" data-lit>Phone line</div><div class="link" data-lit></div><div class="node" data-lit>Voice bot</div><div class="link" data-lit></div><div class="node" data-lit>CRM</div></div>
     <div class="mrow" data-step><span class="grow">Caller: I need to move my delivery to Thursday</span><span class="mono">23:04</span></div>
@@ -853,14 +889,19 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 </article>
 
-    <article class="card">
-      <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+    <article class="card wide">
+      <div class="mock demo">
         <div class="mtitle"><span>Content factory · this week</span><button class="runbtn" type="button">▶ run the week</button></div>
+        <div class="doc" data-step><b>Blog: choosing 18mm panel, 5 mistakes buyers make</b><div class="dline"></div><div class="dline"></div><div class="dline short"></div></div>
+        <div class="doc" data-step><b>Post: new oak range, in stock from Tuesday</b><div class="dline"></div><div class="dline short"></div></div>
         <div class="mrow" data-step><span class="dot g"></span><span class="grow">12 product posts drafted in your tone of voice</span><span class="mono">Mon 07:00</span></div>
-        <div class="mrow" data-step><span class="dot g"></span><span class="grow">Blog piece written from last week's client questions</span><span class="mono">Tue 07:00</span></div>
-        <div class="mrow" data-step><span class="dot g"></span><span class="grow">5 short video scripts from the new catalogue</span><span class="mono">Wed 07:00</span></div>
+        <div class="mrow" data-step><span class="dot g"></span><span class="grow">5 short video scripts written from the new catalogue</span><span class="mono">Wed 07:00</span></div>
         <div class="mrow" data-step><span class="grow">Everything lands in your review queue first</span><span class="chip a">your approval</span></div>
-        <div class="mrow" data-step><span class="grow">Approved items published to site, Telegram, Instagram</span><span class="chip g">done</span></div>
+        <div class="mrow" data-step><span class="dot g"></span><span class="grow">Approved items published to site, Telegram, Instagram</span><span class="chip g">done</span></div>
+        <div class="bigstat mono" style="margin-top:8px">
+          <div data-step><b data-count="19">0</b><span>pieces published this week</span></div>
+          <div data-step><b data-count="6">0</b><span>hours of your time spent</span></div>
+        </div>
       </div>
       <div class="body">
         <h3><span class="num mono">56</span>Content factory</h3>
@@ -879,8 +920,8 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   <div class="section-head" id="s-ops"><span class="idx serif">8 services</span><h2 class="serif">Operations &amp; internal workflow</h2></div>
   <p class="section-sub">Approvals that move, rotas that build themselves, crews that report from the road, stock counts that match the shelf.</p>
   <div class="grid" id="g-ops">
-<article class="card wide">
-  <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+<article class="card">
+  <div class="mock demo">
     <div class="mtitle"><span>Fit-out job board</span><button class="runbtn" type="button">▶ move the job</button></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow"><b>Northgate Ltd</b> · unit 4 fit-out</span><span class="mono">stage 3/6</span></div>
     <div class="mrow" data-step><span class="grow">Site survey checklist</span><div class="bar"><i data-w="100"></i></div><span class="chip g">signed off</span></div>
@@ -896,7 +937,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 </article>
 
 <article class="card">
-  <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+  <div class="mock demo">
     <div class="mtitle"><span>Approval routing</span><button class="runbtn" type="button">▶ route for sign-off</button></div>
     <div class="filechips"><span class="fchip" data-eat>Purchase request</span><span class="fchip" data-eat>Discount 18%</span><span class="fchip" data-eat>Leave request</span><span class="fchip" data-eat>Expenses</span></div>
     <div class="arrowdown">▼ routed by amount and type ▼</div>
@@ -913,7 +954,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 </article>
 
 <article class="card">
-  <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+  <div class="mock demo">
     <div class="mtitle"><span>Document assembly</span><button class="runbtn" type="button">▶ generate the contract</button></div>
     <div class="mrow" data-step><span class="grow">Client <b>Northgate Ltd</b> · order <span class="mono">SO-4417</span></span><span class="chip g">data found</span></div>
     <div class="mrow" data-step><span class="grow">Clause set: prepayment, 30 days, EU delivery</span><span class="chip g">by rule</span></div>
@@ -928,7 +969,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 </article>
 
 <article class="card">
-  <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+  <div class="mock demo">
     <div class="mtitle"><span>Week 11 rota</span><button class="runbtn" type="button">▶ build the rota</button></div>
     <div class="mrow" data-step><span class="grow">Forecast demand: <span data-count="312">0</span> covers Fri evening</span><span class="up">▲</span></div>
     <div class="mrow" data-step><span class="grow">Shifts filled</span><div class="bar"><i data-w="96"></i></div><span class="mono">44/46</span></div>
@@ -945,7 +986,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 </article>
 
 <article class="card">
-  <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+  <div class="mock demo">
     <div class="mtitle"><span>Crew app · van 7</span><button class="runbtn" type="button">▶ dispatch jobs</button></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Job <span class="mono">J-2210</span> · boiler service, Riverside 14</span><span class="mono">09:15</span></div>
     <div class="mrow" data-step><span class="grow">Route sent, client history on screen</span><span class="chip g">on the way</span></div>
@@ -961,7 +1002,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 </article>
 
 <article class="card">
-  <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+  <div class="mock demo">
     <div class="mtitle"><span>Warehouse scanner</span><button class="runbtn" type="button">▶ scan and post</button></div>
     <div class="mrow" data-step><span class="grow">Receiving <span class="mono">GRN-8841</span> · 3 pallets</span><span class="chip g">scanned</span></div>
     <div class="mrow" data-step><span class="grow">Pick list <span class="mono">P-0912</span></span><div class="bar"><i data-w="100"></i></div><span class="chip g">12/12</span></div>
@@ -976,24 +1017,30 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 </article>
 
-<article class="card">
-  <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+<article class="card wide">
+  <div class="mock demo">
     <div class="mtitle"><span>Booking desk</span><button class="runbtn" type="button">▶ take the booking</button></div>
+    <div class="mrow mono" data-step><span class="grow">Mon 14 Apr</span><div class="bar"><i data-w="83"></i></div><span data-count="11">0</span></div>
+    <div class="mrow mono" data-step><span class="grow">Tue 15 Apr</span><div class="bar"><i data-w="58"></i></div><span data-count="7">0</span></div>
+    <div class="mrow mono" data-step><span class="grow">Wed 16 Apr</span><div class="bar"><i data-w="31"></i></div><span data-count="4">0</span></div>
     <div class="mrow" data-step><span class="grow">Free slots today, room 2</span><span class="mono">11:30 · 14:00 · 16:15</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">E. Marchetti booked <span class="mono">14:00</span> · 45 min</span><span class="chip g">confirmed</span></div>
-    <div class="mrow" data-step><span class="grow">Deposit <span class="mono">€25</span> taken online</span><span class="chip g">paid</span></div>
-    <div class="mrow" data-step><span class="grow">Reminder scheduled for <span class="mono">13:00</span></span><span class="chip a">pending</span></div>
-    <div class="mrow" data-step><span class="grow">No-shows this month <span data-count="4">0</span>, was 19</span><span class="down">▼</span><span class="chip g">booked in</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Deposit <span class="mono">€ 25</span> taken online</span><span class="chip g">paid</span></div>
+    <div class="mrow" data-step><span class="dot a"></span><span class="grow">Reminder scheduled for <span class="mono">13:00</span></span><span class="chip a">pending</span></div>
+    <div class="bigstat mono" style="margin-top:8px">
+      <div data-step><b data-count="4">0</b><span>no-shows this month, was 19</span></div>
+      <div data-step><b data-count="137">0</b><span>bookings taken without a call</span></div>
+    </div>
   </div>
-  <div class="body">
+      <div class="body">
     <h3><span class="num mono">38</span>Booking and appointment system</h3>
     <p>Online booking against real availability, automatic reminders that cut no-shows, room and resource allocation, deposits taken up front. Built for clinics, salons, studios, workshops, consultancies and equipment hire.</p>
     <div class="kills"><b>Removes</b><span>the phone-and-paper diary and the empty slot nobody was reminded about.</span></div>
   </div>
 </article>
 
-<article class="card">
-  <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+<article class="card wide">
+  <div class="mock demo">
     <div class="mtitle"><span>Tomorrow's routes</span><button class="runbtn" type="button">▶ plan the runs</button></div>
     <div class="mrow" data-step><span class="grow">28 drops, 4 vans, capacity and time windows applied</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Van 2 sequenced · <span class="mono">112 km</span>, was 141</span><span class="down">▼</span></div>
@@ -1013,8 +1060,8 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   <div class="section-head" id="s-web"><span class="idx serif">7 services</span><h2 class="serif">Web &amp; customer-facing</h2></div>
   <p class="section-sub">Sites that convert, stores that sync, payments that reconcile themselves, and a sales channel inside the client's messenger.</p>
   <div class="grid" id="g-web">
-<article class="card wide">
-  <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+<article class="card">
+  <div class="mock demo">
     <div class="mtitle"><span>Landing page to CRM</span><button class="runbtn" type="button">▶ send an enquiry</button></div>
     <div class="mrow" data-step><span class="grow">Mobile load time</span><span class="mono"><span data-count="9">0</span>00 ms</span><span class="chip g">fast</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Form submitted · Northgate Ltd, quote request</span><span class="mono">10:12</span></div>
@@ -1028,15 +1075,17 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 </article>
 
-<article class="card">
-  <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+<article class="card wide">
+  <div class="mock demo">
     <div class="mtitle"><span>Online store</span><button class="runbtn" type="button">▶ place an order</button></div>
+    <div class="nodes"><div class="node" data-lit>Catalogue</div><div class="link" data-lit></div><div class="node" data-lit>Payment</div><div class="link" data-lit></div><div class="node" data-lit>Warehouse</div></div>
     <div class="mrow" data-step><span class="grow">Cart: 3 items · oak desk, lamp, cable tray</span><span class="mono">€ 486,00</span></div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Delivery calculated · Lyon, 2 days</span><span class="mono">€ 14,50</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Card charged, receipt emailed</span><span class="mono">€ 500,50</span></div>
     <div class="mrow" data-step><span class="grow">Stock reserved in warehouse · SKU 4471</span><span class="mono">7 <span class="down">▼</span></span></div>
-    <div class="mrow" data-step><span class="grow">Order <span class="mono">#10842</span> in the same list as shop-floor sales</span><span class="chip g">paid</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Order <span class="mono">#10842</span> in the same list as shop-floor sales</span><span class="chip g">paid</span></div>
   </div>
-  <div class="body">
+      <div class="body">
     <h3><span class="num mono">41</span>Online store</h3>
     <p>Catalogue, payments, delivery calculation and stock tied to the warehouse, with online orders landing in the same system your offline sales already use.</p>
     <div class="kills"><b>Removes</b><span>Calling a developer every time you want to add a product.</span></div>
@@ -1044,14 +1093,19 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 </article>
 
 <article class="card">
-  <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+  <div class="mock demo">
     <div class="mtitle"><span>Subscriptions</span><button class="runbtn" type="button">▶ run the monthly cycle</button></div>
-    <div class="mrow" data-step><span class="grow">Charged this cycle · 214 accounts</span><span class="mono">€ 38 460</span></div>
-    <div class="mrow" data-step><span class="dot r"></span><span class="grow">Card expired · Kessler GmbH</span><span class="chip r">failed</span></div>
+    <div class="bigstat mono">
+      <div data-step><b data-count="214">0</b><span>accounts charged</span></div>
+      <div data-step><b data-count="38460">0</b><span>euro collected this cycle</span></div>
+      <div data-step><b data-count="3">0</b><span>cards declined</span></div>
+    </div>
+    <div class="mrow" data-step><span class="dot r"></span><span class="grow">Card expired · Kessler GmbH, <span class="mono">€ 349,00</span></span><span class="chip r">failed</span></div>
     <div class="mrow" data-step><span class="grow">Dunning email 1 of 3 sent, card updated by client</span><span class="mono">14:07</span></div>
-    <div class="mrow" data-step><span class="grow">Plan upgraded to Pro, invoice issued automatically</span><span class="chip g">recovered</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Retried and charged, plan upgraded to Pro</span><span class="chip g">recovered</span></div>
+    <div class="doc" data-step><b>Invoice INV-4471 · Kessler GmbH · € 349,00</b><div class="dline"></div><div class="dline"></div><div class="dline short"></div></div>
   </div>
-  <div class="body">
+      <div class="body">
     <h3><span class="num mono">42</span>Customer accounts and subscription billing</h3>
     <p>Recurring charges, plan changes, dunning on failed cards, usage limits and invoices issued without anyone touching them.</p>
     <div class="kills"><b>Removes</b><span>Chasing expired cards by hand and quietly losing that revenue.</span></div>
@@ -1059,7 +1113,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 </article>
 
 <article class="card">
-  <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+  <div class="mock demo">
     <div class="mtitle"><span>Payments and reconciliation</span><button class="runbtn" type="button">▶ close the day</button></div>
     <div class="mrow" data-step><span class="grow">Card, transfer, instalments, invoice</span><span class="chip g">all live</span></div>
     <div class="mrow" data-step><span class="grow">Payments received today</span><span class="mono">€ <span data-count="21740">0</span></span></div>
@@ -1074,14 +1128,19 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 </article>
 
 <article class="card">
-  <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+  <div class="mock demo">
     <div class="mtitle"><span>Messenger sales bot</span><button class="runbtn" type="button">▶ order in telegram</button></div>
-    <div class="mrow" data-step><span class="grow">Client opens catalogue in chat, picks 2 items</span><span class="mono">19:24</span></div>
-    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Paid inside the messenger</span><span class="mono">€ 79,00</span></div>
-    <div class="mrow" data-step><span class="grow">Status check: "where is my parcel" answered by bot</span><span class="chip g">auto</span></div>
-    <div class="mrow" data-step><span class="grow">Conversion vs mobile web form</span><span class="mono"><span class="up">▲</span> <span data-count="34">0</span>%</span><span class="chip g">shipped</span></div>
+    <div class="mrow" data-step><span class="grow">Client opens the catalogue in chat, picks 2 items</span><span class="mono">19:24</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Bot: oak tray and desk lamp, <b class="mono">€ 79,00</b> with delivery</span><span class="chip g">both in stock</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Paid inside the messenger, no website, no forms</span><span class="mono">19:26</span></div>
+    <div class="mrow" data-step><span class="grow">Client: where is my parcel?</span><span class="mono">next day</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">Bot: out for delivery, courier <span class="mono">DPD 7741</span>, before 18:00</span><span class="chip g">auto</span></div>
+    <div class="bigstat mono" style="margin-top:8px">
+      <div data-step><b data-count="34">0</b><span>% better than the mobile web form</span></div>
+      <div data-step><b data-count="62">0</b><span>orders taken in chat this week</span></div>
+    </div>
   </div>
-  <div class="body">
+      <div class="body">
     <h3><span class="num mono">44</span>Telegram or WhatsApp bot as a sales channel</h3>
     <p>Catalogue, ordering, order status, support and notifications inside the messenger your customer already has open. In most consumer categories that beats a mobile web form.</p>
     <div class="kills"><b>Removes</b><span>Staff answering the same "where is my order" message all day.</span></div>
@@ -1089,7 +1148,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 </article>
 
 <article class="card">
-  <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+  <div class="mock demo">
     <div class="mtitle"><span>Marketplace control panel</span><button class="runbtn" type="button">▶ push price update</button></div>
     <div class="filechips" data-step><span class="fchip" data-eat>Admin panel 1</span><span class="fchip" data-eat>Admin panel 2</span><span class="fchip" data-eat>Admin panel 3</span><span class="fchip" data-eat>Admin panel 4</span></div>
     <div class="arrowdown">▼ one screen ▼</div>
@@ -1105,7 +1164,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 </article>
 
 <article class="card">
-  <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+  <div class="mock demo">
     <div class="mtitle"><span>Attribution dashboard</span><button class="runbtn" type="button">▶ join spend to revenue</button></div>
     <div class="nodes" data-step><div class="node" data-lit>Ad click</div><div class="link" data-lit></div><div class="node" data-lit>CRM deal</div><div class="link" data-lit></div><div class="node" data-lit>Closed revenue</div></div>
     <div class="mrow" data-step><span class="grow">Paid search · cost per client</span><span class="mono">€ 118</span><span class="chip g">keep</span></div>
@@ -1125,7 +1184,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   <p class="section-sub">One screen of truth for the director, and an alert the hour something goes wrong instead of a surprise at month end.</p>
   <div class="grid" id="g-rep">
 <article class="card wide">
-  <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+  <div class="mock demo">
     <div class="mtitle"><span>Director's screen</span><button class="runbtn" type="button">▶ refresh the board</button></div>
     <div class="mrow" data-step><span class="grow">Revenue, month to date</span><span class="mono">€<span data-count="418500">0</span></span><span class="up">▲</span></div>
     <div class="mrow" data-step><span class="grow">Gross margin</span><div class="bar"><i data-w="34"></i></div><span class="mono">34%</span></div>
@@ -1141,7 +1200,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 </article>
 
 <article class="card">
-  <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+  <div class="mock demo">
     <div class="mtitle"><span>Sales KPIs · March</span><button class="runbtn" type="button">▶ score the month</button></div>
     <div class="mrow" data-step><span class="grow">A. Petrova · <span class="mono">€96,400</span> closed</span><div class="bar"><i data-w="107"></i></div><span class="chip g">107%</span></div>
     <div class="mrow" data-step><span class="grow">M. Ilves · <span class="mono">€61,200</span> closed</span><div class="bar"><i data-w="82"></i></div><span class="chip a">82%</span></div>
@@ -1157,7 +1216,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 </article>
 
 <article class="card">
-  <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+  <div class="mock demo">
     <div class="mtitle"><span>Monday pack</span><button class="runbtn" type="button">▶ send the reports</button></div>
     <div class="mrow" data-step><span class="grow">Schedule fired <span class="mono">Mon 07:00</span></span><span class="chip g">on time</span></div>
     <div class="doc" data-step><b>Weekly sales and margin</b><div class="dline"></div><div class="dline short"></div></div>
@@ -1172,16 +1231,21 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   </div>
 </article>
 
-<article class="card">
-  <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+<article class="card wide">
+  <div class="mock demo">
     <div class="mtitle"><span>Anomaly watch</span><button class="runbtn" type="button">▶ watch the numbers</button></div>
-    <div class="mrow" data-step><span class="dot r"></span><span class="grow"><b>Margin down</b> on SKU 2210 · 31% to 18%</span><span class="mono">09:41</span></div>
+    <div class="nodes"><div class="node" data-lit>Live data</div><div class="link" data-lit></div><div class="node" data-lit>42 checks</div><div class="link" data-lit></div><div class="node" data-lit>Alerts</div></div>
+    <div class="mrow" data-step><span class="dot r"></span><span class="grow"><b>Margin down</b> on SKU 2210 · 31% to 18% <span class="down">▼</span></span><span class="mono">09:41</span></div>
     <div class="mrow" data-step><span class="dot a"></span><span class="grow">Northgate Ltd has not ordered in <span class="mono">21 days</span></span><span class="chip a">check in</span></div>
     <div class="mrow" data-step><span class="dot r"></span><span class="grow">Stock cover below 5 days on 3 lines</span><span class="chip r">reorder</span></div>
-    <div class="mrow" data-step><span class="dot a"></span><span class="grow">Card payment failed, invoice <span class="mono">INV-3390</span></span></div>
-    <div class="mrow" data-step><span class="grow">All four raised the same morning, not at month end</span><span class="chip g">flagged</span></div>
+    <div class="mrow" data-step><span class="dot a"></span><span class="grow">Card payment failed, invoice <span class="mono">INV-3390</span></span><span class="chip a">retry</span></div>
+    <div class="mrow" data-step><span class="dot g"></span><span class="grow">All four raised the same morning, not at month end</span><span class="chip g">flagged</span></div>
+    <div class="bigstat mono" style="margin-top:8px">
+      <div data-step><b data-count="17">0</b><span>issues caught this month</span></div>
+      <div data-step><b data-count="11300">0</b><span>euro of margin protected</span></div>
+    </div>
   </div>
-  <div class="body">
+      <div class="body">
     <h3><span class="num mono">50</span>Alerting and anomaly detection</h3>
     <p>You get told the moment something leaves its normal range: margin slipping on a product, a regular client going quiet, stock under cover, a server down, a payment failing, expenses spiking.</p>
     <div class="kills"><b>Removes</b><span>finding out about a month-old problem when the month-end figures land.</span></div>
@@ -1194,7 +1258,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   <p class="section-sub">The critical spreadsheet retired, the legacy program tamed, backups that are actually tested, and training so it all gets used.</p>
   <div class="grid" id="g-infra">
 <article class="card wide">
-  <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+  <div class="mock demo">
     <div class="mtitle"><span>Spreadsheet to application</span><button class="runbtn" type="button">▶ retire the file</button></div>
     <div class="filechips" data-step><span class="fchip" data-eat>plan_final_v7.xlsx</span><span class="fchip" data-eat>plan_final_v7 (copy).xlsx</span><span class="fchip" data-eat>Anna's version</span></div>
     <div class="arrowdown">▼ imported ▼</div>
@@ -1210,7 +1274,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 </article>
 
 <article class="card">
-  <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+  <div class="mock demo">
     <div class="mtitle"><span>Legacy Windows program</span><button class="runbtn" type="button">▶ run the robot</button></div>
     <div class="mrow" data-step><span class="dot a"></span><span class="grow">No API, vendor gone since 2011</span><span class="chip a">as is</span></div>
     <div class="mrow" data-step><span class="grow">Robot opens the app, types 240 invoices</span><div class="bar"><i data-w="100"></i></div></div>
@@ -1225,7 +1289,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 </article>
 
 <article class="card">
-  <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+  <div class="mock demo">
     <div class="mtitle"><span>Backup and access</span><button class="runbtn" type="button">▶ run the recovery drill</button></div>
     <div class="mrow" data-step><span class="grow">Backup taken · 02:00, verified by restore test</span><span class="mono">4,2 GB</span></div>
     <div class="mrow" data-step><span class="dot r"></span><span class="grow">Drill: main database wiped</span><span class="chip r">down</span></div>
@@ -1240,7 +1304,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 </article>
 
 <article class="card">
-  <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+  <div class="mock demo">
     <div class="mtitle"><span>Hosting and monitoring</span><button class="runbtn" type="button">▶ ship a release</button></div>
     <div class="nodes" data-step><div class="node" data-lit>Commit</div><div class="link" data-lit></div><div class="node" data-lit>Tests</div><div class="link" data-lit></div><div class="node" data-lit>Live server</div></div>
     <div class="mrow" data-step><span class="grow">Deploy finished, no downtime</span><span class="mono">2 min 40 s</span></div>
@@ -1255,7 +1319,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 </article>
 
 <article class="card">
-  <div class="mock demo"><div class="mock-chrome"><i></i><i></i><i></i></div>
+  <div class="mock demo">
     <div class="mtitle"><span>Handover pack</span><button class="runbtn" type="button">▶ hand it over</button></div>
     <div class="doc" data-step><b>Operating manual · warehouse module</b><div class="dline"></div><div class="dline short"></div></div>
     <div class="mrow" data-step><span class="grow">Video walkthroughs recorded</span><span class="mono"><span data-count="12">0</span></span></div>
@@ -1348,13 +1412,13 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     var delay = reduced ? 0 : 120;
 
     eats.forEach(function(f, i){
-      setTimeout(function(){ f.classList.add('eaten'); }, delay + i * 260);
+      setTimeout(function(){ f.classList.add('eaten'); }, delay + i * 450);
     });
-    var base = delay + eats.length * 260;
+    var base = delay + eats.length * 450;
     lits.forEach(function(n, i){
-      setTimeout(function(){ n.classList.add('lit'); }, base + i * 320);
+      setTimeout(function(){ n.classList.add('lit'); }, base + i * 420);
     });
-    base += lits.length * 320;
+    base += lits.length * 420;
     steps.forEach(function(s, i){
       setTimeout(function(){
         s.classList.add('shown');
