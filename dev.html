@@ -354,6 +354,14 @@ function paletteAt(pal, p){
   }
   return out;
 }
+/* scale a hex colour toward black. The palette is written bright for text on black; the tubes
+   need the same hues at a fraction of that brightness. */
+function dim(hex, k){
+  var out='#';
+  for (var c=1;c<7;c+=2)
+    out+=Math.max(0,Math.min(255,Math.round(parseInt(hex.substr(c,2),16)*k))).toString(16).padStart(2,'0');
+  return out;
+}
 /* hue -> hex. The tube library takes hex strings, so the wheel is converted here rather
    than handed over as hsl(), which its colour parser is not guaranteed to accept. */
 function hslHex(h,s,l){
@@ -389,21 +397,23 @@ function hslHex(h,s,l){
      scene a dominant colour that visibly travels warm -> green -> blue. */
   function paintTubes(){
     if(!tubesApp||!tubesApp.tubes) return;
-    var l=glow.l;
+    /* the tubes read from the SAME palette the text is using, one step behind it, so they are
+       the same family of colours without being the same colour. Palette entries are picked
+       bright, so they are scaled down here to whatever the brightness knob asks for. */
+    var pal=GRADS[flowKey]||hueWheel(12), k=glow.l/0.64, sp=pal.length*0.12;
+    var p=tubeHue/360*pal.length + pal.length*0.10;   /* just behind the text, same family */
     try{
-      /* +180 keeps the tubes on the opposite side of the wheel from the text, so the two are
-         never the same colour. The library spreads the list across the tubes, so three stops
-         means three visibly different tubes. */
-      var h=tubeHue+180;
-      tubesApp.tubes.setColors([hslHex(h,.8,l),hslHex(h+55,.8,l),hslHex(h+110,.8,l)]);
-      tubesApp.tubes.setLightsColors([hslHex(h+15,.8,l+.02),hslHex(h+50,.8,l+.02),
-                                      hslHex(h+85,.8,l+.02),hslHex(h+120,.8,l+.02)]);
+      tubesApp.tubes.setColors([dim(paletteAt(pal,p),k),dim(paletteAt(pal,p+sp),k),
+                                dim(paletteAt(pal,p+sp*2),k)]);
+      tubesApp.tubes.setLightsColors([dim(paletteAt(pal,p+sp*0.3),k),dim(paletteAt(pal,p+sp*0.9),k),
+                                      dim(paletteAt(pal,p+sp*1.5),k),dim(paletteAt(pal,p+sp*2.1),k)]);
       tubePaints++;
     }catch(e){ if(!paintTubes.warned){paintTubes.warned=1;console.warn('tube colours:',e);} }
     /* separate guard: a missing or unhappy intensity setter must not stop the recolouring */
     try{ if (tubesApp.tubes.setLightsIntensity) tubesApp.tubes.setLightsIntensity(glow.i); }catch(e){}
     var r=document.getElementById('tubereadout');
-    if(r) r.textContent='трубки: тон '+Math.round(tubeHue)+'°, перекрасок '+tubePaints;
+    if(r) r.textContent='трубки: '+dim(paletteAt(pal,p),k)+' '+dim(paletteAt(pal,p+sp*2),k)
+                        +', перекрасок '+tubePaints;
   }
   function cycleTubes(now){
     tubesRaf=requestAnimationFrame(cycleTubes);
@@ -429,10 +439,12 @@ function hslHex(h,s,l){
     if(!on) return;
     tubesCv=document.createElement('canvas'); tubesCv.className='tubes';
     stage.appendChild(tubesCv);
+    /* seed from the same palette the text uses, so the first frame is already in family */
+    var pal0=GRADS[flowKey]||hueWheel(12), k0=glow.l/0.64, s0=pal0.length*0.12, p0=pal0.length*0.10;
     tubesCancel=TubesCursorInit(tubesCv,{tubes:{
-      colors:[hslHex(180,.8,glow.l),hslHex(235,.8,glow.l),hslHex(290,.8,glow.l)],
-      lights:{intensity:glow.i,colors:[hslHex(195,.8,glow.l+.02),hslHex(230,.8,glow.l+.02),
-                                       hslHex(265,.8,glow.l+.02),hslHex(300,.8,glow.l+.02)]}}},
+      colors:[dim(paletteAt(pal0,p0),k0),dim(paletteAt(pal0,p0+s0),k0),dim(paletteAt(pal0,p0+s0*2),k0)],
+      lights:{intensity:glow.i,colors:[dim(paletteAt(pal0,p0),k0),dim(paletteAt(pal0,p0+s0*0.9),k0),
+                                       dim(paletteAt(pal0,p0+s0*1.5),k0),dim(paletteAt(pal0,p0+s0*2.1),k0)]}}},
       function(app){tubesApp=app;});
     tubeLast=performance.now();
     tubesRaf=requestAnimationFrame(cycleTubes);
