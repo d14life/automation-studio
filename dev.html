@@ -68,6 +68,10 @@ body{margin:0;background:#000;color:#EDF2EC;font:15px/1.55 system-ui,-apple-syst
   <button id="s-slow">медленно</button>
   <button id="s-mid" class="on">средне</button>
   <button id="s-fast">быстро</button>
+  <b style="margin-left:14px">разброс цвета</b>
+  <button id="d-soft">мягко</button>
+  <button id="d-mid" class="on">средне</button>
+  <button id="d-wide">контраст</button>
   <b style="margin-left:14px">яркость трубок</b>
   <button id="y-dim">тускло</button>
   <button id="y-mid" class="on">средне</button>
@@ -376,7 +380,7 @@ function hslHex(h,s,l){
      spans the whole wheel while the offset turns once per colour-flow period. Repainted at
      ~16 fps instead of every frame: the eye reads it as continuous and the material swap
      is not free. */
-  var tubesRaf=0, tubeHue=0, tubeLast=0;
+  var tubesRaf=0, tubeHue=0, tubeLast=0, tubePaints=0;
   var GLOW={dim:{l:.24,i:45},mid:{l:.34,i:90},bright:{l:.52,i:190}}, glow=GLOW.mid;
   function paintTubes(){
     if(!tubesApp||!tubesApp.tubes) return;
@@ -386,6 +390,7 @@ function hslHex(h,s,l){
       tubesApp.tubes.setLightsColors([hslHex(tubeHue+60,.8,l+.02),hslHex(tubeHue+150,.8,l+.02),
                                       hslHex(tubeHue+240,.8,l+.02),hslHex(tubeHue+330,.8,l+.02)]);
       if (tubesApp.tubes.setLightsIntensity) tubesApp.tubes.setLightsIntensity(glow.i);
+      tubePaints++;
     }catch(e){ cancelAnimationFrame(tubesRaf); tubesRaf=0; console.warn('tube colours:',e); }
   }
   function cycleTubes(now){
@@ -435,7 +440,9 @@ function hslHex(h,s,l){
   var FONTS={nunito:['Nunito',900],comfortaa:['Comfortaa',700],rubik:['Rubik',800],system:['system-ui',700]};
   /* flowSec = seconds for the colours to travel across the text once. The palette window
      drifts three times slower, and the tubes ride that same slow drift. */
-  var flowKey='all', fontKey='nunito', flowSec=7;
+  /* spreadFrac = how far apart the three stops sit, as a share of the palette. A third of
+     the wheel was too loud, neighbours read as one colour, so the middle sits between. */
+  var flowKey='all', fontKey='nunito', flowSec=7, spreadFrac=0.08;
   function liquid(on){
     var host=document.getElementById('liquid');
     if(stopLiquid){stopLiquid();stopLiquid=null;}
@@ -444,8 +451,10 @@ function hslHex(h,s,l){
     host.style.fontWeight=FONTS[fontKey][1];
     /* long melt, short hold: the change itself is what the visitor should see, so the words
        swap often and each transition is drawn out. */
+    var pal=GRADS[flowKey];
     if(on) stopLiquid=LiquidText(host,['ВООБРАЖЕНИЕ','ВАШ ЕДИНСТВЕННЫЙ','ПРЕДЕЛ'],
-      {morphTime:4.5,cooldownTime:0.45,colors:GRADS[flowKey],flow:flowSec,drift:flowSec*3});
+      {morphTime:4.5,cooldownTime:0.45,colors:pal,flow:flowSec,drift:flowSec*3,
+       spread: pal ? pal.length*spreadFrac : 1});
   }
   /* 4 - parallax: same layer speeds as the GSAP timeline, scrubbed by scroll */
   function parallax(on){
@@ -505,9 +514,12 @@ function hslHex(h,s,l){
   radio([['f-nunito','nunito'],['f-comfortaa','comfortaa'],['f-rubik','rubik'],['f-system','system']],
         function(v){fontKey=v;});
   radio([['s-slow',12],['s-mid',7],['s-fast',3.5]], function(v){flowSec=v;});
+  radio([['d-soft',0.05],['d-mid',0.08],['d-wide',0.15]], function(v){spreadFrac=v;});
   radio([['y-dim','dim'],['y-mid','mid'],['y-bright','bright']], function(v){glow=GLOW[v];paintTubes();});
   window.__dev={state:state,apply:apply,grads:GRADS,
-    setFlow:function(k){flowKey=k;liquid(true);},setFont:function(k){fontKey=k;liquid(true);}};
+    setFlow:function(k){flowKey=k;liquid(true);},setFont:function(k){fontKey=k;liquid(true);},
+    /* diagnostics: proves whether the tube loop is actually running and repainting */
+    tubeInfo:function(){return {ready:!!tubesApp,hue:Math.round(tubeHue),paints:tubePaints,glow:glow};}};
   apply();
 })();
 </script>
