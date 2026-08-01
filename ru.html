@@ -171,7 +171,7 @@ header{border-bottom:1px solid var(--rule)}
 .grid .card .mock > .arrowdown{flex:0 0 auto}
 .grid .card .mock > .kanban,.grid .card .mock > .minicols{flex:1 1 auto}
 .grid .card .mock > .nodes,.grid .card .mock > .filechips,.grid .card .mock > .doc{flex:0 1 auto}
-.grid .card .mock > .chartwrap .chart{height:100%;min-height:110px}
+.grid .card .mock > .chartwrap .chart{height:100%;min-height:128px}
 .grid .card .body{padding:24px 24px;justify-content:center;gap:11px}
 .grid .card h3{font-size:20px;line-height:1.28}
 .grid .card:nth-child(even){grid-template-columns:minmax(290px,1fr) minmax(0,2.2fr)}
@@ -235,7 +235,7 @@ header{border-bottom:1px solid var(--rule)}
 .clegend{display:flex;gap:16px;font-size:11px;color:var(--ink-soft);margin:0 0 6px 4px}
 .clegend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:-1px}
 .clegend .c1 i{background:var(--ch1)}.clegend .c2 i{background:var(--ch2)}
-.chart{width:100%;height:110px;display:block}
+.chart{width:100%;height:128px;display:block}
 .chart line{stroke:var(--mock-line);stroke-width:1}
 .chart polyline{fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;
   stroke-dasharray:460;stroke-dashoffset:460;transition:stroke-dashoffset 1400ms var(--ease-out)}
@@ -244,7 +244,7 @@ header{border-bottom:1px solid var(--rule)}
 .chartwrap.solo .area{fill:var(--acc,var(--ch1))}.chart .s2{stroke:var(--ch2)}
 .chart .area{fill:var(--ch1);opacity:0;transition:opacity 1200ms ease 900ms}
 .chart circle{opacity:0;transition:opacity 400ms ease 1190ms}
-.chart .pt{r:2.4;fill:var(--mock-bg);stroke-width:1.6}
+.chart .pt{r:3.6;fill:var(--mock-bg);stroke-width:2}
 .chart .pt.d1{stroke:var(--ch1)}
 .chartwrap.solo .pt.d1{stroke:var(--acc,var(--ch1))}
 .chart .pt.d2{stroke:var(--ch2)}
@@ -597,7 +597,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
             <line x1="0" y1="84" x2="420" y2="84"></line>
             
             <polygon class="area" points="0,92 46,86 92,78 138,74 184,62 230,54 276,44 322,36 368,26 418,16 418,110 0,110"></polygon><polyline class="s1" points="0,92 46,86 92,78 138,74 184,62 230,54 276,44 322,36 368,26 418,16"></polyline>
-            <circle class="p1" cx="418" cy="16" r="3.5"></circle>
+            <circle class="p1" cx="418" cy="16" r="5"></circle>
             
           <circle class="pt d1" cx="0" cy="92"></circle><circle class="pt d1" cx="46" cy="86"></circle><circle class="pt d1" cx="92" cy="78"></circle><circle class="pt d1" cx="138" cy="74"></circle><circle class="pt d1" cx="184" cy="62"></circle><circle class="pt d1" cx="230" cy="54"></circle><circle class="pt d1" cx="276" cy="44"></circle><circle class="pt d1" cx="322" cy="36"></circle><circle class="pt d1" cx="368" cy="26"></circle></svg>
         </div>
@@ -648,8 +648,8 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
             <line x1="0" y1="84" x2="420" y2="84"></line>
             <polyline class="s2" points="0,66 40,64 80,66 120,62 160,64 200,60 240,62 280,58 330,60 418,56"></polyline>
             <polyline class="s1" points="0,88 40,84 80,80 120,34 160,26 200,28 240,30 280,27 330,29 418,26"></polyline>
-            <circle class="p2" cx="418" cy="56" r="3.5"></circle>
-            <circle class="p1" cx="418" cy="26" r="3.5"></circle>
+            <circle class="p2" cx="418" cy="56" r="5"></circle>
+            <circle class="p1" cx="418" cy="26" r="5"></circle>
           <circle class="pt d1" cx="0" cy="88"></circle><circle class="pt d1" cx="40" cy="84"></circle><circle class="pt d1" cx="80" cy="80"></circle><circle class="pt d1" cx="120" cy="34"></circle><circle class="pt d1" cx="160" cy="26"></circle><circle class="pt d1" cx="200" cy="28"></circle><circle class="pt d1" cx="240" cy="30"></circle><circle class="pt d1" cx="280" cy="27"></circle><circle class="pt d1" cx="330" cy="29"></circle><circle class="pt d2" cx="0" cy="66"></circle><circle class="pt d2" cx="40" cy="64"></circle><circle class="pt d2" cx="80" cy="66"></circle><circle class="pt d2" cx="120" cy="62"></circle><circle class="pt d2" cx="160" cy="64"></circle><circle class="pt d2" cx="200" cy="60"></circle><circle class="pt d2" cx="240" cy="62"></circle><circle class="pt d2" cx="280" cy="58"></circle><circle class="pt d2" cx="330" cy="60"></circle></svg>
         </div>
         <div class="mrow" data-step><span class="dot r"></span><span class="grow"><b>Карточка-победитель потеряна</b> · Amazon, SKU 2210</span><span class="mono">09:41</span></div>
@@ -779,7 +779,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
             <line x1="0" y1="84" x2="420" y2="84"></line>
             
             <polygon class="area" points="0,34 52,46 104,64 156,84 208,90 260,76 312,58 364,40 418,24 418,110 0,110"></polygon><polyline class="s1" points="0,34 52,46 104,64 156,84 208,90 260,76 312,58 364,40 418,24"></polyline>
-            <circle class="p1" cx="418" cy="24" r="3.5"></circle>
+            <circle class="p1" cx="418" cy="24" r="5"></circle>
             
           <circle class="pt d1" cx="0" cy="34"></circle><circle class="pt d1" cx="52" cy="46"></circle><circle class="pt d1" cx="104" cy="64"></circle><circle class="pt d1" cx="156" cy="84"></circle><circle class="pt d1" cx="208" cy="90"></circle><circle class="pt d1" cx="260" cy="76"></circle><circle class="pt d1" cx="312" cy="58"></circle><circle class="pt d1" cx="364" cy="40"></circle></svg>
         </div>
@@ -827,8 +827,8 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
             <line x1="0" y1="28" x2="420" y2="28"></line><line x1="0" y1="56" x2="420" y2="56"></line><line x1="0" y1="84" x2="420" y2="84"></line>
             <polyline class="s2" points="0,30 42,34 84,32 126,36 168,34 210,38 252,36 294,40 336,38 418,42"></polyline>
             <polyline class="s1" points="0,62 42,38 84,70 126,44 168,76 210,48 252,80 294,52 336,72 418,46"></polyline>
-            <circle class="p1" cx="418" cy="46" r="3.5"></circle>
-            <circle class="p2" cx="418" cy="42" r="3.5"></circle>
+            <circle class="p1" cx="418" cy="46" r="5"></circle>
+            <circle class="p2" cx="418" cy="42" r="5"></circle>
           <circle class="pt d1" cx="0" cy="62"></circle><circle class="pt d1" cx="42" cy="38"></circle><circle class="pt d1" cx="84" cy="70"></circle><circle class="pt d1" cx="126" cy="44"></circle><circle class="pt d1" cx="168" cy="76"></circle><circle class="pt d1" cx="210" cy="48"></circle><circle class="pt d1" cx="252" cy="80"></circle><circle class="pt d1" cx="294" cy="52"></circle><circle class="pt d1" cx="336" cy="72"></circle><circle class="pt d2" cx="0" cy="30"></circle><circle class="pt d2" cx="42" cy="34"></circle><circle class="pt d2" cx="84" cy="32"></circle><circle class="pt d2" cx="126" cy="36"></circle><circle class="pt d2" cx="168" cy="34"></circle><circle class="pt d2" cx="210" cy="38"></circle><circle class="pt d2" cx="252" cy="36"></circle><circle class="pt d2" cx="294" cy="40"></circle><circle class="pt d2" cx="336" cy="38"></circle></svg>
         </div>
         <div class="mrow mono" data-step><span class="grow">Точное совпадение по назначению</span><div class="bar"><i data-w="77"></i></div><span data-count="109">0</span></div>
@@ -864,7 +864,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
             <line x1="0" y1="84" x2="420" y2="84"></line>
             <polygon class="area" points="0,58 60,57 120,59 180,58 240,56 300,57 340,34 380,22 418,18 418,110 0,110"></polygon>
             <polyline class="s1" points="0,58 60,57 120,59 180,58 240,56 300,57 340,34 380,22 418,18"></polyline>
-            <circle class="p1" cx="418" cy="18" r="3.5"></circle>
+            <circle class="p1" cx="418" cy="18" r="5"></circle>
           <circle class="pt d1" cx="0" cy="58"></circle><circle class="pt d1" cx="60" cy="57"></circle><circle class="pt d1" cx="120" cy="59"></circle><circle class="pt d1" cx="180" cy="58"></circle><circle class="pt d1" cx="240" cy="56"></circle><circle class="pt d1" cx="300" cy="57"></circle><circle class="pt d1" cx="340" cy="34"></circle><circle class="pt d1" cx="380" cy="22"></circle></svg>
         </div>
         <div class="mrow" data-step><span class="dot a"></span><span class="grow">Лестница: вежливое напоминание, затем копия их руководителю, затем проект письма от юриста</span><span class="chip a">шаг 2 из 3</span></div>
@@ -931,7 +931,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <line x1="0" y1="30" x2="420" y2="30"></line><line x1="0" y1="60" x2="420" y2="60"></line><line x1="0" y1="90" x2="420" y2="90"></line>
         <polygon class="area" points="0,22 52,30 104,36 156,46 208,54 260,66 312,74 364,86 418,94 418,110 0,110"></polygon>
         <polyline class="s1" points="0,22 52,30 104,36 156,46 208,54 260,66 312,74 364,86 418,94"></polyline>
-        <circle class="p1" cx="418" cy="94" r="3.5"></circle>
+        <circle class="p1" cx="418" cy="94" r="5"></circle>
       <circle class="pt d1" cx="0" cy="22"></circle><circle class="pt d1" cx="52" cy="30"></circle><circle class="pt d1" cx="104" cy="36"></circle><circle class="pt d1" cx="156" cy="46"></circle><circle class="pt d1" cx="208" cy="54"></circle><circle class="pt d1" cx="260" cy="66"></circle><circle class="pt d1" cx="312" cy="74"></circle><circle class="pt d1" cx="364" cy="86"></circle></svg>
     </div>
     <div class="mrow mono" data-step><span class="grow">Деньги сегодня</span><span>€ <span data-count="128400">0</span></span></div>
@@ -1049,7 +1049,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <line x1="0" y1="28" x2="420" y2="28"></line><line x1="0" y1="56" x2="420" y2="56"></line><line x1="0" y1="84" x2="420" y2="84"></line>
         <polygon class="area" points="0,80 46,40 92,66 138,30 184,58 230,26 276,54 322,36 368,62 418,44 418,110 0,110"></polygon>
         <polyline class="s1" points="0,80 46,40 92,66 138,30 184,58 230,26 276,54 322,36 368,62 418,44"></polyline>
-        <circle class="p1" cx="418" cy="44" r="3.5"></circle>
+        <circle class="p1" cx="418" cy="44" r="5"></circle>
       <circle class="pt d1" cx="0" cy="80"></circle><circle class="pt d1" cx="46" cy="40"></circle><circle class="pt d1" cx="92" cy="66"></circle><circle class="pt d1" cx="138" cy="30"></circle><circle class="pt d1" cx="184" cy="58"></circle><circle class="pt d1" cx="230" cy="26"></circle><circle class="pt d1" cx="276" cy="54"></circle><circle class="pt d1" cx="322" cy="36"></circle><circle class="pt d1" cx="368" cy="62"></circle></svg>
     </div>
     <div class="mrow" data-step><span class="grow">Квалифицированы</span><div class="bar"><i data-w="100"></i></div><span class="mono"><span data-count="212">0</span></span></div>
@@ -1077,8 +1077,8 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <line x1="0" y1="84" x2="420" y2="84"></line>
         <polyline class="s2" points="0,30 42,34 84,32 126,36 168,34 210,38 252,36 294,40 336,38 418,42"></polyline>
         <polyline class="s1" points="0,40 52,38 104,41 156,39 208,42 236,88 264,84 316,44 368,40 418,38"></polyline>
-        <circle class="p2" cx="418" cy="42" r="3.5"></circle>
-        <circle class="p1" cx="418" cy="38" r="3.5"></circle>
+        <circle class="p2" cx="418" cy="42" r="5"></circle>
+        <circle class="p1" cx="418" cy="38" r="5"></circle>
       <circle class="pt d1" cx="0" cy="40"></circle><circle class="pt d1" cx="52" cy="38"></circle><circle class="pt d1" cx="104" cy="41"></circle><circle class="pt d1" cx="156" cy="39"></circle><circle class="pt d1" cx="208" cy="42"></circle><circle class="pt d1" cx="236" cy="88"></circle><circle class="pt d1" cx="264" cy="84"></circle><circle class="pt d1" cx="316" cy="44"></circle><circle class="pt d1" cx="368" cy="40"></circle><circle class="pt d2" cx="0" cy="30"></circle><circle class="pt d2" cx="42" cy="34"></circle><circle class="pt d2" cx="84" cy="32"></circle><circle class="pt d2" cx="126" cy="36"></circle><circle class="pt d2" cx="168" cy="34"></circle><circle class="pt d2" cx="210" cy="38"></circle><circle class="pt d2" cx="252" cy="36"></circle><circle class="pt d2" cx="294" cy="40"></circle><circle class="pt d2" cx="336" cy="38"></circle></svg>
     </div>
     <div class="mrow mono" data-step><span class="grow">Письмо 1 открыто <span class="mono">10:00</span></span><div class="bar"><i data-w="43"></i></div><span data-count="791">0</span></div>
@@ -1130,7 +1130,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <line x1="0" y1="84" x2="420" y2="84"></line>
         
         <polygon class="area" points="0,92 46,86 92,78 138,74 184,62 230,54 276,44 322,36 368,26 418,16 418,110 0,110"></polygon><polyline class="s1" points="0,92 46,86 92,78 138,74 184,62 230,54 276,44 322,36 368,26 418,16"></polyline>
-        <circle class="p1" cx="418" cy="16" r="3.5"></circle>
+        <circle class="p1" cx="418" cy="16" r="5"></circle>
         
       <circle class="pt d1" cx="0" cy="92"></circle><circle class="pt d1" cx="46" cy="86"></circle><circle class="pt d1" cx="92" cy="78"></circle><circle class="pt d1" cx="138" cy="74"></circle><circle class="pt d1" cx="184" cy="62"></circle><circle class="pt d1" cx="230" cy="54"></circle><circle class="pt d1" cx="276" cy="44"></circle><circle class="pt d1" cx="322" cy="36"></circle><circle class="pt d1" cx="368" cy="26"></circle></svg>
     </div>
@@ -1312,7 +1312,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <line x1="0" y1="84" x2="420" y2="84"></line>
         <polygon class="area" points="0,88 40,84 80,80 120,34 160,26 200,28 240,30 280,27 330,29 418,26 418,110 0,110"></polygon>
         <polyline class="s1" points="0,88 40,84 80,80 120,34 160,26 200,28 240,30 280,27 330,29 418,26"></polyline>
-        <circle class="p1" cx="418" cy="26" r="3.5"></circle>
+        <circle class="p1" cx="418" cy="26" r="5"></circle>
       <circle class="pt d1" cx="0" cy="88"></circle><circle class="pt d1" cx="40" cy="84"></circle><circle class="pt d1" cx="80" cy="80"></circle><circle class="pt d1" cx="120" cy="34"></circle><circle class="pt d1" cx="160" cy="26"></circle><circle class="pt d1" cx="200" cy="28"></circle><circle class="pt d1" cx="240" cy="30"></circle><circle class="pt d1" cx="280" cy="27"></circle><circle class="pt d1" cx="330" cy="29"></circle></svg>
     </div>
         <div class="bigstat mono" style="margin-top:8px">
@@ -1576,7 +1576,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
             <line x1="0" y1="28" x2="420" y2="28"></line><line x1="0" y1="56" x2="420" y2="56"></line><line x1="0" y1="84" x2="420" y2="84"></line>
             <polygon class="area" points="0,34 52,46 104,64 156,84 208,90 260,76 312,58 364,40 418,24 418,110 0,110"></polygon>
             <polyline class="s1" points="0,34 52,46 104,64 156,84 208,90 260,76 312,58 364,40 418,24"></polyline>
-            <circle class="p1" cx="418" cy="24" r="3.5"></circle>
+            <circle class="p1" cx="418" cy="24" r="5"></circle>
           <circle class="pt d1" cx="0" cy="34"></circle><circle class="pt d1" cx="52" cy="46"></circle><circle class="pt d1" cx="104" cy="64"></circle><circle class="pt d1" cx="156" cy="84"></circle><circle class="pt d1" cx="208" cy="90"></circle><circle class="pt d1" cx="260" cy="76"></circle><circle class="pt d1" cx="312" cy="58"></circle><circle class="pt d1" cx="364" cy="40"></circle></svg>
         </div>
     <div class="minicols">
@@ -1660,8 +1660,8 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <line x1="0" y1="84" x2="420" y2="84"></line>
         <polyline class="s2" points="0,30 42,34 84,32 126,36 168,34 210,38 252,36 294,40 336,38 418,42"></polyline>
         <polyline class="s1" points="0,62 42,38 84,70 126,44 168,76 210,48 252,80 294,52 336,72 418,46"></polyline>
-        <circle class="p2" cx="418" cy="42" r="3.5"></circle>
-        <circle class="p1" cx="418" cy="46" r="3.5"></circle>
+        <circle class="p2" cx="418" cy="42" r="5"></circle>
+        <circle class="p1" cx="418" cy="46" r="5"></circle>
       <circle class="pt d1" cx="0" cy="62"></circle><circle class="pt d1" cx="42" cy="38"></circle><circle class="pt d1" cx="84" cy="70"></circle><circle class="pt d1" cx="126" cy="44"></circle><circle class="pt d1" cx="168" cy="76"></circle><circle class="pt d1" cx="210" cy="48"></circle><circle class="pt d1" cx="252" cy="80"></circle><circle class="pt d1" cx="294" cy="52"></circle><circle class="pt d1" cx="336" cy="72"></circle><circle class="pt d2" cx="0" cy="30"></circle><circle class="pt d2" cx="42" cy="34"></circle><circle class="pt d2" cx="84" cy="32"></circle><circle class="pt d2" cx="126" cy="36"></circle><circle class="pt d2" cx="168" cy="34"></circle><circle class="pt d2" cx="210" cy="38"></circle><circle class="pt d2" cx="252" cy="36"></circle><circle class="pt d2" cx="294" cy="40"></circle><circle class="pt d2" cx="336" cy="38"></circle></svg>
     </div>
     <div class="mrow" data-step><span class="grow">Загрузка на мобильном</span><span class="mono"><span data-count="9">0</span>00 мс</span><span class="chip g">быстро</span></div>
@@ -1786,7 +1786,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <line x1="0" y1="84" x2="420" y2="84"></line>
         
         <polygon class="area" points="0,58 60,57 120,59 180,58 240,56 300,57 340,34 380,22 418,18 418,110 0,110"></polygon><polyline class="s1" points="0,58 60,57 120,59 180,58 240,56 300,57 340,34 380,22 418,18"></polyline>
-        <circle class="p1" cx="418" cy="18" r="3.5"></circle>
+        <circle class="p1" cx="418" cy="18" r="5"></circle>
         
       <circle class="pt d1" cx="0" cy="58"></circle><circle class="pt d1" cx="60" cy="57"></circle><circle class="pt d1" cx="120" cy="59"></circle><circle class="pt d1" cx="180" cy="58"></circle><circle class="pt d1" cx="240" cy="56"></circle><circle class="pt d1" cx="300" cy="57"></circle><circle class="pt d1" cx="340" cy="34"></circle><circle class="pt d1" cx="380" cy="22"></circle></svg>
     </div>
@@ -1814,8 +1814,8 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <line x1="0" y1="84" x2="420" y2="84"></line>
         <polyline class="s2" points="0,66 40,64 80,66 120,62 160,64 200,60 240,62 280,58 330,60 418,56"></polyline>
         <polyline class="s1" points="0,22 52,30 104,36 156,46 208,54 260,66 312,74 364,86 418,94"></polyline>
-        <circle class="p1" cx="418" cy="94" r="3.5"></circle>
-        <circle class="p2" cx="418" cy="56" r="3.5"></circle>
+        <circle class="p1" cx="418" cy="94" r="5"></circle>
+        <circle class="p2" cx="418" cy="56" r="5"></circle>
       <circle class="pt d1" cx="0" cy="22"></circle><circle class="pt d1" cx="52" cy="30"></circle><circle class="pt d1" cx="104" cy="36"></circle><circle class="pt d1" cx="156" cy="46"></circle><circle class="pt d1" cx="208" cy="54"></circle><circle class="pt d1" cx="260" cy="66"></circle><circle class="pt d1" cx="312" cy="74"></circle><circle class="pt d1" cx="364" cy="86"></circle><circle class="pt d2" cx="0" cy="66"></circle><circle class="pt d2" cx="40" cy="64"></circle><circle class="pt d2" cx="80" cy="66"></circle><circle class="pt d2" cx="120" cy="62"></circle><circle class="pt d2" cx="160" cy="64"></circle><circle class="pt d2" cx="200" cy="60"></circle><circle class="pt d2" cx="240" cy="62"></circle><circle class="pt d2" cx="280" cy="58"></circle><circle class="pt d2" cx="330" cy="60"></circle></svg>
     </div>
     <div class="nodes"><div class="node" data-lit>Клик по рекламе</div><div class="link" data-lit></div><div class="node" data-lit>Сделка в CRM</div><div class="link" data-lit></div><div class="node" data-lit>Закрытая выручка</div></div>
@@ -1842,7 +1842,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <line x1="0" y1="84" x2="420" y2="84"></line>
         <polygon class="area" points="0,80 46,40 92,66 138,30 184,58 230,26 276,54 322,36 368,62 418,44 418,110 0,110"></polygon>
         <polyline class="s1" points="0,80 46,40 92,66 138,30 184,58 230,26 276,54 322,36 368,62 418,44"></polyline>
-        <circle class="p1" cx="418" cy="44" r="3.5"></circle>
+        <circle class="p1" cx="418" cy="44" r="5"></circle>
       <circle class="pt d1" cx="0" cy="80"></circle><circle class="pt d1" cx="46" cy="40"></circle><circle class="pt d1" cx="92" cy="66"></circle><circle class="pt d1" cx="138" cy="30"></circle><circle class="pt d1" cx="184" cy="58"></circle><circle class="pt d1" cx="230" cy="26"></circle><circle class="pt d1" cx="276" cy="54"></circle><circle class="pt d1" cx="322" cy="36"></circle><circle class="pt d1" cx="368" cy="62"></circle></svg>
     </div>
     <div class="mrow" data-step><span class="dot g"></span><span class="grow">Northgate Ltd · 5 звёзд в Google</span><span class="mono">21:14</span><span class="chip g">опубликовано</span></div>
@@ -1880,7 +1880,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <line x1="0" y1="28" x2="420" y2="28"></line><line x1="0" y1="56" x2="420" y2="56"></line><line x1="0" y1="84" x2="420" y2="84"></line>
         <polyline class="s2" points="0,30 42,34 84,32 126,36 168,34 210,38 252,36 294,40 336,38 418,42"></polyline>
         <polyline class="s1" points="0,40 52,38 104,41 156,39 208,42 236,88 264,84 316,44 368,40 418,38"></polyline>
-        <circle class="p1" cx="418" cy="38" r="3.5"></circle><circle class="p2" cx="418" cy="42" r="3.5"></circle>
+        <circle class="p1" cx="418" cy="38" r="5"></circle><circle class="p2" cx="418" cy="42" r="5"></circle>
       <circle class="pt d1" cx="0" cy="40"></circle><circle class="pt d1" cx="52" cy="38"></circle><circle class="pt d1" cx="104" cy="41"></circle><circle class="pt d1" cx="156" cy="39"></circle><circle class="pt d1" cx="208" cy="42"></circle><circle class="pt d1" cx="236" cy="88"></circle><circle class="pt d1" cx="264" cy="84"></circle><circle class="pt d1" cx="316" cy="44"></circle><circle class="pt d1" cx="368" cy="40"></circle><circle class="pt d2" cx="0" cy="30"></circle><circle class="pt d2" cx="42" cy="34"></circle><circle class="pt d2" cx="84" cy="32"></circle><circle class="pt d2" cx="126" cy="36"></circle><circle class="pt d2" cx="168" cy="34"></circle><circle class="pt d2" cx="210" cy="38"></circle><circle class="pt d2" cx="252" cy="36"></circle><circle class="pt d2" cx="294" cy="40"></circle><circle class="pt d2" cx="336" cy="38"></circle></svg>
     </div>
         
@@ -1995,7 +1995,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
             <line x1="0" y1="28" x2="420" y2="28"></line><line x1="0" y1="56" x2="420" y2="56"></line><line x1="0" y1="84" x2="420" y2="84"></line>
             
             <polygon class="area" points="0,92 46,86 92,78 138,74 184,62 230,54 276,44 322,36 368,26 418,16 418,110 0,110"></polygon><polyline class="s1" points="0,92 46,86 92,78 138,74 184,62 230,54 276,44 322,36 368,26 418,16"></polyline>
-            <circle class="p1" cx="418" cy="16" r="3.5"></circle>
+            <circle class="p1" cx="418" cy="16" r="5"></circle>
             
           <circle class="pt d1" cx="0" cy="92"></circle><circle class="pt d1" cx="46" cy="86"></circle><circle class="pt d1" cx="92" cy="78"></circle><circle class="pt d1" cx="138" cy="74"></circle><circle class="pt d1" cx="184" cy="62"></circle><circle class="pt d1" cx="230" cy="54"></circle><circle class="pt d1" cx="276" cy="44"></circle><circle class="pt d1" cx="322" cy="36"></circle><circle class="pt d1" cx="368" cy="26"></circle></svg>
         </div>
@@ -2095,7 +2095,7 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
         <line x1="0" y1="84" x2="420" y2="84"></line>
         <polygon class="area" points="0,88 40,84 80,80 120,34 160,26 200,28 240,30 280,27 330,29 418,26 418,110 0,110"></polygon>
         <polyline class="s1" points="0,88 40,84 80,80 120,34 160,26 200,28 240,30 280,27 330,29 418,26"></polyline>
-        <circle class="p1" cx="418" cy="26" r="3.5"></circle>
+        <circle class="p1" cx="418" cy="26" r="5"></circle>
       <circle class="pt d1" cx="0" cy="88"></circle><circle class="pt d1" cx="40" cy="84"></circle><circle class="pt d1" cx="80" cy="80"></circle><circle class="pt d1" cx="120" cy="34"></circle><circle class="pt d1" cx="160" cy="26"></circle><circle class="pt d1" cx="200" cy="28"></circle><circle class="pt d1" cx="240" cy="30"></circle><circle class="pt d1" cx="280" cy="27"></circle><circle class="pt d1" cx="330" cy="29"></circle></svg>
     </div>
     <div class="mrow" data-step><span class="dot a"></span><span class="grow">Время ответа превысило порог, дежурный оповещён</span><span class="mono">03:14</span></div>
