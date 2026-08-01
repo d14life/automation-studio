@@ -34,10 +34,13 @@ header{position:absolute;top:0;left:0;right:0;z-index:20}
 #space canvas{position:absolute;inset:0}
 
 /* ---------- hero stage ---------- */
-#stage{position:relative;min-height:100svh;overflow:hidden;background:transparent}
+/* a tall track so the first screen has room to travel: the visitor scrolls for two and a bit
+   viewports while the hero stays put and its layers drift apart */
+#stage{position:relative;height:260vh;background:transparent}
+.stagesticky{position:sticky;top:0;height:100svh;overflow:hidden}
 /* same as the bench: the tubes own the whole stage and screen-blend over the starfield */
-#stage canvas.tubes{position:absolute;inset:0;z-index:2;mix-blend-mode:screen;pointer-events:none}
-.stageui{position:relative;z-index:5;min-height:100svh;display:flex;flex-direction:column;
+.stagesticky canvas.tubes{position:absolute;inset:0;z-index:2;mix-blend-mode:screen;pointer-events:none}
+.stageui{position:relative;z-index:5;height:100%;display:flex;flex-direction:column;
   align-items:center;justify-content:center;text-align:center;gap:14px;padding:96px 24px 64px}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .morph{position:relative;height:4.2rem;width:100%;max-width:980px;margin:0 auto;
@@ -256,16 +259,18 @@ footer a{display:block;padding:3px 0}
 </div></header>
 
 <section id="stage">
-  <div class="stageui">
-    <h1 class="sr-only">Solutions101: автоматизация бизнес-процессов. Быстро не значит плохо</h1>
-    <div class="morph" id="liq1"></div>
-    <div class="morph" id="liq2"></div>
+  <div class="stagesticky">
+    <div class="stageui">
+      <h1 class="sr-only">Solutions101: автоматизация бизнес-процессов. Быстро не значит плохо</h1>
+      <div class="morph" id="liq1"></div>
+      <div class="morph" id="liq2"></div>
+    </div>
+    <div class="acts">
+      <button class="btn btn-fill" type="button" id="aiopen">Обсудить задачу</button>
+      <a class="btn btn-line" href="#projects">Живой продукт</a>
+    </div>
+    <a class="scrollhint" href="#about">листайте вниз</a>
   </div>
-  <div class="acts">
-    <button class="btn btn-fill" type="button" id="aiopen">Обсудить задачу</button>
-    <a class="btn btn-line" href="#projects">Живой продукт</a>
-  </div>
-  <a class="scrollhint" href="#about">листайте вниз</a>
 </section>
 
 <section class="plx" id="plx">
@@ -576,7 +581,8 @@ footer a{display:block;padding:3px 0}
      the capture phase leaves the tubes drifting on their own, which is what we picked */
   window.addEventListener('pointermove',function(e){e.stopPropagation();},true);
 
-  var cv=document.createElement('canvas'); cv.className='tubes'; stage.appendChild(cv);
+  var cv=document.createElement('canvas'); cv.className='tubes';
+  document.querySelector('.stagesticky').appendChild(cv);
   var k=GLOW.l/0.64, sp=ICE.length*0.12, p0=ICE.length*0.10, app=null;
   function tubeSet(p){
     return [dim(paletteAt(ICE,p),k),dim(paletteAt(ICE,p+sp),k),dim(paletteAt(ICE,p+sp*2),k)];
@@ -615,19 +621,20 @@ footer a{display:block;padding:3px 0}
      the browser already fires scroll at most once a frame. No animation-frame queue to miss. */
   function paint(){
     var y=window.pageYOffset||0, h=innerHeight||1;
-    if(y>h*1.4) return;                       /* off screen: stop paying for it */
-    var f=Math.min(1,y/h);
-    l1.style.transform='translateY('+(y*0.78).toFixed(1)+'px)';
-    l1.style.opacity=(1-f*1.45).toFixed(3);
-    l2.style.transform='translateY('+(y*0.46).toFixed(1)+'px)';
-    l2.style.opacity=(1-f*1.15).toFixed(3);
-    if(acts){ acts.style.transform='translateY('+(-y*0.34).toFixed(1)+'px)';
-              acts.style.opacity=(1-f*1.5).toFixed(3); }
-    if(hint) hint.style.opacity=(1-f*2.4).toFixed(3);
+    var track=h*1.6;                          /* the distance the drift is spread over */
+    if(y>track*1.25) return;                  /* past the hero: stop paying for it */
+    var f=Math.min(1,y/track);
+    l1.style.transform='translateY('+(f*430).toFixed(1)+'px)';
+    l1.style.opacity=(1-f*1.25).toFixed(3);
+    l2.style.transform='translateY('+(f*250).toFixed(1)+'px)';
+    l2.style.opacity=(1-f*1.05).toFixed(3);
+    if(acts){ acts.style.transform='translateY('+(-f*190).toFixed(1)+'px)';
+              acts.style.opacity=(1-f*1.4).toFixed(3); }
+    if(hint) hint.style.opacity=(1-f*3.2).toFixed(3);
     /* the ribbons sit behind the words, so they travel slower: that difference is the depth */
     if(!tubes) tubes=document.querySelector('canvas.tubes');
-    if(tubes){ tubes.style.transform='translateY('+(y*0.26).toFixed(1)+'px)';
-               tubes.style.opacity=(1-f*1.1).toFixed(3); }
+    if(tubes){ tubes.style.transform='translateY('+(f*150).toFixed(1)+'px)';
+               tubes.style.opacity=(1-f*1.0).toFixed(3); }
   }
   addEventListener('scroll',paint,{passive:true});
   addEventListener('resize',paint,{passive:true});
