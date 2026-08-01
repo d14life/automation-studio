@@ -35,14 +35,15 @@ header{position:absolute;top:0;left:0;right:0;z-index:20}
 #stage canvas.tubes{position:absolute;inset:0;z-index:2;mix-blend-mode:screen;pointer-events:none}
 .stageui{position:relative;z-index:5;min-height:100svh;display:flex;flex-direction:column;
   align-items:center;justify-content:center;text-align:center;gap:14px;padding:96px 24px 64px}
-#liquid{position:relative;height:4.4rem;width:100%;max-width:900px;margin:0 auto 4px;
-  font:900 27pt/1 Nunito,system-ui,sans-serif}
-@media (min-width:1024px){#liquid{font-size:3.9rem;height:5.6rem}}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.morph{position:relative;height:4.2rem;width:100%;max-width:980px;margin:0 auto;
+  font:900 26pt/1 Nunito,system-ui,sans-serif}
+@media (min-width:1024px){.morph{font-size:4.2rem;height:6rem}}
 h1{font:900 clamp(28px,4.6vw,54px)/1.12 Nunito,sans-serif;letter-spacing:-.02em;
   margin:14px 0 0;max-width:20ch}
 h1 em{font-style:normal;color:var(--ice2)}
 .lede{color:var(--dim);max-width:60ch;margin:18px auto 0;font-size:clamp(15px,1.5vw,17.5px)}
-.acts{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:30px}
+.acts{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:46px}
 .btn{border-radius:99px;padding:14px 26px;text-decoration:none;font-weight:900;font-size:15.5px;
   transition:transform .16s ease,background .18s ease,border-color .18s ease;display:inline-block}
 .btn-fill{background:var(--ice2);color:#04121b}
@@ -166,15 +167,13 @@ footer a{display:block;padding:3px 0}
 
 <section id="stage">
   <div class="stageui">
-    <div id="liquid"></div>
-    <h1>Автоматизируем бизнес-процессы. <em>Быстро не значит плохо</em></h1>
-    <p class="lede">Отдаём готовый работающий инструмент, а не теорию и не часы консультаций.
-      Вы проверяете его на своих счетах, заказах и таблицах. Не помогло - не платите.</p>
+    <h1 class="sr-only">Solutions101: автоматизация бизнес-процессов. Быстро не значит плохо</h1>
+    <div class="morph" id="liq1"></div>
+    <div class="morph" id="liq2"></div>
     <div class="acts">
       <a class="btn btn-fill" href="https://wa.me/447756115516" rel="noopener">Обсудить задачу</a>
-      <a class="btn btn-line" href="demo/index.html" target="_blank" rel="noopener">Открыть живой продукт</a>
+      <a class="btn btn-line" href="demo/index.html" target="_blank" rel="noopener">Живой продукт</a>
     </div>
-    <p class="trust">Бухгалтерия для строительной группы: 48 контрагентов, 3 юрлица, мультивалюта. Собрано за один день.</p>
   </div>
   <a class="scrollhint" href="#about">листайте вниз</a>
 </section>
@@ -251,8 +250,10 @@ footer a{display:block;padding:3px 0}
   Starfield1(stage,{quantity:700,speed:2.1,easing:1,warpFactor:10,opacity:0.1,
     mouseAdjust:false,clickToWarp:false,starColor:'rgba(255,255,255,1)',bgColor:'rgba(0,0,0,1)',zIndex:1});
 
-  LiquidText(document.getElementById('liquid'),['ВООБРАЖЕНИЕ','ВАШ ЕДИНСТВЕННЫЙ','ПРЕДЕЛ'],
-    {morphTime:4.5,cooldownTime:0.45,colors:ICE,flow:FLOW,drift:FLOW*3,spread:ICE.length*0.08});
+  /* two lines, same timings, started in the same tick: they melt into the next phrase together */
+  var MORPH={morphTime:4.5,cooldownTime:0.45,colors:ICE,flow:FLOW,drift:FLOW*3,spread:ICE.length*0.08};
+  LiquidText(document.getElementById('liq1'),['АВТОМАТИЗИРУЕМ','БЫСТРО','ТОЛЬКО ПРАКТИКА'],MORPH);
+  LiquidText(document.getElementById('liq2'),['БИЗНЕС-ПРОЦЕССЫ','НЕ ЗНАЧИТ ПЛОХО','НОЛЬ ТЕОРИИ'],MORPH);
 
   /* the library chases the pointer from a listener on document.body; swallowing the event in
      the capture phase leaves the tubes drifting on their own, which is what we picked */
