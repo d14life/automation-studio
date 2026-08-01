@@ -43,8 +43,9 @@ h1{font:900 clamp(28px,4.6vw,54px)/1.12 Nunito,sans-serif;letter-spacing:-.02em;
   margin:14px 0 0;max-width:20ch}
 h1 em{font-style:normal;color:var(--ice2)}
 .lede{color:var(--dim);max-width:60ch;margin:18px auto 0;font-size:clamp(15px,1.5vw,17.5px)}
-.acts{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:46px}
-.btn{border-radius:99px;padding:14px 26px;text-decoration:none;font-weight:900;font-size:15.5px;
+.acts{position:absolute;left:0;right:0;bottom:86px;z-index:6;
+  display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+.btn{border:0;cursor:pointer;font-family:Nunito,sans-serif;border-radius:99px;padding:14px 26px;text-decoration:none;font-weight:900;font-size:15.5px;
   transition:transform .16s ease,background .18s ease,border-color .18s ease;display:inline-block}
 .btn-fill{background:var(--ice2);color:#04121b}
 .btn-line{border:1px solid rgba(223,246,255,.3);color:var(--ice1)}
@@ -131,6 +132,31 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
 .rise.in{opacity:1;transform:none}
 @media (prefers-reduced-motion:reduce){.rise{opacity:1;transform:none;transition:none}}
 
+
+/* ---------- ai chat ---------- */
+.aiwrap{position:fixed;inset:0;z-index:60;display:none;align-items:flex-end;justify-content:center;
+  background:rgba(0,0,0,.62);backdrop-filter:blur(4px)}
+.aiwrap.open{display:flex}
+.aibox{width:min(680px,100%);max-height:86vh;display:flex;flex-direction:column;
+  background:#05090c;border:1px solid var(--line);border-radius:22px 22px 0 0;overflow:hidden}
+@media (min-width:760px){.aiwrap{align-items:center}.aibox{border-radius:22px}}
+.aitop{display:flex;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid var(--line)}
+.aitop b{font:900 15.5px Nunito,sans-serif}
+.aitop small{color:var(--dim);font-size:12.5px}
+.aiclose{margin-left:auto;background:none;border:0;color:var(--dim);font-size:22px;cursor:pointer;line-height:1}
+.ailog{padding:18px;overflow-y:auto;display:grid;gap:12px;flex:1;min-height:180px}
+.msg{max-width:86%;padding:11px 14px;border-radius:14px;font-size:15px;white-space:pre-wrap}
+.msg.me{justify-self:end;background:var(--ice2);color:#04121b;font-weight:700}
+.msg.ai{justify-self:start;background:rgba(255,255,255,.05);border:1px solid var(--line)}
+.msg.sys{justify-self:center;color:var(--dim);font-size:13px;background:none;border:0;text-align:center}
+.aiform{display:flex;gap:10px;padding:14px 16px;border-top:1px solid var(--line)}
+.aiform input{flex:1;background:#000;border:1px solid var(--line);border-radius:99px;color:var(--ink);
+  padding:12px 16px;font:15px Nunito,sans-serif}
+.aiform input:focus{outline:none;border-color:var(--ice2)}
+.aiform button{border:0;border-radius:99px;padding:12px 20px;background:var(--ice2);color:#04121b;
+  font:900 15px Nunito,sans-serif;cursor:pointer}
+.aiform button:active{transform:scale(.97)}
+
 /* border beam: comet ring on containers, ported to vanilla from the shadcn panel */
 .beam{position:relative;isolation:isolate}
 .beam .beam-ring,.beam .beam-glow{position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;
@@ -170,12 +196,22 @@ footer a{display:block;padding:3px 0}
     <h1 class="sr-only">Solutions101: автоматизация бизнес-процессов. Быстро не значит плохо</h1>
     <div class="morph" id="liq1"></div>
     <div class="morph" id="liq2"></div>
-    <div class="acts">
-      <a class="btn btn-fill" href="https://wa.me/447756115516" rel="noopener">Обсудить задачу</a>
-      <a class="btn btn-line" href="demo/index.html" target="_blank" rel="noopener">Живой продукт</a>
-    </div>
+  </div>
+  <div class="acts">
+    <button class="btn btn-fill" type="button" id="aiopen">Обсудить задачу</button>
+    <a class="btn btn-line" href="demo/index.html" target="_blank" rel="noopener">Живой продукт</a>
   </div>
   <a class="scrollhint" href="#about">листайте вниз</a>
+</section>
+
+<section class="plx" id="plx">
+  <div class="plx-sticky">
+    <div class="plx-layer plx-glow" data-speed="70"></div>
+    <div class="plx-layer" data-speed="55"><div class="plx-num">101</div></div>
+    <div class="plx-layer" data-speed="40"><p class="plx-line">Только практика.<br>Ноль теории.</p></div>
+    <div class="plx-layer" data-speed="10"></div>
+    <div class="plx-fade"></div>
+  </div>
 </section>
 
 <section class="band" id="about"><div class="wrap">
@@ -216,6 +252,21 @@ footer a{display:block;padding:3px 0}
   </div>
   <p class="legal">Solutions101 · заказная разработка и автоматизация</p>
 </div></footer>
+
+
+<div class="aiwrap" id="aiwrap" role="dialog" aria-label="Обсудить задачу">
+  <div class="aibox">
+    <div class="aitop"><b>Обсудить задачу</b><small>отвечает ассистент Solutions101</small>
+      <button class="aiclose" id="aiclose" type="button" aria-label="закрыть">&times;</button></div>
+    <div class="ailog" id="ailog">
+      <div class="msg ai">Расскажите, какая рутина съедает время. Спрошу пару уточнений и скажу, что можно автоматизировать и за сколько это делается.</div>
+    </div>
+    <form class="aiform" id="aiform">
+      <input id="aiq" placeholder="Например: теряем заявки в вотсапе" autocomplete="off">
+      <button type="submit">→</button>
+    </form>
+  </div>
+</div>
 
 <script src="anim3.js"></script>
 <script>
@@ -283,6 +334,85 @@ footer a{display:block;padding:3px 0}
                                  dim(paletteAt(ICE,p+sp*1.5),k),dim(paletteAt(ICE,p+sp*2.1),k)]);
     }catch(e){ if(!cycle.warned){cycle.warned=1;console.warn('tube colours:',e);} }
   })(0);
+})();
+</script>
+<script>
+/* Parallax divider: the same layer speeds as the GSAP original, scrubbed by scroll position
+   and eased per layer so the stack drifts apart instead of snapping. */
+(function(){
+  var sec=document.getElementById('plx'); if(!sec) return;
+  var layers=[].map.call(sec.querySelectorAll('.plx-layer'),function(el){
+    return {el:el, sp:parseFloat(el.getAttribute('data-speed'))||0, cur:0};
+  });
+  var target=0, ticking=false;
+  function measure(){
+    var r=sec.getBoundingClientRect();
+    target=Math.min(1,Math.max(0,-r.top/(r.height-innerHeight||1)));
+  }
+  function frame(){
+    var busy=false;
+    layers.forEach(function(L){
+      L.cur+=(target-L.cur)*0.14;
+      if(Math.abs(target-L.cur)>0.0006) busy=true;
+      L.el.style.transform='translateY('+(L.cur*L.sp).toFixed(3)+'%)';
+    });
+    if(busy) requestAnimationFrame(frame); else ticking=false;
+  }
+  function kick(){ measure(); if(!ticking){ticking=true;requestAnimationFrame(frame);} }
+  addEventListener('scroll',kick,{passive:true});
+  addEventListener('resize',kick,{passive:true});
+  kick();
+})();
+
+/* Solution finder: the button opens a chat with the model instead of a dead form.
+   ponytail: the browser talks to the provider directly, no backend to run or pay for. */
+(function(){
+  var KEY='sk-nano-42e0c9b8-97e5-4185-ad5d-d9b29c2c1e14', MODEL='gemini-2.5-flash';
+  var wrap=document.getElementById('aiwrap'), log=document.getElementById('ailog'),
+      form=document.getElementById('aiform'), q=document.getElementById('aiq');
+  var SYS='Ты ассистент студии Solutions101. Студия делает заказную автоматизацию бизнес-процессов: '+
+    'учёт и сверка, счета и документы, CRM и заявки, сбор данных с сайтов и прайсов, отчёты руководителю, '+
+    'боты и ИИ на документах клиента, склад и логистика. Первая рабочая версия за дни, предоплаты нет, '+
+    'клиент платит только если инструмент помог. Отвечай по-русски, коротко, конкретно, без воды и без '+
+    'обещаний сроков точнее чем "за несколько дней". Задавай по одному уточняющему вопросу за раз. '+
+    'Когда задача понятна, назови что именно можно автоматизировать, что это снимет с человека, и предложи '+
+    'написать в WhatsApp +44 7756 115516. Никогда не называй цены.';
+  var history=[{role:'system',content:SYS}];
+
+  function add(text,cls){
+    var d=document.createElement('div'); d.className='msg '+cls; d.textContent=text;
+    log.appendChild(d); log.scrollTop=log.scrollHeight; return d;
+  }
+  function open(){ wrap.classList.add('open'); setTimeout(function(){q.focus();},40); }
+  function close(){ wrap.classList.remove('open'); }
+  document.getElementById('aiopen').addEventListener('click',open);
+  document.getElementById('aiclose').addEventListener('click',close);
+  wrap.addEventListener('click',function(e){ if(e.target===wrap) close(); });
+  addEventListener('keydown',function(e){ if(e.key==='Escape') close(); });
+
+  form.addEventListener('submit',function(e){
+    e.preventDefault();
+    var text=q.value.trim(); if(!text) return;
+    q.value=''; add(text,'me'); history.push({role:'user',content:text});
+    var wait=add('думаю...','sys');
+    fetch('https://nano-gpt.com/api/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+KEY},
+      body:JSON.stringify({model:MODEL,messages:history,max_tokens:600})
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      wait.remove();
+      var a=d&&d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content;
+      if(!a) throw new Error('empty');
+      history.push({role:'assistant',content:a});
+      add(a,'ai');
+    })
+    .catch(function(){
+      wait.remove();
+      add('Связь с ассистентом сорвалась. Напишите напрямую в WhatsApp +44 7756 115516, ответим руками.','sys');
+    });
+  });
 })();
 </script>
 </html>
