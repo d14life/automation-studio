@@ -59,6 +59,35 @@ h1 em{font-style:normal;color:var(--ice2)}
 .scrollhint{position:absolute;left:0;right:0;bottom:26px;z-index:5;text-align:center;
   color:var(--dim);font-size:12.5px;letter-spacing:.14em;text-transform:uppercase}
 
+/* ---------- section: about ---------- */
+section.band{position:relative;z-index:6;background:#000;padding:96px 0 90px;border-top:1px solid var(--line)}
+.eyebrow{font-size:12.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ice2);margin:0 0 14px}
+h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;margin:0;max-width:22ch}
+.about{display:grid;gap:44px;grid-template-columns:minmax(320px,1.15fr) minmax(280px,.85fr);
+  align-items:start;margin-top:34px}
+@media (max-width:900px){.about{grid-template-columns:1fr;gap:32px}}
+.about p{color:var(--dim);margin:0 0 16px;max-width:62ch}
+.about p strong{color:var(--ink);font-weight:700}
+.stats{display:grid;gap:14px}
+.stat{border:1px solid var(--line);border-radius:16px;padding:20px 22px;background:rgba(127,216,255,.03)}
+.stat b{display:block;font:900 30px/1 Nunito,sans-serif;color:var(--ice1)}
+.stat span{display:block;color:var(--dim);font-size:14px;margin-top:6px}
+
+/* border beam: comet ring on containers, ported to vanilla from the shadcn panel */
+.beam{position:relative;isolation:isolate}
+.beam .beam-ring,.beam .beam-glow{position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;
+  background:conic-gradient(from var(--beam-a,40deg), transparent 0deg,
+    color-mix(in srgb, #7FD8FF 4%, transparent) 18deg, color-mix(in srgb, #7FD8FF 55%, transparent) 46deg,
+    #DFF6FF 56deg, color-mix(in srgb, #DFF6FF 22%, #ffffff) 60deg, transparent 63deg, transparent 198deg,
+    color-mix(in srgb, #8E7BE8 4%, transparent) 216deg, color-mix(in srgb, #8E7BE8 50%, transparent) 244deg,
+    #8E7BE8 254deg, color-mix(in srgb, #8E7BE8 26%, #ffffff) 258deg, transparent 261deg, transparent 360deg)}
+.beam .beam-ring{padding:1.5px;
+  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  mask-composite:exclude}
+.beam .beam-glow{filter:blur(14px);opacity:.22;z-index:-1}
+@media (forced-colors:active){.beam .beam-ring,.beam .beam-glow{display:none}}
+
 /* ---------- footer ---------- */
 footer{border-top:1px solid var(--line);padding:44px 0 54px;background:#000;position:relative;z-index:6}
 .cols{display:grid;gap:30px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
@@ -72,6 +101,7 @@ footer a{display:block;padding:3px 0}
 <header><div class="wrap topbar">
   <a class="mark" href="/">Solutions<span>101</span></a>
   <nav class="topnav">
+    <a href="#about">О нас</a>
     <a href="demo/index.html" target="_blank" rel="noopener">Живой продукт</a>
     <a class="cta" href="https://wa.me/447756115516" rel="noopener">Обсудить задачу</a>
   </nav>
@@ -90,8 +120,34 @@ footer a{display:block;padding:3px 0}
     </div>
     <p class="trust">Бухгалтерия для строительной группы: 48 контрагентов, 3 юрлица, мультивалюта. Собрано за один день.</p>
   </div>
-  <div class="scrollhint">листайте вниз</div>
+  <a class="scrollhint" href="#about">листайте вниз</a>
 </section>
+
+<section class="band" id="about"><div class="wrap">
+  <p class="eyebrow">О нас</p>
+  <h2>Небольшая студия с производственной линией на ИИ</h2>
+  <div class="about">
+    <div>
+      <p>Solutions101 - это инженер с профильным образованием и четырьмя годами практики,
+        помноженный на серьёзную производственную линию из ИИ-агентов. Из-за этой связки
+        <strong>работающая первая версия появляется за дни, а не за месяцы</strong>.</p>
+      <p>Мы не продаём часы и не продаём обещания. Вы приносите рутину, которая съедает время,
+        мы отдаём работающий инструмент. Вы гоняете его на своих счетах, заказах и таблицах.
+        Не заработал своё место - не платите.</p>
+      <p>Отрасль значения не имеет. Работаем с любым бизнесом и любым отделом: продажи, финансы,
+        склад, логистика, поддержка, производство. Под каждую задачу разбираемся отдельно, готовых
+        коробок не навязываем.</p>
+    </div>
+    <div class="stats">
+      <div class="stat beam"><i class="beam-ring"></i><i class="beam-glow"></i>
+        <b>дни</b><span>до первой рабочей версии, а не кварталы</span></div>
+      <div class="stat beam"><i class="beam-ring"></i><i class="beam-glow"></i>
+        <b>0 ₽</b><span>предоплата, всегда</span></div>
+      <div class="stat beam"><i class="beam-ring"></i><i class="beam-glow"></i>
+        <b>1 день</b><span>ушёл на бухгалтерию для строительной группы, её можно открыть выше</span></div>
+    </div>
+  </div>
+</div></section>
 
 <footer><div class="wrap">
   <div class="cols">
@@ -107,6 +163,27 @@ footer a{display:block;padding:3px 0}
 </div></footer>
 
 <script src="anim3.js"></script>
+<script>
+/* Border beam engine: sprung angular velocity (k=30, d=11), idle 42 deg/s, 240 on hover.
+   One shared angle on the root element, so any number of framed cards costs one variable. */
+(function(){
+  var root=document.documentElement;
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches){root.style.setProperty('--beam-a','40deg');return;}
+  var angle=40, sp={x:42,v:0,t:42,k:30,d:11}, last=0;
+  document.querySelectorAll('.beam').forEach(function(el){
+    el.addEventListener('mouseenter',function(){sp.t=240;});
+    el.addEventListener('mouseleave',function(){sp.t=42;});
+  });
+  (function frame(now){
+    requestAnimationFrame(frame);
+    if(!last){last=now;return;}
+    var dt=Math.min((now-last)/1000,0.05); last=now;
+    sp.v+=(sp.k*(sp.t-sp.x)-sp.d*sp.v)*dt; sp.x+=sp.v*dt;
+    angle=(angle+sp.x*dt)%360;
+    root.style.setProperty('--beam-a',angle.toFixed(2)+'deg');
+  })(0);
+})();
+</script>
 <script>
 /* Hero graphics, exactly the settings confirmed on the bench:
    ice palette, Nunito, fast travel with the medium spread, tubes tight and one notch brighter. */
