@@ -59,8 +59,9 @@ function Starfield1(host, o) {
     }
   }
   function update(){
-    mouse.x = (cursor.x - cx)/easing;
-    mouse.y = (cursor.y - cy)/easing;
+    /* mouseAdjust off = the field flies straight at the viewer, no drift */
+    mouse.x = mouseAdjust ? (cursor.x - cx)/easing : 0;
+    mouse.y = mouseAdjust ? (cursor.y - cy)/easing : 0;
     var compSpeed = hyper ? speed*warpFactor : speed;
     for (var i=0;i<arr.length;i++){
       var s=arr[i];

@@ -58,7 +58,7 @@ body{margin:0;background:#000;color:#EDF2EC;font:15px/1.55 system-ui,-apple-syst
 <section id="stage">
   <div id="stageui">
     <div id="liquid"></div>
-    <p class="sub">Hold the mouse down for hyperspace. Click to change tube colors.</p>
+    <p class="sub">Зажмите мышь для гиперпрыжка. Клик меняет цвета трубок.</p>
   </div>
 </section>
 
@@ -143,8 +143,9 @@ function Starfield1(host, o) {
     }
   }
   function update(){
-    mouse.x = (cursor.x - cx)/easing;
-    mouse.y = (cursor.y - cy)/easing;
+    /* mouseAdjust off = the field flies straight at the viewer, no drift */
+    mouse.x = mouseAdjust ? (cursor.x - cx)/easing : 0;
+    mouse.y = mouseAdjust ? (cursor.y - cy)/easing : 0;
     var compSpeed = hyper ? speed*warpFactor : speed;
     for (var i=0;i<arr.length;i++){
       var s=arr[i];
@@ -300,8 +301,8 @@ function tubesRandomColors(count){
   /* 1 - starfield-1 port: mouse steering + hold-to-warp */
   function stars(on){
     if(stopStars){stopStars();stopStars=null;}
-    if(on) stopStars=Starfield1(stage,{quantity:512,speed:1,easing:1,warpFactor:10,opacity:0.1,
-      mouseAdjust:true,clickToWarp:true,starColor:'rgba(255,255,255,1)',bgColor:'rgba(0,0,0,1)',zIndex:1});
+    if(on) stopStars=Starfield1(stage,{quantity:700,speed:1.4,easing:1,warpFactor:10,opacity:0.1,
+      mouseAdjust:false,clickToWarp:true,starColor:'rgba(255,255,255,1)',bgColor:'rgba(0,0,0,1)',zIndex:1});
   }
   /* 2 - tubes cursor on top */
   function tubes(on){
@@ -332,8 +333,8 @@ function tubesRandomColors(count){
     var host=document.getElementById('liquid');
     if(stopLiquid){stopLiquid();stopLiquid=null;}
     host.classList.toggle('hidden',!on);
-    if(on) stopLiquid=LiquidText(host,['IMAGINATION','IS YOUR','ONLY LIMIT'],
-      {morphTime:1.5,cooldownTime:0.5,gradient:GRADS[flowKey],flow:6});
+    if(on) stopLiquid=LiquidText(host,['ВООБРАЖЕНИЕ','ВАШ ЕДИНСТВЕННЫЙ','ПРЕДЕЛ'],
+      {morphTime:3.2,cooldownTime:1.4,gradient:GRADS[flowKey],flow:8});
   }
   /* 4 - parallax: same layer speeds as the GSAP timeline, scrubbed by scroll */
   function parallax(on){
