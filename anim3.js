@@ -133,6 +133,15 @@ function paletteAt(pal, p){
   }
   return out;
 }
+/* scale a hex colour toward black. The palette is written bright for text on black; the tubes
+   need the same hues at a fraction of that brightness. */
+function dim(hex, k){
+  var out='#';
+  for (var c=1;c<7;c+=2)
+    out+=Math.max(0,Math.min(255,Math.round(parseInt(hex.substr(c,2),16)*k))).toString(16).padStart(2,'0');
+  return out;
+}
+
 /* hue -> hex. The tube library takes hex strings, so the wheel is converted here rather
    than handed over as hsl(), which its colour parser is not guaranteed to accept. */
 function hslHex(h,s,l){
