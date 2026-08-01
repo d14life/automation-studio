@@ -47,6 +47,11 @@ body{margin:0;background:#000;color:#EDF2EC;font:15px/1.55 system-ui,-apple-syst
   <button id="b-tubes" class="on">2 · tubes cursor</button>
   <button id="b-liquid" class="on">3 · liquid text</button>
   <button id="b-plx" class="on">4 · parallax</button>
+  <b style="margin-left:14px">flow</b>
+  <button id="g-fire" class="on">orange → red</button>
+  <button id="g-green">green</button>
+  <button id="g-ice">ice</button>
+  <button id="g-none">plain</button>
   <a href="/">← live site</a>
 </div>
 
@@ -195,6 +200,10 @@ function LiquidText(host, texts, o) {
   o = o || {};
   var morphTime    = o.morphTime    != null ? o.morphTime    : 1.5;
   var cooldownTime = o.cooldownTime != null ? o.cooldownTime : 0.5;
+  /* optional flowing colour: the whole text is one colour at a time, and that
+     colour travels left to right (orange into red, etc). */
+  var gradient     = o.gradient || null;
+  var flowSeconds  = o.flow != null ? o.flow : 6;
   if (!texts || texts.length < 2) throw new Error('LiquidText: need 2+ texts');
 
   if (!document.getElementById('lt-threshold-svg')){
@@ -206,9 +215,24 @@ function LiquidText(host, texts, o) {
   }
   host.style.position = host.style.position || 'relative';
   host.style.filter = 'url(#threshold) blur(0.6px)';
+  if (gradient && !document.getElementById('lt-flow-style')){
+    var st=document.createElement('style'); st.id='lt-flow-style';
+    st.textContent='@keyframes lt-flow{from{background-position:0% center}to{background-position:-200% center}}';
+    document.head.appendChild(st);
+  }
   function mkSpan(){
     var s=document.createElement('span');
     s.style.cssText='position:absolute;left:0;right:0;top:0;margin:auto;display:inline-block;width:100%;text-align:center';
+    if (gradient){
+      /* 300% wide ramp slid under the glyphs: at any instant the text reads as
+         one colour, and that colour sweeps across the line */
+      s.style.backgroundImage=gradient;
+      s.style.backgroundSize='300% auto';
+      s.style.webkitBackgroundClip='text';
+      s.style.backgroundClip='text';
+      s.style.color='transparent';
+      s.style.animation='lt-flow '+flowSeconds+'s linear infinite';
+    }
     host.appendChild(s); return s;
   }
   var t1=mkSpan(), t2=mkSpan();
@@ -296,11 +320,19 @@ function tubesRandomColors(count){
     });
   }
   /* 3 - liquid text */
+  var GRADS={
+    fire:'linear-gradient(90deg,#ff8a2b,#ff5a1f 20%,#e0233a 45%,#ff5a1f 70%,#ff8a2b)',
+    green:'linear-gradient(90deg,#4CC28F,#9FE8C6 25%,#5C82C9 55%,#4CC28F)',
+    ice:'linear-gradient(90deg,#9FE8C6,#7FD8FF 30%,#8FA8FF 60%,#9FE8C6)',
+    none:null
+  };
+  var flowKey='fire';
   function liquid(on){
     var host=document.getElementById('liquid');
     if(stopLiquid){stopLiquid();stopLiquid=null;}
     host.classList.toggle('hidden',!on);
-    if(on) stopLiquid=LiquidText(host,['IMAGINATION','IS YOUR','ONLY LIMIT'],{morphTime:1.5,cooldownTime:0.5});
+    if(on) stopLiquid=LiquidText(host,['IMAGINATION','IS YOUR','ONLY LIMIT'],
+      {morphTime:1.5,cooldownTime:0.5,gradient:GRADS[flowKey],flow:6});
   }
   /* 4 - parallax: same layer speeds as the GSAP timeline, scrubbed by scroll */
   function parallax(on){
@@ -344,7 +376,15 @@ function tubesRandomColors(count){
       apply();
     });
   });
-  window.__dev={state:state,apply:apply};
+  [['g-fire','fire'],['g-green','green'],['g-ice','ice'],['g-none','none']].forEach(function(p){
+    document.getElementById(p[0]).addEventListener('click',function(){
+      flowKey=p[1];
+      ['g-fire','g-green','g-ice','g-none'].forEach(function(id){
+        document.getElementById(id).classList.toggle('on',id===p[0]);});
+      liquid(state.liquid);
+    });
+  });
+  window.__dev={state:state,apply:apply,grads:GRADS,setFlow:function(k){flowKey=k;liquid(true);}};
   apply();
 })();
 </script>

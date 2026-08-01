@@ -116,6 +116,10 @@ function LiquidText(host, texts, o) {
   o = o || {};
   var morphTime    = o.morphTime    != null ? o.morphTime    : 1.5;
   var cooldownTime = o.cooldownTime != null ? o.cooldownTime : 0.5;
+  /* optional flowing colour: the whole text is one colour at a time, and that
+     colour travels left to right (orange into red, etc). */
+  var gradient     = o.gradient || null;
+  var flowSeconds  = o.flow != null ? o.flow : 6;
   if (!texts || texts.length < 2) throw new Error('LiquidText: need 2+ texts');
 
   if (!document.getElementById('lt-threshold-svg')){
@@ -127,9 +131,24 @@ function LiquidText(host, texts, o) {
   }
   host.style.position = host.style.position || 'relative';
   host.style.filter = 'url(#threshold) blur(0.6px)';
+  if (gradient && !document.getElementById('lt-flow-style')){
+    var st=document.createElement('style'); st.id='lt-flow-style';
+    st.textContent='@keyframes lt-flow{from{background-position:0% center}to{background-position:-200% center}}';
+    document.head.appendChild(st);
+  }
   function mkSpan(){
     var s=document.createElement('span');
     s.style.cssText='position:absolute;left:0;right:0;top:0;margin:auto;display:inline-block;width:100%;text-align:center';
+    if (gradient){
+      /* 300% wide ramp slid under the glyphs: at any instant the text reads as
+         one colour, and that colour sweeps across the line */
+      s.style.backgroundImage=gradient;
+      s.style.backgroundSize='300% auto';
+      s.style.webkitBackgroundClip='text';
+      s.style.backgroundClip='text';
+      s.style.color='transparent';
+      s.style.animation='lt-flow '+flowSeconds+'s linear infinite';
+    }
     host.appendChild(s); return s;
   }
   var t1=mkSpan(), t2=mkSpan();
