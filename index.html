@@ -31,9 +31,13 @@ header{position:absolute;top:0;left:0;right:0;z-index:20}
 
 /* ---------- hero stage ---------- */
 #stage{position:relative;min-height:100svh;overflow:hidden;background:#000}
-#stage canvas.tubes{position:absolute;inset:0;z-index:2;mix-blend-mode:screen}
+/* the tubes sit in the lower band of the hero, under the text rather than behind it:
+   bright ribbons crossing the letters made the slogan hard to read */
+#stage canvas.tubes{position:absolute;left:0;right:0;bottom:0;height:46%;z-index:2;
+  mix-blend-mode:screen;pointer-events:none}
+@media (max-width:700px){#stage canvas.tubes{height:38%}}
 .stageui{position:relative;z-index:5;min-height:100svh;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;text-align:center;padding:110px 24px 80px}
+  align-items:center;justify-content:center;text-align:center;padding:96px 24px 44vh}
 #liquid{position:relative;height:4.4rem;width:100%;max-width:900px;margin:0 auto 4px;
   font:900 27pt/1 Nunito,system-ui,sans-serif}
 @media (min-width:1024px){#liquid{font-size:3.9rem;height:5.6rem}}
@@ -102,7 +106,7 @@ footer a{display:block;padding:3px 0}
 <script src="anim3.js"></script>
 <script>
 /* Hero graphics, exactly the settings confirmed on the bench:
-   ice palette, Nunito, fast travel with a wide spread, tubes tight and one notch brighter. */
+   ice palette, Nunito, fast travel with the medium spread, tubes tight and one notch brighter. */
 (function(){
   var ICE=['#DFF6FF','#7FD8FF','#5C82C9','#8E7BE8'];
   var FLOW=3.5, GLOW={l:.43,i:135};
@@ -112,7 +116,7 @@ footer a{display:block;padding:3px 0}
     mouseAdjust:false,clickToWarp:false,starColor:'rgba(255,255,255,1)',bgColor:'rgba(0,0,0,1)',zIndex:1});
 
   LiquidText(document.getElementById('liquid'),['ВООБРАЖЕНИЕ','ВАШ ЕДИНСТВЕННЫЙ','ПРЕДЕЛ'],
-    {morphTime:4.5,cooldownTime:0.45,colors:ICE,flow:FLOW,drift:FLOW*3,spread:ICE.length*0.15});
+    {morphTime:4.5,cooldownTime:0.45,colors:ICE,flow:FLOW,drift:FLOW*3,spread:ICE.length*0.08});
 
   /* the library chases the pointer from a listener on document.body; swallowing the event in
      the capture phase leaves the tubes drifting on their own, which is what we picked */

@@ -70,8 +70,8 @@ body{margin:0;background:#000;color:#EDF2EC;font:15px/1.55 system-ui,-apple-syst
   <button id="s-fast" class="on">быстро</button>
   <b style="margin-left:14px">разброс цвета</b>
   <button id="d-soft">мягко</button>
-  <button id="d-mid">средне</button>
-  <button id="d-wide" class="on">контраст</button>
+  <button id="d-mid" class="on">средне</button>
+  <button id="d-wide">контраст</button>
   <b style="margin-left:14px">длина трубок</b>
   <button id="t-short" class="on">как было</button>
   <button id="t-mid">средне</button>
@@ -483,7 +483,7 @@ function hslHex(h,s,l){
      drifts three times slower, and the tubes ride that same slow drift. */
   /* spreadFrac = how far apart the three stops sit, as a share of the palette. A third of
      the wheel was too loud, neighbours read as one colour, so the middle sits between. */
-  var flowKey='ice', fontKey='nunito', flowSec=3.5, spreadFrac=0.15;
+  var flowKey='ice', fontKey='nunito', flowSec=3.5, spreadFrac=0.08;
   function liquid(on){
     var host=document.getElementById('liquid');
     if(stopLiquid){stopLiquid();stopLiquid=null;}
