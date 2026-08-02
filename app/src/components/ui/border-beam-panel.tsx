@@ -272,6 +272,11 @@ function BorderBeamPanelBase({
   }, []);
 
   const gradient = React.useMemo(() => ringGradient(beams, colors), [beams, colors]);
+  /* the same gradient with the live angle swapped for a fixed one - see .mk-beam-glow below */
+  const glowGradient = React.useMemo(
+    () => gradient.replace('from var(--mk-beam-a, 0deg)', 'from 0deg'),
+    [gradient],
+  );
 
   const css = `
 .${cls} .mk-beam-ring, .${cls} .mk-beam-glow {
@@ -288,7 +293,18 @@ function BorderBeamPanelBase({
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask-composite: exclude;
 }
-.${cls} .mk-beam-glow { filter: blur(14px); opacity: 0.35; z-index: -1; }
+/* The halo is a second copy of the ring gradient under a 14px blur. Reading the live angle
+   meant the browser rebuilt a conic gradient AND re-blurred it, every frame, over the whole
+   panel - on the biggest panel here that is ~149,000 pixels, sixty times a second. Pinned to a
+   fixed angle it is painted once and never again. At 0.35 opacity behind a 14px blur, a halo
+   that turns and a halo that does not are the same picture; the sharp ring above it still
+   spins, and that is the part the eye follows. */
+.${cls} .mk-beam-glow {
+  background: ${glowGradient};
+  filter: blur(14px);
+  opacity: 0.35;
+  z-index: -1;
+}
 @media (forced-colors: active) {
   .${cls} .mk-beam-ring, .${cls} .mk-beam-glow { display: none; }
   .${cls} { border-color: CanvasText; }
