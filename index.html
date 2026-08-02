@@ -987,9 +987,10 @@ footer a{display:block;padding:3px 0}
     /* the ribbons sit behind the words, so they travel slower: that difference is the depth */
     if(!tubes) tubes=document.getElementById('tubelayer');
     if(tubes){ var op=Math.max(0,1-fade*1.5);
-               tubes.style.transform='translateY('+(f*70).toFixed(1)+'px)';
                tubes.style.opacity=op.toFixed(3);
-               tubes.style.visibility=op<0.02?'hidden':'visible'; }
+               tubes.style.visibility=op<0.02?'hidden':'visible';
+               var tcv=tubes.firstElementChild;
+               if(tcv) tcv.style.transform='translateY('+(f*70).toFixed(1)+'px)'; }
   }
   addEventListener('scroll',paint,{passive:true});
   addEventListener('resize',paint,{passive:true});
