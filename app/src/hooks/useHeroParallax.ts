@@ -6,15 +6,22 @@ import { useEffect } from 'react'
    were dissolved - he was explicit that the original effect was never meant to make anything
    disappear, and that going from solid to gone was the thing that felt wrong.
 
-   Speeds are multiples of the viewport height, deepest layer slowest:
-     ribbons  0.40  - the backdrop, barely moves
-     101      1.00  - mid ground
-     slogan   1.25  - nearest, leaves first
-     buttons  1.35  - riding in front of the 101
-   Everything has cleared the top edge by the end of the runway, which is when the next section
-   arrives, so there is no stretch of empty screen either. */
+   Speeds are PIXELS MOVED PER PIXEL SCROLLED, which is the only number that decides whether
+   the effect is felt. Below 1 a layer lags behind your scroll, and that lag IS the sensation.
+   The first version had everything between 0.9 and 1.2 - moving with the scroll or faster than
+   it - so there was nothing to feel and the hero was gone in an instant. Now the spread runs
+   seven to one, from a backdrop that barely creeps to buttons that nearly keep pace:
 
-const SPEED = { tubes: 0.4, num: 1.0, line1: 1.25, line2: 1.18, acts: 1.35 }
+     ribbons  0.12  - deepest, almost still
+     101      0.52
+     line 2   0.62
+     line 1   0.72
+     buttons  0.85  - nearest, closest to the scroll
+
+   With a 200vh runway the slowest layer still clears the top edge by the end, which is when the
+   next section arrives, so nothing is left hanging and no empty screen opens up. */
+
+const SPEED = { tubes: 0.12, num: 0.52, line2: 0.62, line1: 0.72, acts: 0.85 }
 
 export function useHeroParallax(): void {
   useEffect(() => {
@@ -34,8 +41,9 @@ export function useHeroParallax(): void {
       const h = innerHeight || 1
       const track = Math.max(160, (document.getElementById('stage')?.offsetHeight || h) - h)
       if (y > track * 1.4) return /* past the hero: stop paying for it */
-      const f = Math.min(1, y / track)
-      const up = (speed: number) => 'translateY(' + (-f * h * speed).toFixed(1) + 'px)'
+      const travelled = Math.min(y, track) /* stop moving once the runway is done */
+      const f = travelled / track
+      const up = (speed: number) => 'translateY(' + (-travelled * speed).toFixed(1) + 'px)'
 
       l1.style.transform = up(SPEED.line1)
       l2.style.transform = up(SPEED.line2)

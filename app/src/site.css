@@ -51,8 +51,8 @@ header{position:absolute;top:0;left:0;right:0;z-index:20}
 /* The runway is this height minus one screen, and the hero is pinned for all of it - so this
    is literally how far you must scroll to play the opening. 155vh gave 55vh of it; 210vh gives
    110vh, twice the scroll for the same effect. */
-#stage{position:relative;height:210vh;background:transparent}
-@media (max-width:700px){#stage{height:180vh}}
+#stage{position:relative;height:300vh;background:transparent}
+@media (max-width:700px){#stage{height:230vh}}
 /* Actually sticky, which the name always claimed. It was position:relative, so the hero
    scrolled away after one screen while #stage kept going to 210vh - and the leftover 110vh was
    the screenful of empty stars he kept seeing. Pinned, the parallax plays over the whole
@@ -532,7 +532,7 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
 @supports (animation-timeline:view()){
   @media (prefers-reduced-motion:no-preference){
     .rise{animation:rise-in linear both;animation-timeline:view();
-      animation-range:entry calc(0% + var(--rd,0%)) entry 100%}
+      animation-range:entry calc(0% + var(--rd,0%)) cover 22%}
   }
 }
 
