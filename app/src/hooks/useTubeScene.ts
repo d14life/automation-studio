@@ -117,7 +117,7 @@ export function useTubeScene(ready: boolean, heroVisible: boolean): RefObject<HT
            Narrower on his word: the path used to reach past the ends of the words, now it stays
            well inside them. Height is three quarters of the block, up 50% from a half. */
         a.options.sleepRadiusX = Math.round(textW * 0.38)
-        a.options.sleepRadiusY = Math.round(blockH * 0.75)
+        a.options.sleepRadiusY = Math.round(blockH * 1.125)
         window.__tubeSweep = [a.options.sleepRadiusX, a.options.sleepRadiusY] /* readable proof */
       }
       sweep()
