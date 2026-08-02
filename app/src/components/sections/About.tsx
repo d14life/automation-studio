@@ -1,4 +1,5 @@
 import { BorderBeamPanel } from '@/components/ui/border-beam-panel'
+import { ShinySurface } from '@/components/ui/shiny-button'
 import { GlowCard } from '@/components/ui/spotlight-card'
 
 const R = 16
@@ -21,16 +22,17 @@ export function About() {
           </ul>
         </div>
         <div className="stats">
-          {/* spotlight-card inside the beam ring: the beam rotates, the spotlight follows the cursor */}
-          <BorderBeamPanel {...BEAM} radius={R} seed={5} className="p-0 w-auto border-0 bg-transparent">
+          {/* the shiny-button sweep on the outside, the spotlight card on the inside: the conic
+              border travels on its own, the light under the cursor is the card's */}
+          <ShinySurface>
             <GlowCard customSize className="stat">
               <b>0 ₽</b><span>предоплата. Платите, только если инструмент помог</span>
-            </GlowCard></BorderBeamPanel>
-          <BorderBeamPanel {...BEAM} radius={R} seed={6} className="p-0 w-auto border-0 bg-transparent">
+            </GlowCard></ShinySurface>
+          <ShinySurface>
             <GlowCard customSize className="stat">
               <b>1 день</b><span>ушёл на учёт взаиморасчётов для строительной группы: 48 контрагентов,
               3 юрлица, мультивалюта</span>
-            </GlowCard></BorderBeamPanel>
+            </GlowCard></ShinySurface>
         </div>
       </div>
       {/* ждут данных от Damir: состав команды и образование, число сданных проектов и клиентов */}
