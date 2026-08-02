@@ -351,7 +351,9 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
 /* Blur high enough that the light has no edge. At 5 the blob's rim showed through as a hard
    yellow ring sweeping across the cards - the circles he asked to remove. The rotation and the
    hue cycle are untouched; only the softness and the strength change. */
-.steps .glow-container{--animation-speed:7s;--glow-blur:14;--glow-opacity:.5}
+/* 14 meant a 140px blur repainted on a rotating element, four times over - expensive for a
+   soft edge. 7 is 70px, still far past the point where the rim is visible, at half the area. */
+.steps .glow-container{--animation-speed:7s;--glow-blur:7;--glow-opacity:.5}
 /* Damir: nothing may react to hover. Restate the resting state over the donor's hover rules. */
 .steps .glow-container:hover .glow-content{mix-blend-mode:normal;box-shadow:none;animation:none}
 .steps .glow-container:hover .glow-content:before,
@@ -853,3 +855,9 @@ footer a{display:block;padding:3px 0}
    Opacity keeps it as light around the panel rather than a slab of colour behind it. */
 .glowwrap > :first-child{z-index:0;opacity:.42}
 .glowwrap > :not(:first-child){position:relative;z-index:1}
+
+/* the glow turns on the compositor instead of being repainted every frame */
+@keyframes glow-turn{to{transform:rotate(360deg) scale(var(--scale,1))}}
+.glowspin{animation:glow-turn 9s linear infinite;will-change:transform}
+.glowspin-slow{animation-duration:14s}
+@media (prefers-reduced-motion:reduce){.glowspin{animation:none}}
