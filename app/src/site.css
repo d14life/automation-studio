@@ -130,6 +130,10 @@ header{position:absolute;top:0;left:0;right:0;z-index:20}
   font:900 31.5pt/1 Nunito,system-ui,sans-serif}
 /* height only a little over the 4.8rem text, so the two lines sit close together */
 @media (min-width:1024px){.morph{font-size:4.8rem;height:5.6rem}}
+/* A phone is narrower than the word. At the fixed 42px the longest line was 423px against a
+   327px screen and the slogan showed as its own first thirteen letters. Sized off the screen
+   it always fits; 8.4vw lands on 31.5px at 375 wide, and the height follows the font. */
+@media (max-width:700px){.morph{font-size:clamp(19px,8.4vw,42px);height:clamp(24px,10vw,56px)}}
 h1{font:900 clamp(28px,4.6vw,54px)/1.12 Nunito,sans-serif;letter-spacing:-.02em;
   margin:14px 0 0;max-width:20ch}
 h1 em{font-style:normal;color:var(--ice2)}

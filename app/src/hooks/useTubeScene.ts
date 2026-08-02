@@ -90,8 +90,16 @@ export function useTubeScene(ready: boolean, heroVisible: boolean): RefObject<HT
   useEffect(() => {
     const layer = layerRef.current
     if (!ready || !layer) return
-    /* No WebGL on a phone: half resolution was still too much for the device most visitors use. */
-    if (isSmallDevice()) { layer.style.display = 'none'; return }
+    /* Phones get the ribbons back, on his word - the scene that killed mobile was the OLD one:
+       bloom chain, pixel ratio pinned to 2, sixteen tubes. All three are gone, so a phone now
+       runs a light build instead of nothing: half the ribbons, shorter trails, no ratio above 1.
+       Without a mouse the library idle-sweeps the path on its own, which is the same figure the
+       cursor rests into. Only a genuinely weak device still opts out. */
+    const SMALL = isSmallDevice()
+    if (SMALL && navigator.deviceMemory && navigator.deviceMemory <= 3) {
+      layer.style.display = 'none'
+      return
+    }
 
     if (!heroVisible) {
       layer.style.visibility = 'hidden' /* off screen NOW; the GPU stops compositing it */
@@ -126,12 +134,12 @@ export function useTubeScene(ready: boolean, heroVisible: boolean): RefObject<HT
         colors: tubeSet(p0),
         /* The ribbon's own length, which is its tubular segment count - not the reach of the
            path, which is sleepRadiusX/Y below. +30% on the library's 32-128. */
-        minTubularSegments: 42,
-        maxTubularSegments: 166,
+        minTubularSegments: SMALL ? 28 : 42,
+        maxTubularSegments: SMALL ? 100 : 166,
         /* Every ribbon rebuilds its geometry each frame, so the count is the main-thread cost
            of this scene almost by itself. The library's 16 overlap heavily - at 11 the bundle
            reads the same and there is a third less geometry to rebuild sixty times a second. */
-        count: 11,
+        count: SMALL ? 6 : 11,
         lights: {
           intensity: GLOW.i,
           colors: [
@@ -154,7 +162,7 @@ export function useTubeScene(ready: boolean, heroVisible: boolean): RefObject<HT
       try {
         const r = a.three as { minPixelRatio?: number; maxPixelRatio?: number; resize?: () => void }
         r.minPixelRatio = 1
-        r.maxPixelRatio = 1.4
+        r.maxPixelRatio = SMALL ? 1 : 1.4 /* a phone screen is small enough that 1x still reads */
         r.resize?.()
       } catch { /* older build without the knob: leave it alone */ }
       /* A flat wide figure keeps the ribbons in the line of the text instead of looping down
