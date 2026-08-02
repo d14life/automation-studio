@@ -30,21 +30,22 @@ export function useCardTilt(): void {
     let py = 0
 
     function paint() {
-      /* The fan pushes cards outside the wrapper's own box, so "am I near the cards" has to be
-         asked of the cards themselves - measuring the wrapper flattened any card that had been
-         thrown clear of it. */
       const boxes = cards.map((el) => el.getBoundingClientRect())
-      let l = Infinity, r = -Infinity, t = Infinity, b2 = -Infinity
-      for (const b of boxes) {
-        if (b.left < l) l = b.left
-        if (b.right > r) r = b.right
-        if (b.top < t) t = b.top
-        if (b.bottom > b2) b2 = b.bottom
-      }
-      const outside = px < l - 80 || px > r + 80 || py < t - 80 || py > b2 + 80
+      /* Only the card under the pointer tilts; the rest stay flat, because all four leaning at
+         once reads as the whole fan wobbling rather than as one card answering you.
+
+         Which card that is has to come from the browser, not from a rectangle test. The cards
+         are rotated in the fan, and getBoundingClientRect returns the AXIS-ALIGNED box of a
+         rotated element - far bigger than the card itself. Measured: every one of the four boxes
+         contained every other card's centre, so a rectangle test picked the same card wherever
+         the pointer was. elementFromPoint respects the real rotated shape and the stacking
+         order, which is exactly the card the eye thinks it is on. */
+      const under = document.elementFromPoint(px, py)
+      const card = under ? (under.closest('.proj') as HTMLElement | null) : null
+      const hit = card ? cards.indexOf(card) : -1
       for (let i = 0; i < cards.length; i++) {
         const el = cards[i]
-        if (outside) {
+        if (i !== hit) {
           el.removeAttribute('data-tilt')
           el.style.removeProperty('--tx')
           el.style.removeProperty('--ty')
