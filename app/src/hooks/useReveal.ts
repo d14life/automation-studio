@@ -47,14 +47,17 @@ const MAX_STAGGER = 5
    element carrying both view() animations plays neither - both report a null progress, which is
    what silently killed the arrive-from-below on every heading. So the text reveals and the
    containers around it drift, and no element does both. */
+/* The value is half the travel: the block starts +N and ends -N, so 30px moved a container by
+   only 60px across a whole screen of scrolling - invisible. These are three to four times that,
+   which is the difference between "there is a parallax" and "I cannot feel any parallax". */
 const PARALLAX: [string, string][] = [
-  ['.srv', '30px'],
-  ['.skewrow', '30px'],
-  ['.steps', '30px'],
-  ['.stats', '38px'],
-  ['.projects', '34px'],
-  ['#contacts .ways', '30px'],
-  ['.qs', '30px'],
+  ['.srv', '105px'],
+  ['.skewrow', '105px'],
+  ['.steps', '95px'],
+  ['.stats', '120px'],
+  ['.projects', '110px'],
+  ['#contacts .ways', '95px'],
+  ['.qs', '95px'],
 ]
 
 export function useReveal(): void {

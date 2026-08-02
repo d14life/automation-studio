@@ -21,7 +21,14 @@ import { useEffect } from 'react'
    With a 200vh runway the slowest layer still clears the top edge by the end, which is when the
    next section arrives, so nothing is left hanging and no empty screen opens up. */
 
-const SPEED = { tubes: 0.12, num: 0.52, line2: 0.62, line1: 0.72, acts: 0.85 }
+/* Much slower than before. At 0.72 the slogan lagged the scroll by only 28% and read as
+   "it just moves down a bit with the page". The lag IS the effect, so these are roughly halved:
+   the slogan now holds back 55%, the number 75%, the ribbons 95%.
+
+   They no longer have to clear the top edge inside the runway either - the pin releases while
+   the 101 is still in frame and the hero then leaves at normal speed with the next section
+   behind it, so slow rates cost nothing. */
+const SPEED = { tubes: 0.05, num: 0.25, line2: 0.38, line1: 0.45, acts: 0.60 }
 
 export function useHeroParallax(): void {
   useEffect(() => {
