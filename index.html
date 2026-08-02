@@ -797,7 +797,7 @@ footer a{display:block;padding:3px 0}
 })();
 </script>
 <script src="win.js?v=1"></script>
-<script src="anim3.js?v=5"></script>
+<script src="anim3.js?v=6"></script>
 
 <script>
 /* Hero graphics, exactly the settings confirmed on the bench:
@@ -841,7 +841,8 @@ footer a{display:block;padding:3px 0}
       if(!heroOn) parkTubes(); else wakeTubes();
     },{rootMargin:'80px'}).observe(stage);
   }
-  var MORPH={morphTime:4.5,cooldownTime:0.45,colors:ICE,flow:FLOW,drift:FLOW*3,spread:ICE.length*0.08,
+  var MORPH={morphTime:SMALL?0.9:4.5,cooldownTime:SMALL?1.7:0.45,colors:ICE,flow:FLOW,
+             drift:FLOW*3,spread:ICE.length*0.08,simple:SMALL,
              activeWhen:function(){return heroOn;}};
   var L1=document.getElementById('liq1'), L2=document.getElementById('liq2');
   LiquidText(L1,['АВТОМАТИЗИРУЕМ','БЫСТРО','ТОЛЬКО ПРАКТИКА'],MORPH);
@@ -891,15 +892,10 @@ footer a{display:block;padding:3px 0}
     if(cv){ cv.remove(); cv=null; }
   }
   function wakeTubes(){ if(!SMALL && !app && !cv) buildTubes(); }
-  /* Phones get the ribbons too, but rendered at half resolution and scaled back up: a quarter
-     of the pixels for the same picture. Without this the WebGL scene was what melted the phone. */
+  /* No WebGL on a phone at all. Half resolution was still too much: the scene is simply not
+     worth a stuttering page on the device most visitors will use. */
   var layer=document.getElementById('tubelayer');
-  if(SMALL){
-    layer.style.width='50%'; layer.style.height='50%';
-    layer.style.transformOrigin='0 0';
-    layer.style.transform='scale(2)';
-    GLOW={l:.38,i:90};
-  }
+  if(SMALL){ layer.style.display='none'; return; }
   var cv=null;
   buildTubes();
   function buildTubes(){
