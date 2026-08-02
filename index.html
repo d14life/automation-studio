@@ -39,11 +39,12 @@ header{position:absolute;top:0;left:0;right:0;z-index:20}
 #stage{position:relative;height:260vh;background:transparent}
 .stagesticky{position:sticky;top:0;height:100svh;overflow:hidden}
 /* same as the bench: the tubes own the whole stage and screen-blend over the starfield */
-/* The tubes canvas is fixed at the root, next to the starfield, NOT inside the sticky screen.
-   position:sticky creates its own stacking context, and screen blending only reaches the
-   backdrop inside that context: the tube canvas was painting opaque black straight over the
-   stars, which is why they vanished the moment the 3D scene finished loading. */
-canvas.tubes{position:fixed;inset:0;z-index:1;mix-blend-mode:screen;pointer-events:none}
+/* The tubes live in their own fixed layer at the root, beside the starfield. Two reasons:
+   position:sticky creates a stacking context and screen blending would not reach the stars
+   through it, and the library sizes its canvas from the PARENT box - with <body> as the
+   parent it built an 849 by 6933 surface, which is what made the machine crawl. */
+#tubelayer{position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+#tubelayer canvas{display:block;width:100%;height:100%;mix-blend-mode:screen}
 .stageui{position:relative;z-index:5;height:100%;display:flex;flex-direction:column;
   align-items:center;justify-content:center;text-align:center;gap:14px;padding:96px 24px 64px}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
@@ -64,10 +65,11 @@ h1 em{font-style:normal;color:var(--ice2)}
 .btn:active{transform:scale(.97)}
 .trust{margin-top:26px;color:var(--dim);font-size:13.5px;letter-spacing:.02em}
 /* the big outlined number sits low in the hero with the buttons riding in front of it */
-.hero101{position:absolute;left:0;right:0;bottom:34px;z-index:4;text-align:center;pointer-events:none;
-  font:900 clamp(120px,21vw,300px)/.86 Nunito,sans-serif;color:transparent;letter-spacing:-.04em;
-  -webkit-text-stroke:2px rgba(223,246,255,.15)}
-@media (max-width:700px){.hero101{-webkit-text-stroke-width:1.5px}}
+.hero101{position:absolute;left:0;right:0;bottom:18px;z-index:4;text-align:center;pointer-events:none;
+  font:900 clamp(170px,32vw,440px)/.82 Nunito,sans-serif;color:transparent;letter-spacing:-.05em;
+  -webkit-text-stroke:3px rgba(223,246,255,.42);
+  filter:drop-shadow(0 0 26px rgba(127,216,255,.28))}
+@media (max-width:700px){.hero101{-webkit-text-stroke-width:2px;bottom:8px}}
 .scrollhint{position:absolute;left:0;right:0;bottom:26px;z-index:7;text-align:center;
   color:var(--dim);font-size:12.5px;letter-spacing:.14em;text-transform:uppercase}
 
@@ -111,7 +113,7 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
 
 
 /* ---------- projects: a gentle fan of cards, each showing a mock of what we build ---------- */
-.projects{position:relative;height:520px;margin:54px 0 18px}
+.projects{position:relative;height:min(600px,74vw);margin:58px 0 22px}
 .projects .proj{position:absolute;left:50%;top:50%;width:var(--cardw,300px);aspect-ratio:1;
   margin:calc(var(--cardw,300px)/-2) 0 0 calc(var(--cardw,300px)/-2);
   border:1px solid var(--line);border-radius:22px;overflow:hidden;background:rgba(6,12,16,.86);
@@ -215,9 +217,16 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
   font:900 15px Nunito,sans-serif;cursor:pointer}
 .aiform button:active{transform:scale(.97)}
 
-/* border beam: comet ring on containers, ported to vanilla from the shadcn panel */
+/* Border beam. The angle is animated by the browser through a registered custom property, so
+   there is no per-frame JavaScript writing styles and no hover speed-up: one constant sweep.
+   The blurred glow copy was dropped - a full-size blur repainted every frame was the single
+   most expensive thing on the page. */
+@property --beam-a{syntax:'<angle>';inherits:true;initial-value:40deg}
+@keyframes beam-spin{to{--beam-a:400deg}}
+:root{animation:beam-spin 9s linear infinite}
+@media (prefers-reduced-motion:reduce){:root{animation:none}}
 .beam{position:relative;isolation:isolate}
-.beam .beam-ring,.beam .beam-glow{position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;
+.beam .beam-ring{position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;
   background:conic-gradient(from var(--beam-a,40deg), transparent 0deg,
     color-mix(in srgb, #7FD8FF 4%, transparent) 18deg, color-mix(in srgb, #7FD8FF 55%, transparent) 46deg,
     #DFF6FF 56deg, color-mix(in srgb, #DFF6FF 22%, #ffffff) 60deg, transparent 63deg, transparent 198deg,
@@ -227,8 +236,7 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
   -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
   -webkit-mask-composite:xor;mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
   mask-composite:exclude}
-.beam .beam-glow{filter:blur(14px);opacity:.22;z-index:-1}
-@media (forced-colors:active){.beam .beam-ring,.beam .beam-glow{display:none}}
+@media (forced-colors:active){.beam .beam-ring{display:none}}
 
 /* ---------- footer ---------- */
 footer{border-top:1px solid var(--line);padding:44px 0 54px;background:rgba(0,0,0,.9);position:relative;z-index:6}
@@ -241,6 +249,7 @@ footer a{display:block;padding:3px 0}
 </style>
 
 <div id="space"></div>
+<div id="tubelayer"></div>
 
 <header><div class="wrap topbar">
   <a class="mark" href="/">Solutions<span>101</span></a>
@@ -282,9 +291,9 @@ footer a{display:block;padding:3px 0}
       </ul>
     </div>
     <div class="stats">
-      <div class="stat beam"><i class="beam-ring"></i><i class="beam-glow"></i>
+      <div class="stat beam"><i class="beam-ring"></i>
         <b>0 ₽</b><span>предоплата. Платите, только если инструмент помог</span></div>
-      <div class="stat beam"><i class="beam-ring"></i><i class="beam-glow"></i>
+      <div class="stat beam"><i class="beam-ring"></i>
         <b>1 день</b><span>ушёл на учёт взаиморасчётов для строительной группы: 48 контрагентов,
         3 юрлица, мультивалюта</span></div>
     </div>
@@ -299,7 +308,7 @@ footer a{display:block;padding:3px 0}
   <h2>Что уже собрано и как это выглядит</h2>
   <div class="projects">
 
-    <article class="proj beam"><i class="beam-ring"></i><i class="beam-glow"></i>
+    <article class="proj beam"><i class="beam-ring"></i>
       <div class="shot">
         <div class="bar w1"></div>
         <div class="row"><span class="cell num"></span><span class="cell"></span><span class="cell"></span></div>
@@ -317,7 +326,7 @@ footer a{display:block;padding:3px 0}
       </div>
     </article>
 
-    <article class="proj beam"><i class="beam-ring"></i><i class="beam-glow"></i>
+    <article class="proj beam"><i class="beam-ring"></i>
       <div class="shot">
         <div class="stopline"><i></i>Заказ принят</div>
         <div class="stopline"><i></i>Собран на складе</div>
@@ -334,7 +343,7 @@ footer a{display:block;padding:3px 0}
       </div>
     </article>
 
-    <article class="proj beam"><i class="beam-ring"></i><i class="beam-glow"></i>
+    <article class="proj beam"><i class="beam-ring"></i>
       <div class="shot">
         <div class="cols">
           <div class="col"><span class="chip"></span><span class="chip hi"></span><span class="chip"></span></div>
@@ -350,7 +359,7 @@ footer a{display:block;padding:3px 0}
       </div>
     </article>
 
-    <article class="proj beam"><i class="beam-ring"></i><i class="beam-glow"></i>
+    <article class="proj beam"><i class="beam-ring"></i>
       <div class="shot">
         <div class="bar w4"></div>
         <div class="chart"><i style="height:38%"></i><i style="height:62%"></i><i style="height:44%"></i>
@@ -364,7 +373,7 @@ footer a{display:block;padding:3px 0}
       </div>
     </article>
 
-    <article class="proj beam"><i class="beam-ring"></i><i class="beam-glow"></i>
+    <article class="proj beam"><i class="beam-ring"></i>
       <div class="shot">
         <div class="bubble">Здравствуйте! Остался ли в наличии профиль 40х20?</div>
         <div class="bubble me">Да, 320 метров на складе в Казани. Выставить счёт?</div>
@@ -379,7 +388,7 @@ footer a{display:block;padding:3px 0}
       </div>
     </article>
 
-    <article class="proj beam"><i class="beam-ring"></i><i class="beam-glow"></i>
+    <article class="proj beam"><i class="beam-ring"></i>
       <div class="shot">
         <div class="tiles"><span class="tile">60</span><span class="tile">9</span><span class="tile">5</span>
           <span class="tile">1С</span><span class="tile">API</span><span class="tile">ИИ</span></div>
@@ -435,7 +444,7 @@ footer a{display:block;padding:3px 0}
   <p class="eyebrow">Заявка</p>
   <h2>Расскажите, что съедает время</h2>
   <div class="req">
-    <form class="form beam" id="reqform"><i class="beam-ring"></i><i class="beam-glow"></i>
+    <form class="form beam" id="reqform"><i class="beam-ring"></i>
       <label for="rq-name">Как вас зовут</label>
       <input id="rq-name" required>
       <label for="rq-co">Компания</label>
@@ -503,7 +512,7 @@ footer a{display:block;padding:3px 0}
      of the next one, so six cards read as a fan instead of a pile on a narrow screen. */
   function cardW(){
     var avail=wrap.clientWidth;
-    return Math.round(Math.max(170,Math.min(300,avail/(1+0.55*(N-1)))));
+    return Math.round(Math.max(190,Math.min(360,avail/(1+0.62*(N-1)))));
   }
   function edgeX(){ return Math.max(60,(wrap.clientWidth-cardW())/2); }
   function slotCfg(slot){
@@ -548,27 +557,7 @@ footer a{display:block;padding:3px 0}
 })();
 </script>
 <script src="anim3.js"></script>
-<script>
-/* Border beam engine: sprung angular velocity (k=30, d=11), idle 42 deg/s, 240 on hover.
-   One shared angle on the root element, so any number of framed cards costs one variable. */
-(function(){
-  var root=document.documentElement;
-  if(matchMedia('(prefers-reduced-motion: reduce)').matches){root.style.setProperty('--beam-a','40deg');return;}
-  var angle=40, sp={x:42,v:0,t:42,k:30,d:11}, last=0;
-  document.querySelectorAll('.beam').forEach(function(el){
-    el.addEventListener('mouseenter',function(){sp.t=240;});
-    el.addEventListener('mouseleave',function(){sp.t=42;});
-  });
-  (function frame(now){
-    requestAnimationFrame(frame);
-    if(!last){last=now;return;}
-    var dt=Math.min((now-last)/1000,0.05); last=now;
-    sp.v+=(sp.k*(sp.t-sp.x)-sp.d*sp.v)*dt; sp.x+=sp.v*dt;
-    angle=(angle+sp.x*dt)%360;
-    root.style.setProperty('--beam-a',angle.toFixed(2)+'deg');
-  })(0);
-})();
-</script>
+
 <script>
 /* Hero graphics, exactly the settings confirmed on the bench:
    ice palette, Nunito, fast travel with the medium spread, tubes tight and one notch brighter. */
@@ -577,7 +566,11 @@ footer a{display:block;padding:3px 0}
   var FLOW=3.5, GLOW={l:.43,i:135};
   var stage=document.getElementById('stage');
 
-  Starfield1(document.getElementById('space'),{quantity:700,speed:2.1,easing:1,warpFactor:10,opacity:0.1,
+  /* a phone gets a lighter field and no WebGL at all: the tube scene was the thing that
+     killed mobile, and 700 stars redrawn every frame is more than a phone should pay */
+  var SMALL=matchMedia('(max-width:760px)').matches ||
+            (navigator.deviceMemory && navigator.deviceMemory<=4);
+  Starfield1(document.getElementById('space'),{quantity:SMALL?260:420,speed:2.1,easing:1,warpFactor:10,opacity:0.1,
     mouseAdjust:false,clickToWarp:false,starColor:'rgba(255,255,255,1)',bgColor:'rgba(0,0,0,1)',zIndex:1});
 
   /* two lines, same timings, started in the same tick: they melt into the next phrase together */
@@ -590,8 +583,9 @@ footer a{display:block;padding:3px 0}
      the capture phase leaves the tubes drifting on their own, which is what we picked */
   window.addEventListener('pointermove',function(e){e.stopPropagation();},true);
 
-  var cv=document.createElement('canvas'); cv.className='tubes';
-  document.body.appendChild(cv);
+  if(SMALL) return;                      /* no tube scene on phones */
+  var layer=document.getElementById('tubelayer');
+  var cv=document.createElement('canvas'); cv.className='tubes'; layer.appendChild(cv);
   var k=GLOW.l/0.64, sp=ICE.length*0.12, p0=ICE.length*0.10, app=null;
   function tubeSet(p){
     return [dim(paletteAt(ICE,p),k),dim(paletteAt(ICE,p+sp),k),dim(paletteAt(ICE,p+sp*2),k)];
@@ -644,7 +638,7 @@ footer a{display:block;padding:3px 0}
              num.style.opacity=(1-f*1.2).toFixed(3); }
     if(hint) hint.style.opacity=(1-f*3.2).toFixed(3);
     /* the ribbons sit behind the words, so they travel slower: that difference is the depth */
-    if(!tubes) tubes=document.querySelector('canvas.tubes');
+    if(!tubes) tubes=document.getElementById('tubelayer');
     if(tubes){ var op=Math.max(0,1-f*1.0);
                tubes.style.transform='translateY('+(f*150).toFixed(1)+'px)';
                tubes.style.opacity=op.toFixed(3);
