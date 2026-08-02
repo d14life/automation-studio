@@ -24,7 +24,11 @@ function Starfield1(host, o) {
   var ctx = cv.getContext('2d');
 
   var w=0,h=0,cx=0,cy=0,z=0,colorRatio=0,arr=[];
-  var ratio = quantity / 2;
+  /* How far the field spreads from the centre. It used to be derived from quantity, which
+     silently coupled the two: raising the star count pushed every star further out and threw
+     the extras off-screen, so MORE stars looked like FEWER. Now it is its own knob and the
+     old formula is only the default, so any other caller behaves exactly as before. */
+  var ratio = o.spread != null ? o.spread : quantity / 2;
   var cursor = {x:0,y:0}, mouse = {x:0,y:0};
   var hyper = false;
 
@@ -127,7 +131,7 @@ function Starfield1(host, o) {
   setup(); bigBang(); animate();
   stop.setQuantity=function(n){
     if (n>=arr.length){ return; }
-    arr.length=n; quantity=n; ratio=quantity/2;
+    arr.length=n; quantity=n; if (o.spread == null) ratio=quantity/2;
   };
   function stop(){
     running=false; cancelAnimationFrame(raf);
