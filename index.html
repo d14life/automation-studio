@@ -457,7 +457,7 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
 :root{animation:beam-spin 8.5s linear infinite}   /* 42 deg/s, the resting speed of the panel */
 @media (prefers-reduced-motion:reduce){:root{animation:none}}
 .beam{position:relative;isolation:isolate}
-.beam .beam-ring,.beam .beam-glow{position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;
+.beam .beam-ring,.beam .beam-glow{position:absolute;inset:0;border-radius:inherit;pointer-events:none;
   /* two comets 180 degrees apart: a long tail easing into a bright head with a white tip.
      The toe is a 4% mix rather than `transparent`, because transparent is rgba(0,0,0,0) and a
      conic ramp through it dips visibly grey. */
@@ -634,7 +634,7 @@ footer a{display:block;padding:3px 0}
   <h2>Что уже собрано и как это выглядит</h2>
   <div class="projects">
 
-    <article class="proj edged"><span class="edges"><i class="t"></i><i class="r"></i><i class="b"></i><i class="l"></i><b></b><b></b><b></b><b></b></span>
+    <article class="proj beam"><i class="beam-glow"></i><i class="beam-ring"></i>
       <div class="shot sh-shot"><div class="sh-w">
         <div class="sh-hd">
           <span class="sh-dots"><i></i><i></i><i></i></span>
@@ -660,7 +660,7 @@ footer a{display:block;padding:3px 0}
       </div>
     </article>
 
-    <article class="proj edged"><span class="edges"><i class="t"></i><i class="r"></i><i class="b"></i><i class="l"></i><b></b><b></b><b></b><b></b></span>
+    <article class="proj beam"><i class="beam-glow"></i><i class="beam-ring"></i>
       <div class="shot sh-shot"><div class="sh-w">
         <div class="sh-hd">
           <span class="sh-dots"><i></i><i></i><i></i></span>
@@ -692,7 +692,7 @@ footer a{display:block;padding:3px 0}
       </div>
     </article>
 
-    <article class="proj edged"><span class="edges"><i class="t"></i><i class="r"></i><i class="b"></i><i class="l"></i><b></b><b></b><b></b><b></b></span>
+    <article class="proj beam"><i class="beam-glow"></i><i class="beam-ring"></i>
       <div class="shot sh-shot"><div class="sh-w">
         <div class="sh-hd">
           <span class="sh-dots"><i></i><i></i><i></i></span>
@@ -727,7 +727,7 @@ footer a{display:block;padding:3px 0}
     </article>
 
 
-    <article class="proj edged"><span class="edges"><i class="t"></i><i class="r"></i><i class="b"></i><i class="l"></i><b></b><b></b><b></b><b></b></span>
+    <article class="proj beam"><i class="beam-glow"></i><i class="beam-ring"></i>
       <div class="shot sh-shot"><div class="sh-w">
         <div class="sh-hd">
           <span class="sh-dots"><i></i><i></i><i></i></span>
