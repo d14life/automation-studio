@@ -34,7 +34,8 @@ header{position:absolute;top:0;left:0;right:0;z-index:20}
 #space canvas{position:absolute;inset:0}
 
 /* ---------- hero stage ---------- */
-#stage{position:relative;height:100svh;background:transparent}
+#stage{position:relative;height:148vh;background:transparent}
+@media (max-width:700px){#stage{height:126vh}}
 /* no pull-up: the hero needs its full screen for the drift to be visible at all */
 .stagesticky{position:relative;height:100svh;overflow:hidden}
 /* same as the bench: the tubes own the whole stage and screen-blend over the starfield */
@@ -970,11 +971,13 @@ footer a{display:block;padding:3px 0}
     var y=window.pageYOffset||0, h=innerHeight||1;
     /* the track is exactly the scrollable part of the hero, so the text is gone at the very
        moment the next section reaches the top: no empty stretch of stars in between */
-    var track=h*0.92;                         /* the dissolve spans nearly the whole screen */
+    /* the runway is exactly the part of the hero below the first screen: the dissolve finishes
+       at the instant the next section reaches the top */
+    var track=Math.max(160,(document.getElementById('stage').offsetHeight||h)-h);
     if(y>track*1.4) return;                   /* past the hero: stop paying for it */
     var f=Math.min(1,y/track);
     /* hold, then fade: the words stay readable for the first half of the scroll */
-    var fade=Math.max(0,(f-0.22)/0.78);
+    var fade=Math.max(0,(f-0.10)/0.90);
     l1.style.transform='translateY('+(f*190).toFixed(1)+'px)';
     l1.style.opacity=(1-fade).toFixed(3);
     l2.style.transform='translateY('+(f*115).toFixed(1)+'px)';
