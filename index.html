@@ -52,7 +52,7 @@ header{position:absolute;top:0;left:0;right:0;z-index:20}
   mask-image:linear-gradient(180deg,transparent 12%,#000 26%,#000 74%,transparent 88%)}
 #tubelayer canvas{display:block;width:100%;height:100%}
 .stageui{position:relative;z-index:5;height:100%;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;text-align:center;gap:10px;padding:92px 24px 13vh}
+  align-items:center;justify-content:center;text-align:center;gap:10px;padding:92px 24px 0}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .morph{position:relative;height:3.4rem;width:100%;max-width:980px;margin:0 auto;
   font:900 21pt/1 Nunito,system-ui,sans-serif}
@@ -62,7 +62,8 @@ h1{font:900 clamp(28px,4.6vw,54px)/1.12 Nunito,sans-serif;letter-spacing:-.02em;
 h1 em{font-style:normal;color:var(--ice2)}
 .lede{color:var(--dim);max-width:60ch;margin:18px auto 0;font-size:clamp(15px,1.5vw,17.5px)}
 /* the number and the buttons are one block: the buttons sit centred on top of the 101 */
-.numblock{position:relative;margin-top:clamp(76px,15vh,180px);display:flex;justify-content:center}
+.numblock{position:absolute;left:0;right:0;top:57%;display:flex;justify-content:center}
+@media (max-width:700px){.numblock{position:relative;top:auto;margin-top:clamp(40px,8vh,90px)}}
 .actswrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:6}
 .acts{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
 .btn{border:0;cursor:pointer;font-family:Nunito,sans-serif;border-radius:99px;padding:14px 26px;text-decoration:none;font-weight:900;font-size:15.5px;
