@@ -345,6 +345,17 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
 @media (prefers-reduced-motion:reduce){
   .edgecard,.edgecard-sheen,.edgecard-cta::before{transition:none}
   .edgecard:hover{transform:none}}
+/* No hover, no sheen - so on touch the same sweep is driven by the card's own trip across the
+   screen instead: the browser's scroll timeline, zero script. */
+@media (hover:none){
+  @supports (animation-timeline:view()){
+    .edgecard-sheen{animation:edge-sheen-sweep linear both;
+      animation-timeline:view();animation-range:entry 40% cover 85%}
+  }
+}
+@keyframes edge-sheen-sweep{
+  from{transform:rotate(18deg) translateX(0);opacity:.45}
+  to{transform:rotate(18deg) translateX(210%);opacity:.9}}
 
 /* ---------- section: how ---------- */
 .steps{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));margin-top:34px;counter-reset:s}
@@ -579,7 +590,7 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
 .gshadow::after{content:'';position:absolute;inset:2px;border-radius:inherit;z-index:-1;
   background:hsl(calc(var(--gh) * 1deg) 92% 58%);filter:blur(22px);opacity:.30;
   animation:hue-drift 9s linear infinite}
-@media (max-width:820px){.gshadow::after{display:none}}
+/* used to be display:none under 820px; the phone gets the containers' effects too - his word */
 @media (prefers-reduced-motion:reduce){.edges i,.edges b,.gshadow::after{animation:none}}
 
 /* new, tm- prefixed: dashed placeholder card + de-emphasized placeholder value.
@@ -684,6 +695,28 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
       calc((var(--x,0) - var(--ox,0)) * 1px) calc((var(--y,0) - var(--oy,0)) * 1px),
       hsl(0 0% 100% / .75), transparent 100%)}
 }
+
+/* Touch devices have no cursor to drive the lamp, so the same three gradients sit at the top
+   of each card and breathe instead of following a pointer. Opacity is the only thing animating
+   - compositor work. This is the mobile version of the block above, not an extra effect. */
+@media (hover:none){
+  .glow,.projects .proj.glow,.card.glow,.step.glow{--base:196;--spread:170;--spot:240px;--bw:2px;
+    --hue:calc(var(--base) + 55);
+    background-image:radial-gradient(var(--spot) var(--spot) at 50% -8%,
+      hsl(var(--hue) 100% 72% / .14), transparent 70%)}
+  .glow::before,.glow::after{content:'';position:absolute;inset:calc(var(--bw) * -1);
+    border:var(--bw) solid transparent;border-radius:inherit;pointer-events:none;
+    background-repeat:no-repeat;
+    -webkit-mask:linear-gradient(#000,#000) content-box,linear-gradient(#000,#000);
+    -webkit-mask-composite:xor;mask:linear-gradient(#000,#000) content-box,linear-gradient(#000,#000);
+    mask-composite:exclude}
+  .glow::before{background-image:radial-gradient(calc(var(--spot) * .8) calc(var(--spot) * .8) at 50% -8%,
+      hsl(var(--hue) 100% 62% / .9), transparent 100%);filter:brightness(1.6);
+    animation:glow-breathe 4.5s ease-in-out infinite}
+  .glow::after{background-image:radial-gradient(calc(var(--spot) * .45) calc(var(--spot) * .45) at 50% -8%,
+      hsl(0 0% 100% / .75), transparent 100%);animation:glow-breathe 4.5s ease-in-out -2.25s infinite}
+}
+@keyframes glow-breathe{0%,100%{opacity:.5}50%{opacity:1}}
 
 /* The border beam lives entirely in the donor component now (border-beam-panel.tsx), which
    writes --mk-beam-a on each panel's own element. The old static-site version that used to live
