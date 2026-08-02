@@ -335,7 +335,11 @@ function LiquidText(host, texts, o) {
 function TubesCursorInit(canvas, opts, onReady) {
   /* 100ms delay: lets the canvas get real dimensions first (their NaN-radius fix) */
   var timer=setTimeout(function(){
-    import('https://cdn.jsdelivr.net/npm/threejs-components@0.0.19/build/cursors/tubes1.min.js')
+    /* Self-hosted copy of threejs-components@0.0.19 tubes1 (checksum-verified against the
+       CDN build). Same origin means no third DNS lookup, no extra TLS handshake, and the
+       scene cannot be broken by a CDN outage. Falls back to the CDN if our copy is missing. */
+    import('/tubes1.min.js')
+      .catch(function(){ return import('https://cdn.jsdelivr.net/npm/threejs-components@0.0.19/build/cursors/tubes1.min.js') })
       .then(function(m){
         var app=m.default(canvas, opts || {tubes:{colors:["#5e72e4","#8965e0","#f5365c"],
           lights:{intensity:200,colors:["#21d4fd","#b721ff","#f4d03f","#11cdef"]}}});
