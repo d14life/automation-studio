@@ -49,7 +49,7 @@ header{position:absolute;top:0;left:0;right:0;z-index:20}
    background simply covered the stars and the hero text. Blending the wrapper itself against
    the page fixes both. z-index 0 keeps it above the stars and below everything in the flow. */
 #tubelayer{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
-  mix-blend-mode:screen;transform:translateY(9%)}
+  mix-blend-mode:screen}
 #tubelayer canvas{display:block;width:100%;height:100%}
 .stageui{position:relative;z-index:5;height:100%;display:flex;flex-direction:column;
   align-items:center;justify-content:center;text-align:center;gap:6px;padding:92px 24px 76px}
@@ -61,8 +61,10 @@ h1{font:900 clamp(28px,4.6vw,54px)/1.12 Nunito,sans-serif;letter-spacing:-.02em;
   margin:14px 0 0;max-width:20ch}
 h1 em{font-style:normal;color:var(--ice2)}
 .lede{color:var(--dim);max-width:60ch;margin:18px auto 0;font-size:clamp(15px,1.5vw,17.5px)}
-.acts{position:relative;z-index:6;margin-top:clamp(22px,4.5vh,52px);
-  display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+/* the number and the buttons are one block: the buttons sit centred on top of the 101 */
+.numblock{position:relative;margin-top:clamp(14px,3vh,38px);display:flex;justify-content:center}
+.actswrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:6}
+.acts{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
 .btn{border:0;cursor:pointer;font-family:Nunito,sans-serif;border-radius:99px;padding:14px 26px;text-decoration:none;font-weight:900;font-size:15.5px;
   transition:transform .16s ease,background .18s ease,border-color .18s ease;display:inline-block}
 .btn-fill{background:var(--ice2);color:#04121b}
@@ -76,16 +78,14 @@ h1 em{font-style:normal;color:var(--ice2)}
   background:radial-gradient(46% 40% at 50% 50%,rgba(127,216,255,.22),transparent 70%),
              radial-gradient(30% 26% at 66% 60%,rgba(142,123,232,.18),transparent 70%)}
 .hero101{position:relative;z-index:4;text-align:center;pointer-events:none;
-  margin-top:clamp(26px,5vh,64px);
-  font:900 clamp(96px,15vw,210px)/.86 Nunito,sans-serif;color:transparent;letter-spacing:-.05em;
-  -webkit-text-stroke:2.5px rgba(223,246,255,.42);
-  filter:drop-shadow(0 0 26px rgba(127,216,255,.26))}
+  font:900 clamp(150px,25vw,340px)/.84 Nunito,sans-serif;color:transparent;letter-spacing:-.05em;
+  -webkit-text-stroke:2px rgba(223,246,255,.20);
+  filter:drop-shadow(0 0 34px rgba(127,216,255,.14))}
 @media (max-width:700px){.hero101{-webkit-text-stroke-width:2px}}
 
 /* ---------- section: about ---------- */
 /* transparent so the starfield runs behind every section, which is the whole point of it */
-section.band{position:relative;z-index:6;padding:96px 0 90px;border-top:1px solid var(--line);
-  background:transparent}
+section.band{position:relative;z-index:6;padding:58px 0 56px;background:transparent}
 .eyebrow{font-size:12.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ice2);margin:0 0 14px}
 h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;margin:0;max-width:22ch}
 .about{display:grid;gap:44px;grid-template-columns:minmax(320px,1.15fr) minmax(280px,.85fr);
@@ -274,7 +274,7 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
 @media (forced-colors:active){.beam .beam-ring{display:none}}
 
 /* ---------- footer ---------- */
-footer{border-top:1px solid var(--line);padding:44px 0 54px;background:transparent;position:relative;z-index:6}
+footer{padding:40px 0 50px;background:transparent;position:relative;z-index:6}
 .cols{display:grid;gap:30px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
 footer h4{margin:0 0 10px;font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ice2)}
 footer p,footer a{color:var(--dim);font-size:14.5px;text-decoration:none;margin:0}
@@ -301,12 +301,13 @@ footer a{display:block;padding:3px 0}
       <h1 class="sr-only">Solutions101: автоматизация бизнес-процессов. Быстро не значит плохо</h1>
       <div class="morph" id="liq1"></div>
       <div class="morph" id="liq2"></div>
-      <div class="hero101" aria-hidden="true">101</div>
-    </div>
-    <div class="acts">
-      <button class="btn btn-fill" type="button" id="aiopen">Обсудить задачу</button>
-      <a class="btn btn-line" href="#projects">Живой продукт</a>
-    </div>
+      <div class="numblock">
+        <div class="hero101" aria-hidden="true">101</div>
+        <div class="actswrap"><div class="acts">
+          <button class="btn btn-fill" type="button" id="aiopen">Обсудить задачу</button>
+          <a class="btn btn-line" href="#projects">Живой продукт</a>
+        </div></div>
+      </div>
   </div>
 </section>
 
