@@ -20,7 +20,11 @@ export function useSpotlight(): void {
       placeQueued = true
       requestAnimationFrame(() => { placeQueued = false; placeGlow() })
     }
-    addEventListener('scroll', queuePlace, { passive: true })
+    /* This used to run on every scroll frame, for the whole length of the page: one
+       getBoundingClientRect per glow card per frame, which forces the browser to lay the page
+       out again mid-scroll. That was the drag he felt away from the hero.
+       These offsets only matter while the cursor is actually over a card, and mouseenter
+       already refreshes them - so scrolling no longer pays for them at all. */
     addEventListener('resize', queuePlace, { passive: true })
     glowCards.forEach((c) => {
       c.addEventListener('mouseenter', queuePlace)
@@ -46,7 +50,6 @@ export function useSpotlight(): void {
     window.addEventListener('pointermove', onPointerMove, true)
 
     return () => {
-      removeEventListener('scroll', queuePlace)
       removeEventListener('resize', queuePlace)
       glowCards.forEach((c) => {
         c.removeEventListener('mouseenter', queuePlace)

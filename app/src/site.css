@@ -303,30 +303,44 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
 .card .gain{display:block;margin-top:14px;padding-top:12px;border-top:1px solid var(--line);
   color:var(--ice2);font-size:14px;font-weight:700}
 
-/* Skew-gradient service cards (donor gradient-card-showcase). The donor card is a hard
-   320x400; our Russian copy runs longer and spilled out of the bottom, so the height follows the
-   content with 400 as the floor. The gradient panels are h-full and stretch with it. Scoped here
-   so the donor file stays untouched. */
-.skewrow{gap:0}
-.skewrow .group{height:auto;min-height:400px}
-.skewrow .group > .z-20{height:100%;display:flex;flex-direction:column}
-/* the donor's link is black on white; a site-wide rule was repainting it white, so the label
-   disappeared into its own block. Restate the donor's colours and let it sit at the card foot. */
-.skewrow .group a{color:var(--ink) !important;margin-top:auto;align-self:flex-start;
-  font-size:13px;line-height:1.3;max-width:100%;white-space:normal;
-  /* no live blur here: what sits behind this bubble is the card's own face, which is a static
-     gradient now - there is nothing moving left to frost */
-  background:rgba(255,255,255,.14);border-radius:10px;padding:8px 12px;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.35)}
-/* the card face: the same glass as the nav and the pair in front of the 101, with a hairline rim */
-.skewrow .group > .z-20{background:linear-gradient(160deg,rgba(210,232,245,.10),rgba(190,215,235,.055) 55%,rgba(210,232,245,.085));
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.30), 0 10px 34px rgba(0,0,0,.45)}
-.skewrow .group > .z-20::after{content:'';position:absolute;inset:0;border-radius:inherit;
-  pointer-events:none;padding:1px;
-  background:linear-gradient(150deg,rgba(255,255,255,.55),rgba(255,255,255,.05) 45%,rgba(223,246,255,.4));
+/* Service cards, second design (edge-card.tsx). The skew-gradient donor is gone: it carried a
+   card-sized 30px CSS blur per card - a real filter, its own layer, re-blurred on every
+   composite, six times - and twelve blob spans animating forever. Nothing here animates at
+   rest. On hover only transform and opacity move, which never reaches the main thread. */
+.edgerow{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));margin-top:34px}
+.edgecard{position:relative;overflow:hidden;isolation:isolate;
+  display:flex;flex-direction:column;min-height:280px;
+  padding:26px 26px 24px;border-radius:20px;
+  background:linear-gradient(160deg,rgba(210,232,245,.085),rgba(150,180,205,.03) 52%,rgba(210,232,245,.06));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.26), 0 14px 40px rgba(0,0,0,.5);
+  transition:transform .34s cubic-bezier(.22,1,.36,1), box-shadow .34s ease}
+/* the hairline rim, drawn as a masked gradient border - one paint, never repeated */
+.edgecard::before{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  padding:1px;
+  background:linear-gradient(150deg,rgba(255,255,255,.6),rgba(255,255,255,.05) 42%,rgba(127,216,255,.5));
   -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
   -webkit-mask-composite:xor;mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
-  mask-composite:exclude}
+  mask-composite:exclude;transition:opacity .34s ease}
+/* the sheen leaning across the face: parked off to one side, slides over on hover */
+.edgecard-sheen{position:absolute;top:-40%;left:-30%;width:55%;height:180%;z-index:-1;
+  pointer-events:none;transform:rotate(18deg) translateX(0);opacity:.5;
+  background:linear-gradient(90deg,transparent,rgba(223,246,255,.10) 45%,rgba(223,246,255,.16),transparent);
+  transition:transform .6s cubic-bezier(.22,1,.36,1), opacity .45s ease}
+.edgecard:hover{transform:translateY(-6px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.4), 0 22px 56px rgba(0,0,0,.6)}
+.edgecard:hover .edgecard-sheen{transform:rotate(18deg) translateX(210%);opacity:.9}
+.edgecard h3{margin:0 0 12px;font:900 25px/1.12 Nunito,sans-serif;letter-spacing:-.02em;color:var(--ink)}
+.edgecard p{margin:0;font-size:15px;line-height:1.55;color:var(--dim)}
+.edgecard-cta{margin-top:auto;padding-top:18px;align-self:flex-start;
+  font:800 13px/1.35 Nunito,sans-serif;color:var(--ice1)}
+/* the accent bar that grows under the promise line */
+.edgecard-cta::before{content:'';display:block;width:26px;height:2px;margin-bottom:9px;border-radius:2px;
+  background:linear-gradient(90deg,var(--ice1),rgba(127,216,255,0));
+  transition:width .34s cubic-bezier(.22,1,.36,1)}
+.edgecard:hover .edgecard-cta::before{width:64px}
+@media (prefers-reduced-motion:reduce){
+  .edgecard,.edgecard-sheen,.edgecard-cta::before{transition:none}
+  .edgecard:hover{transform:none}}
 
 /* ---------- section: how ---------- */
 .steps{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));margin-top:34px;counter-reset:s}
