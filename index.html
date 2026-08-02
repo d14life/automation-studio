@@ -112,8 +112,8 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
 
 /* ---------- projects: a gentle fan of cards, each showing a mock of what we build ---------- */
 .projects{position:relative;height:520px;margin:54px 0 18px}
-.projects .proj{position:absolute;left:50%;top:50%;width:min(300px,74vw);aspect-ratio:1;
-  margin:calc(min(300px,74vw)/-2) 0 0 calc(min(300px,74vw)/-2);
+.projects .proj{position:absolute;left:50%;top:50%;width:var(--cardw,300px);aspect-ratio:1;
+  margin:calc(var(--cardw,300px)/-2) 0 0 calc(var(--cardw,300px)/-2);
   border:1px solid var(--line);border-radius:22px;overflow:hidden;background:rgba(6,12,16,.86);
   display:flex;flex-direction:column;isolation:isolate;box-shadow:0 22px 60px rgba(0,0,0,.5);
   transform:translate(var(--fx,0),var(--fy,0)) rotate(var(--fr,0deg)) scale(var(--fs,1));
@@ -499,12 +499,13 @@ footer a{display:block;padding:3px 0}
   var N=cards.length, center=(N-1)/2;
   /* the spread is measured from the container, so six cards always fit the screen instead of
      piling up on each other or running off the side */
-  function edgeX(){
-    /* card width comes from the same formula as the CSS, not from a measurement: measuring
-       during load caught the card mid-layout and collapsed the whole fan into one pile */
-    var avail=wrap.clientWidth, cardW=Math.min(300,avail*0.74);
-    return Math.max(80,(avail-cardW)/2);
+  /* Card size follows the container: every card keeps at least 55 percent of its width clear
+     of the next one, so six cards read as a fan instead of a pile on a narrow screen. */
+  function cardW(){
+    var avail=wrap.clientWidth;
+    return Math.round(Math.max(170,Math.min(300,avail/(1+0.55*(N-1)))));
   }
+  function edgeX(){ return Math.max(60,(wrap.clientWidth-cardW())/2); }
   function slotCfg(slot){
     var d=N>1?(slot-center)/center:0, ad=Math.abs(d);
     return {rot:d*8, scale:1-0.08*ad*ad, x:d*edgeX(), y:ad*ad*2.2, z:10-Math.abs(slot-center)};
@@ -534,6 +535,7 @@ footer a{display:block;padding:3px 0}
       });
       return;
     }
+    wrap.style.setProperty('--cardw',cardW()+'px');
     layout(null);
   }
   cards.forEach(function(el,slot){
