@@ -123,7 +123,7 @@ header{position:absolute;top:0;left:0;right:0;z-index:20}
    their own: they are aimed at the slogan and re-measure its position. */
 .stageui{position:relative;z-index:5;height:100%;display:flex;flex-direction:column;
   align-items:center;justify-content:center;text-align:center;gap:0;padding:92px 24px 300px;
-  transform:translateY(var(--herodrop,72px))}
+  transform:translateY(var(--herodrop,108px))}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 /* half again as big as it was: 21pt -> 31.5pt, 3.2rem -> 4.8rem, heights to match */
 .morph{position:relative;height:3.5rem;width:100%;max-width:1400px;margin:0 auto;
@@ -198,7 +198,7 @@ h1 em{font-style:normal;color:var(--ice2)}
              radial-gradient(30% 26% at 66% 60%,rgba(92,130,201,.20),transparent 70%)}
 .hero101{position:relative;z-index:4;text-align:center;pointer-events:none;
   /* half again as big: 140/22vw/290 -> 210/33vw/435, with a vh cap so it cannot outgrow a short screen */
-  font:900 clamp(210px,min(33vw,40vh),435px)/.84 Nunito,sans-serif;color:transparent;letter-spacing:-.05em;
+  font:900 clamp(180px,min(28vw,31vh),380px)/.84 Nunito,sans-serif;color:transparent;letter-spacing:-.05em;
   /* he said the 101 was too faint; that fix got overwritten twice during the hero rebuild.
      Back to the values that answered the complaint. */
   -webkit-text-stroke:2.5px rgba(223,246,255,.42);
