@@ -43,22 +43,9 @@ const GROUPS = [
 const STEP = 7
 const MAX_STAGGER = 5
 
-/* Elements that drift against the scroll. They must NOT overlap the reveal list above: an
-   element carrying both view() animations plays neither - both report a null progress, which is
-   what silently killed the arrive-from-below on every heading. So the text reveals and the
-   containers around it drift, and no element does both. */
-/* The value is half the travel: the block starts +N and ends -N, so 30px moved a container by
-   only 60px across a whole screen of scrolling - invisible. These are three to four times that,
-   which is the difference between "there is a parallax" and "I cannot feel any parallax". */
-const PARALLAX: [string, string][] = [
-  ['.srv', '105px'],
-  ['.skewrow', '105px'],
-  ['.steps', '95px'],
-  ['.stats', '120px'],
-  ['.projects', '110px'],
-  ['#contacts .ways', '95px'],
-  ['.qs', '95px'],
-]
+/* The container drift ('.par') that used to live here is gone on his word: parallax stays on
+   the hero only, everywhere else it was extra per-frame work for an effect he could not feel.
+   The arrive-from-below reveal below is untouched - that is not parallax. */
 
 export function useReveal(): void {
   useEffect(() => {
@@ -67,15 +54,6 @@ export function useReveal(): void {
        the drift both live inside @supports - so the same two effects run from script instead. */
     const native = CSS.supports('animation-timeline', 'view()')
     if (!native) document.documentElement.classList.add('no-view-timeline')
-
-    const drifted: HTMLElement[] = []
-    for (const [sel, amount] of PARALLAX) {
-      for (const el of Array.prototype.slice.call(document.querySelectorAll(sel)) as HTMLElement[]) {
-        el.classList.add('par')
-        el.style.setProperty('--par', amount)
-        drifted.push(el)
-      }
-    }
 
     const marked: HTMLElement[] = []
     for (const sel of GROUPS) {
@@ -93,7 +71,6 @@ export function useReveal(): void {
 
     /* --- script fallback, only where the browser has no scroll timeline --- */
     let io: IntersectionObserver | null = null
-    let onScroll: (() => void) | null = null
     if (!native) {
       io = new IntersectionObserver(
         (entries) => {
@@ -110,44 +87,15 @@ export function useReveal(): void {
          blank. Two seconds later, show everything regardless. */
       window.setTimeout(() => marked.forEach((el) => el.classList.add('in')), 2000)
 
-      let queued = false
-      onScroll = () => {
-        if (queued) return
-        queued = true
-        requestAnimationFrame(() => {
-          queued = false
-          const h = innerHeight || 1
-          for (const el of drifted) {
-            const b = el.getBoundingClientRect()
-            if (b.bottom < -200 || b.top > h + 200) continue
-            /* -1 at the bottom of the screen, +1 at the top: the same ramp the keyframes use */
-            const p = 1 - 2 * ((b.top + b.height / 2) / (h + b.height))
-            const amt = parseFloat(el.style.getPropertyValue('--par')) || 0
-            el.style.translate = '0 ' + (p * amt).toFixed(1) + 'px'
-          }
-        })
-      }
-      addEventListener('scroll', onScroll, { passive: true })
-      addEventListener('resize', onScroll, { passive: true })
-      onScroll()
     }
 
     return () => {
       if (io) io.disconnect()
-      if (onScroll) {
-        removeEventListener('scroll', onScroll)
-        removeEventListener('resize', onScroll)
-      }
       document.documentElement.classList.remove('no-view-timeline')
       marked.forEach((el) => {
         el.classList.remove('rise', 'in')
         el.style.removeProperty('--rd')
         el.style.removeProperty('--rd-ms')
-      })
-      drifted.forEach((el) => {
-        el.classList.remove('par')
-        el.style.removeProperty('--par')
-        el.style.removeProperty('translate')
       })
     }
   }, [])

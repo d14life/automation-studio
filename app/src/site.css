@@ -779,9 +779,8 @@ footer a{display:block;padding:3px 0}
    depth rather than sliding as one flat sheet. Driven by the browser's own scroll timeline, so
    it costs no script and stays on the compositor.
 
-   It animates `translate`, not `transform`: the reveal animation already owns transform on these
-   same elements, and the two properties compose instead of one cancelling the other. */
-@keyframes par-drift{from{translate:0 var(--par,46px)}to{translate:0 calc(var(--par,46px) * -1)}}
+   The container drift that used to sit here is removed on his word: parallax lives on the hero
+   only now. */
 /* Fallback for a browser without scroll timelines. Everything above lives inside
    @supports (animation-timeline:view()), so where that is missing the page simply shows no
    reveal and no drift - which is exactly what he was seeing everywhere except the hero, whose
@@ -796,12 +795,7 @@ footer a{display:block;padding:3px 0}
   .no-view-timeline .rise{opacity:1;transform:none;transition:none}
 }
 
-@supports (animation-timeline:view()){
-  @media (prefers-reduced-motion:no-preference){
-    .par{animation:par-drift linear both;animation-timeline:view();animation-range:cover 0% cover 100%}
 
-  }
-}
 
 /* ---------- shiny surface (donor shiny-button) ----------
    Verbatim from the donor, only lifted out of its <style jsx> block, which needs a Next.js
