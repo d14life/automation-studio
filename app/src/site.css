@@ -30,10 +30,10 @@ header{position:absolute;top:0;left:0;right:0;z-index:20}
 
    The hint opens by moving a grid track from 0fr to 1fr, which is the only reliable way to
    transition to an automatic width; the text inside is clipped while the track is closed. */
-.navpills{display:flex;align-items:center;gap:8px}
+.navpills{display:flex;align-items:center;gap:10px}
 .navpill{position:relative;isolation:isolate;display:grid;grid-auto-flow:column;align-items:center;
-  padding:9px 16px;border-radius:14px;text-decoration:none;white-space:nowrap;
-  font:700 14.5px/1.2 Nunito,sans-serif;color:var(--ink);
+  padding:12px 22px;border-radius:16px;text-decoration:none;white-space:nowrap;
+  font:700 16.5px/1.15 Nunito,sans-serif;color:var(--ink);
   background:rgba(255,255,255,.06);
   -webkit-backdrop-filter:blur(6px) brightness(1.18) saturate(1.25);
   backdrop-filter:blur(6px) brightness(1.18) saturate(1.25);
@@ -46,10 +46,13 @@ header{position:absolute;top:0;left:0;right:0;z-index:20}
   -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
   -webkit-mask-composite:xor;mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
   mask-composite:exclude}
-.np-label{position:relative;z-index:1}
+/* two lines inside each pill: the section name, and a couple of words saying what it is */
+.np-text{position:relative;z-index:1;display:flex;flex-direction:column;gap:1px;text-align:left}
+.np-label{font-weight:800}
+.np-sub{font:600 12px/1.15 Nunito,sans-serif;color:var(--dim);letter-spacing:.01em}
 .np-hintwrap{position:relative;z-index:1;display:grid;grid-template-columns:0fr;
   transition:grid-template-columns .34s cubic-bezier(.28,.11,.32,1)}
-.np-hint{overflow:hidden;min-width:0;opacity:0;color:var(--dim);font-weight:600;font-size:13px;
+.np-hint{overflow:hidden;min-width:0;opacity:0;color:var(--ink);font-weight:600;font-size:14px;
   transition:opacity .28s ease}
 @media (hover:hover){
   .navpill:hover{background:rgba(255,255,255,.12)}
@@ -57,6 +60,15 @@ header{position:absolute;top:0;left:0;right:0;z-index:20}
   .navpill:hover .np-hint{opacity:1;padding-left:10px}
 }
 .navpill:focus-visible{outline:2px solid var(--ice2);outline-offset:2px}
+#aiopen3{white-space:nowrap}
+/* between the phone panel and a wide desktop the header runs out of room: drop the two-word
+   subtitles first, then the hover hint, before anything is allowed to wrap or overflow */
+@media (max-width:1180px){.np-sub{display:none}.navpill{padding:11px 18px;font-size:15.5px}}
+@media (max-width:900px) and (min-width:701px){
+  .np-hintwrap{display:none}
+  .navpill{padding:10px 14px;font-size:14.5px}
+  .navpills{gap:7px}
+}
 @media (max-width:700px){
   /* in the phone panel there is room for words, so every hint sits open */
   .navpills{flex-direction:column;align-items:stretch;width:100%}
