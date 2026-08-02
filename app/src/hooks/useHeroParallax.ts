@@ -28,7 +28,12 @@ import { useEffect } from 'react'
    They no longer have to clear the top edge inside the runway either - the pin releases while
    the 101 is still in frame and the hero then leaves at normal speed with the next section
    behind it, so slow rates cost nothing. */
-const SPEED = { tubes: 0.05, num: 0.25, line2: 0.38, line1: 0.45, acts: 0.60 }
+/* He asked for the slogan to hang back the way the number does, so the two lines now sit
+   almost on the number's rate instead of half again faster. What is left between them is just
+   enough to keep the lines from travelling as one slab: 0.28 / 0.26 against the number's 0.25.
+   The depth on this screen now comes from the spread between the ribbons, the text and the
+   buttons - 0.05 to 0.60, twelve to one. */
+const SPEED = { tubes: 0.05, num: 0.25, line2: 0.26, line1: 0.28, acts: 0.60 }
 
 export function useHeroParallax(): void {
   useEffect(() => {
