@@ -43,9 +43,32 @@ const GROUPS = [
 const STEP = 7
 const MAX_STAGGER = 5
 
+/* Elements that drift against the scroll. Kept apart from the reveal list on purpose: the
+   reveal owns `transform`, the parallax owns `translate`, and the two compose. Headings and the
+   card rows move; body copy does not, or the page reads as seasick. */
+const PARALLAX: [string, string][] = [
+  ['.band .eyebrow', '58px'],
+  ['.band > .wrap > h2', '46px'],
+  ['.band .claim', '30px'],
+  ['.srv', '26px'],
+  ['.skewrow', '26px'],
+  ['.steps', '26px'],
+  ['.stats', '34px'],
+  ['#contacts .ways', '26px'],
+]
+
 export function useReveal(): void {
   useEffect(() => {
     if (!CSS.supports('animation-timeline', 'view()')) return
+
+    const drifted: HTMLElement[] = []
+    for (const [sel, amount] of PARALLAX) {
+      for (const el of Array.prototype.slice.call(document.querySelectorAll(sel)) as HTMLElement[]) {
+        el.classList.add('par')
+        el.style.setProperty('--par', amount)
+        drifted.push(el)
+      }
+    }
 
     const marked: HTMLElement[] = []
     for (const sel of GROUPS) {
@@ -63,6 +86,10 @@ export function useReveal(): void {
       marked.forEach((el) => {
         el.classList.remove('rise')
         el.style.removeProperty('--rd')
+      })
+      drifted.forEach((el) => {
+        el.classList.remove('par')
+        el.style.removeProperty('--par')
       })
     }
   }, [])

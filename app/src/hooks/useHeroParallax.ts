@@ -22,10 +22,12 @@ export function useHeroParallax(): void {
       const track = Math.max(160, (document.getElementById('stage')?.offsetHeight || h) - h)
       if (y > track * 1.4) return /* past the hero: stop paying for it */
       const f = Math.min(1, y / track)
-      /* Hold, THEN fade. Starting the fade at 10% meant the words were nearly gone by the middle
-         of the runway and the rest of it was a screen of empty stars. They now stay solid for
-         the first 45% and finish dissolving exactly as the next section arrives. */
-      const fade = Math.max(0, (f - 0.45) / 0.55)
+      /* Hold, THEN fade. The empty stretch he keeps seeing is the part of the runway where the
+         words have already gone but the next section has not arrived, so it is exactly the
+         length of the fade - so it has to be halved in PIXELS, not as a share of a runway that
+         just doubled. Old runway 458px faded over 55% = 252px. New runway 916px faded over 14%
+         = 128px: half the empty stretch, on twice the scroll. */
+      const fade = Math.max(0, (f - 0.86) / 0.14)
       l1.style.transform = 'translateY(' + (f * 360).toFixed(1) + 'px)'
       l1.style.opacity = (1 - fade).toFixed(3)
       l2.style.transform = 'translateY(' + (f * 215).toFixed(1) + 'px)'

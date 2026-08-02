@@ -48,8 +48,11 @@ header{position:absolute;top:0;left:0;right:0;z-index:20}
 /* ---------- hero stage ---------- */
 /* the runway for the hero parallax is this height minus one screen: 148vh gave 48vh of scroll
    and the dissolve was over too fast. 210vh gives 110vh - well over twice as long. */
-#stage{position:relative;height:155vh;background:transparent}
-@media (max-width:700px){#stage{height:136vh}}
+/* The runway is this height minus one screen, and the hero is pinned for all of it - so this
+   is literally how far you must scroll to play the opening. 155vh gave 55vh of it; 210vh gives
+   110vh, twice the scroll for the same effect. */
+#stage{position:relative;height:210vh;background:transparent}
+@media (max-width:700px){#stage{height:180vh}}
 /* Actually sticky, which the name always claimed. It was position:relative, so the hero
    scrolled away after one screen while #stage kept going to 210vh - and the leftover 110vh was
    the screenful of empty stars he kept seeing. Pinned, the parallax plays over the whole
@@ -253,7 +256,11 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
    so the donor file stays untouched. */
 .skewrow{gap:0}
 .skewrow .group{height:auto;min-height:400px}
-.skewrow .group > .z-20{height:100%}
+.skewrow .group > .z-20{height:100%;display:flex;flex-direction:column}
+/* the donor's link is black on white; a site-wide rule was repainting it white, so the label
+   disappeared into its own block. Restate the donor's colours and let it sit at the card foot. */
+.skewrow .group a{color:#04121b !important;background:#fff;margin-top:auto;align-self:flex-start;
+  font-size:13px;line-height:1.25;max-width:100%;white-space:normal}
 
 /* ---------- section: how ---------- */
 .steps{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));margin-top:34px;counter-reset:s}
@@ -685,4 +692,19 @@ footer a{display:block;padding:3px 0}
    window already is. The .win prefix is required: win.js injects its own sheet after this one. */
 .win .winbtn{display:none}
 
+}
+
+
+/* ---------- page-wide parallax ----------
+   Headings and card rows drift against the scroll as they cross the viewport, so the page has
+   depth rather than sliding as one flat sheet. Driven by the browser's own scroll timeline, so
+   it costs no script and stays on the compositor.
+
+   It animates `translate`, not `transform`: the reveal animation already owns transform on these
+   same elements, and the two properties compose instead of one cancelling the other. */
+@keyframes par-drift{from{translate:0 var(--par,46px)}to{translate:0 calc(var(--par,46px) * -1)}}
+@supports (animation-timeline:view()){
+  @media (prefers-reduced-motion:no-preference){
+    .par{animation:par-drift linear both;animation-timeline:view();animation-range:cover 0% cover 100%}
+  }
 }
