@@ -46,10 +46,7 @@ header{position:absolute;top:0;left:0;right:0;z-index:20}
   -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
   -webkit-mask-composite:xor;mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
   mask-composite:exclude}
-/* two lines inside each pill: the section name, and a couple of words saying what it is */
-.np-text{position:relative;z-index:1;display:flex;flex-direction:column;gap:1px;text-align:left}
-.np-label{font-weight:800}
-.np-sub{font:600 12px/1.15 Nunito,sans-serif;color:var(--dim);letter-spacing:.01em}
+.np-label{position:relative;z-index:1;font-weight:800}
 .np-hintwrap{position:relative;z-index:1;display:grid;grid-template-columns:0fr;
   transition:grid-template-columns .34s cubic-bezier(.28,.11,.32,1)}
 .np-hint{overflow:hidden;min-width:0;opacity:0;color:var(--ink);font-weight:600;font-size:14px;
@@ -63,7 +60,7 @@ header{position:absolute;top:0;left:0;right:0;z-index:20}
 #aiopen3{white-space:nowrap}
 /* between the phone panel and a wide desktop the header runs out of room: drop the two-word
    subtitles first, then the hover hint, before anything is allowed to wrap or overflow */
-@media (max-width:1180px){.np-sub{display:none}.navpill{padding:11px 18px;font-size:15.5px}}
+@media (max-width:1180px){.navpill{padding:11px 18px;font-size:15.5px}}
 @media (max-width:900px) and (min-width:701px){
   .np-hintwrap{display:none}
   .navpill{padding:10px 14px;font-size:14.5px}
