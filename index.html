@@ -35,6 +35,8 @@ header{position:absolute;top:0;left:0;right:0;z-index:20}
 
 /* ---------- hero stage ---------- */
 #stage{position:relative;height:100svh;background:transparent}
+/* the next section starts while the faded hero is still leaving, so there is no empty stretch */
+#about{margin-top:-24vh}
 .stagesticky{position:relative;height:100svh;overflow:hidden}
 /* same as the bench: the tubes own the whole stage and screen-blend over the starfield */
 /* The tubes live in their own fixed layer at the root, beside the starfield. Two reasons:
@@ -318,7 +320,7 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
    a single lamp moving over the whole fan. Hue shifts with the horizontal position, exactly
    like the original. Pointer-driven only where there is a pointer. */
 @media (hover:hover){
-  .glow,.projects .proj.glow{--base:196;--spread:170;--spot:240px;--bw:2px;
+  .glow,.projects .proj.glow,.card.glow,.step.glow{--base:196;--spread:170;--spot:240px;--bw:2px;
     --hue:calc(var(--base) + (var(--xp,.5) * var(--spread)));
     background-image:radial-gradient(var(--spot) var(--spot) at
       calc((var(--x,0) - var(--ox,0)) * 1px) calc((var(--y,0) - var(--oy,0)) * 1px),
@@ -469,37 +471,37 @@ footer a{display:block;padding:3px 0}
   <p class="eyebrow">Услуги</p>
   <h2>Что умеем и что это снимает с вас</h2>
   <div class="srv">
-    <div class="card">
+    <div class="card glow">
       <h3>Счета, акты, сверка</h3>
       <p>Документы создаются из состояния сделки, долги и переплаты видны по каждому контрагенту,
         платёжный календарь сам показывает, что горит.</p>
       <span class="gain">Закрытие месяца за день вместо недели</span>
     </div>
-    <div class="card">
+    <div class="card glow">
       <h3>Заявки, клиенты, звонки</h3>
       <p>CRM под ваши этапы, телефония с записью разговоров, автообзвон по базе, проверка компании
         по реквизитам перед сделкой.</p>
       <span class="gain">Ни одна заявка не теряется в мессенджерах</span>
     </div>
-    <div class="card">
+    <div class="card glow">
       <h3>Сбор данных</h3>
       <p>Сайты конкурентов, прайсы поставщиков в двенадцати форматах, почта, выгрузки из 1С и
         маркетплейсов - всё стекается в одну таблицу само.</p>
       <span class="gain">Никто не переносит цифры руками</span>
     </div>
-    <div class="card">
+    <div class="card glow">
       <h3>Отчёты руководителю</h3>
       <p>Один экран с деньгами, долгами, загрузкой и просрочками. Письмо в тот час, когда показатель
         вышел за границу, а не через месяц на планёрке.</p>
       <span class="gain">Цифры утром, а не в конце квартала</span>
     </div>
-    <div class="card">
+    <div class="card glow">
       <h3>Боты и ИИ</h3>
       <p>Отвечают клиенту по вашему прайсу и остаткам, читают счета и договоры, заполняют формы,
         заносят контакт в базу и передают человеку сложное.</p>
       <span class="gain">Первая линия работает ночью и в выходные</span>
     </div>
-    <div class="card">
+    <div class="card glow">
       <h3>Склад и доставка</h3>
       <p>Заказы, остатки, маршруты и статусы отгрузок на одной доске. Клиент видит, где его груз,
         без звонка менеджеру.</p>
@@ -638,13 +640,13 @@ footer a{display:block;padding:3px 0}
   <p class="eyebrow">Как идёт работа</p>
   <h2>Четыре шага, никаких сюрпризов</h2>
   <div class="steps">
-    <div class="step"><b>Разбор задачи</b><span>Разговор и взгляд на то, как работа устроена сейчас.
+    <div class="step glow"><b>Разбор задачи</b><span>Разговор и взгляд на то, как работа устроена сейчас.
       На выходе письменное описание, что именно будет собрано и в какой срок. Бесплатно, ни к чему не обязывает.</span></div>
-    <div class="step"><b>Сначала пробуете</b><span>Первая рабочая версия приходит за дни, а не в конце проекта.
+    <div class="step glow"><b>Сначала пробуете</b><span>Первая рабочая версия приходит за дни, а не в конце проекта.
       Вы гоняете её на реальной работе. Не помогло - расходимся, вы ничего не должны.</span></div>
-    <div class="step"><b>Передача</b><span>Исходный код, документация, обучение сотрудников и доступы.
+    <div class="step glow"><b>Передача</b><span>Исходный код, документация, обучение сотрудников и доступы.
       Ничего не заперто: захотите передать другому подрядчику - сможете.</span></div>
-    <div class="step"><b>Поддержка</b><span>Фиксированная месячная сумма или по часам, на ваш выбор.
+    <div class="step glow"><b>Поддержка</b><span>Фиксированная месячная сумма или по часам, на ваш выбор.
       Или вообще без поддержки. Это ваша система.</span></div>
   </div>
 </div></section>
@@ -652,7 +654,7 @@ footer a{display:block;padding:3px 0}
 <section class="band" id="check"><div class="wrap">
   <p class="eyebrow">Проверьте себя</p>
   <h2>Не знаете, что просить? Это нормально</h2>
-  <div class="qbox">
+  <div class="qbox beam"><i class="beam-ring"></i>
     <p class="claim" style="margin-bottom:0">Клиенты редко знают, что заказывать. Зато точно знают, что бесит.
       Если хоть один вопрос колет - это и есть проект.</p>
     <ul class="qs">
@@ -831,6 +833,7 @@ footer a{display:block;padding:3px 0}
     layer.style.transform='translateY('+Math.round(textMid-screenMid)+'px)';
   }
   addEventListener('resize',aimTubesAtText,{passive:true});
+  addEventListener('scroll',aimTubesAtText,{passive:true});   /* the words move, the band follows */
   addEventListener('load',aimTubesAtText);
   aimTubesAtText();
 
@@ -967,11 +970,11 @@ footer a{display:block;padding:3px 0}
     var y=window.pageYOffset||0, h=innerHeight||1;
     /* the track is exactly the scrollable part of the hero, so the text is gone at the very
        moment the next section reaches the top: no empty stretch of stars in between */
-    var track=h;                              /* the drift plays across the first screenful */
+    var track=h*0.78;                         /* the dissolve finishes before the hero leaves */
     if(y>track*1.4) return;                   /* past the hero: stop paying for it */
     var f=Math.min(1,y/track);
     /* hold, then fade: the words stay readable for the first half of the scroll */
-    var fade=Math.max(0,(f-0.35)/0.65);
+    var fade=Math.max(0,(f-0.22)/0.78);
     l1.style.transform='translateY('+(f*190).toFixed(1)+'px)';
     l1.style.opacity=(1-fade).toFixed(3);
     l2.style.transform='translateY('+(f*115).toFixed(1)+'px)';
@@ -983,7 +986,7 @@ footer a{display:block;padding:3px 0}
     if(hint) hint.style.opacity=(1-f*3.2).toFixed(3);
     /* the ribbons sit behind the words, so they travel slower: that difference is the depth */
     if(!tubes) tubes=document.getElementById('tubelayer');
-    if(tubes){ var op=Math.max(0,1-fade);
+    if(tubes){ var op=Math.max(0,1-fade*1.5);
                tubes.style.transform='translateY('+(f*70).toFixed(1)+'px)';
                tubes.style.opacity=op.toFixed(3);
                tubes.style.visibility=op<0.02?'hidden':'visible'; }
