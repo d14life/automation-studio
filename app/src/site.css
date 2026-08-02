@@ -22,23 +22,47 @@ header{position:absolute;top:0;left:0;right:0;z-index:20}
 @media (hover:hover){.cta:hover{background:rgba(127,216,255,.12);border-color:var(--ice2)}}
 .cta:active{transform:scale(.97)}
 
-/* Gradient-menu nav (donor gradient-menu). The donor pill is 60px resting and 180px open;
-   in a header that is too tall, and our lines are longer than "Photo", so both are re-sized here
-   rather than in the donor file. The title span is the fourth in the item, after the gradient,
-   the glow and the icon. */
-.gmenu li{width:44px;height:44px}
-.gmenu li:hover{width:250px}
-.gmenu li > span:nth-of-type(3) span{font-size:19px}
-.gmenu li > span:nth-of-type(4){font-size:12px;letter-spacing:.02em;text-transform:none;
-  white-space:nowrap;font-weight:800}
+/* ---------- nav: glass bubbles that open into a sentence ----------
+   Words, not icons. Each pill carries the section name; hovering it opens a one-line
+   explanation of what is behind it. The glass is the same recipe as the pair in front of the
+   101 - a near-clear pane over a blurred, slightly brightened backdrop, with a hairline rim -
+   and it has no colour of its own.
+
+   The hint opens by moving a grid track from 0fr to 1fr, which is the only reliable way to
+   transition to an automatic width; the text inside is clipped while the track is closed. */
+.navpills{display:flex;align-items:center;gap:8px}
+.navpill{position:relative;isolation:isolate;display:grid;grid-auto-flow:column;align-items:center;
+  padding:9px 16px;border-radius:14px;text-decoration:none;white-space:nowrap;
+  font:700 14.5px/1.2 Nunito,sans-serif;color:var(--ink);
+  background:rgba(255,255,255,.06);
+  -webkit-backdrop-filter:blur(6px) brightness(1.18) saturate(1.25);
+  backdrop-filter:blur(6px) brightness(1.18) saturate(1.25);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.42), inset 0 -1px 0 rgba(255,255,255,.10),
+             0 6px 20px rgba(0,0,0,.4);
+  transition:background .22s ease,color .22s ease}
+.navpill::after{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  padding:1px;background:linear-gradient(150deg,rgba(255,255,255,.65),rgba(255,255,255,.06) 45%,
+    rgba(223,246,255,.45));
+  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  mask-composite:exclude}
+.np-label{position:relative;z-index:1}
+.np-hintwrap{position:relative;z-index:1;display:grid;grid-template-columns:0fr;
+  transition:grid-template-columns .34s cubic-bezier(.28,.11,.32,1)}
+.np-hint{overflow:hidden;min-width:0;opacity:0;color:var(--dim);font-weight:600;font-size:13px;
+  transition:opacity .28s ease}
+@media (hover:hover){
+  .navpill:hover{background:rgba(255,255,255,.12)}
+  .navpill:hover .np-hintwrap{grid-template-columns:1fr}
+  .navpill:hover .np-hint{opacity:1;padding-left:10px}
+}
+.navpill:focus-visible{outline:2px solid var(--ice2);outline-offset:2px}
 @media (max-width:700px){
-  /* in the phone panel there is room for words, so the items sit open and full width */
-  .gmenu{width:100%}
-  .gmenu ul{flex-direction:column;width:100%}
-  .gmenu li{width:100%;height:46px;justify-content:flex-start;padding-left:14px;background:rgba(255,255,255,.06)}
-  .gmenu li > span:nth-of-type(1){opacity:1}
-  .gmenu li > span:nth-of-type(3){transform:none;margin-right:10px}
-  .gmenu li > span:nth-of-type(4){position:static;transform:none;text-align:left}
+  /* in the phone panel there is room for words, so every hint sits open */
+  .navpills{flex-direction:column;align-items:stretch;width:100%}
+  .navpill{justify-content:flex-start}
+  .np-hintwrap{grid-template-columns:1fr}
+  .np-hint{opacity:1;padding-left:10px}
 }
 
 /* the starfield is fixed behind the whole document, so every section flies through space */
