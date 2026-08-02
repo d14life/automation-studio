@@ -48,8 +48,8 @@ header{position:absolute;top:0;left:0;right:0;z-index:20}
    the page fixes both. z-index 0 keeps it above the stars and below everything in the flow. */
 #tubelayer{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
   mix-blend-mode:screen;
-  -webkit-mask-image:linear-gradient(180deg,transparent 30%,#000 41%,#000 59%,transparent 70%);
-  mask-image:linear-gradient(180deg,transparent 30%,#000 41%,#000 59%,transparent 70%)}
+  -webkit-mask-image:linear-gradient(180deg,transparent 12%,#000 26%,#000 74%,transparent 88%);
+  mask-image:linear-gradient(180deg,transparent 12%,#000 26%,#000 74%,transparent 88%)}
 #tubelayer canvas{display:block;width:100%;height:100%}
 .stageui{position:relative;z-index:5;height:100%;display:flex;flex-direction:column;
   align-items:center;justify-content:center;text-align:center;gap:10px;padding:92px 24px 13vh}
@@ -904,8 +904,8 @@ footer a{display:block;padding:3px 0}
         app=a;
         /* a flat wide figure keeps the ribbons in the line of the text instead of looping down
            across the number below it */
-        app.options.sleepRadiusX=620;
-        app.options.sleepRadiusY=78;
+        app.options.sleepRadiusX=360;   /* horizontal sweep back to what it was */
+        app.options.sleepRadiusY=200;   /* tall: the ribbons fill the height around the words */
       });
   }
   function parkTubes(){
