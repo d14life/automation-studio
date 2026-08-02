@@ -44,8 +44,13 @@ header{position:absolute;top:0;left:0;right:0;z-index:20}
    position:sticky creates a stacking context and screen blending would not reach the stars
    through it, and the library sizes its canvas from the PARENT box - with <body> as the
    parent it built an 849 by 6933 surface, which is what made the machine crawl. */
-#tubelayer{position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden}
-#tubelayer canvas{display:block;width:100%;height:100%;mix-blend-mode:screen}
+/* The blend lives on the WRAPPER, not on the canvas. A fixed element makes its own stacking
+   context, so a canvas blending inside it can never reach the starfield behind: its black
+   background simply covered the stars and the hero text. Blending the wrapper itself against
+   the page fixes both. z-index 0 keeps it above the stars and below everything in the flow. */
+#tubelayer{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
+  mix-blend-mode:screen}
+#tubelayer canvas{display:block;width:100%;height:100%}
 .stageui{position:relative;z-index:5;height:100%;display:flex;flex-direction:column;
   align-items:center;justify-content:center;text-align:center;gap:14px;padding:96px 24px 64px}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
