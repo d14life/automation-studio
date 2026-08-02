@@ -220,6 +220,11 @@ function LiquidText(host, texts, o) {
   }
   var t1=mkSpan(), t2=mkSpan();
   var textIndex=0, morph=0, cooldown=0, time=Date.now();
+  /* Paint the first pair immediately. The words used to be written only inside the animation
+     loop, so on a phone (or any browser that delays the first frame) the slogan was an empty
+     box until a frame ran. */
+  setWord(t1,texts[0]); setWord(t2,texts[1%texts.length]);
+  t1.style.opacity='1'; t2.style.opacity='0';
 
   /* the window walks the palette at ~10 fps: smooth to the eye, and far cheaper than
      rebuilding the gradient string on every frame */
