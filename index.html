@@ -282,6 +282,27 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
   mask-composite:exclude}
 @media (forced-colors:active){.beam .beam-ring{display:none}}
 
+
+/* ---------- phone ---------- */
+@media (max-width:700px){
+  /* the header used to wrap onto two rows: text links go, the action button stays */
+  .topnav a:not(.cta){display:none}
+  .topbar{padding:16px 0;gap:10px}
+  .mark{font-size:18px;padding:6px 0}
+  .cta{padding:11px 16px}
+  /* on a narrow screen the buttons covered the whole number, so they sit under it */
+  .numblock{margin-top:clamp(30px,6vh,60px);flex-direction:column;align-items:center;gap:14px}
+  .actswrap{position:static;inset:auto}
+  .acts{flex-direction:column;width:100%;max-width:320px}
+  .acts .btn{width:100%;text-align:center}
+  .hero101{font-size:clamp(120px,34vw,190px)}
+  /* finger-sized targets everywhere */
+  footer a{padding:11px 0}
+  .proj .go{padding:8px 0;display:inline-block}
+  .way{padding:16px}
+  section.band{padding:46px 0 44px}
+}
+
 /* ---------- footer ---------- */
 footer{padding:40px 0 50px;background:transparent;position:relative;z-index:6}
 .cols{display:grid;gap:30px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
