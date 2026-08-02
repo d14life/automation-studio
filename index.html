@@ -230,6 +230,32 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
   font:900 15px Nunito,sans-serif;cursor:pointer}
 .aiform button:active{transform:scale(.97)}
 
+
+/* Spotlight cards: vanilla port of the shadcn glow card. One pointer listener writes the
+   cursor position into two root variables; every card reads them, so the light appears to be
+   a single lamp moving over the whole fan. Hue shifts with the horizontal position, exactly
+   like the original. Pointer-driven only where there is a pointer. */
+@media (hover:hover){
+  .glow{--base:196;--spread:170;--spot:240px;--bw:2px;
+    --hue:calc(var(--base) + (var(--xp,.5) * var(--spread)));
+    background-image:radial-gradient(var(--spot) var(--spot) at
+      calc(var(--x,0) * 1px) calc(var(--y,0) * 1px),
+      hsl(var(--hue) 100% 72% / .14), transparent 70%);
+    background-attachment:fixed;background-position:50% 50%}
+  .glow::before,.glow::after{content:'';position:absolute;inset:calc(var(--bw) * -1);
+    border:var(--bw) solid transparent;border-radius:inherit;pointer-events:none;
+    background-attachment:fixed;background-position:50% 50%;background-repeat:no-repeat;
+    -webkit-mask:linear-gradient(#000,#000) content-box,linear-gradient(#000,#000);
+    -webkit-mask-composite:xor;mask:linear-gradient(#000,#000) content-box,linear-gradient(#000,#000);
+    mask-composite:exclude}
+  .glow::before{background-image:radial-gradient(calc(var(--spot) * .8) calc(var(--spot) * .8) at
+      calc(var(--x,0) * 1px) calc(var(--y,0) * 1px),
+      hsl(var(--hue) 100% 62% / .9), transparent 100%);filter:brightness(1.6)}
+  .glow::after{background-image:radial-gradient(calc(var(--spot) * .45) calc(var(--spot) * .45) at
+      calc(var(--x,0) * 1px) calc(var(--y,0) * 1px),
+      hsl(0 0% 100% / .75), transparent 100%)}
+}
+
 /* Border beam. The angle is animated by the browser through a registered custom property, so
    there is no per-frame JavaScript writing styles and no hover speed-up: one constant sweep.
    The blurred glow copy was dropped - a full-size blur repainted every frame was the single
@@ -321,7 +347,7 @@ footer a{display:block;padding:3px 0}
   <h2>Что уже собрано и как это выглядит</h2>
   <div class="projects">
 
-    <article class="proj beam"><i class="beam-ring"></i>
+    <article class="proj glow">
       <div class="shot">
         <div class="bar w1"></div>
         <div class="row"><span class="cell num"></span><span class="cell"></span><span class="cell"></span></div>
@@ -339,7 +365,7 @@ footer a{display:block;padding:3px 0}
       </div>
     </article>
 
-    <article class="proj beam"><i class="beam-ring"></i>
+    <article class="proj glow">
       <div class="shot">
         <div class="stopline"><i></i>Заказ принят</div>
         <div class="stopline"><i></i>Собран на складе</div>
@@ -356,7 +382,7 @@ footer a{display:block;padding:3px 0}
       </div>
     </article>
 
-    <article class="proj beam"><i class="beam-ring"></i>
+    <article class="proj glow">
       <div class="shot">
         <div class="cols">
           <div class="col"><span class="chip"></span><span class="chip hi"></span><span class="chip"></span></div>
@@ -372,7 +398,7 @@ footer a{display:block;padding:3px 0}
       </div>
     </article>
 
-    <article class="proj beam"><i class="beam-ring"></i>
+    <article class="proj glow">
       <div class="shot">
         <div class="bar w4"></div>
         <div class="chart"><i style="height:38%"></i><i style="height:62%"></i><i style="height:44%"></i>
@@ -386,7 +412,7 @@ footer a{display:block;padding:3px 0}
       </div>
     </article>
 
-    <article class="proj beam"><i class="beam-ring"></i>
+    <article class="proj glow">
       <div class="shot">
         <div class="bubble">Здравствуйте! Остался ли в наличии профиль 40х20?</div>
         <div class="bubble me">Да, 320 метров на складе в Казани. Выставить счёт?</div>
@@ -401,7 +427,7 @@ footer a{display:block;padding:3px 0}
       </div>
     </article>
 
-    <article class="proj beam"><i class="beam-ring"></i>
+    <article class="proj glow">
       <div class="shot">
         <div class="tiles"><span class="tile">60</span><span class="tile">9</span><span class="tile">5</span>
           <span class="tile">1С</span><span class="tile">API</span><span class="tile">ИИ</span></div>
@@ -603,9 +629,24 @@ footer a{display:block;padding:3px 0}
   LiquidText(L1,['АВТОМАТИЗИРУЕМ','БЫСТРО','ТОЛЬКО ПРАКТИКА'],MORPH);
   LiquidText(L2,['БИЗНЕС-ПРОЦЕССЫ','НЕ ЗНАЧИТ ПЛОХО','НОЛЬ ТЕОРИИ'],MORPH);
 
-  /* the library chases the pointer from a listener on document.body; swallowing the event in
-     the capture phase leaves the tubes drifting on their own, which is what we picked */
-  window.addEventListener('pointermove',function(e){e.stopPropagation();},true);
+  /* One capture-phase listener does two jobs: it swallows the event so the tube library cannot
+     chase the cursor, and it hands the position to the spotlight cards. Writes are folded into
+     an animation frame, so a fast mouse still costs one write per frame. */
+  var spotQueued=false, spotX=0, spotY=0;
+  window.addEventListener('pointermove',function(e){
+    e.stopPropagation();
+    spotX=e.clientX; spotY=e.clientY;
+    if(spotQueued) return;
+    spotQueued=true;
+    requestAnimationFrame(function(){
+      spotQueued=false;
+      var r=document.documentElement.style;
+      r.setProperty('--x',spotX.toFixed(1));
+      r.setProperty('--y',spotY.toFixed(1));
+      r.setProperty('--xp',(spotX/innerWidth).toFixed(3));
+      r.setProperty('--yp',(spotY/innerHeight).toFixed(3));
+    });
+  },true);
 
   function parkTubes(){
     if(!app) return;
