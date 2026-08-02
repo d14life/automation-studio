@@ -705,7 +705,7 @@ footer a{display:block;padding:3px 0}
    screen gains depth as you scroll instead of sliding away as one flat sheet. */
 (function(){
   var l1=document.getElementById('liq1'), l2=document.getElementById('liq2'),
-      acts=document.querySelector('.acts'), hint=document.querySelector('.scrollhint'),
+      acts=document.querySelector('.acts'), hint=null,
       num=document.querySelector('.hero101'),
       tubes=null;   /* the canvas arrives a moment later, so it is looked up lazily */
   if(!l1||!l2) return;
