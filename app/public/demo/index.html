@@ -1,0 +1,1052 @@
+<!doctype html>
+<html lang="ru"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Взаиморасчёты</title>
+<style>
+/* Дизайн-система Premium Construction Fintech (Stitch), собственная реализация:
+   без Tailwind CDN и Google Fonts — приложение должно работать в контуре клиента без интернета. */
+:root{
+  --surface:#f8f9fb; --card:#fff; --border:#e2e8f0; --border-soft:#eef2f7;
+  --navy:#0a1a2b; --navy-2:#132638; --ink:#0b1c30; --mut:#64748b; --mut-2:#94a3b8;
+  --green:#00734f; --green-bg:#e7f7f0; --red:#ba1a1a; --red-bg:#fdecec;
+  --blue-bg:#eff4ff; --accent:#1a2b3c;
+  --r-sm:4px; --r-md:8px; --r-lg:12px;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--surface);color:var(--ink);
+  font:400 14px/1.45 Inter,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased}
+.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+.caps{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--mut)}
+.mut{color:var(--mut)}
+.pos{color:var(--green)}.neg{color:var(--red)}.zero{color:var(--mut-2)}
+svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;
+  stroke-linecap:round;stroke-linejoin:round;flex:none}
+svg.i.sm{width:16px;height:16px}
+
+/* ── каркас ── */
+#app{display:flex;min-height:100vh}
+/* размер боковой панели задаём через flex-basis: у flex-элемента width перебивается
+   базисом, поэтому свёртка по width не срабатывает */
+aside{flex:0 0 260px;background:var(--navy);color:#dbe6f2;display:flex;flex-direction:column;
+  position:sticky;top:0;height:100vh;min-width:0;overflow:hidden}
+aside.tuck{flex:0 0 68px}
+aside.tuck .brand b,aside.tuck .brand span,aside.tuck nav button span,
+aside.tuck .foot button span{display:none}
+aside.tuck .foot{padding:14px 0}
+aside.tuck .brand{padding:22px 0 18px;text-align:center}
+aside.tuck nav button{justify-content:center;padding:11px 0}
+aside.tuck .foot{padding:16px 0;text-align:center}
+aside.tuck .foot button{width:100%;justify-content:center}
+.tuckbtn{flex:none}
+aside .brand{padding:22px 24px 18px}
+aside .brand b{display:block;font-size:20px;font-weight:700;color:#fff;letter-spacing:-.01em}
+aside .brand span{font-size:12px;color:#7f93a8}
+aside nav{padding:8px 12px;display:flex;flex-direction:column;gap:2px;flex:1}
+aside nav button{display:flex;align-items:center;gap:12px;width:100%;padding:11px 14px;
+  background:none;border:0;border-left:3px solid transparent;border-radius:var(--r-md);
+  font:inherit;color:#a8bacd;cursor:pointer;text-align:left}
+aside nav button:hover{background:#ffffff0d;color:#e2ecf7}
+aside nav button.on{background:#eef4ff;color:var(--navy);border-left-color:var(--green);font-weight:600}
+aside .foot{padding:14px 18px;border-top:1px solid #ffffff14;display:flex;
+  flex-direction:column;gap:12px}
+aside .who{display:flex;align-items:center;gap:10px;min-width:0}
+aside .who span{min-width:0}
+aside .who b{display:block;font-size:13px;color:#e2ecf7;font-weight:600;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+aside .who i{font-style:normal;font-size:12px;color:#7f93a8}
+aside.tuck .who span:last-child{display:none}
+aside.tuck .who{justify-content:center}
+aside .foot button{display:flex;align-items:center;gap:12px;width:100%;background:none;border:0;
+  font:inherit;color:#8fa2b6;cursor:pointer;padding:0}
+aside .foot button:hover{color:#fff}
+
+main{flex:1;min-width:0;display:flex;flex-direction:column}
+header{height:64px;flex:none;background:var(--card);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:12px;padding:0 20px;position:sticky;top:0;z-index:20}
+header .title{font-weight:700;font-size:16px}
+header .sep{width:1px;height:24px;background:var(--border)}
+.stamp{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mut);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+header .title{white-space:nowrap}
+#tools{display:flex;align-items:center;gap:8px}
+#tools .hint{margin-left:0}
+header .hint{margin-left:0}
+.dot{width:7px;height:7px;border-radius:99px;background:var(--green);flex:none}
+.grow{flex:1}
+.avatar{width:32px;height:32px;border-radius:99px;background:var(--navy);color:#fff;flex:none;
+  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600}
+.wrap{padding:24px;max-width:1600px;width:100%}
+h1{font-size:36px;font-weight:700;letter-spacing:-.02em;margin:0 0 4px}
+h1+.sub{color:var(--mut);margin:0 0 24px}
+h1.solo{margin-bottom:24px}
+
+/* ── элементы ── */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:var(--r-sm);
+  border:1px solid var(--border);background:var(--card);color:var(--ink);font:inherit;cursor:pointer;
+  text-decoration:none;white-space:nowrap}
+.btn:hover{background:#f8fafc}
+.btn.dark{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.dark:hover{background:#0f1f2e}
+.btn.icon{padding:8px}
+input,select{font:inherit;padding:8px 12px;border:1px solid var(--border);border-radius:var(--r-sm);
+  background:var(--card);color:var(--ink)}
+input:focus,select:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 3px #1a2b3c1f}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:99px;
+  border:1px solid var(--border);background:var(--card);font-size:13px;cursor:pointer;user-select:none}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:99px;
+  font-size:12px;font-weight:600;background:#f1f5f9;color:var(--mut)}
+.pill.owes_us{background:var(--green-bg);color:var(--green)}
+.pill.we_owe{background:var(--red-bg);color:var(--red)}
+/* валюта: одинаковая форма у всех строк, валютные — с акцентом */
+.pill.cur{min-width:52px;justify-content:center;white-space:nowrap;font-variant-numeric:tabular-nums}
+.pill.cur.fx{background:var(--blue-bg);color:var(--accent)}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
+.card .hd{display:flex;align-items:center;gap:10px;padding:16px 20px;border-bottom:1px solid var(--border-soft)}
+.card .hd b{font-size:18px;font-weight:600}
+.card .bd{padding:20px}
+
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;margin-bottom:24px}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px}
+.kpi .row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.kpi .v{font-size:34px;font-weight:700;letter-spacing:-.02em;margin:12px 0 6px}
+.kpi .badge{width:34px;height:34px;border-radius:var(--r-md);display:flex;align-items:center;
+  justify-content:center;flex:none}
+.kpi .badge.up{background:var(--red-bg);color:var(--red)}
+.kpi .badge.down{background:var(--green-bg);color:var(--green)}
+.kpi .trend{font-size:13px;display:flex;align-items:center;gap:6px}
+.kpi .bar{height:4px;border-radius:99px;background:#eef2f7;margin-top:14px;overflow:hidden}
+.kpi .bar i{display:block;height:100%;border-radius:99px}
+.kpi.act,.alert.act,.rank.act,.calrow.act,tr.cp.act,.avatar.act{cursor:pointer;transition:.12s;user-select:none}
+.avatar.act:hover{background:var(--accent)}
+#modal{position:fixed;inset:0;z-index:90;background:#0f172a5c;display:flex;align-items:center;
+  justify-content:center}
+#modal[hidden]{display:none}
+#modal form{width:380px;background:var(--card);border-radius:var(--r-lg);padding:28px;
+  display:flex;flex-direction:column;gap:12px}
+#modal h3{margin:0 0 4px;font-size:18px}
+#modal label{font-size:13px;font-weight:500;margin-bottom:-8px}
+.pager{display:flex;align-items:center;gap:8px}
+.pager button{min-width:32px;padding:5px 9px}
+.pager button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.calrow.act:hover{background:#f8fafc}
+.kpi.act:hover{border-color:var(--accent);box-shadow:0 2px 10px #0f172a14}
+.alert.act:hover,.rank.act:hover{background:#f8fafc}
+.kpi .more{display:flex;align-items:center;gap:4px;margin-top:12px;font-size:12px;
+  font-weight:600;color:var(--accent);opacity:0;transition:.12s}
+.kpi.act:hover .more{opacity:1}
+
+.toolbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--card);
+  border:1px solid var(--border);border-radius:var(--r-lg);padding:12px 16px;margin-bottom:20px}
+.search{display:flex;align-items:center;gap:8px;flex:1;min-width:240px;border:1px solid var(--border);
+  border-radius:var(--r-sm);padding:0 12px;background:#fbfcfe}
+.search input{border:0;background:none;padding:9px 0;flex:1}
+.search input:focus{box-shadow:none}
+
+.tblwrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:980px}
+thead th{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--mut);
+  background:#fbfcfe;padding:12px 12px;text-align:left;border-bottom:1px solid var(--border);
+  cursor:pointer;user-select:none;white-space:nowrap}
+thead th.r,td.r{text-align:right}
+tbody td{padding:12px;border-bottom:1px solid var(--border-soft);vertical-align:middle}
+tbody tr.cp:hover{background:#f8fafc}
+tbody tr.cp{cursor:pointer}
+tfoot td{padding:14px 16px;font-weight:700;background:#fbfcfe;border-top:2px solid var(--border)}
+.cpname{display:flex;align-items:center;gap:10px}
+.chev{transition:transform .15s;color:var(--mut-2)}
+.chev.open{transform:rotate(90deg)}
+.detail>td{background:#f8fafc;padding:14px 12px 14px 40px}
+.detail .line{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:9px 14px;
+  background:var(--card);border:1px solid var(--border);border-radius:var(--r-md);margin-bottom:8px}
+.detail .line>b{min-width:190px}
+.detail .line .amt{margin-left:auto;font-weight:600}
+.detail .line .grow{color:var(--mut)}
+.detail .line.has-docs{cursor:pointer}
+.detail .line.has-docs:hover{background:#fbfcfe}
+.docs{margin:-4px 0 8px 30px;border-left:2px solid var(--border);padding-left:12px}
+.docline{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:6px 10px;
+  font-size:13px;color:var(--mut)}
+.docline:not(:last-child){border-bottom:1px solid var(--border-soft)}
+.tblfoot{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;
+  font-size:13px;color:var(--mut);border-top:1px solid var(--border-soft)}
+
+.age0{background:#e7f7f0}.age1{background:#eef4ff}.age2{background:#fef6ec}.age3{background:#fdecec}
+.age3.big{color:var(--red);font-weight:600}
+.legend{display:flex;align-items:center;gap:16px;flex-wrap:wrap;background:var(--card);
+  border:1px solid var(--border);border-radius:var(--r-lg);padding:10px 16px}
+.legend i{width:10px;height:10px;border-radius:99px;display:inline-block;margin-right:6px}
+
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+.cols3{display:grid;grid-template-columns:minmax(280px,340px) 1fr;gap:20px;align-items:start}
+@media(max-width:820px){.cols,.cols3{grid-template-columns:1fr}}
+
+.alert{background:var(--card);border:1px solid var(--border);border-left:4px solid var(--red);
+  border-radius:var(--r-md);padding:14px 16px;margin-bottom:12px}
+.alert.info{border-left-color:var(--accent)}
+.alert b{display:block;margin-bottom:2px}
+.alert .m{font-size:13px;color:var(--mut)}
+.alert .warn{font-size:13px;color:var(--red);font-weight:600}
+
+.rank{display:flex;align-items:center;gap:14px;padding:14px 20px;border-bottom:1px solid var(--border-soft)}
+.rank .n{width:28px;height:28px;border-radius:var(--r-sm);background:var(--blue-bg);color:var(--accent);
+  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex:none}
+.rank .body{flex:1;min-width:0}
+.rank .top{display:flex;justify-content:space-between;gap:12px;margin-bottom:7px}
+.rank .track{height:6px;border-radius:99px;background:#eef2f7;overflow:hidden}
+.rank .track i{display:block;height:100%;border-radius:99px;background:var(--green)}
+
+.calrow{display:flex;align-items:center;gap:14px;padding:14px 20px;border-bottom:1px solid var(--border-soft)}
+.calrow .when{width:92px;flex:none}
+.calrow .when .d{font-size:13px;font-weight:600}
+.calrow .arrow{width:32px;height:32px;border-radius:99px;display:flex;align-items:center;
+  justify-content:center;flex:none}
+.calrow .arrow.in{background:var(--green-bg);color:var(--green)}
+.calrow .arrow.out{background:var(--red-bg);color:var(--red)}
+.od{display:inline-block;margin-top:4px;padding:2px 7px;border-radius:var(--r-sm);
+  background:var(--red-bg);color:var(--red);font-size:11px;font-weight:700}
+
+.toggle{position:relative;width:44px;height:24px;flex:none}
+.toggle input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer;z-index:2}
+.toggle span{position:absolute;inset:0;background:#cbd5e1;border-radius:99px;transition:.15s}
+.toggle span::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;
+  background:#fff;border-radius:99px;transition:.15s}
+.toggle input:checked+span{background:var(--green)}
+.toggle input:checked+span::after{transform:translateX(20px)}
+.star{color:var(--mut-2)}.star.on{color:var(--green)}
+.note{display:flex;gap:10px;background:var(--blue-bg);border-radius:var(--r-md);padding:14px 16px;
+  margin:16px 20px 20px;font-size:13px;color:#3d5064}
+.userrow{display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid var(--border-soft)}
+
+#notes{position:fixed;right:24px;top:70px;width:400px;max-height:70vh;overflow:auto;z-index:40;
+  background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);
+  box-shadow:0 8px 24px #0f172a1f}
+#notes .n{display:flex;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border-soft);
+  font-size:13px}
+#notes .n.act{cursor:pointer;user-select:none}
+#notes .n.act:hover{background:#f8fafc}
+.bell{position:relative;background:none;border:0;padding:8px;cursor:pointer;color:var(--ink)}
+.bell b{position:absolute;top:2px;right:2px;min-width:16px;height:16px;padding:0 4px;background:var(--red);
+  color:#fff;font-size:10px;font-weight:700;border-radius:99px;display:flex;align-items:center;
+  justify-content:center}
+
+#login{position:fixed;inset:0;z-index:99;background:var(--surface);display:flex;
+  align-items:center;justify-content:center}
+#login[hidden]{display:none}
+#login form{width:380px;background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);
+  padding:36px;display:flex;flex-direction:column;gap:14px}
+#login h2{margin:0;font-size:24px;font-weight:700;letter-spacing:-.01em}
+#login label{font-size:13px;font-weight:500;margin-bottom:-8px}
+.err{color:var(--red);font-size:13px;min-height:18px}
+.empty{padding:28px 20px;text-align:center;color:var(--mut-2)}
+#chtip{position:absolute;display:none;z-index:5;pointer-events:none;background:var(--navy);color:#fff;
+  border-radius:var(--r-md);padding:10px 12px;font-size:12px;min-width:230px;box-shadow:0 8px 20px #0f172a3d}
+#chtip b{display:block;margin-bottom:6px;font-size:13px}
+#chtip div{display:flex;align-items:center;gap:6px;padding:2px 0}
+#chtip i{width:8px;height:8px;border-radius:8px;flex:none}
+#chtip span{margin-left:auto;font-weight:600;font-variant-numeric:tabular-nums}
+[data-tip]:not(.hint):not(.act):not(button):not(a):not(select){cursor:help}
+.hint{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;
+  border-radius:99px;background:#e2e8f0;color:var(--mut);font-size:10px;font-weight:700;
+  margin-left:6px;cursor:help;user-select:none;vertical-align:middle;flex:none;
+  font-variant-numeric:normal;letter-spacing:0;text-transform:none}
+.hint:hover{background:var(--accent);color:#fff}
+#hinttip{position:fixed;display:none;z-index:80;max-width:320px;background:var(--navy);color:#fff;
+  border-radius:var(--r-md);padding:10px 12px;font:400 12px/1.45 inherit;letter-spacing:0;
+  text-transform:none;box-shadow:0 8px 20px #0f172a3d;pointer-events:none}
+#toast{position:fixed;right:24px;bottom:24px;z-index:60;display:flex;flex-direction:column;gap:10px}
+#toast .t{background:var(--navy);color:#fff;border-radius:var(--r-md);padding:14px 18px;
+  box-shadow:0 8px 24px #0f172a2e;display:flex;align-items:center;gap:12px;max-width:420px;
+  animation:tin .18s ease-out}
+#toast .t a{color:#7fd8b0;cursor:pointer;font-weight:600;white-space:nowrap}
+@keyframes tin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media print{aside,header,.toolbar,.noprint{display:none}}
+</style><script>
+/* DEMO MODE: static snapshot, anonymized data, no server. */
+window.__DEMO__={"/api/report": {"as_of": "2026-08-01T21:56:39", "report_date": "2026-08-01", "source": "schedule", "org": null, "orgs": [{"id": "org-zharkyn-eng", "name": "ТОО «Алатау Строй»", "bin": "104332181960"}, {"id": "org-zharkyn-bzhk", "name": "ТОО «Сарыарқа Курылыс»", "bin": "013389083863"}, {"id": "org-zharkyn-astana", "name": "ТОО «Байтерек Групп»", "bin": "794026542351"}], "total": 34.39, "direction": "customers", "rows": [{"counterparty": {"id": "cp-161559407816", "name": "ТОО «Жетісу Проект»", "bin": "161559407816", "tax_mode": "Общеустановленный"}, "net": 43404444.0, "sides": {"debt": 43404444.0}, "status": "owes_us", "currency": "KZT", "contracts": 1, "orgs": ["org-zharkyn-bzhk"], "detail": [{"contract": "Договор №475 от 2024-04-16", "account": "1210", "currency": "KZT", "dt": 43404444.0, "kt": 0.0, "amount_cur": null, "rate": null, "folded": 43404444.0, "sign": 1, "side": "debt", "documents": [{"id": "doc-161559407816-1210-dg-161559407816-1-1", "name": "ТОО «Мерей Логистик»", "date": "2026-05-28", "amount": 43404444.0}]}]}, {"counterparty": {"id": "cp-184959310341", "name": "ТОО «Нұрлы Комплект»", "bin": "184959310341", "tax_mode": "—"}, "net": 26502997.97, "sides": {"debt": 26502997.97}, "status": "owes_us", "currency": "KZT", "contracts": 1, "orgs": ["org-zharkyn-astana"], "detail": [{"contract": "Договор №472 от 2025-05-01", "account": "1210", "currency": "KZT", "dt": 26502997.97, "kt": 0.0, "amount_cur": null, "rate": null, "folded": 26502997.97, "sign": 1, "side": "debt", "documents": [{"id": "doc-184959310341-1210-dg-184959310341-1-1", "name": "ТОО «Дала Снаб»", "date": "2026-05-18", "amount": 8733942.51}, {"id": "doc-184959310341-1210-dg-184959310341-1-2", "name": "ТОО «Тұлпар Трейд»", "date": "2026-05-11", "amount": 17769055.46}]}]}, {"counterparty": {"id": "cp-316475255341", "name": "ТОО «Аспан Материалдары»", "bin": "316475255341", "tax_mode": "Общеустановленный"}, "net": 18623934.49, "sides": {"debt": 20819034.49, "advance": 2195100.0}, "status": "owes_us", "currency": "KZT", "contracts": 3, "orgs": ["org-zharkyn-bzhk"], "detail": [{"contract": "Договор №338 от 2025-11-07", "account": "1210", "currency": "KZT", "dt": 7101066.03, "kt": 0.0, "amount_cur": null, "rate": null, "folded": 7101066.03, "sign": 1, "side": "debt", "documents": [{"id": "doc-316475255341-1210-dg-316475255341-1-1", "name": "ТОО «Береке Сервис»", "date": "2026-03-05", "amount": 7101066.03}]}, {"contract": "Договор №459 от 2026-12-04", "account": "1210", "currency": "KZT", "dt": 13717968.46, "kt": 0.0, "amount_cur": null, "rate": null, "folded": 13717968.46, "sign": 1, "side": "debt", "documents": [{"id": "doc-316475255341-1210-dg-316475255341-2-1", "name": "ТОО «Қыран Индустрия»", "date": "2026-03-17", "amount": 13717968.46}]}, {"contract": "Договор №449 от 2026-06-02", "account": "3510", "currency": "KZT", "dt": 0.0, "kt": 2195100.0, "amount_cur": null, "rate": null, "folded": 2195100.0, "sign": -1, "side": "advance", "documents": [{"id": "doc-316475255341-3510-dg-316475255341-3-1", "name": "ТОО «Алтын Инвест»", "date": "2026-01-30", "amount": 1877388.16}, {"id": "doc-316475255341-3510-dg-316475255341-3-2", "name": "ТОО «Ақжол Строй»", "date": "2026-05-17", "amount": 317711.84}]}]}, {"counterparty": {"id": "cp-928327648350", "name": "ТОО «Самғау Курылыс»", "bin": "928327648350", "tax_mode": "Общеустановленный"}, "net": 16039893.49, "sides": {"debt": 22112791.31, "advance": 6072897.81}, "status": "owes_us", "currency": "RUB/USD", "contracts": 3, "orgs": ["org-zharkyn-bzhk"], "detail": [{"contract": "Договор №459 от 2026-12-28", "account": "1210", "currency": "KZT", "dt": 11199985.21, "kt": 0.0, "amount_cur": null, "rate": null, "folded": 11199985.21, "sign": 1, "side": "debt", "documents": [{"id": "doc-928327648350-1210-dg-928327648350-1-1", "name": "ТОО «Орда Групп»", "date": "2026-02-28", "amount": 2635290.64}, {"id": "doc-928327648350-1210-dg-928327648350-1-2", "name": "ТОО «Тау Проект»", "date": "2026-05-04", "amount": 7027441.7}, {"id": "doc-928327648350-1210-dg-928327648350-1-3", "name": "ТОО «Керуен Логистик»", "date": "2026-03-04", "amount": 1537252.87}]}, {"contract": "Договор №208 от 2025-05-05", "account": "1210", "currency": "USD", "dt": 10912806.1, "kt": 0.0, "amount_cur": 21047.36, "rate": 518.4881, "folded": 10912806.1, "sign": 1, "side": "debt", "documents": [{"id": "doc-928327648350-1210-dg-928327648350-2-1", "name": "ТОО «Арман Комплект»", "date": "2026-05-27", "amount": 5009156.9}, {"id": "doc-928327648350-1210-dg-928327648350-2-2", "name": "ТОО «Жайық Снаб»", "date": "2026-06-01", "amount": 5903649.2}]}, {"contract": "Договор №487 от 2025-08-28", "account": "3510", "currency": "RUB", "dt": 0.0, "kt": 6072897.81, "amount_cur": 1124964.86, "rate": 5.3983, "folded": 6072897.81, "sign": -1, "side": "advance", "documents": [{"id": "doc-928327648350-3510-dg-928327648350-3-1", "name": "ТОО «Шыңғыс Трейд»", "date": "2026-06-18", "amount": 6072897.81}]}]}, {"counterparty": {"id": "cp-305641395376", "name": "АБУ", "bin": "305641395376", "tax_mode": "—"}, "net": 10243800.0, "sides": {"advance": -10243800.0}, "status": "owes_us", "currency": "RUB", "contracts": 1, "orgs": ["org-zharkyn-astana"], "detail": [{"contract": "Договор №119 от 2025-08-28", "account": "3510", "currency": "RUB", "dt": 0.0, "kt": -10243800.0, "amount_cur": -1897597.39, "rate": 5.3983, "folded": -10243800.0, "sign": -1, "side": "advance", "documents": [{"id": "doc-305641395376-3510-dg-305641395376-2-1", "name": "ТОО «Айбын Материалдары»", "date": "2026-02-27", "amount": -10243800.0}]}]}, {"counterparty": {"id": "cp-724238849696", "name": "ТОО «Дария Сервис»", "bin": "724238849696", "tax_mode": "—"}, "net": 8242397.31, "sides": {"debt": 8242397.31}, "status": "owes_us", "currency": "KZT", "contracts": 1, "orgs": ["org-zharkyn-eng"], "detail": [{"contract": "Договор №346 от 2026-03-07", "account": "1210", "currency": "KZT", "dt": 8242397.31, "kt": 0.0, "amount_cur": null, "rate": null, "folded": 8242397.31, "sign": 1, "side": "debt", "documents": [{"id": "doc-724238849696-1210-dg-724238849696-1-1", "name": "ТОО «Болашақ Индустрия»", "date": "2026-04-18", "amount": 915821.92}, {"id": "doc-724238849696-1210-dg-724238849696-1-2", "name": "ТОО «Қазына Инвест»", "date": "2026-03-13", "amount": 7326575.38}]}]}, {"counterparty": {"id": "cp-532871012269", "name": "ТОО «Тәуелсіз Строй»", "bin": "532871012269", "tax_mode": "—"}, "net": 7713779.69, "sides": {"debt": 7713779.69}, "status": "owes_us", "currency": "KZT", "contracts": 1, "orgs": ["org-zharkyn-bzhk"], "detail": [{"contract": "Договор №416 от 2026-09-21", "account": "1210", "currency": "KZT", "dt": 7713779.69, "kt": 0.0, "amount_cur": null, "rate": null, "folded": 7713779.69, "sign": 1, "side": "debt", "documents": [{"id": "doc-532871012269-1210-dg-532871012269-1-1", "name": "ТОО «Салтанат Курылыс»", "date": "2026-01-31", "amount": 7713779.69}]}]}, {"counterparty": {"id": "cp-166978480184", "name": "ТОО «Ертіс Групп»", "bin": "166978480184", "tax_mode": "—"}, "net": 6977502.91, "sides": {"debt": 9904302.91, "advance": 2926800.0}, "status": "owes_us", "currency": "USD", "contracts": 2, "orgs": ["org-zharkyn-bzhk"], "detail": [{"contract": "Договор №291 от 2026-12-04", "account": "1210", "currency": "KZT", "dt": 9904302.91, "kt": 0.0, "amount_cur": null, "rate": null, "folded": 9904302.91, "sign": 1, "side": "debt", "documents": [{"id": "doc-166978480184-1210-dg-166978480184-1-1", "name": "ТОО «Оқжетпес Проект»", "date": "2026-04-22", "amount": 9904302.91}]}, {"contract": "Договор №343 от 2024-04-12", "account": "3510", "currency": "USD", "dt": 0.0, "kt": 2926800.0, "amount_cur": 5644.88, "rate": 518.4881, "folded": 2926800.0, "sign": -1, "side": "advance", "documents": [{"id": "doc-166978480184-3510-dg-166978480184-2-1", "name": "ТОО «Аружан Логистик»", "date": "2026-02-26", "amount": 1994083.52}, {"id": "doc-166978480184-3510-dg-166978480184-2-2", "name": "ТОО «Батыр Комплект»", "date": "2026-04-08", "amount": 932716.48}]}]}, {"counterparty": {"id": "cp-514627048281", "name": "ТОО «Мирас Снаб»", "bin": "514627048281", "tax_mode": "Упрощенная декларация"}, "net": 4612919.24, "sides": {"debt": 4612919.24}, "status": "owes_us", "currency": "KZT", "contracts": 1, "orgs": ["org-zharkyn-bzhk"], "detail": [{"contract": "Договор №432 от 2024-01-25", "account": "1210", "currency": "KZT", "dt": 4612919.24, "kt": 0.0, "amount_cur": null, "rate": null, "folded": 4612919.24, "sign": 1, "side": "debt", "documents": [{"id": "doc-514627048281-1210-dg-514627048281-1-1", "name": "ТОО «Шапағат Трейд»", "date": "2026-04-16", "amount": 4612919.24}]}]}, {"counterparty": {"id": "cp-489325288095", "name": "ТОО «Айдын Материалдары»", "bin": "489325288095", "tax_mode": "Общеустановленный"}, "net": 1927008.05, "sides": {"debt": 3630405.65, "advance": 1703397.6}, "status": "owes_us", "currency": "USD", "contracts": 3, "orgs": ["org-zharkyn-astana"], "detail": [{"contract": "Договор №487 от 2025-08-24", "account": "1210", "currency": "KZT", "dt": 924103.26, "kt": 0.0, "amount_cur": null, "rate": null, "folded": 924103.26, "sign": 1, "side": "debt", "documents": [{"id": "doc-489325288095-1210-dg-489325288095-1-1", "name": "ТОО «Нұрсая Сервис»", "date": "2026-04-13", "amount": 924103.26}]}, {"contract": "Договор №195 от 2026-12-04", "account": "1210", "currency": "KZT", "dt": 2706302.39, "kt": 0.0, "amount_cur": null, "rate": null, "folded": 2706302.39, "sign": 1, "side": "debt", "documents": [{"id": "doc-489325288095-1210-dg-489325288095-2-1", "name": "ТОО «Дәурен Индустрия»", "date": "2026-06-05", "amount": 2255251.99}, {"id": "doc-489325288095-1210-dg-489325288095-2-2", "name": "ТОО «Салауат Инвест»", "date": "2026-04-19", "amount": 451050.4}]}, {"contract": "Договор №334 от 2024-07-19", "account": "3510", "currency": "USD", "dt": 0.0, "kt": 1703397.6, "amount_cur": 3285.32, "rate": 518.4881, "folded": 1703397.6, "sign": -1, "side": "advance", "documents": [{"id": "doc-489325288095-3510-dg-489325288095-3-1", "name": "ТОО «Темірбек Строй»", "date": "2026-06-05", "amount": 318217.13}, {"id": "doc-489325288095-3510-dg-489325288095-3-2", "name": "ТОО «Қаусар Курылыс»", "date": "2026-06-12", "amount": 1385180.47}]}]}, {"counterparty": {"id": "cp-701543039117", "name": "ТОО «Жібек Групп»", "bin": "701543039117", "tax_mode": "—"}, "net": 1799982.0, "sides": {"debt": 1799982.0}, "status": "owes_us", "currency": "KZT", "contracts": 1, "orgs": ["org-zharkyn-astana"], "detail": [{"contract": "Договор №244 от 2026-09-01", "account": "1210", "currency": "KZT", "dt": 1799982.0, "kt": 0.0, "amount_cur": null, "rate": null, "folded": 1799982.0, "sign": 1, "side": "debt", "documents": [{"id": "doc-701543039117-1210-dg-701543039117-1-1", "name": "ТОО «Атамекен Проект»", "date": "2026-03-27", "amount": 53999.46}, {"id": "doc-701543039117-1210-dg-701543039117-1-2", "name": "ТОО «Оркен Логистик»", "date": "2026-03-23", "amount": 125998.74}, {"id": "doc-701543039117-1210-dg-701543039117-1-3", "name": "ТОО «Байсал Комплект»", "date": "2026-02-17", "amount": 1619983.8}]}]}, {"counterparty": {"id": "cp-182278248963", "name": "ТОО «Аманат Снаб»", "bin": "182278248963", "tax_mode": "Общеустановленный"}, "net": 1288379.47, "sides": {"debt": 1288379.47}, "status": "owes_us", "currency": "KZT", "contracts": 1, "orgs": ["org-zharkyn-eng"], "detail": [{"contract": "Договор №421 от 2026-06-10", "account": "1210", "currency": "KZT", "dt": 1288379.47, "kt": 0.0, "amount_cur": null, "rate": null, "folded": 1288379.47, "sign": 1, "side": "debt", "documents": [{"id": "doc-182278248963-1210-dg-182278248963-1-1", "name": "ТОО «Керуен Логистик»", "date": "2026-04-03", "amount": 176836.4}, {"id": "doc-182278248963-1210-dg-182278248963-1-2", "name": "ТОО «Дулат Трейд»", "date": "2026-01-24", "amount": 1111543.07}]}]}, {"counterparty": {"id": "cp-834657871331", "name": "ТОО «Есіл Материалдары»", "bin": "834657871331", "tax_mode": "Общеустановленный"}, "net": 398776.5, "sides": {"debt": 398776.5}, "status": "owes_us", "currency": "KZT", "contracts": 1, "orgs": ["org-zharkyn-bzhk"], "detail": [{"contract": "Договор №247 от 2025-08-20", "account": "1210", "currency": "KZT", "dt": 398776.5, "kt": 0.0, "amount_cur": null, "rate": null, "folded": 398776.5, "sign": 1, "side": "debt", "documents": [{"id": "doc-834657871331-1210-dg-834657871331-1-1", "name": "ТОО «Жалын Сервис»", "date": "2026-07-07", "amount": 62308.83}, {"id": "doc-834657871331-1210-dg-834657871331-1-2", "name": "ТОО «Қайсар Индустрия»", "date": "2026-03-08", "amount": 8307.85}, {"id": "doc-834657871331-1210-dg-834657871331-1-3", "name": "ТОО «Мұрагер Инвест»", "date": "2026-06-17", "amount": 328159.83}]}]}, {"counterparty": {"id": "cp-509839301031", "name": "ТОО «Нысана Строй»", "bin": "509839301031", "tax_mode": "Общеустановленный"}, "net": 357541.47, "sides": {"debt": 7071735.65, "advance": 6714194.18}, "status": "owes_us", "currency": "RUB", "contracts": 2, "orgs": ["org-zharkyn-bzhk"], "detail": [{"contract": "Договор №382 от 2026-03-03", "account": "1210", "currency": "KZT", "dt": 7071735.65, "kt": 0.0, "amount_cur": null, "rate": null, "folded": 7071735.65, "sign": 1, "side": "debt", "documents": [{"id": "doc-509839301031-1210-dg-509839301031-1-1", "name": "ТОО «Дала Снаб»", "date": "2026-02-05", "amount": 1737968.93}, {"id": "doc-509839301031-1210-dg-509839301031-1-2", "name": "ТОО «Тұлпар Трейд»", "date": "2026-05-14", "amount": 5333766.72}]}, {"contract": "Договор №203 от 2024-04-28", "account": "3510", "currency": "RUB", "dt": 0.0, "kt": 6714194.18, "amount_cur": 1243760.85, "rate": 5.3983, "folded": 6714194.18, "sign": -1, "side": "advance", "documents": [{"id": "doc-509839301031-3510-dg-509839301031-2-1", "name": "ТОО «Отан Курылыс»", "date": "2026-06-01", "amount": 2582382.38}, {"id": "doc-509839301031-3510-dg-509839301031-2-2", "name": "ТОО «Парасат Групп»", "date": "2026-04-01", "amount": 1377270.6}, {"id": "doc-509839301031-3510-dg-509839301031-2-3", "name": "ТОО «Рауан Проект»", "date": "2026-03-23", "amount": 2754541.2}]}]}, {"counterparty": {"id": "cp-051834738299", "name": "ТОО «Сұңқар Логистик»", "bin": "051834738299", "tax_mode": "—"}, "net": 292680.0, "sides": {"debt": 292680.0}, "status": "owes_us", "currency": "KZT", "contracts": 2, "orgs": ["org-zharkyn-bzhk"], "detail": [{"contract": "Договор №463 от 2025-08-04", "account": "1210", "currency": "KZT", "dt": 42361.58, "kt": 0.0, "amount_cur": null, "rate": null, "folded": 42361.58, "sign": 1, "side": "debt", "documents": [{"id": "doc-051834738299-1210-dg-051834738299-1-1", "name": "ТОО «Ұлытау Комплект»", "date": "2026-05-26", "amount": 15885.59}, {"id": "doc-051834738299-1210-dg-051834738299-1-2", "name": "ТОО «Шұғыла Снаб»", "date": "2026-03-01", "amount": 11346.85}, {"id": "doc-051834738299-1210-dg-051834738299-1-3", "name": "ТОО «Алатау Трейд»", "date": "2026-02-05", "amount": 15129.13}]}, {"contract": "Договор №498 от 2025-11-15", "account": "1210", "currency": "KZT", "dt": 250318.42, "kt": 0.0, "amount_cur": null, "rate": null, "folded": 250318.42, "sign": 1, "side": "debt", "documents": [{"id": "doc-051834738299-1210-dg-051834738299-2-1", "name": "ТОО «Сарыарқа Материалдары»", "date": "2026-04-13", "amount": 250318.42}]}]}, {"counterparty": {"id": "cp-737631165667", "name": "ТОО «Байтерек Сервис»", "bin": "737631165667", "tax_mode": "—"}, "net": 202073.38, "sides": {"debt": 202073.38}, "status": "owes_us", "currency": "KZT", "contracts": 2, "orgs": ["org-zharkyn-astana"], "detail": [{"contract": "Договор №151 от 2024-04-24", "account": "1210", "currency": "KZT", "dt": 120441.09, "kt": 0.0, "amount_cur": null, "rate": null, "folded": 120441.09, "sign": 1, "side": "debt", "documents": [{"id": "doc-737631165667-1210-dg-737631165667-1-1", "name": "ТОО «Жетісу Индустрия»", "date": "2026-03-13", "amount": 112834.29}, {"id": "doc-737631165667-1210-dg-737631165667-1-2", "name": "ТОО «Мерей Инвест»", "date": "2026-01-23", "amount": 7606.8}]}, {"contract": "Договор №165 от 2026-06-22", "account": "1210", "currency": "KZT", "dt": 81632.29, "kt": 0.0, "amount_cur": null, "rate": null, "folded": 81632.29, "sign": 1, "side": "debt", "documents": [{"id": "doc-737631165667-1210-dg-737631165667-2-1", "name": "ТОО «Нұрлы Строй»", "date": "2026-07-08", "amount": 24969.88}, {"id": "doc-737631165667-1210-dg-737631165667-2-2", "name": "ТОО «Дала Курылыс»", "date": "2026-05-17", "amount": 56662.42}]}]}, {"counterparty": {"id": "cp-010651333872", "name": "ТОО «Тұлпар Групп»", "bin": "010651333872", "tax_mode": "Общеустановленный"}, "net": 1975.59, "sides": {"debt": 1975.59}, "status": "owes_us", "currency": "KZT", "contracts": 1, "orgs": ["org-zharkyn-bzhk"], "detail": [{"contract": "Договор №198 от 2025-11-23", "account": "1210", "currency": "KZT", "dt": 1975.59, "kt": 0.0, "amount_cur": null, "rate": null, "folded": 1975.59, "sign": 1, "side": "debt", "documents": [{"id": "doc-010651333872-1210-dg-010651333872-1-1", "name": "ТОО «Аспан Проект»", "date": "2026-05-06", "amount": 342.71}, {"id": "doc-010651333872-1210-dg-010651333872-1-2", "name": "ТОО «Береке Логистик»", "date": "2026-04-27", "amount": 1632.88}]}]}, {"counterparty": {"id": "cp-624731781080", "name": "ТОО «Қыран Комплект»", "bin": "624731781080", "tax_mode": "Общеустановленный"}, "net": 0.0, "sides": {"debt": 5619690.14, "advance": 5619690.14}, "status": "closed", "currency": "USD", "contracts": 2, "orgs": ["org-zharkyn-bzhk"], "detail": [{"contract": "Договор №243 от 2024-04-28", "account": "1210", "currency": "KZT", "dt": 5619690.14, "kt": 0.0, "amount_cur": null, "rate": null, "folded": 5619690.14, "sign": 1, "side": "debt", "documents": [{"id": "doc-624731781080-1210-dg-624731781080-1-1", "name": "ТОО «Алтын Снаб»", "date": "2026-07-14", "amount": 5416568.81}, {"id": "doc-624731781080-1210-dg-624731781080-1-2", "name": "ТОО «Ақжол Трейд»", "date": "2026-06-17", "amount": 203121.33}]}, {"contract": "Договор №144 от 2025-05-05", "account": "3510", "currency": "USD", "dt": 0.0, "kt": 5619690.14, "amount_cur": 10838.61, "rate": 518.4881, "folded": 5619690.14, "sign": -1, "side": "advance", "documents": [{"id": "doc-624731781080-3510-dg-624731781080-2-1", "name": "ТОО «Самғау Материалдары»", "date": "2026-05-10", "amount": 5619690.14}]}]}, {"counterparty": {"id": "cp-132677360260", "name": "ТОО «Орда Сервис»", "bin": "132677360260", "tax_mode": "Общеустановленный"}, "net": 0.0, "sides": {"debt": 17263893.7, "advance": 17263893.7}, "status": "closed", "currency": "EUR", "contracts": 3, "orgs": ["org-zharkyn-bzhk"], "detail": [{"contract": "Договор №464 от 2024-01-05", "account": "1210", "currency": "KZT", "dt": 11939515.27, "kt": 0.0, "amount_cur": null, "rate": null, "folded": 11939515.27, "sign": 1, "side": "debt", "documents": [{"id": "doc-132677360260-1210-dg-132677360260-1-1", "name": "ТОО «Тау Индустрия»", "date": "2026-03-07", "amount": 6012096.34}, {"id": "doc-132677360260-1210-dg-132677360260-1-2", "name": "ТОО «Керуен Инвест»", "date": "2026-07-17", "amount": 5927418.93}]}, {"contract": "Договор №226 от 2025-11-03", "account": "1210", "currency": "KZT", "dt": 5324378.43, "kt": 0.0, "amount_cur": null, "rate": null, "folded": 5324378.43, "sign": 1, "side": "debt", "documents": [{"id": "doc-132677360260-1210-dg-132677360260-2-1", "name": "ТОО «Арман Строй»", "date": "2026-06-27", "amount": 5324378.43}]}, {"contract": "Договор №196 от 2025-05-13", "account": "3510", "currency": "EUR", "dt": 0.0, "kt": 17263893.7, "amount_cur": 31102.84, "rate": 555.0584, "folded": 17263893.7, "sign": -1, "side": "advance", "documents": [{"id": "doc-132677360260-3510-dg-132677360260-3-1", "name": "ТОО «Жайық Курылыс»", "date": "2026-07-08", "amount": 16161943.04}, {"id": "doc-132677360260-3510-dg-132677360260-3-2", "name": "ТОО «Шыңғыс Групп»", "date": "2026-03-22", "amount": 1101950.66}]}]}, {"counterparty": {"id": "cp-647468723430", "name": "ТОО «Айбын Проект»", "bin": "647468723430", "tax_mode": "—"}, "net": -0.29, "sides": {"advance": 0.29}, "status": "we_owe", "currency": "KZT", "contracts": 1, "orgs": ["org-zharkyn-eng"], "detail": [{"contract": "Договор №114 от 2025-11-11", "account": "3510", "currency": "KZT", "dt": 0.0, "kt": 0.4, "amount_cur": null, "rate": null, "folded": 0.4, "sign": -1, "side": "advance", "documents": [{"id": "doc-647468723430-3510-dg-647468723430-3-1", "name": "ТОО «Дария Логистик»", "date": "2026-02-20", "amount": 0.27}, {"id": "doc-647468723430-3510-dg-647468723430-3-2", "name": "ТОО «Болашақ Комплект»", "date": "2026-04-09", "amount": 0.02}]}]}, {"counterparty": {"id": "cp-980500978820", "name": "ТОО «Қазына Снаб»", "bin": "980500978820", "tax_mode": "—"}, "net": -40243.5, "sides": {"advance": 40243.5}, "status": "we_owe", "currency": "KZT", "contracts": 1, "orgs": ["org-zharkyn-bzhk"], "detail": [{"contract": "Договор №223 от 2025-08-04", "account": "3510", "currency": "KZT", "dt": 0.0, "kt": 40243.5, "amount_cur": null, "rate": null, "folded": 40243.5, "sign": -1, "side": "advance", "documents": [{"id": "doc-980500978820-3510-dg-980500978820-3-1", "name": "ТОО «Тәуелсіз Трейд»", "date": "2026-07-01", "amount": 10975.5}, {"id": "doc-980500978820-3510-dg-980500978820-3-2", "name": "ТОО «Салтанат Материалдары»", "date": "2026-05-14", "amount": 2032.5}, {"id": "doc-980500978820-3510-dg-980500978820-3-3", "name": "ТОО «Ертіс Сервис»", "date": "2026-05-10", "amount": 27235.5}]}]}, {"counterparty": {"id": "cp-812191361939", "name": "ТОО «Оқжетпес Индустрия»", "bin": "812191361939", "tax_mode": "—"}, "net": -92194.2, "sides": {"advance": 92194.2}, "status": "we_owe", "currency": "KZT", "contracts": 1, "orgs": ["org-zharkyn-eng"], "detail": [{"contract": "Договор №327 от 2025-08-28", "account": "3510", "currency": "KZT", "dt": 0.0, "kt": 92194.2, "amount_cur": null, "rate": null, "folded": 92194.2, "sign": -1, "side": "advance", "documents": [{"id": "doc-812191361939-3510-dg-812191361939-1-1", "name": "ТОО «Аружан Инвест»", "date": "2026-01-26", "amount": 32089.69}, {"id": "doc-812191361939-3510-dg-812191361939-1-2", "name": "ТОО «Батыр Строй»", "date": "2026-05-09", "amount": 26486.74}, {"id": "doc-812191361939-3510-dg-812191361939-1-3", "name": "ТОО «Мирас Курылыс»", "date": "2026-03-16", "amount": 33617.77}]}]}, {"counterparty": {"id": "cp-909169985435", "name": "ТОО «Шапағат Групп»", "bin": "909169985435", "tax_mode": "—"}, "net": -219510.0, "sides": {"advance": 219510.0}, "status": "we_owe", "currency": "KZT", "contracts": 1, "orgs": ["org-zharkyn-bzhk"], "detail": [{"contract": "Договор №470 от 2025-11-15", "account": "3510", "currency": "KZT", "dt": 0.0, "kt": 219510.0, "amount_cur": null, "rate": null, "folded": 219510.0, "sign": -1, "side": "advance", "documents": [{"id": "doc-909169985435-3510-dg-909169985435-2-1", "name": "ТОО «Айдын Проект»", "date": "2026-07-13", "amount": 33674.83}, {"id": "doc-909169985435-3510-dg-909169985435-2-2", "name": "ТОО «Нұрсая Логистик»", "date": "2026-04-23", "amount": 103518.92}, {"id": "doc-909169985435-3510-dg-909169985435-2-3", "name": "ТОО «Дәурен Комплект»", "date": "2026-05-02", "amount": 82316.25}]}]}, {"counterparty": {"id": "cp-346247510799", "name": "ТОО «Салауат Снаб»", "bin": "346247510799", "tax_mode": "—"}, "net": -409752.0, "sides": {"advance": 409752.0}, "status": "we_owe", "currency": "KZT", "contracts": 1, "orgs": ["org-zharkyn-bzhk"], "detail": [{"contract": "Договор №469 от 2024-10-18", "account": "3510", "currency": "KZT", "dt": 0.0, "kt": 409752.0, "amount_cur": null, "rate": null, "folded": 409752.0, "sign": -1, "side": "advance", "documents": [{"id": "doc-346247510799-3510-dg-346247510799-3-1", "name": "ТОО «Темірбек Трейд»", "date": "2026-03-14", "amount": 409752.0}]}]}, {"counterparty": {"id": "cp-118384251354", "name": "ТОО «Қаусар Материалдары»", "bin": "118384251354", "tax_mode": "—"}, "net": -635664.38, "sides": {"debt": -635664.38}, "status": "we_owe", "currency": "KZT", "contracts": 2, "orgs": ["org-zharkyn-eng"], "detail": [{"contract": "Договор №171 от 2026-12-20", "account": "1210", "currency": "KZT", "dt": -25426.58, "kt": 0.0, "amount_cur": null, "rate": null, "folded": -25426.58, "sign": 1, "side": "debt", "documents": [{"id": "doc-118384251354-1210-dg-118384251354-1-1", "name": "ТОО «Жібек Сервис»", "date": "2026-06-13", "amount": -9649.84}, {"id": "doc-118384251354-1210-dg-118384251354-1-2", "name": "ТОО «Атамекен Индустрия»", "date": "2026-02-22", "amount": -4595.16}, {"id": "doc-118384251354-1210-dg-118384251354-1-3", "name": "ТОО «Оркен Инвест»", "date": "2026-01-31", "amount": -11181.57}]}, {"contract": "Договор №130 от 2025-11-23", "account": "1210", "currency": "KZT", "dt": -610237.8, "kt": 0.0, "amount_cur": null, "rate": null, "folded": -610237.8, "sign": 1, "side": "debt", "documents": [{"id": "doc-118384251354-1210-dg-118384251354-2-1", "name": "ТОО «Байсал Строй»", "date": "2026-03-16", "amount": -295147.69}, {"id": "doc-118384251354-1210-dg-118384251354-2-2", "name": "ТОО «Аманат Курылыс»", "date": "2026-03-26", "amount": -315090.11}]}]}, {"counterparty": {"id": "cp-278498084124", "name": "ТОО «Дулат Групп»", "bin": "278498084124", "tax_mode": "—"}, "net": -760602.15, "sides": {"debt": 2341440.0, "advance": 3102042.15}, "status": "we_owe", "currency": "RUB", "contracts": 2, "orgs": ["org-zharkyn-bzhk"], "detail": [{"contract": "Договор №310 от 2024-07-19", "account": "1210", "currency": "KZT", "dt": 2341440.0, "kt": 0.0, "amount_cur": null, "rate": null, "folded": 2341440.0, "sign": 1, "side": "debt", "documents": [{"id": "doc-278498084124-1210-dg-278498084124-1-1", "name": "ТОО «Есіл Проект»", "date": "2026-06-10", "amount": 878040.0}, {"id": "doc-278498084124-1210-dg-278498084124-1-2", "name": "ТОО «Жалын Логистик»", "date": "2026-05-29", "amount": 859747.5}, {"id": "doc-278498084124-1210-dg-278498084124-1-3", "name": "ТОО «Қайсар Комплект»", "date": "2026-02-28", "amount": 603652.5}]}, {"contract": "Договор №128 от 2025-05-21", "account": "3510", "currency": "RUB", "dt": 0.0, "kt": 3102042.15, "amount_cur": 574633.15, "rate": 5.3983, "folded": 3102042.15, "sign": -1, "side": "advance", "documents": [{"id": "doc-278498084124-3510-dg-278498084124-2-1", "name": "ТОО «Мұрагер Снаб»", "date": "2026-05-11", "amount": 1233342.06}, {"id": "doc-278498084124-3510-dg-278498084124-2-2", "name": "ТОО «Нысана Трейд»", "date": "2026-06-27", "amount": 1588395.07}, {"id": "doc-278498084124-3510-dg-278498084124-2-3", "name": "ТОО «Отан Материалдары»", "date": "2026-03-27", "amount": 280305.01}]}]}, {"counterparty": {"id": "cp-118244935348", "name": "ТОО «Парасат Сервис»", "bin": "118244935348", "tax_mode": "—"}, "net": -846013.49, "sides": {"debt": 28421986.51, "advance": 29268000.0}, "status": "we_owe", "currency": "RUB", "contracts": 2, "orgs": ["org-zharkyn-bzhk"], "detail": [{"contract": "Договор №172 от 2024-01-13", "account": "1210", "currency": "KZT", "dt": 28421986.51, "kt": 0.0, "amount_cur": null, "rate": null, "folded": 28421986.51, "sign": 1, "side": "debt", "documents": [{"id": "doc-118244935348-1210-dg-118244935348-1-1", "name": "ТОО «Рауан Индустрия»", "date": "2026-01-28", "amount": 28421986.51}]}, {"contract": "Договор №411 от 2025-08-28", "account": "3510", "currency": "RUB", "dt": 0.0, "kt": 29268000.0, "amount_cur": 5421706.83, "rate": 5.3983, "folded": 29268000.0, "sign": -1, "side": "advance", "documents": [{"id": "doc-118244935348-3510-dg-118244935348-2-1", "name": "ТОО «Сұңқар Инвест»", "date": "2026-01-24", "amount": 9849807.69}, {"id": "doc-118244935348-3510-dg-118244935348-2-2", "name": "ТОО «Ұлытау Строй»", "date": "2026-03-25", "amount": 19418192.31}]}]}, {"counterparty": {"id": "cp-740164005242", "name": "ТОО «Шұғыла Курылыс»", "bin": "740164005242", "tax_mode": "Общеустановленный"}, "net": -929715.58, "sides": {"advance": 929715.58}, "status": "we_owe", "currency": "KZT", "contracts": 1, "orgs": ["org-zharkyn-bzhk"], "detail": [{"contract": "Договор №496 от 2025-05-09", "account": "3510", "currency": "KZT", "dt": 0.0, "kt": 929715.58, "amount_cur": null, "rate": null, "folded": 929715.58, "sign": -1, "side": "advance", "documents": [{"id": "doc-740164005242-3510-dg-740164005242-3-1", "name": "ТОО «Алатау Групп»", "date": "2026-05-10", "amount": 929715.58}]}]}, {"counterparty": {"id": "cp-786801128059", "name": "ТОО «Сарыарқа Проект»", "bin": "786801128059", "tax_mode": "—"}, "net": -951210.0, "sides": {"advance": 951210.0}, "status": "we_owe", "currency": "RUB", "contracts": 1, "orgs": ["org-zharkyn-astana"], "detail": [{"contract": "Договор №305 от 2026-06-14", "account": "3510", "currency": "RUB", "dt": 0.0, "kt": 951210.0, "amount_cur": 176205.47, "rate": 5.3983, "folded": 951210.0, "sign": -1, "side": "advance", "documents": [{"id": "doc-786801128059-3510-dg-786801128059-3-1", "name": "ТОО «Байтерек Логистик»", "date": "2026-03-29", "amount": 951210.0}]}]}, {"counterparty": {"id": "cp-826204505331", "name": "ТОО «Жетісу Комплект»", "bin": "826204505331", "tax_mode": "—"}, "net": -1006087.5, "sides": {"advance": 1006087.5}, "status": "we_owe", "currency": "KZT", "contracts": 1, "orgs": ["org-zharkyn-bzhk"], "detail": [{"contract": "Договор №195 от 2025-08-12", "account": "3510", "currency": "KZT", "dt": 0.0, "kt": 1006087.5, "amount_cur": null, "rate": null, "folded": 1006087.5, "sign": -1, "side": "advance", "documents": [{"id": "doc-826204505331-3510-dg-826204505331-1-1", "name": "ТОО «Нысана Трейд»", "date": "2026-02-27", "amount": 1006087.5}]}]}, {"counterparty": {"id": "cp-586923226025", "name": "ТОО «Мерей Снаб»", "bin": "586923226025", "tax_mode": "—"}, "net": -1172915.1, "sides": {"advance": 1172915.1}, "status": "we_owe", "currency": "KZT", "contracts": 1, "orgs": ["org-zharkyn-bzhk"], "detail": [{"contract": "Договор №292 от 2026-09-09", "account": "3510", "currency": "KZT", "dt": 0.0, "kt": 1172915.1, "amount_cur": null, "rate": null, "folded": 1172915.1, "sign": -1, "side": "advance", "documents": [{"id": "doc-586923226025-3510-dg-586923226025-2-1", "name": "ТОО «Нұрлы Трейд»", "date": "2026-04-15", "amount": 86882.6}, {"id": "doc-586923226025-3510-dg-586923226025-2-2", "name": "ТОО «Дала Материалдары»", "date": "2026-04-22", "amount": 1086032.5}]}]}, {"counterparty": {"id": "cp-634216073375", "name": "ТОО «Тұлпар Сервис»", "bin": "634216073375", "tax_mode": "—"}, "net": -1381968.38, "sides": {"advance": 1381968.38}, "status": "we_owe", "currency": "KZT", "contracts": 1, "orgs": ["org-zharkyn-astana"], "detail": [{"contract": "Договор №239 от 2026-12-24", "account": "3510", "currency": "KZT", "dt": 0.0, "kt": 1381968.38, "amount_cur": null, "rate": null, "folded": 1381968.38, "sign": -1, "side": "advance", "documents": [{"id": "doc-634216073375-3510-dg-634216073375-2-1", "name": "ТОО «Аспан Индустрия»", "date": "2026-07-18", "amount": 1381968.38}]}]}, {"counterparty": {"id": "cp-433036541458", "name": "ТОО «Береке Инвест»", "bin": "433036541458", "tax_mode": "—"}, "net": -1390230.0, "sides": {"advance": 1390230.0}, "status": "we_owe", "currency": "KZT", "contracts": 1, "orgs": ["org-zharkyn-bzhk"], "detail": [{"contract": "Договор №299 от 2025-08-08", "account": "3510", "currency": "KZT", "dt": 0.0, "kt": 1390230.0, "amount_cur": null, "rate": null, "folded": 1390230.0, "sign": -1, "side": "advance", "documents": [{"id": "doc-433036541458-3510-dg-433036541458-1-1", "name": "ТОО «Қыран Строй»", "date": "2026-05-17", "amount": 379153.64}, {"id": "doc-433036541458-3510-dg-433036541458-1-2", "name": "ТОО «Алтын Курылыс»", "date": "2026-06-23", "amount": 687215.97}, {"id": "doc-433036541458-3510-dg-433036541458-1-3", "name": "ТОО «Ақжол Групп»", "date": "2026-06-20", "amount": 323860.39}]}]}, {"counterparty": {"id": "cp-685014294019", "name": "ТОО «Самғау Проект»", "bin": "685014294019", "tax_mode": "Общеустановленный"}, "net": -1463400.0, "sides": {"advance": 1463400.0}, "status": "we_owe", "currency": "KZT", "contracts": 1, "orgs": ["org-zharkyn-bzhk"], "detail": [{"contract": "Договор №407 от 2026-12-16", "account": "3510", "currency": "KZT", "dt": 0.0, "kt": 1463400.0, "amount_cur": null, "rate": null, "folded": 1463400.0, "sign": -1, "side": "advance", "documents": [{"id": "doc-685014294019-3510-dg-685014294019-1-1", "name": "ТОО «Орда Логистик»", "date": "2026-07-06", "amount": 1463400.0}]}]}, {"counterparty": {"id": "cp-655698169340", "name": "ТОО «Тау Комплект»", "bin": "655698169340", "tax_mode": "—"}, "net": -2195100.0, "sides": {"advance": 2195100.0}, "status": "we_owe", "currency": "KZT", "contracts": 1, "orgs": ["org-zharkyn-eng"], "detail": [{"contract": "Договор №227 от 2026-12-16", "account": "3510", "currency": "KZT", "dt": 0.0, "kt": 2195100.0, "amount_cur": null, "rate": null, "folded": 2195100.0, "sign": -1, "side": "advance", "documents": [{"id": "doc-655698169340-3510-dg-655698169340-2-1", "name": "ТОО «Байтерек Логистик»", "date": "2026-04-16", "amount": 2195100.0}]}]}, {"counterparty": {"id": "cp-608835615951", "name": "ТОО «Керуен Снаб»", "bin": "608835615951", "tax_mode": "—"}, "net": -2560950.0, "sides": {"advance": 2560950.0}, "status": "we_owe", "currency": "KZT", "contracts": 1, "orgs": ["org-zharkyn-bzhk"], "detail": [{"contract": "Договор №302 от 2024-07-11", "account": "3510", "currency": "KZT", "dt": 0.0, "kt": 2560950.0, "amount_cur": null, "rate": null, "folded": 2560950.0, "sign": -1, "side": "advance", "documents": [{"id": "doc-608835615951-3510-dg-608835615951-2-1", "name": "ТОО «Арман Трейд»", "date": "2026-04-21", "amount": 1289960.0}, {"id": "doc-608835615951-3510-dg-608835615951-2-2", "name": "ТОО «Жайық Материалдары»", "date": "2026-05-16", "amount": 1270990.0}]}]}, {"counterparty": {"id": "cp-484656482366", "name": "ТОО «Шыңғыс Сервис»", "bin": "484656482366", "tax_mode": "—"}, "net": -3812157.0, "sides": {"advance": 3812157.0}, "status": "we_owe", "currency": "KZT", "contracts": 1, "orgs": ["org-zharkyn-bzhk"], "detail": [{"contract": "Договор №423 от 2026-12-04", "account": "3510", "currency": "KZT", "dt": 0.0, "kt": 3812157.0, "amount_cur": null, "rate": null, "folded": 3812157.0, "sign": -1, "side": "advance", "documents": [{"id": "doc-484656482366-3510-dg-484656482366-2-1", "name": "ТОО «Айбын Индустрия»", "date": "2026-03-22", "amount": 3388584.0}, {"id": "doc-484656482366-3510-dg-484656482366-2-2", "name": "ТОО «Дария Инвест»", "date": "2026-07-12", "amount": 423573.0}]}]}, {"counterparty": {"id": "cp-299468044369", "name": "ТОО «Болашақ Строй»", "bin": "299468044369", "tax_mode": "—"}, "net": -4390200.0, "sides": {"advance": 4390200.0}, "status": "we_owe", "currency": "KZT", "contracts": 1, "orgs": ["org-zharkyn-bzhk"], "detail": [{"contract": "Договор №156 от 2024-01-17", "account": "3510", "currency": "KZT", "dt": 0.0, "kt": 4390200.0, "amount_cur": null, "rate": null, "folded": 4390200.0, "sign": -1, "side": "advance", "documents": [{"id": "doc-299468044369-3510-dg-299468044369-1-1", "name": "ТОО «Қазына Курылыс»", "date": "2026-06-29", "amount": 1291235.29}, {"id": "doc-299468044369-3510-dg-299468044369-1-2", "name": "ТОО «Тәуелсіз Групп»", "date": "2026-07-01", "amount": 3098964.71}]}]}, {"counterparty": {"id": "cp-957773872148", "name": "ТОО «Салтанат Проект»", "bin": "957773872148", "tax_mode": "—"}, "net": -7097490.0, "sides": {"debt": -7097490.0}, "status": "we_owe", "currency": "KZT", "contracts": 1, "orgs": ["org-zharkyn-bzhk"], "detail": [{"contract": "Договор №107 от 2024-04-12", "account": "1210", "currency": "KZT", "dt": -7097490.0, "kt": 0.0, "amount_cur": null, "rate": null, "folded": -7097490.0, "sign": 1, "side": "debt", "documents": [{"id": "doc-957773872148-1210-dg-957773872148-1-1", "name": "ТОО «Ертіс Логистик»", "date": "2026-05-10", "amount": -7097490.0}]}]}, {"counterparty": {"id": "cp-951343320037", "name": "ТОО «Оқжетпес Комплект»", "bin": "951343320037", "tax_mode": "Общеустановленный"}, "net": -7242034.74, "sides": {"debt": 25560593.69, "advance": 32802628.43}, "status": "we_owe", "currency": "USD", "contracts": 2, "orgs": ["org-zharkyn-astana"], "detail": [{"contract": "Договор №415 от 2026-12-16", "account": "1210", "currency": "KZT", "dt": 25560593.69, "kt": 0.0, "amount_cur": null, "rate": null, "folded": 25560593.69, "sign": 1, "side": "debt", "documents": [{"id": "doc-951343320037-1210-dg-951343320037-1-1", "name": "ТОО «Аружан Снаб»", "date": "2026-07-08", "amount": 23430544.21}, {"id": "doc-951343320037-1210-dg-951343320037-1-2", "name": "ТОО «Батыр Трейд»", "date": "2026-02-26", "amount": 2130049.48}]}, {"contract": "Договор №217 от 2025-02-26", "account": "3510", "currency": "USD", "dt": 0.0, "kt": 32802628.43, "amount_cur": 63265.92, "rate": 518.4881, "folded": 32802628.43, "sign": -1, "side": "advance", "documents": [{"id": "doc-951343320037-3510-dg-951343320037-2-1", "name": "ТОО «Мирас Материалдары»", "date": "2026-04-21", "amount": 14239900.72}, {"id": "doc-951343320037-3510-dg-951343320037-2-2", "name": "ТОО «Шапағат Сервис»", "date": "2026-06-24", "amount": 18562727.71}]}]}, {"counterparty": {"id": "cp-917693676320", "name": "ТОО «Айдын Индустрия»", "bin": "917693676320", "tax_mode": "—"}, "net": -10243800.0, "sides": {"advance": 10243800.0}, "status": "we_owe", "currency": "KZT", "contracts": 1, "orgs": ["org-zharkyn-bzhk"], "detail": [{"contract": "Договор №362 от 2026-03-11", "account": "3510", "currency": "KZT", "dt": 0.0, "kt": 10243800.0, "amount_cur": null, "rate": null, "folded": 10243800.0, "sign": -1, "side": "advance", "documents": [{"id": "doc-917693676320-3510-dg-917693676320-2-1", "name": "ТОО «Аспан Индустрия»", "date": "2026-06-18", "amount": 10243800.0}]}]}, {"counterparty": {"id": "cp-163287083172", "name": "ТОО «Нұрсая Инвест»", "bin": "163287083172", "tax_mode": "Общеустановленный"}, "net": -12073050.0, "sides": {"advance": 12073050.0}, "status": "we_owe", "currency": "KZT", "contracts": 1, "orgs": ["org-zharkyn-eng"], "detail": [{"contract": "Договор №461 от 2026-06-22", "account": "3510", "currency": "KZT", "dt": 0.0, "kt": 12073050.0, "amount_cur": null, "rate": null, "folded": 12073050.0, "sign": -1, "side": "advance", "documents": [{"id": "doc-163287083172-3510-dg-163287083172-2-1", "name": "ТОО «Самғау Материалдары»", "date": "2026-02-03", "amount": 12073050.0}]}]}, {"counterparty": {"id": "cp-788957986872", "name": "ТОО «Дәурен Строй»", "bin": "788957986872", "tax_mode": "—"}, "net": -20747623.79, "sides": {"debt": 10555.5, "advance": 20758179.29}, "status": "we_owe", "currency": "KZT", "contracts": 2, "orgs": ["org-zharkyn-bzhk"], "detail": [{"contract": "Договор №444 от 2026-09-21", "account": "1210", "currency": "KZT", "dt": 10555.5, "kt": 0.0, "amount_cur": null, "rate": null, "folded": 10555.5, "sign": 1, "side": "debt", "documents": [{"id": "doc-788957986872-1210-dg-788957986872-1-1", "name": "ТОО «Салауат Курылыс»", "date": "2026-07-22", "amount": 2171.41}, {"id": "doc-788957986872-1210-dg-788957986872-1-2", "name": "ТОО «Темірбек Групп»", "date": "2026-07-10", "amount": 4644.42}, {"id": "doc-788957986872-1210-dg-788957986872-1-3", "name": "ТОО «Қаусар Проект»", "date": "2026-02-03", "amount": 3739.67}]}, {"contract": "Договор №304 от 2026-09-09", "account": "3510", "currency": "KZT", "dt": 0.0, "kt": 20758179.29, "amount_cur": null, "rate": null, "folded": 20758179.29, "sign": -1, "side": "advance", "documents": [{"id": "doc-788957986872-3510-dg-788957986872-2-1", "name": "ТОО «Жібек Логистик»", "date": "2026-07-20", "amount": 10498389.53}, {"id": "doc-788957986872-3510-dg-788957986872-2-2", "name": "ТОО «Атамекен Комплект»", "date": "2026-06-18", "amount": 10259789.77}]}]}, {"counterparty": {"id": "cp-774348734714", "name": "ТОО «Оркен Снаб»", "bin": "774348734714", "tax_mode": "—"}, "net": -24991442.52, "sides": {"advance": 24991442.52}, "status": "we_owe", "currency": "KZT", "contracts": 1, "orgs": ["org-zharkyn-astana"], "detail": [{"contract": "Договор №456 от 2024-01-25", "account": "3510", "currency": "KZT", "dt": 0.0, "kt": 24991442.52, "amount_cur": null, "rate": null, "folded": 24991442.52, "sign": -1, "side": "advance", "documents": [{"id": "doc-774348734714-3510-dg-774348734714-3-1", "name": "ТОО «Байсал Трейд»", "date": "2026-06-15", "amount": 24991442.52}]}]}, {"counterparty": {"id": "cp-345581223623", "name": "ТОО «Аманат Материалдары»", "bin": "345581223623", "tax_mode": "Общеустановленный"}, "net": -37787078.47, "sides": {"debt": 65382621.53, "advance": 103169700.0}, "status": "we_owe", "currency": "USD", "contracts": 3, "orgs": ["org-zharkyn-bzhk"], "detail": [{"contract": "Договор №353 от 2024-10-18", "account": "1210", "currency": "KZT", "dt": 4086413.85, "kt": 0.0, "amount_cur": null, "rate": null, "folded": 4086413.85, "sign": 1, "side": "debt", "documents": [{"id": "doc-345581223623-1210-dg-345581223623-1-1", "name": "ТОО «Дулат Сервис»", "date": "2026-04-19", "amount": 4086413.85}]}, {"contract": "Договор №489 от 2025-02-26", "account": "1210", "currency": "USD", "dt": 61296207.69, "kt": 0.0, "amount_cur": 118221.05, "rate": 518.4881, "folded": 61296207.69, "sign": 1, "side": "debt", "documents": [{"id": "doc-345581223623-1210-dg-345581223623-2-1", "name": "ТОО «Есіл Индустрия»", "date": "2026-05-10", "amount": 61296207.69}]}, {"contract": "Договор №100 от 2024-01-01", "account": "3510", "currency": "KZT", "dt": 0.0, "kt": 103169700.0, "amount_cur": null, "rate": null, "folded": 103169700.0, "sign": -1, "side": "advance", "documents": [{"id": "doc-345581223623-3510-dg-345581223623-3-1", "name": "ТОО «Жалын Инвест»", "date": "2026-06-21", "amount": 103169700.0}]}]}, {"counterparty": {"id": "cp-166587603669", "name": "ТОО «Қайсар Строй»", "bin": "166587603669", "tax_mode": "Общеустановленный"}, "net": -155424862.73, "sides": {"debt": 33814315.69, "advance": 189239178.42}, "status": "we_owe", "currency": "USD", "contracts": 3, "orgs": ["org-zharkyn-eng"], "detail": [{"contract": "Договор №425 от 2025-02-06", "account": "1210", "currency": "KZT", "dt": 13951361.02, "kt": 0.0, "amount_cur": null, "rate": null, "folded": 13951361.02, "sign": 1, "side": "debt", "documents": [{"id": "doc-166587603669-1210-dg-166587603669-1-1", "name": "ТОО «Мұрагер Курылыс»", "date": "2026-06-05", "amount": 2823489.73}, {"id": "doc-166587603669-1210-dg-166587603669-1-2", "name": "ТОО «Нысана Групп»", "date": "2026-04-22", "amount": 11127871.29}]}, {"contract": "Договор №427 от 2025-08-12", "account": "1210", "currency": "USD", "dt": 19862954.67, "kt": 0.0, "amount_cur": 38309.38, "rate": 518.4881, "folded": 19862954.67, "sign": 1, "side": "debt", "documents": [{"id": "doc-166587603669-1210-dg-166587603669-2-1", "name": "ТОО «Отан Проект»", "date": "2026-03-31", "amount": 13655781.34}, {"id": "doc-166587603669-1210-dg-166587603669-2-2", "name": "ТОО «Парасат Логистик»", "date": "2026-07-10", "amount": 6207173.33}]}, {"contract": "Договор №249 от 2024-10-10", "account": "3510", "currency": "KZT", "dt": 0.0, "kt": 189239178.42, "amount_cur": null, "rate": null, "folded": 189239178.42, "sign": -1, "side": "advance", "documents": [{"id": "doc-166587603669-3510-dg-166587603669-3-1", "name": "ТОО «Рауан Комплект»", "date": "2026-03-18", "amount": 56771753.53}, {"id": "doc-166587603669-3510-dg-166587603669-3-2", "name": "ТОО «Сұңқар Снаб»", "date": "2026-04-15", "amount": 54406263.8}, {"id": "doc-166587603669-3510-dg-166587603669-3-3", "name": "ТОО «Ұлытау Трейд»", "date": "2026-02-23", "amount": 78061161.1}]}]}, {"counterparty": {"id": "cp-096705466889", "name": "ТОО «Шұғыла Материалдары»", "bin": "096705466889", "tax_mode": "—"}, "net": -211700074.12, "sides": {"debt": 21187184.22, "advance": 232887258.35}, "status": "we_owe", "currency": "KZT", "contracts": 2, "orgs": ["org-zharkyn-bzhk"], "detail": [{"contract": "Договор №474 от 2025-11-07", "account": "1210", "currency": "KZT", "dt": 21187184.22, "kt": 0.0, "amount_cur": null, "rate": null, "folded": 21187184.22, "sign": 1, "side": "debt", "documents": [{"id": "doc-096705466889-1210-dg-096705466889-1-1", "name": "ТОО «Алатау Сервис»", "date": "2026-01-26", "amount": 2612118.6}, {"id": "doc-096705466889-1210-dg-096705466889-1-2", "name": "ТОО «Сарыарқа Индустрия»", "date": "2026-03-19", "amount": 4643766.41}, {"id": "doc-096705466889-1210-dg-096705466889-1-3", "name": "ТОО «Байтерек Инвест»", "date": "2026-04-03", "amount": 13931299.22}]}, {"contract": "Договор №458 от 2024-07-23", "account": "3510", "currency": "KZT", "dt": 0.0, "kt": 232887258.35, "amount_cur": null, "rate": null, "folded": 232887258.35, "sign": -1, "side": "advance", "documents": [{"id": "doc-096705466889-3510-dg-096705466889-2-1", "name": "ТОО «Жетісу Строй»", "date": "2026-03-25", "amount": 98744197.54}, {"id": "doc-096705466889-3510-dg-096705466889-2-2", "name": "ТОО «Мерей Курылыс»", "date": "2026-06-10", "amount": 134143060.81}]}]}], "totals": {"owed_to_us": 148630085.56, "we_owe": 511565369.94, "net": -362935284.38, "sum_debt": 349867801.77, "sum_advance": 712803086.15}}, "/api/report?set=suppliers": {"as_of": "2026-08-01T21:56:39", "report_date": "2026-08-01", "source": "schedule", "org": null, "orgs": [{"id": "org-zharkyn-eng", "name": "ТОО «Алатау Строй»", "bin": "104332181960"}, {"id": "org-zharkyn-bzhk", "name": "ТОО «Сарыарқа Курылыс»", "bin": "013389083863"}, {"id": "org-zharkyn-astana", "name": "ТОО «Байтерек Групп»", "bin": "794026542351"}], "total": 9.51, "direction": "suppliers", "rows": [{"counterparty": {"id": "cp-586923226025", "name": "ТОО «Мерей Снаб»", "bin": "586923226025", "tax_mode": "—"}, "net": 131362452.22, "sides": {"debt": 131362452.22}, "status": "we_owe", "currency": "KZT", "contracts": 1, "orgs": ["org-zharkyn-bzhk"], "detail": [{"contract": "Договор №111 от 2024-04-08", "account": "3310", "currency": "KZT", "dt": 0.0, "kt": 131362452.22, "amount_cur": null, "rate": null, "folded": 131362452.22, "sign": 1, "side": "debt", "documents": [{"id": "doc-586923226025-3310-dg-586923226025-1-1", "name": "ТОО «Нұрлы Групп»", "date": "2026-07-13", "amount": 35319149.89}, {"id": "doc-586923226025-3310-dg-586923226025-1-2", "name": "ТОО «Дала Проект»", "date": "2026-02-04", "amount": 52049273.52}, {"id": "doc-586923226025-3310-dg-586923226025-1-3", "name": "ТОО «Тұлпар Логистик»", "date": "2026-02-08", "amount": 43994028.81}]}]}, {"counterparty": {"id": "cp-373467065627", "name": "ТОО «Аспан Комплект»", "bin": "373467065627", "tax_mode": "Общеустановленный"}, "net": 26524125.0, "sides": {"advance": 8780400.0, "debt": 35304525.0}, "status": "we_owe", "currency": "KZT", "contracts": 2, "orgs": ["org-zharkyn-astana"], "detail": [{"contract": "Договор №180 от 2025-05-01", "account": "1710", "currency": "KZT", "dt": 8780400.0, "kt": 0.0, "amount_cur": null, "rate": null, "folded": 8780400.0, "sign": -1, "side": "advance", "documents": [{"id": "doc-373467065627-1710-dg-373467065627-2-1", "name": "ТОО «Береке Снаб»", "date": "2026-04-17", "amount": 4263315.61}, {"id": "doc-373467065627-1710-dg-373467065627-2-2", "name": "ТОО «Қыран Трейд»", "date": "2026-06-09", "amount": 4009546.82}, {"id": "doc-373467065627-1710-dg-373467065627-2-3", "name": "ТОО «Алтын Материалдары»", "date": "2026-07-04", "amount": 507537.57}]}, {"contract": "Договор №355 от 2025-08-08", "account": "3310", "currency": "KZT", "dt": 0.0, "kt": 35304525.0, "amount_cur": null, "rate": null, "folded": 35304525.0, "sign": 1, "side": "debt", "documents": [{"id": "doc-373467065627-3310-dg-373467065627-1-1", "name": "ТОО «Ақжол Сервис»", "date": "2026-04-08", "amount": 15933900.66}, {"id": "doc-373467065627-3310-dg-373467065627-1-2", "name": "ТОО «Самғау Индустрия»", "date": "2026-05-30", "amount": 8748023.89}, {"id": "doc-373467065627-3310-dg-373467065627-1-3", "name": "ТОО «Орда Инвест»", "date": "2026-03-05", "amount": 10622600.45}]}]}, {"counterparty": {"id": "cp-184959310341", "name": "ТОО «Нұрлы Комплект»", "bin": "184959310341", "tax_mode": "—"}, "net": 26502997.16, "sides": {"debt": 26502997.16}, "status": "we_owe", "currency": "KZT", "contracts": 1, "orgs": ["org-zharkyn-astana"], "detail": [{"contract": "Договор №472 от 2025-05-01", "account": "3310", "currency": "KZT", "dt": 0.0, "kt": 26502997.16, "amount_cur": null, "rate": null, "folded": 26502997.16, "sign": 1, "side": "debt", "documents": [{"id": "doc-184959310341-3310-dg-184959310341-1-1", "name": "ТОО «Тау Строй»", "date": "2026-05-24", "amount": 7794999.17}, {"id": "doc-184959310341-3310-dg-184959310341-1-2", "name": "ТОО «Керуен Курылыс»", "date": "2026-02-19", "amount": 18707998.0}]}]}, {"counterparty": {"id": "cp-298069901627", "name": "ТОО «Арман Групп»", "bin": "298069901627", "tax_mode": "Общеустановленный"}, "net": 23034281.85, "sides": {"debt": 23034281.85}, "status": "we_owe", "currency": "KZT", "contracts": 1, "orgs": ["org-zharkyn-bzhk"], "detail": [{"contract": "Договор №312 от 2024-01-09", "account": "3310", "currency": "KZT", "dt": 0.0, "kt": 23034281.85, "amount_cur": null, "rate": null, "folded": 23034281.85, "sign": 1, "side": "debt", "documents": [{"id": "doc-298069901627-3310-dg-298069901627-1-1", "name": "ТОО «Жайық Проект»", "date": "2026-07-12", "amount": 23034281.85}]}]}, {"counterparty": {"id": "cp-204653755646", "name": "ТОО «Арматура Казахстан»", "bin": "204653755646", "tax_mode": "Общеустановленный"}, "net": 11121840.0, "sides": {"advance": 3292650.0, "debt": 14414490.0}, "status": "we_owe", "currency": "KZT", "contracts": 2, "orgs": ["org-zharkyn-bzhk"], "detail": [{"contract": "Договор №163 от 2026-12-04", "account": "1710", "currency": "KZT", "dt": 3292650.0, "kt": 0.0, "amount_cur": null, "rate": null, "folded": 3292650.0, "sign": -1, "side": "advance", "documents": [{"id": "doc-204653755646-1710-dg-204653755646-2-1", "name": "ТОО «Шыңғыс Логистик»", "date": "2026-06-05", "amount": 1664027.42}, {"id": "doc-204653755646-1710-dg-204653755646-2-2", "name": "ТОО «Айбын Комплект»", "date": "2026-02-14", "amount": 1628622.58}]}, {"contract": "Договор №496 от 2026-09-25", "account": "3310", "currency": "KZT", "dt": 0.0, "kt": 14414490.0, "amount_cur": null, "rate": null, "folded": 14414490.0, "sign": 1, "side": "debt", "documents": [{"id": "doc-204653755646-3310-dg-204653755646-1-1", "name": "ТОО «Дария Снаб»", "date": "2026-04-08", "amount": 2039786.32}, {"id": "doc-204653755646-3310-dg-204653755646-1-2", "name": "ТОО «Болашақ Трейд»", "date": "2026-01-26", "amount": 5711401.7}, {"id": "doc-204653755646-3310-dg-204653755646-1-3", "name": "ТОО «Қазына Материалдары»", "date": "2026-06-12", "amount": 6663301.98}]}]}, {"counterparty": {"id": "cp-484656482366", "name": "ТОО «Шыңғыс Сервис»", "bin": "484656482366", "tax_mode": "—"}, "net": 10701258.84, "sides": {"debt": 10701258.84}, "status": "we_owe", "currency": "KZT", "contracts": 1, "orgs": ["org-zharkyn-bzhk"], "detail": [{"contract": "Договор №191 от 2024-04-08", "account": "3310", "currency": "KZT", "dt": 0.0, "kt": 10701258.84, "amount_cur": null, "rate": null, "folded": 10701258.84, "sign": 1, "side": "debt", "documents": [{"id": "doc-484656482366-3310-dg-484656482366-1-1", "name": "ТОО «Қаусар Проект»", "date": "2026-03-22", "amount": 9241996.27}, {"id": "doc-484656482366-3310-dg-484656482366-1-2", "name": "ТОО «Тәуелсіз Сервис»", "date": "2026-02-10", "amount": 1459262.57}]}]}, {"counterparty": {"id": "cp-417080531003", "name": "ТОО «Салтанат Индустрия»", "bin": "417080531003", "tax_mode": "Общеустановленный"}, "net": 8707230.0, "sides": {"advance": 1682910.0, "debt": 10390140.0}, "status": "we_owe", "currency": "KZT", "contracts": 2, "orgs": ["org-zharkyn-bzhk"], "detail": [{"contract": "Договор №333 от 2024-10-10", "account": "1710", "currency": "KZT", "dt": 1682910.0, "kt": 0.0, "amount_cur": null, "rate": null, "folded": 1682910.0, "sign": -1, "side": "advance", "documents": [{"id": "doc-417080531003-1710-dg-417080531003-2-1", "name": "ТОО «Ертіс Инвест»", "date": "2026-04-17", "amount": 677681.88}, {"id": "doc-417080531003-1710-dg-417080531003-2-2", "name": "ТОО «Оқжетпес Строй»", "date": "2026-05-22", "amount": 429198.52}, {"id": "doc-417080531003-1710-dg-417080531003-2-3", "name": "ТОО «Аружан Логистик»", "date": "2026-06-25", "amount": 576029.6}]}, {"contract": "Договор №237 от 2026-06-14", "account": "3310", "currency": "KZT", "dt": 0.0, "kt": 10390140.0, "amount_cur": null, "rate": null, "folded": 10390140.0, "sign": 1, "side": "debt", "documents": [{"id": "doc-417080531003-3310-dg-417080531003-1-1", "name": "ТОО «Аружан Курылыс»", "date": "2026-03-13", "amount": 6253325.0}, {"id": "doc-417080531003-3310-dg-417080531003-1-2", "name": "ТОО «Батыр Групп»", "date": "2026-04-19", "amount": 4136815.0}]}]}, {"counterparty": {"id": "cp-345581223623", "name": "ТОО «Аманат Материалдары»", "bin": "345581223623", "tax_mode": "Общеустановленный"}, "net": 6644201.85, "sides": {"debt": 6644201.85}, "status": "we_owe", "currency": "USD", "contracts": 2, "orgs": ["org-zharkyn-bzhk"], "detail": [{"contract": "Договор №353 от 2024-10-18", "account": "3310", "currency": "KZT", "dt": 0.0, "kt": 5315361.48, "amount_cur": null, "rate": null, "folded": 5315361.48, "sign": 1, "side": "debt", "documents": [{"id": "doc-345581223623-3310-dg-345581223623-1-1", "name": "ТОО «Нұрлы Строй»", "date": "2026-02-20", "amount": 4606646.61}, {"id": "doc-345581223623-3310-dg-345581223623-1-2", "name": "ТОО «Дала Курылыс»", "date": "2026-03-25", "amount": 708714.87}]}, {"contract": "Договор №489 от 2025-02-26", "account": "3310", "currency": "USD", "dt": 0.0, "kt": 1328840.37, "amount_cur": 2562.91, "rate": 518.4881, "folded": 1328840.37, "sign": 1, "side": "debt", "documents": [{"id": "doc-345581223623-3310-dg-345581223623-2-1", "name": "ТОО «Мирас Проект»", "date": "2026-06-06", "amount": 1328840.37}]}]}, {"counterparty": {"id": "cp-309232719374", "name": "ТОО «Шапағат Логистик»", "bin": "309232719374", "tax_mode": "Упрощенная декларация"}, "net": 2282904.0, "sides": {"debt": 2282904.0}, "status": "we_owe", "currency": "KZT", "contracts": 1, "orgs": ["org-zharkyn-bzhk"], "detail": [{"contract": "Договор №282 от 2025-11-15", "account": "3310", "currency": "KZT", "dt": 0.0, "kt": 2282904.0, "amount_cur": null, "rate": null, "folded": 2282904.0, "sign": 1, "side": "debt", "documents": [{"id": "doc-309232719374-3310-dg-309232719374-1-1", "name": "ТОО «Айдын Комплект»", "date": "2026-06-02", "amount": 894004.36}, {"id": "doc-309232719374-3310-dg-309232719374-1-2", "name": "ТОО «Нұрсая Снаб»", "date": "2026-04-06", "amount": 1388899.64}]}]}, {"counterparty": {"id": "cp-096705466889", "name": "ТОО «Шұғыла Материалдары»", "bin": "096705466889", "tax_mode": "—"}, "net": 909232.28, "sides": {"debt": 909232.28}, "status": "we_owe", "currency": "KZT", "contracts": 1, "orgs": ["org-zharkyn-bzhk"], "detail": [{"contract": "Договор №474 от 2025-11-07", "account": "3310", "currency": "KZT", "dt": 0.0, "kt": 909232.28, "amount_cur": null, "rate": null, "folded": 909232.28, "sign": 1, "side": "debt", "documents": [{"id": "doc-096705466889-3310-dg-096705466889-1-1", "name": "ТОО «Дәурен Трейд»", "date": "2026-05-07", "amount": 909232.28}]}]}, {"counterparty": {"id": "cp-529912419049", "name": "ТОО «Салауат Материалдары»", "bin": "529912419049", "tax_mode": "—"}, "net": -4873122.0, "sides": {"advance": 11414520.0, "debt": 6541398.0}, "status": "owes_us", "currency": "KZT", "contracts": 2, "orgs": ["org-zharkyn-bzhk"], "detail": [{"contract": "Договор №200 от 2024-01-17", "account": "1710", "currency": "KZT", "dt": 11414520.0, "kt": 0.0, "amount_cur": null, "rate": null, "folded": 11414520.0, "sign": -1, "side": "advance", "documents": [{"id": "doc-529912419049-1710-dg-529912419049-2-1", "name": "ТОО «Темірбек Сервис»", "date": "2026-06-21", "amount": 11414520.0}]}, {"contract": "Договор №335 от 2026-12-04", "account": "3310", "currency": "KZT", "dt": 0.0, "kt": 6541398.0, "amount_cur": null, "rate": null, "folded": 6541398.0, "sign": 1, "side": "debt", "documents": [{"id": "doc-529912419049-3310-dg-529912419049-1-1", "name": "ТОО «Қаусар Индустрия»", "date": "2026-04-21", "amount": 1619774.75}, {"id": "doc-529912419049-3310-dg-529912419049-1-2", "name": "ТОО «Жібек Инвест»", "date": "2026-04-28", "amount": 4921623.25}]}]}, {"counterparty": {"id": "cp-663193149190", "name": "ТОО «Атамекен Строй»", "bin": "663193149190", "tax_mode": "—"}, "net": -4938975.0, "sides": {"advance": 4938975.0}, "status": "owes_us", "currency": "KZT", "contracts": 1, "orgs": ["org-zharkyn-bzhk"], "detail": [{"contract": "Договор №129 от 2025-02-02", "account": "1710", "currency": "KZT", "dt": 4938975.0, "kt": 0.0, "amount_cur": null, "rate": null, "folded": 4938975.0, "sign": -1, "side": "advance", "documents": [{"id": "doc-663193149190-1710-dg-663193149190-2-1", "name": "ТОО «Оркен Курылыс»", "date": "2026-02-26", "amount": 1067886.49}, {"id": "doc-663193149190-1710-dg-663193149190-2-2", "name": "ТОО «Байсал Групп»", "date": "2026-03-09", "amount": 3871088.51}]}]}, {"counterparty": {"id": "cp-586518506716", "name": "ТОО «Аманат Проект»", "bin": "586518506716", "tax_mode": "Общеустановленный"}, "net": -19975410.0, "sides": {"advance": 19975410.0}, "status": "owes_us", "currency": "KZT", "contracts": 1, "orgs": ["org-zharkyn-bzhk"], "detail": [{"contract": "Договор №185 от 2024-10-10", "account": "1710", "currency": "KZT", "dt": 19975410.0, "kt": 0.0, "amount_cur": null, "rate": null, "folded": 19975410.0, "sign": -1, "side": "advance", "documents": [{"id": "doc-586518506716-1710-dg-586518506716-2-1", "name": "ТОО «Дулат Логистик»", "date": "2026-07-14", "amount": 9415161.4}, {"id": "doc-586518506716-1710-dg-586518506716-2-2", "name": "ТОО «Есіл Комплект»", "date": "2026-01-26", "amount": 10560248.6}]}]}], "totals": {"owed_to_us": 29787507.0, "we_owe": 247790523.2, "net": -218003016.2, "sum_debt": 268087881.2, "sum_advance": 50084865.0}}, "/api/orgs": [{"id": "org-zharkyn-eng", "name": "ТОО «Алатау Строй»", "bin": "104332181960"}, {"id": "org-zharkyn-bzhk", "name": "ТОО «Сарыарқа Курылыс»", "bin": "013389083863"}, {"id": "org-zharkyn-astana", "name": "ТОО «Байтерек Групп»", "bin": "794026542351"}], "/api/aging": {"report_date": "2026-08-01", "rows": [{"counterparty": {"id": "cp-345581223623", "name": "ТОО «Аманат Материалдары»", "bin": "345581223623", "tax_mode": "Общеустановленный"}, "0-30": 0.0, "31-60": 0.0, "61-90": 61296207.69, "90+": 4086413.85, "total": 65382621.53}, {"counterparty": {"id": "cp-161559407816", "name": "ТОО «Жетісу Проект»", "bin": "161559407816", "tax_mode": "Общеустановленный"}, "0-30": 0.0, "31-60": 0.0, "61-90": 43404444.0, "90+": 0.0, "total": 43404444.0}, {"counterparty": {"id": "cp-166587603669", "name": "ТОО «Қайсар Строй»", "bin": "166587603669", "tax_mode": "Общеустановленный"}, "0-30": 6207173.33, "31-60": 2823489.73, "61-90": 0.0, "90+": 24783652.62, "total": 33814315.69}, {"counterparty": {"id": "cp-118244935348", "name": "ТОО «Парасат Сервис»", "bin": "118244935348", "tax_mode": "—"}, "0-30": 0.0, "31-60": 0.0, "61-90": 0.0, "90+": 28421986.51, "total": 28421986.51}, {"counterparty": {"id": "cp-184959310341", "name": "ТОО «Нұрлы Комплект»", "bin": "184959310341", "tax_mode": "—"}, "0-30": 0.0, "31-60": 0.0, "61-90": 26502997.97, "90+": 0.0, "total": 26502997.97}, {"counterparty": {"id": "cp-951343320037", "name": "ТОО «Оқжетпес Комплект»", "bin": "951343320037", "tax_mode": "Общеустановленный"}, "0-30": 23430544.21, "31-60": 0.0, "61-90": 0.0, "90+": 2130049.48, "total": 25560593.69}, {"counterparty": {"id": "cp-928327648350", "name": "ТОО «Самғау Курылыс»", "bin": "928327648350", "tax_mode": "Общеустановленный"}, "0-30": 0.0, "31-60": 0.0, "61-90": 17940247.8, "90+": 4172543.51, "total": 22112791.31}, {"counterparty": {"id": "cp-096705466889", "name": "ТОО «Шұғыла Материалдары»", "bin": "096705466889", "tax_mode": "—"}, "0-30": 0.0, "31-60": 0.0, "61-90": 0.0, "90+": 21187184.22, "total": 21187184.22}, {"counterparty": {"id": "cp-316475255341", "name": "ТОО «Аспан Материалдары»", "bin": "316475255341", "tax_mode": "Общеустановленный"}, "0-30": 0.0, "31-60": 0.0, "61-90": 0.0, "90+": 20819034.49, "total": 20819034.49}, {"counterparty": {"id": "cp-132677360260", "name": "ТОО «Орда Сервис»", "bin": "132677360260", "tax_mode": "Общеустановленный"}, "0-30": 5927418.93, "31-60": 5324378.43, "61-90": 0.0, "90+": 6012096.34, "total": 17263893.7}, {"counterparty": {"id": "cp-166978480184", "name": "ТОО «Ертіс Групп»", "bin": "166978480184", "tax_mode": "—"}, "0-30": 0.0, "31-60": 0.0, "61-90": 0.0, "90+": 9904302.91, "total": 9904302.91}, {"counterparty": {"id": "cp-724238849696", "name": "ТОО «Дария Сервис»", "bin": "724238849696", "tax_mode": "—"}, "0-30": 0.0, "31-60": 0.0, "61-90": 0.0, "90+": 8242397.31, "total": 8242397.31}, {"counterparty": {"id": "cp-532871012269", "name": "ТОО «Тәуелсіз Строй»", "bin": "532871012269", "tax_mode": "—"}, "0-30": 0.0, "31-60": 0.0, "61-90": 0.0, "90+": 7713779.69, "total": 7713779.69}, {"counterparty": {"id": "cp-509839301031", "name": "ТОО «Нысана Строй»", "bin": "509839301031", "tax_mode": "Общеустановленный"}, "0-30": 0.0, "31-60": 0.0, "61-90": 5333766.72, "90+": 1737968.93, "total": 7071735.65}, {"counterparty": {"id": "cp-624731781080", "name": "ТОО «Қыран Комплект»", "bin": "624731781080", "tax_mode": "Общеустановленный"}, "0-30": 5416568.81, "31-60": 203121.33, "61-90": 0.0, "90+": 0.0, "total": 5619690.14}, {"counterparty": {"id": "cp-514627048281", "name": "ТОО «Мирас Снаб»", "bin": "514627048281", "tax_mode": "Упрощенная декларация"}, "0-30": 0.0, "31-60": 0.0, "61-90": 0.0, "90+": 4612919.24, "total": 4612919.24}, {"counterparty": {"id": "cp-489325288095", "name": "ТОО «Айдын Материалдары»", "bin": "489325288095", "tax_mode": "Общеустановленный"}, "0-30": 0.0, "31-60": 2255251.99, "61-90": 0.0, "90+": 1375153.66, "total": 3630405.65}, {"counterparty": {"id": "cp-278498084124", "name": "ТОО «Дулат Групп»", "bin": "278498084124", "tax_mode": "—"}, "0-30": 0.0, "31-60": 878040.0, "61-90": 859747.5, "90+": 603652.5, "total": 2341440.0}, {"counterparty": {"id": "cp-701543039117", "name": "ТОО «Жібек Групп»", "bin": "701543039117", "tax_mode": "—"}, "0-30": 0.0, "31-60": 0.0, "61-90": 0.0, "90+": 1799982.0, "total": 1799982.0}, {"counterparty": {"id": "cp-182278248963", "name": "ТОО «Аманат Снаб»", "bin": "182278248963", "tax_mode": "Общеустановленный"}, "0-30": 0.0, "31-60": 0.0, "61-90": 0.0, "90+": 1288379.47, "total": 1288379.47}, {"counterparty": {"id": "cp-834657871331", "name": "ТОО «Есіл Материалдары»", "bin": "834657871331", "tax_mode": "Общеустановленный"}, "0-30": 62308.83, "31-60": 328159.83, "61-90": 0.0, "90+": 8307.85, "total": 398776.5}, {"counterparty": {"id": "cp-051834738299", "name": "ТОО «Сұңқар Логистик»", "bin": "051834738299", "tax_mode": "—"}, "0-30": 0.0, "31-60": 0.0, "61-90": 15885.59, "90+": 276794.41, "total": 292680.0}, {"counterparty": {"id": "cp-737631165667", "name": "ТОО «Байтерек Сервис»", "bin": "737631165667", "tax_mode": "—"}, "0-30": 24969.88, "31-60": 0.0, "61-90": 56662.42, "90+": 120441.09, "total": 202073.38}, {"counterparty": {"id": "cp-788957986872", "name": "ТОО «Дәурен Строй»", "bin": "788957986872", "tax_mode": "—"}, "0-30": 6815.84, "31-60": 0.0, "61-90": 0.0, "90+": 3739.67, "total": 10555.5}, {"counterparty": {"id": "cp-010651333872", "name": "ТОО «Тұлпар Групп»", "bin": "010651333872", "tax_mode": "Общеустановленный"}, "0-30": 0.0, "31-60": 0.0, "61-90": 468.37, "90+": 1632.88, "total": 1975.59}, {"counterparty": {"id": "cp-118384251354", "name": "ТОО «Қаусар Материалдары»", "bin": "118384251354", "tax_mode": "—"}, "0-30": 0.0, "31-60": -9649.84, "61-90": 0.0, "90+": -626014.53, "total": -635664.38}, {"counterparty": {"id": "cp-957773872148", "name": "ТОО «Салтанат Проект»", "bin": "957773872148", "tax_mode": "—"}, "0-30": 0.0, "31-60": 0.0, "61-90": -7097490.0, "90+": 0.0, "total": -7097490.0}], "totals": {"0-30": 41075799.83, "31-60": 11802791.47, "61-90": 148312812.39, "90+": 148676398.07, "total": 349867801.77, "overdue": 308792001.94}, "overdue_days": 21.95}, "/api/history": [{"date": "2026-06-05", "owed_to_us": 121430779.89, "we_owe": 417948907.23, "net": -296518127.34, "suppliers_net": -178108464.23}, {"date": "2026-06-12", "owed_to_us": 144795429.35, "we_owe": 498366983.4, "net": -353571554.05, "suppliers_net": -212378538.39}, {"date": "2026-06-19", "owed_to_us": 147039743.64, "we_owe": 506091620.48, "net": -359051876.85, "suppliers_net": -215670383.92}, {"date": "2026-06-26", "owed_to_us": 143755018.75, "we_owe": 494786025.8, "net": -351031007.05, "suppliers_net": -210852517.27}, {"date": "2026-07-03", "owed_to_us": 126276120.68, "we_owe": 434625938.29, "net": -308349817.61, "suppliers_net": -185215362.57}, {"date": "2026-07-10", "owed_to_us": 133841392.04, "we_owe": 460664615.64, "net": -326823223.6, "suppliers_net": -196311716.09}, {"date": "2026-07-15", "owed_to_us": 149625907.14, "we_owe": 514992857.92, "net": -365366950.79, "suppliers_net": -219463636.41}, {"date": "2026-07-17", "owed_to_us": 144468443.16, "we_owe": 497241539.58, "net": -352773096.42, "suppliers_net": -211898931.75}, {"date": "2026-07-24", "owed_to_us": 143621251.68, "we_owe": 494325616.98, "net": -350704365.3, "suppliers_net": -210656314.55}, {"date": "2026-07-31", "owed_to_us": 148630085.56, "we_owe": 511565369.94, "net": -362935284.38, "suppliers_net": -218003016.2}, {"date": "2026-08-01", "owed_to_us": 148630085.56, "we_owe": 511565369.94, "net": -362935284.38, "suppliers_net": -218003016.2}], "/api/calendar": {"report_date": "2026-08-01", "items": [{"due": "2026-02-22", "direction": "in", "set": "customers", "counterparty": "ТОО «Байтерек Сервис»", "doc": "ТОО «Мерей Инвест»", "doc_date": "2026-01-23", "amount": 7606.8, "overdue_days": 117.07}, {"due": "2026-02-23", "direction": "in", "set": "customers", "counterparty": "ТОО «Аманат Снаб»", "doc": "ТОО «Дулат Трейд»", "doc_date": "2026-01-24", "amount": 1111543.07, "overdue_days": 116.34}, {"due": "2026-02-25", "direction": "in", "set": "customers", "counterparty": "ТОО «Шұғыла Материалдары»", "doc": "ТОО «Алатау Сервис»", "doc_date": "2026-01-26", "amount": 2612118.6, "overdue_days": 114.88}, {"due": "2026-02-25", "direction": "out", "set": "suppliers", "counterparty": "ТОО «Арматура Казахстан»", "doc": "ТОО «Болашақ Трейд»", "doc_date": "2026-01-26", "amount": 5711401.7, "overdue_days": 114.88}, {"due": "2026-02-27", "direction": "in", "set": "customers", "counterparty": "ТОО «Парасат Сервис»", "doc": "ТОО «Рауан Индустрия»", "doc_date": "2026-01-28", "amount": 28421986.51, "overdue_days": 113.41}, {"due": "2026-03-02", "direction": "in", "set": "customers", "counterparty": "ТОО «Тәуелсіз Строй»", "doc": "ТОО «Салтанат Курылыс»", "doc_date": "2026-01-31", "amount": 7713779.69, "overdue_days": 111.22}, {"due": "2026-03-02", "direction": "out", "set": "customers", "counterparty": "ТОО «Қаусар Материалдары»", "doc": "ТОО «Оркен Инвест»", "doc_date": "2026-01-31", "amount": 11181.57, "overdue_days": 111.22}, {"due": "2026-03-05", "direction": "in", "set": "customers", "counterparty": "ТОО «Дәурен Строй»", "doc": "ТОО «Қаусар Проект»", "doc_date": "2026-02-03", "amount": 3739.67, "overdue_days": 109.02}, {"due": "2026-03-06", "direction": "out", "set": "suppliers", "counterparty": "ТОО «Мерей Снаб»", "doc": "ТОО «Дала Проект»", "doc_date": "2026-02-04", "amount": 52049273.52, "overdue_days": 108.29}, {"due": "2026-03-07", "direction": "in", "set": "customers", "counterparty": "ТОО «Нысана Строй»", "doc": "ТОО «Дала Снаб»", "doc_date": "2026-02-05", "amount": 1737968.93, "overdue_days": 107.56}, {"due": "2026-03-07", "direction": "in", "set": "customers", "counterparty": "ТОО «Сұңқар Логистик»", "doc": "ТОО «Алатау Трейд»", "doc_date": "2026-02-05", "amount": 15129.13, "overdue_days": 107.56}, {"due": "2026-03-10", "direction": "out", "set": "suppliers", "counterparty": "ТОО «Мерей Снаб»", "doc": "ТОО «Тұлпар Логистик»", "doc_date": "2026-02-08", "amount": 43994028.81, "overdue_days": 105.36}, {"due": "2026-03-12", "direction": "out", "set": "suppliers", "counterparty": "ТОО «Шыңғыс Сервис»", "doc": "ТОО «Тәуелсіз Сервис»", "doc_date": "2026-02-10", "amount": 1459262.57, "overdue_days": 103.9}, {"due": "2026-03-19", "direction": "in", "set": "customers", "counterparty": "ТОО «Жібек Групп»", "doc": "ТОО «Байсал Комплект»", "doc_date": "2026-02-17", "amount": 1619983.8, "overdue_days": 98.78}, {"due": "2026-03-21", "direction": "out", "set": "suppliers", "counterparty": "ТОО «Нұрлы Комплект»", "doc": "ТОО «Керуен Курылыс»", "doc_date": "2026-02-19", "amount": 18707998.0, "overdue_days": 97.32}, {"due": "2026-03-22", "direction": "out", "set": "suppliers", "counterparty": "ТОО «Аманат Материалдары»", "doc": "ТОО «Нұрлы Строй»", "doc_date": "2026-02-20", "amount": 4606646.61, "overdue_days": 96.58}, {"due": "2026-03-24", "direction": "out", "set": "customers", "counterparty": "ТОО «Қаусар Материалдары»", "doc": "ТОО «Атамекен Индустрия»", "doc_date": "2026-02-22", "amount": 4595.16, "overdue_days": 95.12}, {"due": "2026-03-28", "direction": "in", "set": "customers", "counterparty": "ТОО «Оқжетпес Комплект»", "doc": "ТОО «Батыр Трейд»", "doc_date": "2026-02-26", "amount": 2130049.48, "overdue_days": 92.19}, {"due": "2026-03-30", "direction": "in", "set": "customers", "counterparty": "ТОО «Самғау Курылыс»", "doc": "ТОО «Орда Групп»", "doc_date": "2026-02-28", "amount": 2635290.64, "overdue_days": 90.73}, {"due": "2026-03-30", "direction": "in", "set": "customers", "counterparty": "ТОО «Дулат Групп»", "doc": "ТОО «Қайсар Комплект»", "doc_date": "2026-02-28", "amount": 603652.5, "overdue_days": 90.73}, {"due": "2026-03-31", "direction": "in", "set": "customers", "counterparty": "ТОО «Сұңқар Логистик»", "doc": "ТОО «Шұғыла Снаб»", "doc_date": "2026-03-01", "amount": 11346.85, "overdue_days": 90.0}, {"due": "2026-04-03", "direction": "in", "set": "customers", "counterparty": "ТОО «Самғау Курылыс»", "doc": "ТОО «Керуен Логистик»", "doc_date": "2026-03-04", "amount": 1537252.87, "overdue_days": 87.8}, {"due": "2026-04-04", "direction": "in", "set": "customers", "counterparty": "ТОО «Аспан Материалдары»", "doc": "ТОО «Береке Сервис»", "doc_date": "2026-03-05", "amount": 7101066.03, "overdue_days": 87.07}, {"due": "2026-04-04", "direction": "out", "set": "suppliers", "counterparty": "ТОО «Аспан Комплект»", "doc": "ТОО «Орда Инвест»", "doc_date": "2026-03-05", "amount": 10622600.45, "overdue_days": 87.07}, {"due": "2026-04-06", "direction": "in", "set": "customers", "counterparty": "ТОО «Орда Сервис»", "doc": "ТОО «Тау Индустрия»", "doc_date": "2026-03-07", "amount": 6012096.34, "overdue_days": 85.61}, {"due": "2026-04-07", "direction": "in", "set": "customers", "counterparty": "ТОО «Есіл Материалдары»", "doc": "ТОО «Қайсар Индустрия»", "doc_date": "2026-03-08", "amount": 8307.85, "overdue_days": 84.88}, {"due": "2026-04-12", "direction": "in", "set": "customers", "counterparty": "ТОО «Дария Сервис»", "doc": "ТОО «Қазына Инвест»", "doc_date": "2026-03-13", "amount": 7326575.38, "overdue_days": 81.22}, {"due": "2026-04-12", "direction": "in", "set": "customers", "counterparty": "ТОО «Байтерек Сервис»", "doc": "ТОО «Жетісу Индустрия»", "doc_date": "2026-03-13", "amount": 112834.29, "overdue_days": 81.22}, {"due": "2026-04-12", "direction": "out", "set": "suppliers", "counterparty": "ТОО «Салтанат Индустрия»", "doc": "ТОО «Аружан Курылыс»", "doc_date": "2026-03-13", "amount": 6253325.0, "overdue_days": 81.22}, {"due": "2026-04-15", "direction": "out", "set": "customers", "counterparty": "ТОО «Қаусар Материалдары»", "doc": "ТОО «Байсал Строй»", "doc_date": "2026-03-16", "amount": 295147.69, "overdue_days": 79.02}, {"due": "2026-04-16", "direction": "in", "set": "customers", "counterparty": "ТОО «Аспан Материалдары»", "doc": "ТОО «Қыран Индустрия»", "doc_date": "2026-03-17", "amount": 13717968.46, "overdue_days": 78.29}, {"due": "2026-04-18", "direction": "in", "set": "customers", "counterparty": "ТОО «Шұғыла Материалдары»", "doc": "ТОО «Сарыарқа Индустрия»", "doc_date": "2026-03-19", "amount": 4643766.41, "overdue_days": 76.83}, {"due": "2026-04-21", "direction": "out", "set": "suppliers", "counterparty": "ТОО «Шыңғыс Сервис»", "doc": "ТОО «Қаусар Проект»", "doc_date": "2026-03-22", "amount": 9241996.27, "overdue_days": 74.63}, {"due": "2026-04-22", "direction": "in", "set": "customers", "counterparty": "ТОО «Жібек Групп»", "doc": "ТОО «Оркен Логистик»", "doc_date": "2026-03-23", "amount": 125998.74, "overdue_days": 73.9}, {"due": "2026-04-24", "direction": "out", "set": "suppliers", "counterparty": "ТОО «Аманат Материалдары»", "doc": "ТОО «Дала Курылыс»", "doc_date": "2026-03-25", "amount": 708714.87, "overdue_days": 72.44}, {"due": "2026-04-25", "direction": "out", "set": "customers", "counterparty": "ТОО «Қаусар Материалдары»", "doc": "ТОО «Аманат Курылыс»", "doc_date": "2026-03-26", "amount": 315090.11, "overdue_days": 71.71}, {"due": "2026-04-26", "direction": "in", "set": "customers", "counterparty": "ТОО «Жібек Групп»", "doc": "ТОО «Атамекен Проект»", "doc_date": "2026-03-27", "amount": 53999.46, "overdue_days": 70.97}, {"due": "2026-04-30", "direction": "in", "set": "customers", "counterparty": "ТОО «Қайсар Строй»", "doc": "ТОО «Отан Проект»", "doc_date": "2026-03-31", "amount": 13655781.34, "overdue_days": 68.05}, {"due": "2026-05-03", "direction": "in", "set": "customers", "counterparty": "ТОО «Аманат Снаб»", "doc": "ТОО «Керуен Логистик»", "doc_date": "2026-04-03", "amount": 176836.4, "overdue_days": 65.85}, {"due": "2026-05-03", "direction": "in", "set": "customers", "counterparty": "ТОО «Шұғыла Материалдары»", "doc": "ТОО «Байтерек Инвест»", "doc_date": "2026-04-03", "amount": 13931299.22, "overdue_days": 65.85}, {"due": "2026-05-06", "direction": "out", "set": "suppliers", "counterparty": "ТОО «Шапағат Логистик»", "doc": "ТОО «Нұрсая Снаб»", "doc_date": "2026-04-06", "amount": 1388899.64, "overdue_days": 63.66}, {"due": "2026-05-08", "direction": "out", "set": "suppliers", "counterparty": "ТОО «Аспан Комплект»", "doc": "ТОО «Ақжол Сервис»", "doc_date": "2026-04-08", "amount": 15933900.66, "overdue_days": 62.19}, {"due": "2026-05-08", "direction": "out", "set": "suppliers", "counterparty": "ТОО «Арматура Казахстан»", "doc": "ТОО «Дария Снаб»", "doc_date": "2026-04-08", "amount": 2039786.32, "overdue_days": 62.19}, {"due": "2026-05-13", "direction": "in", "set": "customers", "counterparty": "ТОО «Айдын Материалдары»", "doc": "ТОО «Нұрсая Сервис»", "doc_date": "2026-04-13", "amount": 924103.26, "overdue_days": 58.54}, {"due": "2026-05-13", "direction": "in", "set": "customers", "counterparty": "ТОО «Сұңқар Логистик»", "doc": "ТОО «Сарыарқа Материалдары»", "doc_date": "2026-04-13", "amount": 250318.42, "overdue_days": 58.54}, {"due": "2026-05-16", "direction": "in", "set": "customers", "counterparty": "ТОО «Мирас Снаб»", "doc": "ТОО «Шапағат Трейд»", "doc_date": "2026-04-16", "amount": 4612919.24, "overdue_days": 56.34}, {"due": "2026-05-18", "direction": "in", "set": "customers", "counterparty": "ТОО «Дария Сервис»", "doc": "ТОО «Болашақ Индустрия»", "doc_date": "2026-04-18", "amount": 915821.92, "overdue_days": 54.88}, {"due": "2026-05-19", "direction": "in", "set": "customers", "counterparty": "ТОО «Айдын Материалдары»", "doc": "ТОО «Салауат Инвест»", "doc_date": "2026-04-19", "amount": 451050.4, "overdue_days": 54.15}, {"due": "2026-05-19", "direction": "in", "set": "customers", "counterparty": "ТОО «Аманат Материалдары»", "doc": "ТОО «Дулат Сервис»", "doc_date": "2026-04-19", "amount": 4086413.85, "overdue_days": 54.15}, {"due": "2026-05-19", "direction": "out", "set": "suppliers", "counterparty": "ТОО «Салтанат Индустрия»", "doc": "ТОО «Батыр Групп»", "doc_date": "2026-04-19", "amount": 4136815.0, "overdue_days": 54.15}, {"due": "2026-05-21", "direction": "out", "set": "suppliers", "counterparty": "ТОО «Салауат Материалдары»", "doc": "ТОО «Қаусар Индустрия»", "doc_date": "2026-04-21", "amount": 1619774.75, "overdue_days": 52.68}, {"due": "2026-05-22", "direction": "in", "set": "customers", "counterparty": "ТОО «Ертіс Групп»", "doc": "ТОО «Оқжетпес Проект»", "doc_date": "2026-04-22", "amount": 9904302.91, "overdue_days": 51.95}, {"due": "2026-05-22", "direction": "in", "set": "customers", "counterparty": "ТОО «Қайсар Строй»", "doc": "ТОО «Нысана Групп»", "doc_date": "2026-04-22", "amount": 11127871.29, "overdue_days": 51.95}, {"due": "2026-05-27", "direction": "in", "set": "customers", "counterparty": "ТОО «Тұлпар Групп»", "doc": "ТОО «Береке Логистик»", "doc_date": "2026-04-27", "amount": 1632.88, "overdue_days": 48.29}, {"due": "2026-05-28", "direction": "out", "set": "suppliers", "counterparty": "ТОО «Салауат Материалдары»", "doc": "ТОО «Жібек Инвест»", "doc_date": "2026-04-28", "amount": 4921623.25, "overdue_days": 47.56}, {"due": "2026-06-03", "direction": "in", "set": "customers", "counterparty": "ТОО «Самғау Курылыс»", "doc": "ТОО «Тау Проект»", "doc_date": "2026-05-04", "amount": 7027441.7, "overdue_days": 43.17}, {"due": "2026-06-05", "direction": "in", "set": "customers", "counterparty": "ТОО «Тұлпар Групп»", "doc": "ТОО «Аспан Проект»", "doc_date": "2026-05-06", "amount": 342.71, "overdue_days": 41.71}, {"due": "2026-06-06", "direction": "out", "set": "suppliers", "counterparty": "ТОО «Шұғыла Материалдары»", "doc": "ТОО «Дәурен Трейд»", "doc_date": "2026-05-07", "amount": 909232.28, "overdue_days": 40.98}, {"due": "2026-06-09", "direction": "in", "set": "customers", "counterparty": "ТОО «Аманат Материалдары»", "doc": "ТОО «Есіл Индустрия»", "doc_date": "2026-05-10", "amount": 61296207.69, "overdue_days": 38.78}, {"due": "2026-06-09", "direction": "out", "set": "customers", "counterparty": "ТОО «Салтанат Проект»", "doc": "ТОО «Ертіс Логистик»", "doc_date": "2026-05-10", "amount": 7097490.0, "overdue_days": 38.78}, {"due": "2026-06-10", "direction": "in", "set": "customers", "counterparty": "ТОО «Нұрлы Комплект»", "doc": "ТОО «Тұлпар Трейд»", "doc_date": "2026-05-11", "amount": 17769055.46, "overdue_days": 38.05}, {"due": "2026-06-13", "direction": "in", "set": "customers", "counterparty": "ТОО «Нысана Строй»", "doc": "ТОО «Тұлпар Трейд»", "doc_date": "2026-05-14", "amount": 5333766.72, "overdue_days": 35.85}, {"due": "2026-06-16", "direction": "in", "set": "customers", "counterparty": "ТОО «Байтерек Сервис»", "doc": "ТОО «Дала Курылыс»", "doc_date": "2026-05-17", "amount": 56662.42, "overdue_days": 33.66}, {"due": "2026-06-17", "direction": "in", "set": "customers", "counterparty": "ТОО «Нұрлы Комплект»", "doc": "ТОО «Дала Снаб»", "doc_date": "2026-05-18", "amount": 8733942.51, "overdue_days": 32.93}, {"due": "2026-06-23", "direction": "out", "set": "suppliers", "counterparty": "ТОО «Нұрлы Комплект»", "doc": "ТОО «Тау Строй»", "doc_date": "2026-05-24", "amount": 7794999.17, "overdue_days": 28.54}, {"due": "2026-06-25", "direction": "in", "set": "customers", "counterparty": "ТОО «Сұңқар Логистик»", "doc": "ТОО «Ұлытау Комплект»", "doc_date": "2026-05-26", "amount": 15885.59, "overdue_days": 27.07}, {"due": "2026-06-26", "direction": "in", "set": "customers", "counterparty": "ТОО «Самғау Курылыс»", "doc": "ТОО «Арман Комплект»", "doc_date": "2026-05-27", "amount": 5009156.9, "overdue_days": 26.34}, {"due": "2026-06-27", "direction": "in", "set": "customers", "counterparty": "ТОО «Жетісу Проект»", "doc": "ТОО «Мерей Логистик»", "doc_date": "2026-05-28", "amount": 43404444.0, "overdue_days": 25.61}, {"due": "2026-06-28", "direction": "in", "set": "customers", "counterparty": "ТОО «Дулат Групп»", "doc": "ТОО «Жалын Логистик»", "doc_date": "2026-05-29", "amount": 859747.5, "overdue_days": 24.88}, {"due": "2026-06-29", "direction": "out", "set": "suppliers", "counterparty": "ТОО «Аспан Комплект»", "doc": "ТОО «Самғау Индустрия»", "doc_date": "2026-05-30", "amount": 8748023.89, "overdue_days": 24.15}, {"due": "2026-07-01", "direction": "in", "set": "customers", "counterparty": "ТОО «Самғау Курылыс»", "doc": "ТОО «Жайық Снаб»", "doc_date": "2026-06-01", "amount": 5903649.2, "overdue_days": 22.68}, {"due": "2026-07-02", "direction": "out", "set": "suppliers", "counterparty": "ТОО «Шапағат Логистик»", "doc": "ТОО «Айдын Комплект»", "doc_date": "2026-06-02", "amount": 894004.36, "overdue_days": 21.95}, {"due": "2026-07-05", "direction": "in", "set": "customers", "counterparty": "ТОО «Айдын Материалдары»", "doc": "ТОО «Дәурен Индустрия»", "doc_date": "2026-06-05", "amount": 2255251.99, "overdue_days": 19.76}, {"due": "2026-07-05", "direction": "in", "set": "customers", "counterparty": "ТОО «Қайсар Строй»", "doc": "ТОО «Мұрагер Курылыс»", "doc_date": "2026-06-05", "amount": 2823489.73, "overdue_days": 19.76}, {"due": "2026-07-06", "direction": "out", "set": "suppliers", "counterparty": "ТОО «Аманат Материалдары»", "doc": "ТОО «Мирас Проект»", "doc_date": "2026-06-06", "amount": 1328840.37, "overdue_days": 19.02}, {"due": "2026-07-10", "direction": "in", "set": "customers", "counterparty": "ТОО «Дулат Групп»", "doc": "ТОО «Есіл Проект»", "doc_date": "2026-06-10", "amount": 878040.0, "overdue_days": 16.1}, {"due": "2026-07-12", "direction": "out", "set": "suppliers", "counterparty": "ТОО «Арматура Казахстан»", "doc": "ТОО «Қазына Материалдары»", "doc_date": "2026-06-12", "amount": 6663301.98, "overdue_days": 14.63}, {"due": "2026-07-13", "direction": "out", "set": "customers", "counterparty": "ТОО «Қаусар Материалдары»", "doc": "ТОО «Жібек Сервис»", "doc_date": "2026-06-13", "amount": 9649.84, "overdue_days": 13.9}, {"due": "2026-07-17", "direction": "in", "set": "customers", "counterparty": "ТОО «Есіл Материалдары»", "doc": "ТОО «Мұрагер Инвест»", "doc_date": "2026-06-17", "amount": 328159.83, "overdue_days": 10.98}, {"due": "2026-07-17", "direction": "in", "set": "customers", "counterparty": "ТОО «Қыран Комплект»", "doc": "ТОО «Ақжол Трейд»", "doc_date": "2026-06-17", "amount": 203121.33, "overdue_days": 10.98}, {"due": "2026-07-27", "direction": "in", "set": "customers", "counterparty": "ТОО «Орда Сервис»", "doc": "ТОО «Арман Строй»", "doc_date": "2026-06-27", "amount": 5324378.43, "overdue_days": 3.66}, {"due": "2026-08-06", "direction": "in", "set": "customers", "counterparty": "ТОО «Есіл Материалдары»", "doc": "ТОО «Жалын Сервис»", "doc_date": "2026-07-07", "amount": 62308.83, "overdue_days": 0.0}, {"due": "2026-08-07", "direction": "in", "set": "customers", "counterparty": "ТОО «Байтерек Сервис»", "doc": "ТОО «Нұрлы Строй»", "doc_date": "2026-07-08", "amount": 24969.88, "overdue_days": 0.0}, {"due": "2026-08-07", "direction": "in", "set": "customers", "counterparty": "ТОО «Оқжетпес Комплект»", "doc": "ТОО «Аружан Снаб»", "doc_date": "2026-07-08", "amount": 23430544.21, "overdue_days": 0.0}, {"due": "2026-08-09", "direction": "in", "set": "customers", "counterparty": "ТОО «Қайсар Строй»", "doc": "ТОО «Парасат Логистик»", "doc_date": "2026-07-10", "amount": 6207173.33, "overdue_days": 0.0}, {"due": "2026-08-09", "direction": "in", "set": "customers", "counterparty": "ТОО «Дәурен Строй»", "doc": "ТОО «Темірбек Групп»", "doc_date": "2026-07-10", "amount": 4644.42, "overdue_days": 0.0}, {"due": "2026-08-11", "direction": "out", "set": "suppliers", "counterparty": "ТОО «Арман Групп»", "doc": "ТОО «Жайық Проект»", "doc_date": "2026-07-12", "amount": 23034281.85, "overdue_days": 0.0}, {"due": "2026-08-12", "direction": "out", "set": "suppliers", "counterparty": "ТОО «Мерей Снаб»", "doc": "ТОО «Нұрлы Групп»", "doc_date": "2026-07-13", "amount": 35319149.89, "overdue_days": 0.0}, {"due": "2026-08-13", "direction": "in", "set": "customers", "counterparty": "ТОО «Қыран Комплект»", "doc": "ТОО «Алтын Снаб»", "doc_date": "2026-07-14", "amount": 5416568.81, "overdue_days": 0.0}, {"due": "2026-08-16", "direction": "in", "set": "customers", "counterparty": "ТОО «Орда Сервис»", "doc": "ТОО «Керуен Инвест»", "doc_date": "2026-07-17", "amount": 5927418.93, "overdue_days": 0.0}, {"due": "2026-08-21", "direction": "in", "set": "customers", "counterparty": "ТОО «Дәурен Строй»", "doc": "ТОО «Салауат Курылыс»", "doc_date": "2026-07-22", "amount": 2171.41, "overdue_days": 0.0}]}, "/api/notifications": [{"kind": "overdue", "set": "suppliers", "name": "ТОО «Мерей Снаб»", "amount": 96043302.33, "opposite": false, "net": 131362452.22, "text": "ТОО «Мерей Снаб»: просрочено 131 260 492.45 ₸ — мы не платим"}, {"kind": "overdue", "set": "customers", "name": "ТОО «Аманат Материалдары»", "amount": 65382621.53, "opposite": true, "net": -37787078.47, "text": "ТОО «Аманат Материалдары»: просрочено 89 357 143.00 ₸ — нам не платят"}, {"kind": "overdue", "set": "customers", "name": "ТОО «Жетісу Проект»", "amount": 43404444.0, "opposite": false, "net": 43404444.0, "text": "ТОО «Жетісу Проект»: просрочено 59 320 000.00 ₸ — нам не платят"}, {"kind": "overdue", "set": "suppliers", "name": "ТОО «Аспан Комплект»", "amount": 35304525.0, "opposite": false, "net": 26524125.0, "text": "ТОО «Аспан Комплект»: просрочено 48 250 000.00 ₸ — мы не платим"}, {"kind": "overdue", "set": "customers", "name": "ТОО «Парасат Сервис»", "amount": 28421986.51, "opposite": true, "net": -846013.49, "text": "ТОО «Парасат Сервис»: просрочено 38 843 770.00 ₸ — нам не платят"}, {"kind": "overdue", "set": "customers", "name": "ТОО «Қайсар Строй»", "amount": 27607142.36, "opposite": true, "net": -155424862.73, "text": "ТОО «Қайсар Строй»: просрочено 37 730 138.52 ₸ — нам не платят"}, {"kind": "overdue", "set": "customers", "name": "ТОО «Нұрлы Комплект»", "amount": 26502997.97, "opposite": false, "net": 26502997.97, "text": "ТОО «Нұрлы Комплект»: просрочено 36 221 126.10 ₸ — нам не платят"}, {"kind": "overdue", "set": "suppliers", "name": "ТОО «Нұрлы Комплект»", "amount": 26502997.16, "opposite": false, "net": 26502997.16, "text": "ТОО «Нұрлы Комплект»: просрочено 36 221 125.00 ₸ — мы не платим"}, {"kind": "overdue", "set": "customers", "name": "ТОО «Самғау Курылыс»", "amount": 22112791.31, "opposite": false, "net": 16039893.49, "text": "ТОО «Самғау Курылыс»: просрочено 30 221 117.00 ₸ — нам не платят"}, {"kind": "overdue", "set": "customers", "name": "ТОО «Шұғыла Материалдары»", "amount": 21187184.22, "opposite": true, "net": -211700074.12, "text": "ТОО «Шұғыла Материалдары»: просрочено 28 956 108.00 ₸ — нам не платят"}, {"kind": "overdue", "set": "customers", "name": "ТОО «Аспан Материалдары»", "amount": 20819034.49, "opposite": false, "net": 18623934.49, "text": "ТОО «Аспан Материалдары»: просрочено 28 452 965.00 ₸ — нам не платят"}, {"kind": "overdue", "set": "suppliers", "name": "ТОО «Арматура Казахстан»", "amount": 14414490.0, "opposite": false, "net": 11121840.0, "text": "ТОО «Арматура Казахстан»: просрочено 19 700 000.00 ₸ — мы не платим"}, {"kind": "overdue", "set": "customers", "name": "ТОО «Орда Сервис»", "amount": 11336474.77, "opposite": true, "net": 0.0, "text": "ТОО «Орда Сервис»: просрочено 15 493 337.12 ₸ — нам не платят"}, {"kind": "overdue", "set": "suppliers", "name": "ТОО «Шыңғыс Сервис»", "amount": 10701258.84, "opposite": false, "net": 10701258.84, "text": "ТОО «Шыңғыс Сервис»: просрочено 14 625 200.00 ₸ — мы не платим"}, {"kind": "overdue", "set": "suppliers", "name": "ТОО «Салтанат Индустрия»", "amount": 10390140.0, "opposite": false, "net": 8707230.0, "text": "ТОО «Салтанат Индустрия»: просрочено 14 200 000.00 ₸ — мы не платим"}, {"kind": "overdue", "set": "customers", "name": "ТОО «Ертіс Групп»", "amount": 9904302.91, "opposite": false, "net": 6977502.91, "text": "ТОО «Ертіс Групп»: просрочено 13 536 016.00 ₸ — нам не платят"}, {"kind": "overdue", "set": "customers", "name": "ТОО «Дария Сервис»", "amount": 8242397.31, "opposite": false, "net": 8242397.31, "text": "ТОО «Дария Сервис»: просрочено 11 264 722.30 ₸ — нам не платят"}, {"kind": "overdue", "set": "customers", "name": "ТОО «Тәуелсіз Строй»", "amount": 7713779.69, "opposite": false, "net": 7713779.69, "text": "ТОО «Тәуелсіз Строй»: просрочено 10 542 271.00 ₸ — нам не платят"}, {"kind": "overdue", "set": "customers", "name": "ТОО «Нысана Строй»", "amount": 7071735.65, "opposite": false, "net": 357541.47, "text": "ТОО «Нысана Строй»: просрочено 9 664 802.04 ₸ — нам не платят"}, {"kind": "overdue", "set": "suppliers", "name": "ТОО «Аманат Материалдары»", "amount": 6644201.85, "opposite": false, "net": 6644201.85, "text": "ТОО «Аманат Материалдары»: просрочено 9 080 500.00 ₸ — мы не платим"}, {"kind": "overdue", "set": "suppliers", "name": "ТОО «Салауат Материалдары»", "amount": 6541398.0, "opposite": true, "net": -4873122.0, "text": "ТОО «Салауат Материалдары»: просрочено 8 940 000.00 ₸ — мы не платим"}, {"kind": "overdue", "set": "customers", "name": "ТОО «Мирас Снаб»", "amount": 4612919.24, "opposite": false, "net": 4612919.24, "text": "ТОО «Мирас Снаб»: просрочено 6 304 386.00 ₸ — нам не платят"}, {"kind": "overdue", "set": "customers", "name": "ТОО «Айдын Материалдары»", "amount": 3630405.65, "opposite": false, "net": 1927008.05, "text": "ТОО «Айдын Материалдары»: просрочено 4 961 604.00 ₸ — нам не платят"}, {"kind": "overdue", "set": "customers", "name": "ТОО «Дулат Групп»", "amount": 2341440.0, "opposite": true, "net": -760602.15, "text": "ТОО «Дулат Групп»: просрочено 3 200 000.00 ₸ — нам не платят"}, {"kind": "overdue", "set": "suppliers", "name": "ТОО «Шапағат Логистик»", "amount": 2282904.0, "opposite": false, "net": 2282904.0, "text": "ТОО «Шапағат Логистик»: просрочено 3 120 000.00 ₸ — мы не платим"}, {"kind": "overdue", "set": "customers", "name": "ТОО «Оқжетпес Комплект»", "amount": 2130049.48, "opposite": true, "net": -7242034.74, "text": "ТОО «Оқжетпес Комплект»: просрочено 2 911 096.73 ₸ — нам не платят"}, {"kind": "overdue", "set": "customers", "name": "ТОО «Жібек Групп»", "amount": 1799982.0, "opposite": false, "net": 1799982.0, "text": "ТОО «Жібек Групп»: просрочено 2 460 000.00 ₸ — нам не платят"}, {"kind": "overdue", "set": "customers", "name": "ТОО «Аманат Снаб»", "amount": 1288379.47, "opposite": false, "net": 1288379.47, "text": "ТОО «Аманат Снаб»: просрочено 1 760 802.88 ₸ — нам не платят"}, {"kind": "overdue", "set": "suppliers", "name": "ТОО «Шұғыла Материалдары»", "amount": 909232.28, "opposite": false, "net": 909232.28, "text": "ТОО «Шұғыла Материалдары»: просрочено 1 242 629.88 ₸ — мы не платим"}, {"kind": "overdue", "set": "customers", "name": "ТОО «Есіл Материалдары»", "amount": 336467.67, "opposite": false, "net": 398776.5, "text": "ТОО «Есіл Материалдары»: просрочено 459 843.75 ₸ — нам не платят"}, {"kind": "overdue", "set": "customers", "name": "ТОО «Сұңқар Логистик»", "amount": 292680.0, "opposite": false, "net": 292680.0, "text": "ТОО «Сұңқар Логистик»: просрочено 400 000.00 ₸ — нам не платят"}, {"kind": "overdue", "set": "customers", "name": "ТОО «Қыран Комплект»", "amount": 203121.33, "opposite": true, "net": 0.0, "text": "ТОО «Қыран Комплект»: просрочено 277 601.93 ₸ — нам не платят"}, {"kind": "overdue", "set": "customers", "name": "ТОО «Байтерек Сервис»", "amount": 177103.51, "opposite": false, "net": 202073.38, "text": "ТОО «Байтерек Сервис»: просрочено 242 043.88 ₸ — нам не платят"}, {"kind": "overdue", "set": "customers", "name": "ТОО «Дәурен Строй»", "amount": 3739.67, "opposite": true, "net": -20747623.79, "text": "ТОО «Дәурен Строй»: просрочено 5 110.93 ₸ — нам не платят"}, {"kind": "overdue", "set": "customers", "name": "ТОО «Тұлпар Групп»", "amount": 1975.59, "opposite": false, "net": 1975.59, "text": "ТОО «Тұлпар Групп»: просрочено 2 700.00 ₸ — нам не платят"}], "/api/rules": [{"id": 1, "rule_set": "customers", "account": "1210", "sign": 1, "side": "debt", "enabled": 1}, {"id": 2, "rule_set": "customers", "account": "3510", "sign": -1, "side": "advance", "enabled": 1}, {"id": 3, "rule_set": "customers", "account": "3310", "sign": -1, "side": "offset", "enabled": 0}, {"id": 4, "rule_set": "suppliers", "account": "3310", "sign": 1, "side": "debt", "enabled": 1}, {"id": 5, "rule_set": "suppliers", "account": "1710", "sign": -1, "side": "advance", "enabled": 1}], "/api/settings": {"sync_interval_min": 30}, "/api/me": {"login": "admin", "role": "admin"}};
+(function(){
+  var real=window.fetch;
+  function respond(data,status){return Promise.resolve(new Response(JSON.stringify(data),{status:status||200,headers:{'Content-Type':'application/json'}}));}
+  window.fetch=function(url,init){
+    var u=String(url); var method=(init&&init.method||'GET').toUpperCase();
+    if(u.indexOf('/api/')===-1) return real.apply(this,arguments);
+    var path=u.slice(u.indexOf('/api/'));
+    if(method!=='GET'){
+      if(path.indexOf('/api/login')===0) return respond({login:'demo',role:'admin'});
+      if(path.indexOf('/api/logout')===0) return respond({ok:true});
+      return respond({ok:true,demo:true});
+    }
+    if(window.__DEMO__[path]) return respond(window.__DEMO__[path]);
+    var base=path.split('&')[0];
+    if(window.__DEMO__[base]) return respond(window.__DEMO__[base]);
+    base=path.split('?')[0];
+    if(window.__DEMO__[base]) return respond(window.__DEMO__[base]);
+    return respond({error:'demo: нет данных для '+path},200);
+  };
+})();
+</script>
+</head><body>
+
+<div id="login" hidden><form onsubmit="return doLogin(event)">
+  <h2>Взаиморасчёты</h2>
+  <div class="mut" style="margin-top:-8px;font-size:13px">Расчёты с покупателями и поставщиками</div>
+  <label>Логин</label><input id="l_login" autocomplete="username">
+  <label>Пароль</label><input id="l_pw" type="password" autocomplete="current-password">
+  <div class="err" id="l_err"></div>
+  <button class="btn dark" style="justify-content:center;padding:11px">Войти</button>
+</form></div>
+
+<div id="app" hidden>
+  <aside>
+    <div class="brand"><b>Взаиморасчёты</b><span>расчёты с контрагентами</span></div>
+    <nav id="nav"></nav>
+    <div class="foot">
+      <div class="who"><span class="avatar" id="ava2"></span>
+        <span><b id="whoLogin"></b><i id="role"></i></span></div>
+      <button onclick="logout()" data-tip="Выйти">
+      <svg class="i" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l-5-5 5-5"/><path d="M15 12H5"/></svg>
+      <span>Выйти</span></button></div>
+  </aside>
+  <main>
+    <header>
+      <button class="btn icon tuckbtn" onclick="toggleTuck()" data-tip="Свернуть меню">
+        <svg class="i sm" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+      <button class="btn icon" id="back" onclick="goBack()" data-tip="Вернуться назад" hidden>
+        <svg class="i" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <span class="title" id="htitle">Взаиморасчёты</span>
+      <span class="sep"></span>
+      <span class="stamp" id="stamp"></span>
+      <span class="grow"></span>
+      <span id="tools"></span>
+      <button class="bell" onclick="toggleNotes()" data-tip="Уведомления">
+        <svg class="i" viewBox="0 0 24 24"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+        <b id="ncount" hidden></b></button>
+      <span class="avatar act" id="ava" onclick="openPassword()" data-tip="Сменить пароль"></span>
+    </header>
+    <div class="wrap" id="view"></div>
+  </main>
+</div>
+<div id="notes" hidden></div>
+<div id="toast"></div>
+<div id="hinttip"></div>
+<div id="modal" hidden><form onsubmit="return savePassword(event)">
+  <h3>Смена пароля</h3>
+  <div class="mut" style="font-size:13px;margin-top:-6px" id="pw_who"></div>
+  <label>Текущий пароль</label><input id="pw_cur" type="password" autocomplete="current-password">
+  <label>Новый пароль</label><input id="pw_new" type="password" autocomplete="new-password">
+  <label>Повторите новый</label><input id="pw_new2" type="password" autocomplete="new-password">
+  <div class="mut" style="font-size:12px">Минимум 8 символов. Другие ваши сессии будут закрыты.</div>
+  <div class="err" id="pw_err"></div>
+  <div style="display:flex;gap:10px">
+    <button class="btn dark" style="flex:1;justify-content:center">Сохранить</button>
+    <button type="button" class="btn" onclick="closePassword()">Отмена</button>
+  </div>
+</form></div>
+
+<script>
+"use strict";
+const $=s=>document.querySelector(s);
+const fmt=v=>(v||0).toLocaleString("ru-RU",{minimumFractionDigits:2,maximumFractionDigits:2});
+const short=v=>{const a=Math.abs(v);
+  return a>=1e9?(v/1e9).toFixed(1)+" млрд":a>=1e6?(v/1e6).toFixed(1)+" млн":fmt(v)};
+const cls=v=>v>0?"pos":v<0?"neg":"zero";
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const ini=n=>n.replace(/[«"]/g,"").trim().split(/\s+/).slice(0,2).map(w=>w[0]).join("").toUpperCase();
+const orgName=(orgs,id)=>(orgs||[]).find(o=>o.id===id)?.name||id;
+// подсказка по наведению: hint("текст") -> значок «?»
+const hint=t=>`<span class="hint" data-tip="${esc(t)}">?</span>`;
+// подсказка без значка «?» — вешается прямо на символ
+const tip=t=>` data-tip="${esc(t)}"`;
+// План счетов РК: 1xxx — активы (нам должны / мы отдали вперёд), 3xxx — обязательства (должны мы)
+const ACCOUNTS={
+ "1210":"Краткосрочная дебиторская задолженность покупателей и заказчиков. Заказчик должен нам за подписанные акты и накладные.",
+ "3510":"Краткосрочные авансы полученные. Заказчик заплатил вперёд — мы должны ему работы или возврат денег.",
+ "3310":"Краткосрочная кредиторская задолженность поставщикам и подрядчикам. Мы должны за полученные материалы и услуги.",
+ "1710":"Краткосрочные авансы выданные. Мы заплатили поставщику вперёд — он должен нам поставку.",
+ "1280":"Прочая краткосрочная дебиторская задолженность: расчёты вне основной реализации.",
+ "3390":"Прочая краткосрочная кредиторская задолженность: обязательства вне основных поставок.",
+ "2110":"Долгосрочная дебиторская задолженность покупателей — расчёты со сроком больше года.",
+ "4110":"Долгосрочная кредиторская задолженность поставщикам — обязательства со сроком больше года.",
+};
+const accHint=a=>ACCOUNTS[a]?hint(ACCOUNTS[a]):"";
+const LOGKIND={login:["Вход",""],login_fail:["Неудачный вход","we_owe"],
+  onec_request:["Запрос к 1С",""],onec_error:["Ошибка связи с 1С","we_owe"],
+  refresh:["Обновление из 1С","owes_us"],export:["Выгрузка в Excel",""],
+  settings_change:["Изменение настроек","owes_us"],user_add:["Добавлен пользователь","owes_us"],
+  password_change:["Смена пароля","owes_us"],password_fail:["Неверный текущий пароль","we_owe"],
+  backup:["Резервная копия",""],backup_error:["Ошибка бэкапа","we_owe"]};
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape"&&!$("#modal").hidden)return closePassword();
+  const typing=/^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName);
+  if(!typing&&(e.key==="Backspace"||(e.altKey&&e.key==="ArrowLeft"))){e.preventDefault();goBack()}
+});
+document.addEventListener("mouseover",e=>{
+  const h=e.target.closest?.("[data-tip]");if(!h)return;
+  const b=$("#hinttip");b.textContent=h.dataset.tip;b.style.display="block";
+  const r=h.getBoundingClientRect(),bb=b.getBoundingClientRect();
+  b.style.left=Math.max(8,Math.min(r.left-8,innerWidth-bb.width-8))+"px";
+  b.style.top=(r.bottom+8+bb.height>innerHeight?r.top-bb.height-8:r.bottom+8)+"px";
+});
+document.addEventListener("mouseout",e=>{
+  if(e.target.closest?.("[data-tip]"))$("#hinttip").style.display="none";
+});
+
+const ICON={
+  customers:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  suppliers:'<rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>',
+  aging:'<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M9.5 14.5l5 4M14.5 14.5l-5 4"/>',
+  dashboard:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
+  calendar:'<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+  settings:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.14.36.43.65.79.82H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+  search:'<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>',
+  refresh:'<path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/>',
+  excel:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/>',
+  doc:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/>',
+  chev:'<path d="M9 6l6 6-6 6"/>',
+  down:'<path d="M12 5v14"/><path d="M19 12l-7 7-7-7"/>',
+  up:'<path d="M12 19V5"/><path d="M5 12l7-7 7 7"/>',
+  warn:'<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  flip:'<path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/>',
+  bank:'<path d="M3 21h18M4 10h16M5 10V7l7-4 7 4v3M6 10v11M10 10v11M14 10v11M18 10v11"/>',
+  users:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>',
+  sync:'<path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  trash:'<path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>',
+  info:'<circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/>',
+};
+const svg=(k,c="i")=>`<svg class="${c}" viewBox="0 0 24 24">${ICON[k]}</svg>`;
+
+let me=null, view="customers", sortKey="net", sortDir=-1, notes=[], agingSet="customers";
+let chartData=null;
+let debtorsMode="all", debtorsAll=false;   // руководителю важен факт долга, а не отчёт
+let notesAll=false;
+let page=1;
+const nav=[];   // история переходов: возврат к предыдущему экрану с его фильтрами
+const SIDEBAR={open:"0 0 260px",tuck:"0 0 68px"};
+function applyTuck(tuck){
+  const a=document.querySelector("aside");
+  a.classList.toggle("tuck",tuck);
+  a.style.flex=tuck?SIDEBAR.tuck:SIDEBAR.open;   // размер ставим явно: надёжнее каскада
+  const b=document.querySelector("header .tuckbtn");
+  if(b)b.title=tuck?"Развернуть меню":"Свернуть меню";
+}
+function toggleTuck(){
+  const tuck=!document.querySelector("aside").classList.contains("tuck");
+  applyTuck(tuck);
+  localStorage.setItem("tuck",tuck?"1":"");
+}
+let PAGE_SIZE=50;     // ponytail: рисуем страницу, а не весь список — на 3000 строк DOM тормозит.
+                      // Сортировка и итоги считаются по всему набору. Если строк станет >10k,
+                      // переносить сортировку и постраничность на сервер.
+function chartTip(ev,i){
+  if(!chartData)return;
+  const {h,SER,money}=chartData, p=h[i], box=$("#chtip");
+  box.innerHTML=`<b>${p.date}</b>`+SER.map(([k,c,label,abs])=>
+    `<div><i style="background:${c}"></i>${label}<span>${money(abs?Math.abs(p[k]):p[k])} ₸</span></div>`).join("");
+  box.style.display="block";
+  const r=ev.currentTarget.ownerSVGElement.getBoundingClientRect();
+  box.style.left=Math.min(ev.clientX-r.left+14, r.width-250)+"px";
+  box.style.top=Math.max(ev.clientY-r.top-10,0)+"px";
+  const g=document.getElementById("ch-guide");
+  if(g){g.style.display="";g.setAttribute("x1",chartData.X(i));g.setAttribute("x2",chartData.X(i))}
+}
+function chartTipOff(){const b=$("#chtip");if(b)b.style.display="none";
+  const g=document.getElementById("ch-guide");if(g)g.style.display="none"}
+const state={q:"",date:"",hide_zero:false,only_debtors:false,org:""};
+const TABS=[["customers","Покупатели","customers"],["suppliers","Поставщики","suppliers"],
+  ["aging","Сроки долга","aging"],["dashboard","Дашборд","dashboard"],
+  ["calendar","Календарь","calendar"],["settings","Настройки","settings"]];
+
+async function api(path,opts){
+  const r=await fetch(path,opts);
+  if(r.status===401){$("#login").hidden=false;$("#app").hidden=true;throw new Error("auth")}
+  if(!r.ok){const e=await r.json().catch(()=>({error:r.status}));throw new Error(e.error)}
+  return r.headers.get("Content-Type")?.includes("json")?r.json():r;
+}
+async function doLogin(ev){ev.preventDefault();
+  try{me=await api("/api/login",{method:"POST",body:JSON.stringify(
+      {login:$("#l_login").value,password:$("#l_pw").value})});
+    $("#login").hidden=true;boot();
+  }catch(e){$("#l_err").textContent=location.protocol==="file:"
+    // страница открыта двойным кликом по файлу — запросы к серверу из file:// не уходят
+    ?"Страница открыта из файла. Откройте http://127.0.0.1:8090 — приложению нужен сервер."
+    :e.message}
+  return false}
+async function logout(){await api("/api/logout",{method:"POST"});location.reload()}
+function openPassword(){
+  $("#pw_who").textContent=`Пользователь ${me.login}`;
+  ["pw_cur","pw_new","pw_new2"].forEach(i=>$("#"+i).value="");
+  $("#pw_err").textContent="";$("#modal").hidden=false;$("#pw_cur").focus();
+}
+function closePassword(){$("#modal").hidden=true}
+async function savePassword(ev){
+  ev.preventDefault();
+  const cur=$("#pw_cur").value,nw=$("#pw_new").value;
+  if(nw!==$("#pw_new2").value){$("#pw_err").textContent="Новые пароли не совпадают";return false}
+  try{
+    await api("/api/password",{method:"POST",body:JSON.stringify({current:cur,new:nw})});
+    closePassword();toast("Пароль изменён. Остальные ваши сессии закрыты.");
+  }catch(e){$("#pw_err").textContent=e.message}
+  return false;
+}
+
+function boot(){
+  $("#app").hidden=false;
+  applyTuck(!!localStorage.getItem("tuck"));
+  $("#role").textContent=me.role==="admin"?"Администратор":"Бухгалтер";
+  $("#whoLogin").textContent=me.login;
+  $("#ava").textContent=$("#ava2").textContent=me.login.slice(0,2).toUpperCase();
+  drawNav();render();loadNotes();
+}
+function drawNav(){
+  $("#nav").innerHTML=TABS.filter(([k])=>k!=="settings"||me.role==="admin")
+    .map(([k,t,ic])=>`<button class="${view===k?'on':''}" onclick="go('${k}')"
+      data-tip="${t}">${svg(ic)}<span>${t}</span></button>`).join("");
+}
+function snapshotView(){return {view,page,sortKey,sortDir,agingSet,state:{...state}}}
+function go(v,keepHistory){
+  if(!keepHistory&&v!==view)nav.push(snapshotView());
+  view=v;drawNav();$("#notes").hidden=true;render();
+}
+function goBack(){
+  const p=nav.pop();if(!p)return;
+  view=p.view;page=p.page;sortKey=p.sortKey;sortDir=p.sortDir;agingSet=p.agingSet;
+  Object.assign(state,p.state);
+  drawNav();$("#notes").hidden=true;render();
+}
+function openReport(opts={}){        // клик по строке/карточке -> отчёт с нужным фильтром
+  const set=opts.set||"customers";
+  nav.push(snapshotView());          // чтобы можно было вернуться туда, откуда пришли
+  Object.assign(state,{q:"",only_debtors:false,hide_zero:false},opts);
+  if(opts.sort){sortKey=opts.sort;sortDir=opts.dir||-1}
+  page=1;
+  go(set,true);
+}
+
+const noteKey=x=>`${x.kind}|${x.text}`;
+function seenNotes(){try{return new Set(JSON.parse(localStorage.getItem("seenNotes")||"[]"))}
+  catch(e){return new Set()}}
+function markNotesSeen(){
+  localStorage.setItem("seenNotes",JSON.stringify(notes.map(noteKey)));
+  paintBadge();
+}
+function paintBadge(){
+  const seen=seenNotes(), fresh=notes.filter(x=>!seen.has(noteKey(x))).length;
+  $("#ncount").hidden=!fresh;$("#ncount").textContent=fresh;
+}
+async function loadNotes(){
+  notes=await api("/api/notifications");
+  paintBadge();
+}
+function toggleNotes(){
+  const n=$("#notes");n.hidden=!n.hidden;
+  if(!n.hidden)markNotesSeen();      // открыли — счётчик гаснет, новые появятся снова
+  n.innerHTML=notes.length?notes.map(x=>
+    `<div class="n act" onclick='openReport({set:"${x.set||"customers"}",`+
+    `q:${esc(JSON.stringify(x.name||""))}});toggleNotes()' data-tip="Открыть контрагента">`+
+    `${svg(x.kind==="overdue"?"warn":"flip","i sm")}<span>${esc(x.text)}`+
+    `${x.opposite?`<br><span class="mut">по итогу позиция обратная — учтён аванс</span>`:""}`+
+    `</span></div>`).join("")
+    :'<div class="empty">Нет уведомлений</div>';
+}
+async function refresh(){await api("/api/refresh",{method:"POST"});render();loadNotes()}
+
+function toolbar(showExport){
+  const p=params();
+  $("#tools").innerHTML=`
+    <button class="btn icon" onclick="refresh()" data-tip="Обновить из 1С">${svg("refresh","i sm")}</button>${hint("Запросить свежие остатки из 1С прямо сейчас, не дожидаясь расписания.")}
+    <input type="date" value="${state.date}" onchange="state.date=this.value;render()">${hint("Отчёт на любую прошедшую дату. Если снимка на эту дату нет, приложение запросит остатки у 1С.")}
+    ${showExport?`<a class="btn dark" href="/api/export.xlsx?${p}">${svg("excel","i sm")}Экспорт в Excel</a>${hint("Выгружает ровно то, что сейчас на экране — с учётом поиска, фильтров и выбранной даты.")}`:""}`;
+}
+function params(){return new URLSearchParams({set:view,q:state.q,date:state.date,org:state.org,
+  hide_zero:state.hide_zero?1:0,only_debtors:state.only_debtors?1:0})}
+
+function render(){
+  $("#htitle").textContent=(TABS.find(t=>t[0]===view)||[,"Взаиморасчёты"])[1];
+  $("#back").hidden=!nav.length;
+  if(view==="customers"||view==="suppliers")return renderReport();
+  if(view==="aging")return renderAging();
+  if(view==="dashboard")return renderDash();
+  if(view==="calendar")return renderCal();
+  if(view==="settings")return renderSettings();
+}
+
+/* ── Покупатели / Поставщики ── */
+async function renderReport(){
+  toolbar(true);
+  const rep=await api("/api/report?"+params());
+  $("#stamp").innerHTML=`<span class="dot"${tip("Зелёная точка: последний запрос к 1С прошёл успешно. Рядом время этого запроса.")}></span>Данные из 1С: ${esc(rep.as_of.replace("T"," "))}
+    &nbsp;·&nbsp; отчёт на ${esc(rep.report_date)}`+
+    hint("Слева — когда приложение последний раз успешно получило данные из 1С. "+
+         "Справа — дата, на которую построен отчёт. Если 1С недоступна, показываются "+
+         "цифры последнего успешного обращения, и время слева перестаёт обновляться.");
+  const sorted=[...rep.rows].sort((a,b)=>{
+    const g=r=>sortKey==="name"?r.counterparty.name:sortKey==="debt"?(r.sides.debt||0)
+      :sortKey==="advance"?(r.sides.advance||0):r.net;
+    const va=g(a),vb=g(b);return (va>vb?1:va<vb?-1:0)*sortDir});
+  const pages=Math.max(1,Math.ceil(sorted.length/PAGE_SIZE));
+  if(page>pages)page=1;
+  const rows=sorted.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE);   // в DOM только страница
+  const t=rep.totals, mx=Math.max(t.owed_to_us,t.we_owe,1);
+  const st={owes_us:"Должны нам",we_owe:"Должны мы",closed:"Закрыто"};
+  const ar=k=>sortKey===k?(sortDir>0?" ↑":" ↓"):"";
+
+  $("#view").innerHTML=`
+  <h1>${view==="customers"?"Покупатели":"Поставщики"}</h1>
+  <p class="sub">Свёрнутое сальдо расчётов по каждому контрагенту на ${esc(rep.report_date)}.</p>
+  <div class="kpis">
+    <div class="kpi"><div class="row"><span class="caps">Должны нам${hint("Сумма по всем контрагентам, которые остались нам должны после зачёта их авансов. В бухгалтерии это называется дебиторская задолженность.")}</span>
+      <span class="badge down"${tip("Зелёная стрелка вниз: деньги приходят к нам. Сумма долгов контрагентов перед компанией.")}>${svg("down","i sm")}</span></div>
+      <div class="v pos num">${fmt(t.owed_to_us)} ₸</div>
+      <div class="trend mut">дебиторская задолженность</div>
+      <div class="bar"><i style="width:${t.owed_to_us/mx*100}%;background:var(--green)"></i></div></div>
+    <div class="kpi"><div class="row"><span class="caps">Должны мы${hint("Сумма по контрагентам, которые заплатили вперёд больше, чем мы им сдали. Мы должны им работы или возврат денег. В бухгалтерии — кредиторская задолженность.")}</span>
+      <span class="badge up"${tip("Красная стрелка вверх: деньги уходят от нас. Сумма наших долгов перед контрагентами.")}>${svg("up","i sm")}</span></div>
+      <div class="v neg num">${fmt(t.we_owe)} ₸</div>
+      <div class="trend mut">кредиторская задолженность</div>
+      <div class="bar"><i style="width:${t.we_owe/mx*100}%;background:var(--red)"></i></div></div>
+    <div class="kpi"><div class="row"><span class="caps">Чистая позиция${hint("Разница между тем, что должны нам, и тем, что должны мы. Минус означает, что в сумме мы должны больше, чем нам.")}</span>
+      <span class="badge ${t.net<0?'up':'down'}"${tip("Итоговая позиция компании: разница между тем, что должны нам, и тем, что должны мы. Красный фон — минус, в пользу контрагентов.")}>${svg("bank","i sm")}</span></div>
+      <div class="v num ${t.net>0?"pos":t.net<0?"neg":"zero"}">${fmt(t.net)} ₸</div>
+      <div class="trend mut">${t.net<0?"В пользу контрагентов":t.net>0?"В нашу пользу":"Расчёты закрыты"}</div></div>
+  </div>
+  <div class="toolbar">
+    <span class="search">${svg("search","i sm")}
+      <input placeholder="Контрагент или БИН/ИИН" value="${esc(state.q)}"
+        oninput="state.q=this.value;page=1;renderReport()"></span>
+    <select onchange="state.org=this.value;page=1;renderReport()" data-tip="Организация">
+      <option value="">Все организации</option>
+      ${(rep.orgs||[]).map(o=>`<option value="${esc(o.id)}"
+        ${state.org===o.id?"selected":""}>${esc(o.name)}</option>`).join("")}
+    </select>
+    <span class="chip ${state.hide_zero?"on":""}"
+      onclick="state.hide_zero=!state.hide_zero;page=1;renderReport()">Скрыть нулевые${hint("Убрать из списка контрагентов, у которых расчёты закрыты — итог ровно ноль.")}</span>
+    <span class="chip ${state.only_debtors?"on":""}"
+      onclick="state.only_debtors=!state.only_debtors;page=1;renderReport()">Только должники${hint("Оставить только тех, кто должен нам. Те, кому должны мы, скрываются.")}</span>
+    <span class="pill" data-tip="контрагентов после фильтров">${sorted.length} из ${rep.total}</span>
+  </div>
+  <div class="card"><div class="tblwrap"><table>
+    <thead><tr>
+      <th style="width:40px"></th>
+      <th onclick="sortBy('name')">Контрагент${ar("name")}</th>
+      <th>БИН/ИИН</th>
+      <th>Валюта${hint("Валюта договоров контрагента. Если договоры валютные — суммы в таблице всё равно приведены в тенге по курсу на дату отчёта.")}</th>
+      <th class="r">Дог.${hint("Сколько договоров у контрагента. Раскройте строку, чтобы увидеть сальдо по каждому отдельно.")}</th>
+      <th class="r" onclick="sortBy('debt')">Долг (₸)${hint("Сколько контрагент должен нам по подписанным актам и накладным. Счёт 1210 у покупателей, 3310 у поставщиков.")}${ar("debt")}</th>
+      <th class="r" onclick="sortBy('advance')">Аванс (₸)${hint("Предоплата, которую ещё не закрыли работами или поставкой. Счёт 3510 у покупателей, 1710 у поставщиков.")}${ar("advance")}</th>
+      <th class="r" onclick="sortBy('net')">Итог (₸)${hint("Долг минус аванс — одна цифра вместо двух счетов. Зелёная: должны нам. Красная: должны мы.")}${ar("net")}</th>
+      <th>Статус</th><th style="width:48px"></th>
+    </tr></thead>
+    <tbody>${rows.map((r,i)=>`
+      <tr class="cp" onclick="toggleDetail(${i})">
+        <td><span class="chev" id="c${i}">${svg("chev","i sm")}</span></td>
+        <td><span class="cpname"><span class="avatar" style="width:28px;height:28px;font-size:10px;
+          background:var(--blue-bg);color:var(--accent)">${esc(ini(r.counterparty.name))}</span>
+          <span>${esc(r.counterparty.name)}
+            ${!state.org?`<div class="mut" style="font-size:12px">
+              ${esc((r.orgs||[]).map(o=>orgName(rep.orgs,o)).join(", "))}</div>`:""}
+          </span></span></td>
+        <td class="mut num">${esc(r.counterparty.bin)}</td>
+        <td><span class="pill cur ${r.currency==="KZT"?"":"fx"}"${tip(r.currency==="KZT"
+          ?"Все договоры контрагента в тенге, пересчёт не требуется."
+          :"У контрагента есть валютные договоры ("+r.currency+"). В таблице суммы приведены к тенге по курсу на дату отчёта, детали в раскрытии строки.")}
+          >${esc(r.currency)}</span></td>
+        <td class="r num mut">${r.contracts}</td>
+        <td class="r num">${fmt(r.sides.debt||0)}</td>
+        <td class="r num">${fmt(r.sides.advance||0)}</td>
+        <td class="r num ${r.status==="owes_us"?"pos":r.status==="we_owe"?"neg":"zero"}"
+          style="font-weight:600">${fmt(Math.abs(r.net))}</td>
+        <td><span class="pill ${r.status}"${tip(r.status==="owes_us"
+          ?"Итог положительный в нашу пользу: после вычета авансов контрагент остаётся должен нам."
+          :r.status==="we_owe"
+          ?"Итог в пользу контрагента: он заплатил вперёд больше, чем мы ему сдали, либо мы не расплатились."
+          :"Расчёты закрыты: долг и аванс полностью погасили друг друга.")}>${st[r.status]}</span></td>
+        <td class="noprint"><a class="btn icon" data-tip="Акт сверки" target="_blank"
+          onclick="event.stopPropagation()"
+          href="/act?set=${view}&cp=${encodeURIComponent(r.counterparty.id)}"
+          ${tip("Печатная форма акта сверки по этому контрагенту: документы, итог, подписи. Откроется в новой вкладке.")}>${svg("doc","i sm")}</a></td>
+      </tr>
+      <tr class="detail" id="d${i}" hidden><td colspan="10">
+        ${r.detail.map((d,j)=>`<div class="line ${d.documents.length?"has-docs":""}"
+            ${d.documents.length?`onclick="toggleDocs(${i},${j})"`:""}>
+          ${d.documents.length?`<span class="chev" id="dc${i}_${j}">${svg("chev","i sm")}</span>`
+            :svg("doc","i sm")}
+          <b>${esc(d.contract)}</b><span class="mut">счёт ${esc(d.account)}${accHint(d.account)}</span>
+          ${d.currency!=="KZT"?`<span class="pill">${esc(d.currency)} по курсу ${fmt(d.rate)}</span>`:""}
+          ${d.amount_cur?`<span class="mut num">${fmt(d.amount_cur)} ${esc(d.currency)}</span>`:""}
+          <span class="mut num">Дт ${fmt(d.dt)} / Кт ${fmt(d.kt)}</span>
+          <span class="num amt">${d.sign>0?"+":"−"} ${fmt(Math.abs(d.folded))} ₸</span>
+        </div>
+        ${d.documents.length?`<div class="docs" id="dl${i}_${j}" hidden>
+          ${d.documents.map(doc=>`<div class="docline">
+            <span class="mut num" style="width:96px">${esc(doc.date)}</span>
+            <span style="flex:1;min-width:180px">${esc(doc.name)}</span>
+            <span class="num" style="margin-left:auto">${fmt(doc.amount)} ₸</span></div>`).join("")}
+        </div>`:""}`).join("")}
+        <div style="padding:4px 2px"><b class="num">Итог: ${fmt(r.net)} ₸</b></div>
+      </td></tr>`).join("")||`<tr><td colspan="10" class="empty">Ничего не найдено</td></tr>`}
+    </tbody>
+    <tfoot><tr>
+      <td colspan="5">Итого по отчёту${sorted.length>rows.length?" (по всем строкам, не только по странице)":""}</td>
+      <td class="r num">${fmt(t.sum_debt)}</td>
+      <td class="r num">${fmt(t.sum_advance)}</td>
+      <td class="r num ${t.net>0?"pos":t.net<0?"neg":"zero"}">${fmt(t.net)}</td><td colspan="2"></td>
+    </tr></tfoot></table></div>
+    <div class="tblfoot"><span>${svg("info","i sm")} Итог = долг − аванс</span>
+      ${hint("Развёрнутое сальдо: долг и аванс показаны отдельно по каждому контрагенту, а не одной свёрнутой суммой по счёту. Свернуть по счёту нельзя — потеряется, с кого требовать и кому платить. Свёртка делается только внутри одного контрагента, в колонке «Итог».")}
+      ${pages>1?`<span class="pager">
+        <button class="btn" ${page===1?"disabled":""} onclick="goPage(${page-1})">Назад</button>
+        ${Array.from({length:pages},(_,i)=>i+1)
+          .filter(n=>n===1||n===pages||Math.abs(n-page)<=2)
+          .map((n,i,a)=>(i&&n-a[i-1]>1?'<span class="mut">…</span>':"")+
+            `<button class="btn ${n===page?"on":""}" onclick="goPage(${n})">${n}</button>`).join("")}
+        <button class="btn" ${page===pages?"disabled":""} onclick="goPage(${page+1})">Вперёд</button>
+      </span>`:""}
+      <span>Показано ${rows.length?((page-1)*PAGE_SIZE+1):0}–${(page-1)*PAGE_SIZE+rows.length}
+        из ${sorted.length}${sorted.length!==rep.total?` (всего ${rep.total})`:""}</span></div>
+  </div>`;
+}
+function sortBy(k){sortDir=sortKey===k?-sortDir:-1;sortKey=k;page=1;renderReport()}
+function goPage(n){page=n;renderReport();document.querySelector("main").scrollTo({top:0})}
+function toggleDetail(i){const d=$("#d"+i);d.hidden=!d.hidden;$("#c"+i).classList.toggle("open",!d.hidden)}
+function toggleDocs(i,j){  // второй уровень: документы расчётов по договору
+  const d=$(`#dl${i}_${j}`);if(!d)return;
+  d.hidden=!d.hidden;$(`#dc${i}_${j}`).classList.toggle("open",!d.hidden);
+  event.stopPropagation();
+}
+
+/* ── Сроки долга ── */
+async function renderAging(){
+  toolbar(false);
+  const ag=await api("/api/aging?set="+agingSet+"&date="+state.date);
+  $("#stamp").innerHTML=`<span class="dot"></span>Отчёт на ${esc(ag.report_date)}`;
+  const B=["0-30","31-60","61-90","90+"], T=ag.totals;
+  const pct=T.total?(T.overdue/T.total*100).toFixed(1):0;
+  $("#view").innerHTML=`
+  <h1>Сроки долга</h1>
+  <p class="sub">Анализ задолженности по периодам возникновения —
+    ${agingSet==="customers"?"покупатели":"поставщики"}.</p>
+  <div class="toolbar">
+    <span class="chip ${agingSet==="customers"?"on":""}"
+      onclick="agingSet='customers';renderAging()">Покупатели</span>
+    <span class="chip ${agingSet==="suppliers"?"on":""}"
+      onclick="agingSet='suppliers';renderAging()">Поставщики</span>
+    <span class="grow"></span>
+    <span class="legend">
+      <span class="caps">Легенда:</span>
+      <span><i style="background:#a7e8cb"></i>0–30 дн.</span>
+      <span><i style="background:#bed2f7"></i>31–60 дн.</span>
+      <span><i style="background:#f7d9ae"></i>61–90 дн.</span>
+      <span><i style="background:#f5b5b5"></i>90+ дн.</span></span>
+  </div>
+  <div class="kpis">
+    <div class="kpi"><span class="caps">Всего должны нам (₸)${hint("Вся задолженность в пользу компании, разложенная ниже по возрасту документов.")}</span>
+      <div class="v num">${fmt(T.total)}</div>
+      <div class="trend mut">Просрочка старше ${ag.overdue_days} дней</div></div>
+    <div class="kpi"><span class="caps">Просрочено (₸)${hint(`Долг по документам старше ${ag.overdue_days} дней. Срок считается от даты документа.`)}</span>
+      <div class="v neg num">${fmt(T.overdue)}</div>
+      <div class="trend neg">${pct}% от общего долга</div></div>
+    <div class="kpi"><span class="caps">Старше 90 дней (₸)${hint("Самая старая часть долга. Обычно требует отдельного решения: претензия, график погашения, резерв.")}</span>
+      <div class="v neg num">${fmt(T["90+"])}</div>
+      <div class="trend mut">Критический возраст</div></div>
+  </div>
+  <div class="card"><div class="tblwrap"><table>
+    <thead><tr><th>Контрагент</th>
+      ${B.map(b=>`<th class="r">${b} дней</th>`).join("")}<th class="r">Всего (₸)</th></tr></thead>
+    <tbody>${ag.rows.map(r=>`<tr class="cp act"
+      onclick='openReport({set:"${agingSet}",q:${esc(JSON.stringify(r.counterparty.name))}})'
+      data-tip="Открыть контрагента в отчёте">
+      <td>${esc(r.counterparty.name)}</td>
+      ${B.map((b,i)=>`<td class="r num ${r[b]?"age"+i:""} ${i===3&&r[b]?"big":""}"${r[b]?tip(
+        ["Свежий долг: документы не старше 30 дней, срок оплаты обычно ещё не наступил.",
+         "Просрочка до двух месяцев: пора напомнить.",
+         "Просрочка до трёх месяцев: требует отдельного разбора.",
+         "Критический возраст: старше 90 дней. Обычно уже нужны претензия, график погашения или резерв."][i]):""}>
+        ${r[b]?fmt(r[b]):"—"}</td>`).join("")}
+      <td class="r num" style="font-weight:700">${fmt(r.total)}</td></tr>`).join("")
+      ||`<tr><td colspan="6" class="empty">Долгов нет</td></tr>`}</tbody>
+    <tfoot><tr><td>Итого</td>
+      ${B.map((b,i)=>`<td class="r num ${i===3?"neg":""}">${fmt(T[b])}</td>`).join("")}
+      <td class="r num">${fmt(T.total)}</td></tr></tfoot></table></div></div>`;
+}
+
+/* ── Дашборд ── */
+async function renderDash(){
+  toolbar(false);
+  const [h,rep,repS]=await Promise.all([api("/api/history"),
+    api("/api/report?set=customers"),api("/api/report?set=suppliers")]);
+  $("#stamp").innerHTML=`<span class="dot"></span>Данные из 1С: ${esc(rep.as_of.replace("T"," "))}`;
+  const last=h[h.length-1]||{owed_to_us:0,we_owe:0,net:0}, prev=h[h.length-2]||last;
+  const dlt=(a,b)=>b?((a-b)/Math.abs(b)*100):0;
+  // сравниваем с предыдущей точкой графика и прямо называем её дату
+  const since=prev.date&&prev.date!==last.date
+    ?`с ${prev.date.split("-").reverse().join(".")}`:"с прошлого обновления";
+  const tr=(v,good)=>`<div class="trend ${(v>=0)===good?"pos":"neg"}">
+    ${svg(v>=0?"up":"down","i sm")}${v>=0?"+":""}${v.toFixed(1)}% ${since}</div>`;
+  // «должник» = тот, кто должен НАМ. У поставщиков это неотработанный аванс,
+  // поэтому берём по статусу, а не по знаку.
+  const debt=(res,set)=>res.rows.filter(r=>r.status==="owes_us")
+    .map(r=>({...r,set,amount:Math.abs(r.net)}));
+  const pools={customers:debt(rep,"customers"),suppliers:debt(repS,"suppliers")};
+  pools.all=[...pools.customers,...pools.suppliers];
+  const list=[...pools[debtorsMode]].sort((a,b)=>b.amount-a.amount);
+  const top=list.slice(0,debtorsAll?list.length:5), mx=list.length?list[0].amount:1;
+
+  const W=1000,H=300,P=64;
+  const all=h.flatMap(p=>[p.owed_to_us,p.we_owe,Math.abs(p.net)]);
+  const max=Math.max(...all,1), step=Math.pow(10,Math.floor(Math.log10(max)));
+  const axis=Math.ceil(max/step)*step;                     // «круглый» потолок оси
+  const X=i=>P+i*(W-P-24)/Math.max(h.length-1,1), Y=v=>H-40-(v/axis)*(H-72);
+  const SER=[["owed_to_us","#00734f","Дебиторская задолженность",0],
+             ["we_owe","#ba1a1a","Кредиторская задолженность",0],
+             ["net","#0a1a2b","Чистая позиция",1]];
+  const pts=(k,abs)=>h.map((p,i)=>`${X(i)},${Y(abs?Math.abs(p[k]):p[k])}`).join(" ");
+  const money=v=>v.toLocaleString("ru-RU",{maximumFractionDigits:0});
+  chartData={h,SER,X,money};
+  const chart=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;display:block">
+    <defs>${SER.map(([k,c])=>`<linearGradient id="g${k}" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="${c}" stop-opacity=".16"/>
+      <stop offset="1" stop-color="${c}" stop-opacity="0"/></linearGradient>`).join("")}</defs>
+    ${[0,.25,.5,.75,1].map(f=>`<line x1="${P}" x2="${W-24}" y1="${Y(f*axis)}" y2="${Y(f*axis)}"
+      stroke="#eef2f7"/><text x="0" y="${Y(f*axis)+4}" font-size="11" fill="#94a3b8">
+      ${(f*axis/1e6).toFixed(0)} млн</text>`).join("")}
+    <polygon points="${P},${H-40} ${pts("owed_to_us",0)} ${X(h.length-1)},${H-40}"
+      fill="url(#gowed_to_us)"/>
+    ${SER.map(([k,c,,abs])=>`<polyline fill="none" stroke="${c}" stroke-width="2.5"
+      stroke-linejoin="round" stroke-linecap="round" points="${pts(k,abs)}"/>`).join("")}
+    ${h.map((p,i)=>SER.map(([k,c,,abs])=>`<circle cx="${X(i)}"
+      cy="${Y(abs?Math.abs(p[k]):p[k])}" r="3.5" fill="#fff" stroke="${c}" stroke-width="2"/>`)
+      .join("")).join("")}
+    <line id="ch-guide" y1="8" y2="${H-40}" stroke="#94a3b8" stroke-dasharray="3 3" style="display:none"/>
+    ${h.map((p,i)=>`<rect x="${X(i)-(W-P-24)/Math.max(h.length-1,1)/2}" y="0"
+      width="${(W-P-24)/Math.max(h.length-1,1)}" height="${H-40}" fill="transparent"
+      onmousemove="chartTip(event,${i})" onmouseleave="chartTipOff()"/>`).join("")}
+    ${h.map((p,i)=>`<text x="${X(i)}" y="${H-12}" font-size="11" fill="#94a3b8"
+      text-anchor="middle">${p.date.slice(5).replace("-",".")}</text>`).join("")}
+  </svg>`;
+
+  $("#view").innerHTML=`
+  <h1 class="solo">Дашборд</h1>
+  <div class="kpis">
+    <div class="kpi act" onclick="openReport({only_debtors:true})"
+      data-tip="Показать контрагентов, которые должны нам">
+      <div class="row"><span class="caps">Должны нам</span>
+      <span class="badge down">${svg("down","i sm")}</span></div>
+      <div class="v num pos">${short(last.owed_to_us)} ₸</div>
+      <div class="trend mut">дебиторская задолженность</div>
+      ${tr(dlt(last.owed_to_us,prev.owed_to_us),true)}
+      <div class="more">Открыть должников ${svg("chev","i sm")}</div></div>
+    <div class="kpi act" onclick="openReport({sort:'net',dir:1})" data-tip="Показать, кому должны мы">
+      <div class="row"><span class="caps">Должны мы</span>
+      <span class="badge up">${svg("up","i sm")}</span></div>
+      <div class="v num neg">${short(last.we_owe)} ₸</div>
+      <div class="trend mut">кредиторская задолженность</div>
+      ${tr(dlt(last.we_owe,prev.we_owe),false)}
+      <div class="more">Кому должны мы ${svg("chev","i sm")}</div></div>
+    <div class="kpi act" onclick="openReport()" data-tip="Открыть полный отчёт">
+      <div class="row"><span class="caps">Чистая позиция</span>
+      <span class="badge ${last.net<0?"up":"down"}">${svg("bank","i sm")}</span></div>
+      <div class="v num ${last.net>0?"pos":last.net<0?"neg":"zero"}">${short(last.net)} ₸</div>
+      <div class="trend mut">${last.net<0?"В пользу контрагентов":"В нашу пользу"}</div>
+      <div class="more">Весь отчёт ${svg("chev","i sm")}</div></div>
+  </div>
+  <div class="card" style="margin-bottom:20px">
+    <div class="hd"><b>Динамика задолженности</b>${hint("Как менялись суммы от снимка к снимку. Каждая точка — сохранённый срез данных из 1С.")}<span class="grow"></span>
+      <span class="mut" style="font-size:13px">${SER.map(([,c,label])=>
+        `<i style="display:inline-block;width:9px;height:9px;border-radius:9px;background:${c};
+         margin:0 5px 0 14px"></i>${label}`).join("")}</span></div>
+    <div class="bd" style="position:relative"><div id="chtip"></div>${chart}
+      <div class="mut" style="font-size:12px;text-align:center;margin-top:4px">
+        ${h.length} срезов · наведите на точку, чтобы увидеть сумму</div></div></div>
+  <div class="cols3">
+    <div><div class="caps" style="margin-bottom:12px;display:flex;align-items:center;gap:8px">
+      <span>Требует внимания</span><span class="pill">${notes.length}</span>
+      <span class="mut" style="text-transform:none;letter-spacing:0;font-weight:400">— просрочка в обе стороны</span>
+      ${notes.length>4?`<span class="grow"></span><a class="mut"
+        style="cursor:pointer;text-transform:none;letter-spacing:0;font-weight:400"
+        onclick="notesAll=${!notesAll};renderDash()">${notesAll?"свернуть":"показать все"}</a>`:""}
+      ${hint("Просрочка по документам старше 30 дней: акты подписаны и не оплачены. Авансы здесь намеренно не вычитаются — аванс привязан к своему договору и без письменного соглашения о зачёте просроченный долг не гасит. Если по итогу позиция обратная, на карточке стоит пометка. Нажмите карточку, чтобы открыть контрагента.")}</div>
+      <div>${(notesAll?notes:notes.slice(0,4)).map(n=>`<div class="alert act ${n.kind==="overdue"?"":"info"}"
+          onclick='openReport({set:"${n.set||"customers"}",q:${esc(JSON.stringify(n.name||""))}})'
+          data-tip="Открыть карточку контрагента">
+        <b>${esc(n.name||n.text.split(":")[0])}</b>
+        <div class="${n.kind==="overdue"?"warn":"m"}">${esc(n.text.split(":").slice(1).join(":").trim())}</div>
+        <div class="mut" style="font-size:12px;margin-top:4px">
+          ${n.set==="suppliers"?"поставщики":"покупатели"}${n.opposite
+            ?` · <b>но по итогу ${fmt(Math.abs(n.net))} ₸ ${n.set==="suppliers"
+              ?"должны нам":"должны мы"}</b> — есть аванс`:""}</div>
+      </div>`).join("")||'<div class="alert info"><b>Всё спокойно</b><div class="m">Просрочек нет</div></div>'}</div>
+    </div>
+    <div class="card"><div class="hd"><b>Должники</b><span class="mut" style="font-size:13px;font-weight:400">— кто должен нам</span>${hint("Кто должен НАМ по итогу — долг минус аванс. Отличается от блока «Требует внимания» слева: там просрочка по актам без вычета авансов, здесь итоговая позиция. Переключателем можно посмотреть покупателей, поставщиков или всех сразу.")}<span class="grow"></span>
+      <span class="chip ${debtorsMode==="customers"?"on":""}"
+        onclick="debtorsMode='customers';renderDash()">Покупатели</span>
+      <span class="chip ${debtorsMode==="suppliers"?"on":""}"
+        onclick="debtorsMode='suppliers';renderDash()">Поставщики</span>
+      <span class="chip ${debtorsMode==="all"?"on":""}"
+        onclick="debtorsMode='all';renderDash()">Все</span></div>
+      ${top.map((r,i)=>`<div class="rank act"
+        onclick='openReport({set:"${r.set}",q:${esc(JSON.stringify(r.counterparty.name))}})'
+        data-tip="Открыть карточку контрагента"><span class="n">${i+1}</span>
+        <span class="body"><span class="top"><span>${esc(r.counterparty.name)}
+          ${debtorsMode==="all"?`<span class="mut" style="font-size:12px">·
+            ${r.set==="suppliers"?"поставщик":"покупатель"}</span>`:""}</span>
+          <b class="num pos">${fmt(r.amount)} ₸</b></span>
+          <span class="track"><i style="width:${r.amount/mx*100}%"></i></span></span></div>`).join("")
+        ||'<div class="empty">Должников нет</div>'}
+      ${list.length>5?`<div class="tblfoot"><span>показано ${top.length} из ${list.length}</span>
+        <a class="mut" style="cursor:pointer" onclick="debtorsAll=${!debtorsAll};renderDash()">
+          ${debtorsAll?"свернуть":"показать всех"}</a></div>`:""}
+    </div></div>`;
+}
+
+/* ── Календарь ── */
+async function renderCal(){
+  toolbar(false);
+  const c=await api("/api/calendar");
+  $("#stamp").innerHTML=`<span class="dot"></span>Отчёт на ${esc(c.report_date)}`;
+  const over=c.items.filter(i=>i.overdue_days>0), soon=c.items.filter(i=>!i.overdue_days);
+  const sum=a=>a.reduce((s,i)=>s+i.amount,0);
+  const row=i=>`<div class="calrow act"
+    onclick='openReport({set:"${i.set}",q:${esc(JSON.stringify(i.counterparty))}})'
+    data-tip="Открыть контрагента в отчёте">
+    <span class="when"><span class="d">${esc(i.due)}</span>
+      ${i.overdue_days?`<br><span class="od"${tip("Столько дней прошло с ожидаемого срока оплаты. Срок = дата документа плюс 30 дней.")}>+${i.overdue_days} дн</span>`:""}</span>
+    <span class="arrow ${i.direction==="in"?"in":"out"}"${tip(i.direction==="in"
+      ?"Стрелка вниз: деньги должны прийти нам. Это долг покупателя по подписанным актам."
+      :"Стрелка вверх: деньги должны уйти от нас. Это наш долг поставщику за полученные материалы.")}
+      >${svg(i.direction==="in"?"down":"up","i sm")}</span>
+    <span class="body" style="flex:1;min-width:0">
+      <div style="font-weight:600">${esc(i.counterparty)}</div>
+      <div class="mut" style="font-size:13px">${esc(i.doc)} от ${esc(i.doc_date)}</div></span>
+    <b class="num ${i.direction==="in"?"pos":"neg"}">${fmt(i.amount)} ₸</b></div>`;
+  $("#view").innerHTML=`
+  <h1>Календарь</h1>
+  <p class="sub">Ожидаемые поступления и платежи по срокам документов.</p>
+  <div class="toolbar">
+    <span class="pill we_owe">Просрочено: ${over.length} · на ${short(sum(over))} ₸</span>
+    <span class="pill owes_us">Ожидается: ${soon.length} · на ${short(sum(soon))} ₸</span>
+  </div>
+  <div class="cols">
+    <div class="card"><div class="hd">${svg("warn")}<b>Просрочено</b>${hint("Документы, у которых ожидаемый срок оплаты уже прошёл. Срок считается как дата документа плюс 30 дней.")}<span class="grow"></span>
+      <span class="pill we_owe">критично</span></div>
+      ${over.map(row).join("")||'<div class="empty">Просрочек нет</div>'}</div>
+    <div class="card"><div class="hd">${svg("clock")}<b>Ожидается</b>${hint("Платежи, срок которых ещё не наступил. Стрелка вниз — деньги придут нам, вверх — платим мы.")}<span class="grow"></span>
+      <span class="pill">в плане</span></div>
+      ${soon.map(row).join("")||'<div class="empty">Пусто</div>'}</div>
+  </div>`;
+}
+
+/* ── Настройки ── */
+async function renderSettings(){
+  $("#tools").innerHTML="";$("#stamp").innerHTML="";
+  const [rls,st,users,log]=await Promise.all([
+    api("/api/rules"),api("/api/settings"),api("/api/users"),api("/api/audit")]);
+  const side={debt:"Долг",advance:"Аванс",offset:"Зачёт"};
+  $("#view").innerHTML=`
+  <h1>Настройки</h1>
+  <p class="sub">Учётные правила, расписание синхронизации и доступ пользователей.</p>
+  <div class="cols3" style="grid-template-columns:1fr 380px">
+    <div>
+      <div class="card" style="margin-bottom:20px">
+        <div class="hd"><b>Правила счетов</b>${hint("Формула отчёта, вынесенная в настройки. Каждая строка: какой счёт 1С взять, в каком отчёте, с каким знаком. Приложение читает эту таблицу при каждом расчёте — поэтому новый счёт добавляется без программиста и без новой версии.")}</div>
+        <table><thead><tr><th>Отчёт</th><th>Счёт${hint("Номер счёта из плана счетов Казахстана. Первая цифра говорит о типе: 1 — актив (деньги, которые нам должны или которые мы отдали вперёд), 3 — обязательство (то, что должны мы). Наведите на конкретный номер, чтобы увидеть расшифровку.")}</th>
+          <th>Знак +/−${hint("Прибавить счёт к итогу или вычесть. Долг прибавляется, аванс вычитается.")}</th><th>Сторона${hint("В какую колонку отчёта попадёт сумма: «Долг» или «Аванс». Отдельный вид — «Зачёт» для случая, когда контрагент одновременно покупатель и поставщик.")}</th><th class="r">Активен${hint("Выключенное правило не участвует в расчёте. Данные при этом продолжают выгружаться из 1С, поэтому включение действует сразу.")}</th></tr></thead>
+        <tbody>${rls.map(r=>`<tr>
+          <td>${r.rule_set==="customers"?"Покупатели":"Поставщики"}</td>
+          <td class="num" style="font-weight:600">${esc(r.account)}${accHint(r.account)}</td>
+          <td><span class="pill">${r.sign>0?"+":"−"}</span></td>
+          <td>${side[r.side]}</td>
+          <td class="r"><label class="toggle" style="display:inline-block">
+            <input type="checkbox" ${r.enabled?"checked":""}
+              onchange="toggleRule(${r.id},this.checked)"><span></span></label></td>
+        </tr>`).join("")}</tbody></table>
+        <div class="note">${svg("info","i sm")}<span>Строка со стороной <b>«Зачёт»</b> — это случай
+          «покупатель = поставщик»: контрагент должен нам за работы, а мы ему за материалы.
+          Включите её, чтобы итог сходился с ручной выгрузкой бухгалтерии. Состав счетов меняется
+          здесь же, правка кода не требуется.</span></div>
+      </div>
+      <div class="card"><div class="hd">${svg("sync")}<b>Расписание синхронизации 1С</b>${hint("Как часто приложение само запрашивает остатки у 1С. В промежутках показываются данные последнего успешного обращения — время видно в шапке.")}</div>
+        <div class="bd">
+          <div class="caps" style="margin-bottom:8px">Интервал обновления</div>
+          <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+            <select onchange="saveInterval(this.value)">
+              ${[15,30,60,120,240].map(v=>`<option value="${v}"
+                ${st.sync_interval_min===v?"selected":""}>Каждые ${v} минут</option>`).join("")}
+            </select>
+            <button class="btn" onclick="refresh()">${svg("refresh","i sm")}Синхронизировать сейчас</button>
+            <span class="grow"></span><span class="pill owes_us"><span class="dot"></span>Подключено</span>
+          </div></div></div>
+    </div>
+    <div class="card"><div class="hd">${svg("users")}<b>Пользователи</b>${hint("Бухгалтер видит отчёты и может обновлять данные. Администратор дополнительно правит правила счетов, расписание и список пользователей.")}</div>
+      ${users.map(u=>`<div class="userrow">
+        <span class="avatar">${esc(u.login.slice(0,2).toUpperCase())}</span>
+        <span class="body" style="flex:1"><div style="font-weight:600">${esc(u.login)}</div>
+          <div class="mut" style="font-size:13px">${u.role==="admin"?"Администратор":"Бухгалтер"}</div></span>
+        ${u.login!=="admin"?`<button class="btn icon" onclick="delUser(${u.id})"
+          data-tip="Удалить">${svg("trash","i sm")}</button>`:""}</div>`).join("")}
+      <div class="bd">
+        <div class="caps" style="margin-bottom:10px">Добавить пользователя</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <input id="nu_l" placeholder="Логин">
+          <input id="nu_p" type="password" placeholder="Пароль">
+          <div style="display:flex;gap:10px">
+            <select id="nu_r" style="flex:1">
+              <option value="user">Бухгалтер</option><option value="admin">Администратор</option></select>
+            <button class="btn dark" onclick="addUser()">${svg("plus","i sm")}</button>
+          </div>
+          <div class="err" id="nu_err"></div>
+        </div></div></div>
+  </div>
+  <div class="card" style="margin-top:20px">
+    <div class="hd">${svg("doc")}<b>Журнал обращений</b>${hint("Протокол работы: входы и неудачные попытки, каждое обращение к 1С с параметрами и временем ответа, выгрузки и изменения настроек. По техпредложению это одна из четырёх гарантий того, что приложение только читает: журнал показывает, что запросы были исключительно на выборку данных.")}
+      <span class="grow"></span>
+      <span class="mut" style="font-size:13px">последние ${log.length} событий</span></div>
+    <div class="tblwrap"><table style="min-width:760px">
+      <thead><tr><th style="width:170px">Время</th><th style="width:130px">Пользователь</th>
+        <th style="width:210px">Событие</th><th>Подробности</th></tr></thead>
+      <tbody>${log.map(r=>`<tr>
+        <td class="num mut">${esc(r.at.replace("T"," "))}</td>
+        <td>${r.login?esc(r.login):'<span class="mut">система</span>'}</td>
+        <td><span class="pill ${LOGKIND[r.kind]?.[1]||""}">${esc(LOGKIND[r.kind]?.[0]||r.kind)}</span></td>
+        <td class="mut" style="font-size:13px">${esc(r.detail||"—")}</td>
+      </tr>`).join("")||'<tr><td colspan="4" class="empty">Журнал пуст</td></tr>'}</tbody>
+    </table></div></div>`;
+}
+function toast(text,linkText,onClick){
+  const d=document.createElement("div");d.className="t";
+  d.innerHTML=`<span style="flex:1">${text}</span>`;
+  if(linkText){const a=document.createElement("a");a.textContent=linkText;
+    a.onclick=()=>{d.remove();onClick()};d.appendChild(a)}
+  $("#toast").appendChild(d);setTimeout(()=>d.remove(),7000);
+}
+async function toggleRule(id,en){
+  const rls=await api("/api/rules");
+  const r=rls.find(x=>x.id===id)||{};
+  await api("/api/rules",{method:"POST",body:JSON.stringify({id,enabled:en})});
+  await api("/api/refresh",{method:"POST"});loadNotes();
+  const set=r.rule_set==="customers"?"Покупатели":"Поставщики";
+  // изменение видно на другой вкладке — говорим об этом прямо и даём перейти
+  toast(`Счёт ${r.account} ${en?"включён в расчёт":"исключён из расчёта"}. `+
+        `Отчёт «${set}» пересчитан.`, `Открыть ${set}`, ()=>go(r.rule_set));
+}
+async function saveInterval(v){
+  await api("/api/settings",{method:"POST",body:JSON.stringify({sync_interval_min:+v})})}
+async function addUser(){
+  try{await api("/api/users",{method:"POST",body:JSON.stringify(
+    {login:$("#nu_l").value,password:$("#nu_p").value,role:$("#nu_r").value})});
+    renderSettings()}catch(e){$("#nu_err").textContent=e.message}
+}
+async function delUser(id){
+  await api("/api/users",{method:"POST",body:JSON.stringify({delete:id})});renderSettings()}
+
+document.addEventListener("click",e=>{
+  const n=$("#notes");
+  if(!n.hidden&&!n.contains(e.target)&&!e.target.closest(".bell"))n.hidden=true;
+});
+(async()=>{try{me=await api("/api/me");boot()}catch(e){}})();
+</script><div style="position:fixed;left:12px;bottom:12px;z-index:999;background:#101828cc;color:#e2e8f0;font:600 12px/1.4 system-ui;padding:8px 14px;border-radius:99px;backdrop-filter:blur(4px)">Демо · данные обезличены · построено за 1 день</div></body></html>

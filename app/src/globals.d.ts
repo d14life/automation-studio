@@ -1,0 +1,114 @@
+/* Ambient types for the two plain <script> libraries the page loads from /public.
+   Signatures are read off public/anim3.js and public/win.js, not guessed. */
+
+export {}
+
+declare global {
+  /* ---------- anim3.js ---------- */
+
+  interface StarfieldOptions {
+    starColor?: string
+    bgColor?: string
+    mouseAdjust?: boolean
+    easing?: number
+    clickToWarp?: boolean
+    warpFactor?: number
+    opacity?: number
+    speed?: number
+    quantity?: number
+    /* how far the field spreads from the centre; defaults to quantity/2, which used to couple
+       the two so that adding stars pushed them off-screen. Set it to keep the count honest. */
+    spread?: number
+    /* a phone does not need 60 fps of starfield */
+    minFrameMs?: number
+    zIndex?: number
+  }
+  /* the returned stop() also carries setQuantity, attached to the function object */
+  interface StarfieldStop {
+    (): void
+    setQuantity(n: number): void
+  }
+
+  interface LiquidTextOptions {
+    morphTime?: number
+    cooldownTime?: number
+    colors?: string[]
+    flow?: number
+    drift?: number
+    spread?: number
+    letters?: boolean
+    activeWhen?: () => boolean
+    simple?: boolean
+  }
+  /* LiquidText hangs letterSpans() on the host element it was given */
+  interface LiquidTextHost extends HTMLElement {
+    letterSpans?(): HTMLElement[]
+  }
+
+  /* threejs-components tubes1 instance, only the members the page touches */
+  interface TubesApp {
+    options: { sleepRadiusX: number; sleepRadiusY: number }
+    tubes: {
+      setColors(colors: string[]): void
+      setLightsColors(colors: string[]): void
+    }
+    dispose(): void
+  }
+  interface TubesOptions {
+    tubes?: {
+      colors?: string[]
+      /* trail length of each ribbon; the library's own defaults are 32 and 128 */
+      minTubularSegments?: number
+      maxTubularSegments?: number
+      lights?: { intensity?: number; colors?: string[] }
+    }
+  }
+
+  /* ---------- win.js ---------- */
+
+  interface WinOpenOptions {
+    key?: string
+    title?: string
+    body?: HTMLElement | null
+    host?: HTMLElement
+    w?: number
+    h?: number
+    dock?: boolean
+    onClose?: (key: string) => void
+  }
+  interface WinMgrApi {
+    open(o: WinOpenOptions): HTMLElement
+    close(key: string): void
+    minimize(key: string): void
+    maximize(key: string): void
+    focus(key: string): void
+    setBadge(key: string, flag: boolean): void
+    isOpen(key: string): boolean
+  }
+
+  interface Window {
+    Starfield1(host: HTMLElement, o?: StarfieldOptions): StarfieldStop
+    LiquidText(host: LiquidTextHost, texts: string[], o?: LiquidTextOptions): () => void
+    /* returns a cancel() for the 100 ms init timer */
+    TubesCursorInit(
+      canvas: HTMLCanvasElement,
+      opts?: TubesOptions,
+      onReady?: (app: TubesApp) => void,
+    ): () => void
+    flowGrad(cs: string[]): string
+    paletteAt(pal: string[], p: number): string
+    dim(hex: string, k: number): string
+    hslHex(h: number, s?: number, l?: number): string
+    tubesRandomColors(count: number): string[]
+    WinMgr: WinMgrApi
+    /* readable proof that the tube colour cycle is alive */
+    __tubeHue?: number
+    /* [sleepRadiusX, sleepRadiusY] - how far the ribbons travel, readable for checking */
+    __tubeSweep?: [number, number]
+  }
+
+  interface Navigator {
+    /* non-standard, part of the SMALL test */
+    readonly deviceMemory?: number
+  }
+}
