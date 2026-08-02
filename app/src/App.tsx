@@ -3,6 +3,7 @@ import { TubeLayer } from '@/components/fx/TubeLayer'
 import { TopBar } from '@/components/sections/TopBar'
 import { Hero } from '@/components/sections/Hero'
 import { About } from '@/components/sections/About'
+import { Numbers } from '@/components/sections/Numbers'
 import { Services } from '@/components/sections/Services'
 import { Projects } from '@/components/sections/Projects'
 import { HowItWorks } from '@/components/sections/HowItWorks'
@@ -46,6 +47,7 @@ export default function App() {
       <TopBar onAiOpen={ai.open} onBurger={burger.toggle} navOpen={burger.open} onNavClick={burger.onNavClick} />
       <Hero onAiOpen={ai.open} />
       <About />
+      <Numbers />
       <Services />
       <Projects />
       <HowItWorks />

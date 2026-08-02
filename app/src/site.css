@@ -877,3 +877,27 @@ footer a{display:block;padding:3px 0}
   /* no hover on a phone: the resting row is the only one, and it must not be pushed aside */
   .ihl .ihl-hover{display:none}
 }
+
+/* ---------- numbers band, with the sparkles donor as a lit strip ----------
+   The donor's own composition: two hairlines, the particle field falling away beneath them, and
+   a radial mask so the field has no edge. Sized down from the demo's 40rem to a section strip. */
+.sparkstrip{position:relative;height:150px;width:100%;max-width:760px;margin:6px auto 30px}
+.sp-line{position:absolute;top:0;left:50%;translate:-50% 0}
+.sp-line-wide{width:75%;height:2px;filter:blur(2px);
+  background:linear-gradient(to right,transparent,var(--ice3),transparent)}
+.sp-line-narrow{width:25%;height:2px;filter:blur(1px);
+  background:linear-gradient(to right,transparent,var(--ice2),transparent)}
+.sparkstrip .sp-core{position:absolute;inset:0;width:100%;height:100%}
+.sp-mask{position:absolute;inset:0;background:#000;pointer-events:none;
+  -webkit-mask-image:radial-gradient(340px 190px at top,transparent 20%,#000);
+  mask-image:radial-gradient(340px 190px at top,transparent 20%,#000)}
+
+.figs{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}
+.fig{padding:20px 22px;border:1px solid var(--line);border-radius:16px;
+  background:rgba(255,255,255,.04);
+  -webkit-backdrop-filter:blur(8px) brightness(1.1);backdrop-filter:blur(8px) brightness(1.1);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22)}
+.fig b{display:block;font:900 34px/1.05 Nunito,sans-serif;color:var(--ice1);letter-spacing:-.02em}
+.fig-of{display:block;margin-top:6px;font-weight:800;font-size:14.5px}
+.fig-sub{display:block;margin-top:6px;color:var(--dim);font-size:13px;line-height:1.45}
+@media (max-width:700px){.sparkstrip{height:110px}}
