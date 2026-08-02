@@ -135,28 +135,112 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
   .projects{height:auto;display:flex;flex-direction:column;gap:18px}
   .projects .proj{position:static;margin:0;width:100%;aspect-ratio:auto;transform:none;transition:none}
 }
-.shot{height:46%;flex:none;background:linear-gradient(160deg,#07131c,#04090d);
-  border-bottom:1px solid var(--line);padding:14px;display:flex;flex-direction:column;gap:7px;overflow:hidden}
-.shot .bar{height:8px;border-radius:99px;background:rgba(127,216,255,.16)}
-.shot .bar.w1{width:70%}.shot .bar.w2{width:46%}.shot .bar.w3{width:88%}.shot .bar.w4{width:34%}
-.shot .row{display:flex;gap:7px;align-items:center}
-.shot .row .cell{height:10px;border-radius:4px;background:rgba(223,246,255,.10);flex:1}
-.shot .row .cell.num{flex:0 0 52px;background:rgba(127,216,255,.30)}
-.shot .cols{display:flex;gap:7px;flex:1}
-.shot .col{flex:1;background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:9px;
-  padding:7px;display:flex;flex-direction:column;gap:5px}
-.shot .chip{height:18px;border-radius:6px;background:rgba(127,216,255,.14)}
-.shot .chip.hi{background:rgba(142,123,232,.30)}
-.shot .chart{flex:1;display:flex;align-items:flex-end;gap:6px}
-.shot .chart i{flex:1;border-radius:4px 4px 0 0;background:linear-gradient(180deg,var(--ice2),rgba(127,216,255,.12))}
-.shot .bubble{max-width:78%;padding:7px 10px;border-radius:11px;font-size:11px;color:var(--dim);
-  background:rgba(255,255,255,.05);border:1px solid var(--line)}
-.shot .bubble.me{align-self:flex-end;background:rgba(127,216,255,.18);color:#DFF6FF;border-color:transparent}
-.shot .stopline{display:flex;align-items:center;gap:9px;font-size:11px;color:var(--dim)}
-.shot .stopline i{width:8px;height:8px;border-radius:99px;background:var(--ice2);flex:none}
-.shot .tiles{flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
-.shot .tile{border:1px solid var(--line);border-radius:9px;background:rgba(255,255,255,.03);
-  display:flex;align-items:center;justify-content:center;font:900 15px Nunito,sans-serif;color:var(--ice2)}
+/* ---------- product mockups inside the project cards ----------
+   Four shots, one primitive set: window bar (.sh-hd), body (.sh-b), row (.sh-r),
+   truncating label (.sh-t), mono number (.sh-n), status pill (.sh-p).
+   .sh-shot is the query container and .sh-w carries the base font, so every size below
+   is a container unit or an em: the same markup reads correctly at 260px and at 520px. */
+.shot.sh-shot{padding:0;gap:0;overflow:hidden;container-type:inline-size}
+/* below the fan breakpoint the card stops being square, so the shot keeps the 46:100 share itself */
+@media (max-width:820px){.shot.sh-shot{height:auto;aspect-ratio:100/46}}
+.sh-w{display:flex;flex-direction:column;height:100%;min-height:0;overflow:hidden;color:var(--ink);
+  font:400 clamp(7.6px,3.4cqw,15px)/1.22 Nunito,system-ui,sans-serif;
+  --shg:clamp(3px,1.4cqw,7px);--shage:clamp(30px,11.5cqw,48px);
+  --shm:ui-monospace,SFMono-Regular,Menlo,monospace}
+
+/* window bar */
+.sh-hd{flex:none;display:flex;align-items:center;gap:calc(var(--shg)*1.2);
+  padding:calc(var(--shg)*1.1) calc(var(--shg)*1.6);
+  border-bottom:1px solid var(--line);background:rgba(127,216,255,.045)}
+.sh-hd b{font-weight:900;letter-spacing:-.01em;white-space:nowrap}
+.sh-dots{display:flex;gap:.34em;flex:none}
+.sh-dots i{width:.4em;height:.4em;border-radius:99px;background:rgba(159,170,161,.42)}
+.sh-tab{flex:none;padding:.08em .55em;border-radius:99px;font-size:.88em;font-weight:700;
+  color:var(--dim);white-space:nowrap}
+.sh-on{background:rgba(127,216,255,.16);color:var(--ice1)}
+.sh-mr{margin-left:auto;font-size:.86em;color:var(--dim);white-space:nowrap}
+
+/* body, rows, cells */
+.sh-b{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;
+  padding:0 calc(var(--shg)*1.6)}
+.sh-r{flex:1 1 0;min-height:0;display:flex;align-items:center;gap:var(--shg);
+  border-top:1px solid var(--line)}
+.sh-ch{flex:none;display:flex;align-items:center;gap:var(--shg);color:var(--dim);font-size:.76em;
+  text-transform:uppercase;letter-spacing:.07em;padding:calc(var(--shg)*1.2) 0 calc(var(--shg)*.7)}
+.sh-ch>*{white-space:nowrap}
+.sh-t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sh-n{font-family:var(--shm);font-variant-numeric:tabular-nums;font-size:.92em;
+  text-align:right;white-space:nowrap}
+.sh-p{font-style:normal;padding:.1em .42em;border-radius:.45em;font-size:.8em;font-weight:700;
+  white-space:nowrap;background:rgba(127,216,255,.14);color:var(--ice2)}
+.sh-p2{background:rgba(142,123,232,.24);color:#C9BEFF}
+.sh-p3{background:rgba(92,130,201,.3);color:#CFE0FF}
+.sh-age{flex:none;width:var(--shage);text-align:center}       /* keeps the status column square */
+.sh-tot{flex:none;display:flex;align-items:center;gap:var(--shg);font-weight:900;
+  padding:calc(var(--shg)*1.1) 0;border-top:1px solid rgba(127,216,255,.32)}
+.sh-tot .sh-n{color:var(--ice1);font-weight:700}
+
+/* 2. shipment: a rail of five stops, three done, one current */
+.sh-trk{justify-content:space-between}
+.sh-rail{flex:1;min-height:0;display:flex;align-items:center;padding:calc(var(--shg)*1.4) 0}
+.sh-st{flex:1;min-width:0;position:relative;display:flex;flex-direction:column;align-items:center;
+  gap:.45em;font-size:.84em;color:var(--dim)}
+.sh-st em{font-style:normal;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sh-st i{position:relative;z-index:1;flex:none;width:.62em;height:.62em;border-radius:99px;
+  background:rgba(159,170,161,.3);border:1px solid rgba(159,170,161,.45)}
+.sh-st::before{content:'';position:absolute;left:-50%;top:.31em;width:100%;height:1px;
+  background:var(--line)}
+.sh-st:first-child::before{display:none}
+.sh-done i{background:var(--ice2);border-color:var(--ice2)}
+.sh-done::before,.sh-now::before{background:rgba(127,216,255,.5)}
+.sh-now{color:var(--ice1);font-weight:700}
+.sh-now i{background:var(--ice1);border-color:var(--ice1);box-shadow:0 0 0 .22em rgba(127,216,255,.2)}
+.sh-facts{flex:none;display:flex;gap:var(--shg);border-top:1px solid var(--line);
+  padding:calc(var(--shg)*1.2) 0}
+.sh-facts>span{flex:1;min-width:0;display:flex;flex-direction:column;gap:.12em}
+.sh-facts em{font-style:normal;font-size:.76em;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sh-facts b{font-weight:900;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* 3. crm: three columns, two deals each */
+.sh-kan{flex-direction:row;gap:var(--shg);padding-top:calc(var(--shg)*1.3);
+  padding-bottom:calc(var(--shg)*1.5)}
+.sh-col{flex:1;min-width:0;display:flex;flex-direction:column;gap:calc(var(--shg)*.9)}
+.sh-colh{flex:none;display:flex;align-items:center;gap:.3em;font-size:.8em;font-weight:700;
+  letter-spacing:.05em;text-transform:uppercase;color:var(--dim);overflow:hidden}
+.sh-colh em{font-style:normal;margin-left:auto;flex:none;padding:0 .45em;border-radius:99px;
+  font-family:var(--shm);background:rgba(127,216,255,.14);color:var(--ice2)}
+.sh-dl{flex:1 1 0;min-height:0;overflow:hidden;display:flex;flex-direction:column;justify-content:center;
+  gap:.15em;padding:.3em .42em;border:1px solid var(--line);border-left:2px solid var(--ice3);
+  border-radius:.5em;background:rgba(255,255,255,.035)}
+.sh-dl>*{flex:none}
+.sh-dl .sh-n{text-align:left;font-weight:700;color:var(--ice2)}
+.sh-col:nth-child(2) .sh-dl{border-left-color:var(--ice2)}
+.sh-col:nth-child(3) .sh-dl{border-left-color:#8E7BE8}
+
+/* 4. bot: chat log plus composer */
+.sh-chat{justify-content:flex-end;gap:calc(var(--shg)*.85);
+  padding-top:calc(var(--shg)*1.2);padding-bottom:calc(var(--shg)*1.2)}
+.sh-msg{flex:none;display:flex;align-items:flex-end;gap:.4em;max-width:92%}
+.sh-me{margin-left:auto;justify-content:flex-end}
+.sh-bub{padding:.26em .5em;border-radius:.7em;font-size:.92em;line-height:1.25;
+  border:1px solid var(--line);background:rgba(255,255,255,.05)}
+.sh-me .sh-bub{font-weight:700;color:var(--ice1);border-color:transparent;background:rgba(127,216,255,.18)}
+.sh-av{flex:none;font:900 .74em/1 Nunito,sans-serif;width:1.75em;height:1.75em;border-radius:99px;
+  display:grid;place-items:center;color:#04121b;background:linear-gradient(150deg,var(--ice1),var(--ice3))}
+.sh-typ{display:inline-flex;align-items:center;gap:.26em;padding:.45em .5em}
+.sh-typ i{width:.3em;height:.3em;border-radius:99px;background:var(--dim);animation:sh-blink 1.1s infinite}
+.sh-typ i:nth-child(2){animation-delay:.18s}
+.sh-typ i:nth-child(3){animation-delay:.36s}
+@keyframes sh-blink{0%,60%,100%{opacity:.28}30%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.sh-typ i{animation:none}}
+.sh-comp{flex:none;display:flex;align-items:center;gap:var(--shg);border-top:1px solid var(--line);
+  background:rgba(127,216,255,.04);padding:calc(var(--shg)*1.1) calc(var(--shg)*1.6)}
+.sh-inp{flex:1;min-width:0;padding:.24em .7em;border:1px solid var(--line);border-radius:99px;
+  background:#05090c;color:var(--dim);font-size:.9em;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sh-send{flex:none;width:1.6em;height:1.6em;border-radius:99px;display:grid;place-items:center;
+  font-weight:900;line-height:1;background:var(--ice2);color:#04121b}
 .proj .body{padding:16px 18px 18px;display:flex;flex-direction:column;flex:1;min-height:0}
 .proj .tag{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ice2);margin-bottom:8px}
 .proj .tag em{font-style:normal;color:var(--dim)}
@@ -205,18 +289,6 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
 
 
 /* ---------- ai chat ---------- */
-/* A docked panel, not a modal: no backdrop, nothing blocked, the page stays scrollable and
-   clickable while the assistant is open. */
-.aiwrap{position:fixed;top:86px;right:18px;bottom:18px;width:min(400px,calc(100vw - 36px));
-  z-index:60;display:none;pointer-events:none}
-.aiwrap.open{display:block}
-.aibox{height:100%;display:flex;flex-direction:column;pointer-events:auto;
-  background:rgba(5,9,12,.94);backdrop-filter:blur(8px);
-  border:1px solid var(--line);border-radius:20px;overflow:hidden;
-  box-shadow:0 24px 70px rgba(0,0,0,.6)}
-@media (max-width:700px){
-  .aiwrap{top:auto;left:10px;right:10px;bottom:10px;width:auto;height:72vh}
-}
 .aitop{display:flex;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid var(--line)}
 .aitop b{font:900 15.5px Nunito,sans-serif}
 .aitop small{color:var(--dim);font-size:12.5px}
@@ -419,14 +491,22 @@ footer a{display:block;padding:3px 0}
   <div class="projects">
 
     <article class="proj beam"><i class="beam-ring"></i>
-      <div class="shot">
-        <div class="bar w1"></div>
-        <div class="row"><span class="cell num"></span><span class="cell"></span><span class="cell"></span></div>
-        <div class="row"><span class="cell num"></span><span class="cell"></span><span class="cell"></span></div>
-        <div class="row"><span class="cell num"></span><span class="cell"></span><span class="cell"></span></div>
-        <div class="row"><span class="cell num"></span><span class="cell"></span><span class="cell"></span></div>
-        <div class="bar w2"></div>
-      </div>
+      <div class="shot sh-shot"><div class="sh-w">
+        <div class="sh-hd">
+          <span class="sh-dots"><i></i><i></i><i></i></span>
+          <b>Взаиморасчёты</b>
+          <span class="sh-tab sh-on">Долги</span><span class="sh-tab">Оплаты</span>
+          <span class="sh-mr">3 юрлица</span>
+        </div>
+        <div class="sh-b">
+          <div class="sh-ch"><span class="sh-t">Контрагент</span><span>Сальдо, ₸</span><span class="sh-age">Срок</span></div>
+          <div class="sh-r"><span class="sh-t">КазСтройМет</span><span class="sh-n">4 820 000</span><span class="sh-age"><i class="sh-p">0-30</i></span></div>
+          <div class="sh-r"><span class="sh-t">Аском Трейд</span><span class="sh-n">1 145 300</span><span class="sh-age"><i class="sh-p">31-60</i></span></div>
+          <div class="sh-r"><span class="sh-t">СМУ-7 Астана</span><span class="sh-n">930 000</span><span class="sh-age"><i class="sh-p sh-p2">60+</i></span></div>
+          <div class="sh-r"><span class="sh-t">Гидромаш КЗ</span><span class="sh-n">612 400</span><span class="sh-age"><i class="sh-p sh-p3">90+</i></span></div>
+          <div class="sh-tot"><span class="sh-t">Итого к получению</span><span class="sh-n">7 507 700</span><span class="sh-age"></span></div>
+        </div>
+      </div></div>
       <div class="body">
         <p class="tag">Стройка · Казахстан <em>· работает у клиента</em></p>
         <h3>Учёт взаиморасчётов</h3>
@@ -437,14 +517,28 @@ footer a{display:block;padding:3px 0}
     </article>
 
     <article class="proj glow">
-      <div class="shot">
-        <div class="stopline"><i></i>Заказ принят</div>
-        <div class="stopline"><i></i>Собран на складе</div>
-        <div class="stopline"><i></i>Передан перевозчику</div>
-        <div class="stopline"><i></i>В пути, Алматы</div>
-        <div class="stopline"><i></i>Ожидает выдачи</div>
-        <div class="bar w3"></div>
-      </div>
+      <div class="shot sh-shot"><div class="sh-w">
+        <div class="sh-hd">
+          <span class="sh-dots"><i></i><i></i><i></i></span>
+          <b>Посылка</b>
+          <span class="sh-n">KZ-4417-2290</span>
+          <span class="sh-p sh-mr">В пути</span>
+        </div>
+        <div class="sh-b sh-trk">
+          <div class="sh-rail">
+            <span class="sh-st sh-done"><i></i><em>Принят</em></span>
+            <span class="sh-st sh-done"><i></i><em>Склад</em></span>
+            <span class="sh-st sh-done"><i></i><em>Отгрузка</em></span>
+            <span class="sh-st sh-now"><i></i><em>В пути</em></span>
+            <span class="sh-st"><i></i><em>Выдача</em></span>
+          </div>
+          <div class="sh-facts">
+            <span><em>Перевозчик</em><b>СДЭК</b></span>
+            <span><em>Город</em><b>Алматы</b></span>
+            <span><em>Прибытие</em><b class="sh-n">14.03</b></span>
+          </div>
+        </div>
+      </div></div>
       <div class="body">
         <p class="tag">Логистика <em>· работает у клиента</em></p>
         <h3>Доска отслеживания посылок</h3>
@@ -454,13 +548,31 @@ footer a{display:block;padding:3px 0}
     </article>
 
     <article class="proj beam"><i class="beam-ring"></i>
-      <div class="shot">
-        <div class="cols">
-          <div class="col"><span class="chip"></span><span class="chip hi"></span><span class="chip"></span></div>
-          <div class="col"><span class="chip hi"></span><span class="chip"></span></div>
-          <div class="col"><span class="chip"></span><span class="chip"></span><span class="chip hi"></span></div>
+      <div class="shot sh-shot"><div class="sh-w">
+        <div class="sh-hd">
+          <span class="sh-dots"><i></i><i></i><i></i></span>
+          <b>Сделки</b>
+          <span class="sh-tab sh-on">Неделя</span>
+          <span class="sh-mr">9 в работе</span>
         </div>
-      </div>
+        <div class="sh-b sh-kan">
+          <div class="sh-col">
+            <div class="sh-colh">Заявка<em>4</em></div>
+            <div class="sh-dl"><span class="sh-t">Ромашка</span><span class="sh-n">180 000 ₽</span></div>
+            <div class="sh-dl"><span class="sh-t">СтройДвор</span><span class="sh-n">96 400 ₽</span></div>
+          </div>
+          <div class="sh-col">
+            <div class="sh-colh">Замер<em>3</em></div>
+            <div class="sh-dl"><span class="sh-t">Алтын Групп</span><span class="sh-n">340 000 ₽</span></div>
+            <div class="sh-dl"><span class="sh-t">Бекет и К</span><span class="sh-n">78 900 ₽</span></div>
+          </div>
+          <div class="sh-col">
+            <div class="sh-colh">Счёт<em>2</em></div>
+            <div class="sh-dl"><span class="sh-t">Гранд Строй</span><span class="sh-n">1 240 000 ₽</span></div>
+            <div class="sh-dl"><span class="sh-t">ТД Верста</span><span class="sh-n">415 000 ₽</span></div>
+          </div>
+        </div>
+      </div></div>
       <div class="body">
         <p class="tag">Продажи <em>· макет</em></p>
         <h3>CRM под ваш процесс</h3>
@@ -471,12 +583,21 @@ footer a{display:block;padding:3px 0}
 
 
     <article class="proj glow">
-      <div class="shot">
-        <div class="bubble">Здравствуйте! Остался ли в наличии профиль 40х20?</div>
-        <div class="bubble me">Да, 320 метров на складе в Казани. Выставить счёт?</div>
-        <div class="bubble">Да, на ООО Ромашка</div>
-        <div class="bubble me">Счёт 1174 отправлен на почту, бронь на 3 дня</div>
-      </div>
+      <div class="shot sh-shot"><div class="sh-w">
+        <div class="sh-hd">
+          <span class="sh-dots"><i></i><i></i><i></i></span>
+          <b>Ассистент</b>
+          <span class="sh-tab sh-on">Склад</span>
+          <span class="sh-mr">онлайн</span>
+        </div>
+        <div class="sh-b sh-chat">
+          <div class="sh-msg sh-me"><span class="sh-bub">Профиль 40х20 есть?</span></div>
+          <div class="sh-msg"><span class="sh-av">S</span><span class="sh-bub">Да, 320 м в Казани</span></div>
+          <div class="sh-msg sh-me"><span class="sh-bub">Счёт на ООО Ромашка</span></div>
+          <div class="sh-msg"><span class="sh-av">S</span><span class="sh-bub sh-typ"><i></i><i></i><i></i></span></div>
+        </div>
+        <div class="sh-comp"><span class="sh-inp">Написать сообщение</span><span class="sh-send">&#8594;</span></div>
+      </div></div>
       <div class="body">
         <p class="tag">ИИ <em>· макет</em></p>
         <h3>Бот на ваших документах</h3>
@@ -569,7 +690,7 @@ footer a{display:block;padding:3px 0}
 
 
 <div class="aiwrap" id="aiwrap" role="dialog" aria-label="Обсудить задачу">
-  <div class="aibox">
+  <div class="aibox" id="aibox">
     <div class="aitop"><b>Обсудить задачу</b><small>отвечает ассистент Solutions101</small>
       <button class="aiclose" id="aiclose" type="button" aria-label="закрыть">&times;</button></div>
     <div class="ailog" id="ailog">
@@ -640,7 +761,8 @@ footer a{display:block;padding:3px 0}
   refresh();
 })();
 </script>
-<script src="anim3.js?v=3"></script>
+<script src="win.js?v=1"></script>
+<script src="anim3.js?v=4"></script>
 
 <script>
 /* Hero graphics, exactly the settings confirmed on the bench:
@@ -826,8 +948,12 @@ footer a{display:block;padding:3px 0}
     var d=document.createElement('div'); d.className='msg '+cls; d.textContent=text;
     log.appendChild(d); log.scrollTop=log.scrollHeight; return d;
   }
-  function open(){ wrap.classList.add('open'); setTimeout(function(){q.focus();},40); }
-  function close(){ wrap.classList.remove('open'); }
+  /* the panel is a real window now: draggable, resizable, dockable, never modal */
+  function open(){
+    WinMgr.open({key:'ai',title:'Обсудить задачу',body:document.getElementById('aibox')});
+    setTimeout(function(){q.focus();},40);
+  }
+  function close(){ WinMgr.close('ai'); }
   document.getElementById('aiopen').addEventListener('click',open);
   ['aiopen2','aiopen3'].forEach(function(id){
     var b=document.getElementById(id); if(b) b.addEventListener('click',open);
@@ -843,7 +969,6 @@ footer a{display:block;padding:3px 0}
     window.open('https://wa.me/447756115516?text='+encodeURIComponent(text),'_blank','noopener');
   });
   document.getElementById('aiclose').addEventListener('click',close);
-  addEventListener('keydown',function(e){ if(e.key==='Escape') close(); });
 
   form.addEventListener('submit',function(e){
     e.preventDefault();
