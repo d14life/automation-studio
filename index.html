@@ -123,7 +123,10 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
 
 
 /* ---------- projects: a gentle fan of cards, each showing a mock of what we build ---------- */
-.projects{position:relative;height:min(600px,74vw);margin:58px 0 22px}
+/* full-bleed: the fan is not bound by the reading column, so the cards can be big */
+.projects{position:relative;height:min(700px,80vw);margin:58px 0 22px;
+  width:100vw;margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw)}
+@media (max-width:820px){.projects{width:auto;margin-left:0;margin-right:0}}
 .projects .proj{position:absolute;left:50%;top:50%;width:var(--cardw,300px);aspect-ratio:1;
   margin:calc(var(--cardw,300px)/-2) 0 0 calc(var(--cardw,300px)/-2);
   border:1px solid var(--line);border-radius:22px;overflow:hidden;background:rgba(6,12,16,.86);
@@ -522,9 +525,9 @@ footer a{display:block;padding:3px 0}
      of the next one, so six cards read as a fan instead of a pile on a narrow screen. */
   function cardW(){
     var avail=wrap.clientWidth;
-    return Math.round(Math.max(190,Math.min(360,avail/(1+0.62*(N-1)))));
+    return Math.round(Math.max(230,Math.min(460,avail/3.4)));
   }
-  function edgeX(){ return Math.max(60,(wrap.clientWidth-cardW())/2); }
+  function edgeX(){ return Math.max(60,(wrap.clientWidth-cardW())/2*0.92); }
   function slotCfg(slot){
     var d=N>1?(slot-center)/center:0, ad=Math.abs(d);
     return {rot:d*8, scale:1-0.08*ad*ad, x:d*edgeX(), y:ad*ad*2.2, z:10-Math.abs(slot-center)};
