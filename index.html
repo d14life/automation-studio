@@ -62,7 +62,7 @@ h1{font:900 clamp(28px,4.6vw,54px)/1.12 Nunito,sans-serif;letter-spacing:-.02em;
 h1 em{font-style:normal;color:var(--ice2)}
 .lede{color:var(--dim);max-width:60ch;margin:18px auto 0;font-size:clamp(15px,1.5vw,17.5px)}
 /* the number and the buttons are one block: the buttons sit centred on top of the 101 */
-.numblock{position:relative;margin-top:clamp(14px,3vh,38px);display:flex;justify-content:center}
+.numblock{position:relative;margin-top:clamp(54px,11vh,132px);display:flex;justify-content:center}
 .actswrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:6}
 .acts{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
 .btn{border:0;cursor:pointer;font-family:Nunito,sans-serif;border-radius:99px;padding:14px 26px;text-decoration:none;font-weight:900;font-size:15.5px;
@@ -205,12 +205,18 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
 
 
 /* ---------- ai chat ---------- */
-.aiwrap{position:fixed;inset:0;z-index:60;display:none;align-items:flex-end;justify-content:center;
-  background:rgba(0,0,0,.62);backdrop-filter:blur(4px)}
-.aiwrap.open{display:flex}
-.aibox{width:min(680px,100%);max-height:86vh;display:flex;flex-direction:column;
-  background:#05090c;border:1px solid var(--line);border-radius:22px 22px 0 0;overflow:hidden}
-@media (min-width:760px){.aiwrap{align-items:center}.aibox{border-radius:22px}}
+/* A docked panel, not a modal: no backdrop, nothing blocked, the page stays scrollable and
+   clickable while the assistant is open. */
+.aiwrap{position:fixed;top:86px;right:18px;bottom:18px;width:min(400px,calc(100vw - 36px));
+  z-index:60;display:none;pointer-events:none}
+.aiwrap.open{display:block}
+.aibox{height:100%;display:flex;flex-direction:column;pointer-events:auto;
+  background:rgba(5,9,12,.94);backdrop-filter:blur(8px);
+  border:1px solid var(--line);border-radius:20px;overflow:hidden;
+  box-shadow:0 24px 70px rgba(0,0,0,.6)}
+@media (max-width:700px){
+  .aiwrap{top:auto;left:10px;right:10px;bottom:10px;width:auto;height:72vh}
+}
 .aitop{display:flex;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid var(--line)}
 .aitop b{font:900 15.5px Nunito,sans-serif}
 .aitop small{color:var(--dim);font-size:12.5px}
@@ -767,7 +773,6 @@ footer a{display:block;padding:3px 0}
     window.open('https://wa.me/447756115516?text='+encodeURIComponent(text),'_blank','noopener');
   });
   document.getElementById('aiclose').addEventListener('click',close);
-  wrap.addEventListener('click',function(e){ if(e.target===wrap) close(); });
   addEventListener('keydown',function(e){ if(e.key==='Escape') close(); });
 
   form.addEventListener('submit',function(e){
