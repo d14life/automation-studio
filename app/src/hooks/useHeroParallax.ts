@@ -47,11 +47,17 @@ export function useHeroParallax(): void {
 
     /* written straight from the scroll handler: it only writes styles, never reads layout, and
        the browser already fires scroll at most once a frame. No animation-frame queue to miss. */
+    /* the runway only changes on resize, so it is measured there, not on every scroll event -
+       offsetHeight inside the scroll handler was the one layout read left on the hot path */
+    let track = 160
+    const measure = () => {
+      const h = innerHeight || 1
+      track = Math.max(160, (document.getElementById('stage')?.offsetHeight || h) - h)
+    }
+    measure()
     function paint() {
       if (!l1 || !l2) return
       const y = window.pageYOffset || 0
-      const h = innerHeight || 1
-      const track = Math.max(160, (document.getElementById('stage')?.offsetHeight || h) - h)
       if (y > track * 1.4) return /* past the hero: stop paying for it */
       const travelled = Math.min(y, track) /* stop moving once the runway is done */
       const f = travelled / track
@@ -69,12 +75,13 @@ export function useHeroParallax(): void {
         if (tcv) tcv.style.transform = up(SPEED.tubes)
       }
     }
+    const onResize = () => { measure(); paint() }
     addEventListener('scroll', paint, { passive: true })
-    addEventListener('resize', paint, { passive: true })
+    addEventListener('resize', onResize, { passive: true })
     paint()
     return () => {
       removeEventListener('scroll', paint)
-      removeEventListener('resize', paint)
+      removeEventListener('resize', onResize)
     }
   }, [])
 }
