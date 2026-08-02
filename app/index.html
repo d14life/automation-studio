@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Solutions101 · рабочие инструменты для бизнеса за дни</title>
+    <meta name="description" content="Собираем автоматизацию под вашу задачу за дни. Проверяете на своей реальной работе. Не помогло - не платите, предоплаты нет." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;900&display=swap" />
+
+    <!-- Nunito arrives from Google, and display=swap means the browser paints the fallback face
+         first. On body copy nobody notices; on a 400px "101" the swap is a jarring flash of a
+         completely different number. The hero holds still until the face is ready, with a 1.5s
+         timeout so a slow or blocked font can never leave the first screen blank. -->
+    <style>
+      .hero101, .morph { visibility: hidden }
+      html.fonts-in .hero101, html.fonts-in .morph { visibility: visible }
+    </style>
+    <script>
+      (function () {
+        var d = document.documentElement
+        var shown = false
+        function go() { if (shown) return; shown = true; d.classList.add('fonts-in') }
+        setTimeout(go, 1500)
+        if (document.fonts && document.fonts.load) {
+          document.fonts.load('900 40px Nunito').then(go, go)
+        } else { go() }
+      })()
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
