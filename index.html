@@ -815,7 +815,7 @@ footer a{display:block;padding:3px 0}
   var SMALL=matchMedia('(hover:none)').matches || matchMedia('(pointer:coarse)').matches ||
             matchMedia('(max-width:600px)').matches ||
             (navigator.deviceMemory && navigator.deviceMemory<=4);
-  var stopStars=Starfield1(document.getElementById('space'),{quantity:SMALL?170:640,
+  var stopStars=Starfield1(document.getElementById('space'),{quantity:SMALL?300:2200,
     minFrameMs:SMALL?32:0,speed:SMALL?2.6:3.2,easing:1,warpFactor:10,opacity:0.1,
     mouseAdjust:false,clickToWarp:false,starColor:'rgba(255,255,255,1)',bgColor:'rgba(0,0,0,1)',zIndex:1});
 
