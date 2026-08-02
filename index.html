@@ -35,8 +35,7 @@ header{position:absolute;top:0;left:0;right:0;z-index:20}
 
 /* ---------- hero stage ---------- */
 #stage{position:relative;height:100svh;background:transparent}
-/* the next section starts while the faded hero is still leaving, so there is no empty stretch */
-#about{margin-top:-24vh}
+/* no pull-up: the hero needs its full screen for the drift to be visible at all */
 .stagesticky{position:relative;height:100svh;overflow:hidden}
 /* same as the bench: the tubes own the whole stage and screen-blend over the starfield */
 /* The tubes live in their own fixed layer at the root, beside the starfield. Two reasons:
@@ -53,7 +52,7 @@ header{position:absolute;top:0;left:0;right:0;z-index:20}
   mask-image:linear-gradient(180deg,transparent 30%,#000 41%,#000 59%,transparent 70%)}
 #tubelayer canvas{display:block;width:100%;height:100%}
 .stageui{position:relative;z-index:5;height:100%;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;text-align:center;gap:6px;padding:92px 24px 76px}
+  align-items:center;justify-content:center;text-align:center;gap:10px;padding:92px 24px 13vh}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .morph{position:relative;height:3.4rem;width:100%;max-width:980px;margin:0 auto;
   font:900 21pt/1 Nunito,system-ui,sans-serif}
@@ -63,7 +62,7 @@ h1{font:900 clamp(28px,4.6vw,54px)/1.12 Nunito,sans-serif;letter-spacing:-.02em;
 h1 em{font-style:normal;color:var(--ice2)}
 .lede{color:var(--dim);max-width:60ch;margin:18px auto 0;font-size:clamp(15px,1.5vw,17.5px)}
 /* the number and the buttons are one block: the buttons sit centred on top of the 101 */
-.numblock{position:relative;margin-top:clamp(54px,11vh,132px);display:flex;justify-content:center}
+.numblock{position:relative;margin-top:clamp(76px,15vh,180px);display:flex;justify-content:center}
 .actswrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:6}
 .acts{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
 .btn{border:0;cursor:pointer;font-family:Nunito,sans-serif;border-radius:99px;padding:14px 26px;text-decoration:none;font-weight:900;font-size:15.5px;
@@ -905,8 +904,8 @@ footer a{display:block;padding:3px 0}
         app=a;
         /* a flat wide figure keeps the ribbons in the line of the text instead of looping down
            across the number below it */
-        app.options.sleepRadiusX=360;
-        app.options.sleepRadiusY=64;
+        app.options.sleepRadiusX=620;
+        app.options.sleepRadiusY=78;
       });
   }
   function parkTubes(){
@@ -970,7 +969,7 @@ footer a{display:block;padding:3px 0}
     var y=window.pageYOffset||0, h=innerHeight||1;
     /* the track is exactly the scrollable part of the hero, so the text is gone at the very
        moment the next section reaches the top: no empty stretch of stars in between */
-    var track=h*0.78;                         /* the dissolve finishes before the hero leaves */
+    var track=h*0.92;                         /* the dissolve spans nearly the whole screen */
     if(y>track*1.4) return;                   /* past the hero: stop paying for it */
     var f=Math.min(1,y/track);
     /* hold, then fade: the words stay readable for the first half of the scroll */
