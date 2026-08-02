@@ -149,10 +149,12 @@ export function useTubeScene(ready: boolean, heroVisible: boolean): RefObject<HT
       const app = appRef.current
       if (!app) { last = now; return }
       if (now - last < 62) return
-      /* SAME rate as the slogan: LiquidText walks the palette in FLOW seconds, and this was
-         doing it in FLOW*3, so after a few seconds the ribbons and the words were on completely
-         different colours. One shared tempo; p0 keeps the ribbons a step behind, as intended. */
-      hue = (hue + 360 * (now - last) / 1000 / FLOW) % 360; last = now
+      /* Matches the slogan's PALETTE clock, which is `drift`, not `flow`. The text has two
+         motions: the gradient slides across the letters every FLOW seconds, while the palette
+         itself rotates every drift = FLOW*3 seconds. The ribbons take one colour, so they have
+         to follow the palette. Changing this to FLOW was my mistake - it drove them three times
+         faster than the words. p0 keeps them a step behind, which is the intended offset. */
+      hue = (hue + 360 * (now - last) / 1000 / (FLOW * 3)) % 360; last = now
       const p = hue / 360 * ICE.length + p0
       try {
         app.tubes.setColors(tubeSet(p))
