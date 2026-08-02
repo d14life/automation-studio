@@ -324,8 +324,17 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
    donor file itself stays byte-identical. */
 .steps .glow-container{--card-width:100%;--card-radius:18px;
   width:100%;aspect-ratio:auto;display:block;cursor:default}
-.steps .glow-content{position:relative;padding:0;display:block;background:none}
-.steps .glow{width:34%;height:34%;left:33%;top:33%}
+/* The donor's inner card was set to background:none and its travelling light shrunk to a third,
+   which left only a couple of faint arcs at the card foot - the animation was there but had
+   nothing to play against. The face is glass now, in keeping with the rest of the page, and the
+   light is large enough to read as it sweeps. */
+.steps .glow-content{position:relative;padding:0;display:block;
+  background:rgba(255,255,255,.05);border-radius:16px;
+  -webkit-backdrop-filter:blur(12px) brightness(1.1) saturate(1.15);
+  backdrop-filter:blur(12px) brightness(1.1) saturate(1.15);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.28), 0 10px 30px rgba(0,0,0,.45)}
+.steps .glow{width:58%;height:58%;left:21%;top:21%}
+.steps .glow-container{--animation-speed:7s;--glow-blur:5;--glow-opacity:.85}
 /* Damir: nothing may react to hover. Restate the resting state over the donor's hover rules. */
 .steps .glow-container:hover .glow-content{mix-blend-mode:normal;box-shadow:none;animation:none}
 .steps .glow-container:hover .glow-content:before,
