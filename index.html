@@ -205,6 +205,10 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
    truncating label (.sh-t), mono number (.sh-n), status pill (.sh-p).
    .sh-shot is the query container and .sh-w carries the base font, so every size below
    is a container unit or an em: the same markup reads correctly at 260px and at 520px. */
+/* the base rule the mockups depend on: it was lost when the old mockup CSS was replaced, and
+   without a fixed height the shot stopped holding its band and the content poured over the card */
+.shot{height:46%;flex:none;overflow:hidden;background:linear-gradient(160deg,#07131c,#04090d);
+  border-bottom:1px solid var(--line)}
 .shot.sh-shot{padding:0;gap:0;overflow:hidden;container-type:inline-size}
 /* below the fan breakpoint the card stops being square, so the shot keeps the 46:100 share itself */
 @media (max-width:820px){.shot.sh-shot{height:auto;aspect-ratio:100/46}}
