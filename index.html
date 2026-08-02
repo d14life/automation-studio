@@ -524,6 +524,42 @@ footer p,footer a{color:var(--dim);font-size:14.5px;text-decoration:none;margin:
 footer a{display:block;padding:3px 0}
 @media (hover:hover){footer a:hover{color:var(--ink)}}
 .legal{margin-top:34px;color:#5d6a63;font-size:12.5px}
+
+/* Phone patch for solutions101.net. Append at the end of the existing <style> block.
+   Measured on the live page at 360x780, 390x844 and 414x896. Nothing here touches desktop:
+   every rule sits inside the same max-width:700px breakpoint the existing phone block uses. */
+
+@media (max-width:700px){
+
+/* the burger measures 42.0x46.0 at all three widths, under the 44px target the build notes require */
+.burger{padding:12px 11px}
+
+/* the menu CTA is a .gbtn, not a .cta, so the phone .cta padding never reaches it: it is 39.4px tall */
+.topnav .gbtn{min-height:44px}
+
+/* .numblock and .actswrap shrink-wrap the 101 glyph, so .acts is stuck at 193.9px and its
+   own max-width:320px never applies */
+.numblock,.actswrap{width:100%}
+
+/* every input computes 15px, and iOS Safari zooms the page on focus below 16px */
+.form input,.form textarea,.aiform input{font-size:16px}
+
+/* the ul keeps the 40px UA indent and each row adds 22px on the right, so a question gets
+   210px of the 312px column */
+.qbox{padding:22px 20px 26px}
+.qs{padding-left:0}
+.qs li{padding-right:0}
+
+/* overflow:hidden on a flex:1 1 0% item zeroes its automatic minimum size and cuts the card
+   copy mid-sentence (57px shown of 94px). The line-clamp is already inert and is reset only
+   so the fix also holds in browsers that do not blockify -webkit-box inside a flex parent. */
+.proj p{-webkit-line-clamp:unset;overflow:visible}
+
+/* the window dock button is 118.2x21.5 and on a 360px screen it docks to 320px, which the
+   window already is. The .win prefix is required: win.js injects its own sheet after this one. */
+.win .winbtn{display:none}
+
+}
 </style>
 
 <div id="space"></div>
