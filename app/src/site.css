@@ -309,13 +309,12 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
    disappeared into its own block. Restate the donor's colours and let it sit at the card foot. */
 .skewrow .group a{color:var(--ink) !important;margin-top:auto;align-self:flex-start;
   font-size:13px;line-height:1.3;max-width:100%;white-space:normal;
-  background:rgba(255,255,255,.125);border-radius:10px;padding:8px 12px;
-  -webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);
+  /* no live blur here: what sits behind this bubble is the card's own face, which is a static
+     gradient now - there is nothing moving left to frost */
+  background:rgba(255,255,255,.14);border-radius:10px;padding:8px 12px;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.35)}
 /* the card face: the same glass as the nav and the pair in front of the 101, with a hairline rim */
-.skewrow .group > .z-20{background:rgba(255,255,255,.07);
-  -webkit-backdrop-filter:blur(9px);
-  backdrop-filter:blur(9px);
+.skewrow .group > .z-20{background:linear-gradient(160deg,rgba(210,232,245,.10),rgba(190,215,235,.055) 55%,rgba(210,232,245,.085));
   box-shadow:inset 0 1px 0 rgba(255,255,255,.30), 0 10px 34px rgba(0,0,0,.45)}
 .skewrow .group > .z-20::after{content:'';position:absolute;inset:0;border-radius:inherit;
   pointer-events:none;padding:1px;
@@ -343,9 +342,7 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
    nothing to play against. The face is glass now, in keeping with the rest of the page, and the
    light is large enough to read as it sweeps. */
 .steps .glow-content{position:relative;padding:0;display:block;
-  background:rgba(255,255,255,.07);border-radius:16px;
-  -webkit-backdrop-filter:blur(9px);
-  backdrop-filter:blur(9px);
+  background:linear-gradient(160deg,rgba(210,232,245,.095),rgba(190,215,235,.05) 55%,rgba(210,232,245,.08));border-radius:16px;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.28), 0 10px 30px rgba(0,0,0,.45)}
 .steps .glow{width:58%;height:58%;left:21%;top:21%}
 /* Blur high enough that the light has no edge. At 5 the blob's rim showed through as a hard
@@ -902,8 +899,7 @@ footer a{display:block;padding:3px 0}
 
 .figs{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}
 .fig{padding:20px 22px;border:1px solid var(--line);border-radius:16px;
-  background:rgba(255,255,255,.055);
-  -webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px);
+  background:linear-gradient(160deg,rgba(210,232,245,.085),rgba(190,215,235,.045) 60%,rgba(210,232,245,.07));
   box-shadow:inset 0 1px 0 rgba(255,255,255,.22)}
 .fig b{display:block;font:900 34px/1.05 Nunito,sans-serif;color:var(--ice1);letter-spacing:-.02em}
 .fig-of{display:block;margin-top:6px;font-weight:800;font-size:14.5px}
