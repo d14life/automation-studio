@@ -239,20 +239,19 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
   .glow{--base:196;--spread:170;--spot:240px;--bw:2px;
     --hue:calc(var(--base) + (var(--xp,.5) * var(--spread)));
     background-image:radial-gradient(var(--spot) var(--spot) at
-      calc(var(--x,0) * 1px) calc(var(--y,0) * 1px),
-      hsl(var(--hue) 100% 72% / .14), transparent 70%);
-    background-attachment:fixed;background-position:50% 50%}
+      calc((var(--x,0) - var(--ox,0)) * 1px) calc((var(--y,0) - var(--oy,0)) * 1px),
+      hsl(var(--hue) 100% 72% / .14), transparent 70%)}
   .glow::before,.glow::after{content:'';position:absolute;inset:calc(var(--bw) * -1);
     border:var(--bw) solid transparent;border-radius:inherit;pointer-events:none;
-    background-attachment:fixed;background-position:50% 50%;background-repeat:no-repeat;
+    background-repeat:no-repeat;
     -webkit-mask:linear-gradient(#000,#000) content-box,linear-gradient(#000,#000);
     -webkit-mask-composite:xor;mask:linear-gradient(#000,#000) content-box,linear-gradient(#000,#000);
     mask-composite:exclude}
   .glow::before{background-image:radial-gradient(calc(var(--spot) * .8) calc(var(--spot) * .8) at
-      calc(var(--x,0) * 1px) calc(var(--y,0) * 1px),
+      calc((var(--x,0) - var(--ox,0)) * 1px) calc((var(--y,0) - var(--oy,0)) * 1px),
       hsl(var(--hue) 100% 62% / .9), transparent 100%);filter:brightness(1.6)}
   .glow::after{background-image:radial-gradient(calc(var(--spot) * .45) calc(var(--spot) * .45) at
-      calc(var(--x,0) * 1px) calc(var(--y,0) * 1px),
+      calc((var(--x,0) - var(--ox,0)) * 1px) calc((var(--y,0) - var(--oy,0)) * 1px),
       hsl(0 0% 100% / .75), transparent 100%)}
 }
 
@@ -633,6 +632,24 @@ footer a{display:block;padding:3px 0}
      chase the cursor, and it hands the position to the spotlight cards. Writes are folded into
      an animation frame, so a fast mouse still costs one write per frame. */
   var spotQueued=false, spotX=0, spotY=0;
+  var glowCards=[].slice.call(document.querySelectorAll('.glow'));
+  function placeGlow(){
+    for(var i=0;i<glowCards.length;i++){
+      var b=glowCards[i].getBoundingClientRect();
+      glowCards[i].style.setProperty('--ox',Math.round(b.left));
+      glowCards[i].style.setProperty('--oy',Math.round(b.top));
+    }
+  }
+  var placeQueued=false;
+  function queuePlace(){
+    if(placeQueued) return; placeQueued=true;
+    requestAnimationFrame(function(){placeQueued=false;placeGlow();});
+  }
+  addEventListener('scroll',queuePlace,{passive:true});
+  addEventListener('resize',queuePlace,{passive:true});
+  glowCards.forEach(function(c){c.addEventListener('mouseenter',queuePlace);
+                               c.addEventListener('transitionend',queuePlace);});
+  placeGlow();
   window.addEventListener('pointermove',function(e){
     e.stopPropagation();
     spotX=e.clientX; spotY=e.clientY;
