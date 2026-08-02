@@ -11,19 +11,26 @@ export function useStarfield(ready: boolean): RefObject<HTMLDivElement | null> {
     if (!ready || !host) return
     const SMALL = isSmallDevice()
 
+    /* The mobile field used to be 900 stars squeezed into a spread of 150 - a dense knot in the
+       middle of the screen with empty corners, which is why the phone never looked like the Mac.
+       The faithful match is the same DENSITY, not the same count: the Mac runs 4400 stars over a
+       ~1520x864 window, so the spread scales with this screen's size and the count with its
+       area. On a 375x812 phone that lands near 1100 stars over a spread of ~550. */
+    const z = ((innerWidth || 1520) + (innerHeight || 864)) / 2
     const stopStars = window.Starfield1(host, {
       /* spread is pinned to 1100 - the value the approved look had at 2200 stars - so the count
          below is now purely a count. Before this, the library derived spread from quantity, and
          raising the count pushed the whole field outward and lost the extras off the edges. */
-      quantity: SMALL ? 900 : 4400,
-      spread: SMALL ? 150 : 1100,
+      quantity: SMALL ? Math.round(4400 * (innerWidth * innerHeight) / (1520 * 864)) : 4400,
+      spread: SMALL ? Math.round(1100 * z / 1192) : 1100,
       /* 4400 stars redrawn every frame, for the whole life of the page, is the single largest
          standing cost on the desktop version. Uncapped it ran at the screen's refresh - 120 a
          second on this Mac. Capped to ~45 that is well under half the work, and because the
          drift is now measured against the clock rather than counted in frames, the field moves
          at exactly the same visible speed as before. */
       minFrameMs: SMALL ? 32 : 22,
-      speed: SMALL ? 3.12 : 3.84,
+      /* 30% slower on both versions - his word */
+      speed: SMALL ? 2.18 : 2.69,
       easing: 1,
       warpFactor: 10,
       opacity: 0.1,
