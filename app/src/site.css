@@ -123,7 +123,7 @@ header{position:absolute;top:0;left:0;right:0;z-index:20}
    their own: they are aimed at the slogan and re-measure its position. */
 .stageui{position:relative;z-index:5;height:100%;display:flex;flex-direction:column;
   align-items:center;justify-content:center;text-align:center;gap:0;padding:92px 24px 300px;
-  transform:translateY(var(--herodrop,34px))}
+  transform:translateY(var(--herodrop,72px))}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 /* half again as big as it was: 21pt -> 31.5pt, 3.2rem -> 4.8rem, heights to match */
 .morph{position:relative;height:3.5rem;width:100%;max-width:1400px;margin:0 auto;
@@ -137,7 +137,7 @@ h1 em{font-style:normal;color:var(--ice2)}
 /* the number and the buttons are one block: the buttons sit centred on top of the 101 */
 /* how far below the middle the 101 hangs. It is capped by vh as well as px because at half
    again the size the glyph is tall enough to run off the bottom of a short laptop screen. */
-.numblock{position:absolute;left:0;right:0;top:calc(50% + min(150px,16vh));display:flex;justify-content:center}
+.numblock{position:absolute;left:0;right:0;top:calc(50% + min(105px,11vh));display:flex;justify-content:center}
 @media (max-width:700px){.numblock{position:relative;top:auto;margin-top:clamp(40px,8vh,90px)}}
 .actswrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:6}
 
@@ -606,7 +606,7 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
 @supports (animation-timeline:view()){
   @media (prefers-reduced-motion:no-preference){
     .rise{animation:rise-in linear both;animation-timeline:view();
-      animation-range:entry calc(0% + var(--rd,0%)) cover 22%}
+      animation-range:entry calc(0% + var(--rd,0%)) cover 12%}
   }
 }
 
