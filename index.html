@@ -762,7 +762,7 @@ footer a{display:block;padding:3px 0}
 })();
 </script>
 <script src="win.js?v=1"></script>
-<script src="anim3.js?v=4"></script>
+<script src="anim3.js?v=5"></script>
 
 <script>
 /* Hero graphics, exactly the settings confirmed on the bench:
@@ -779,7 +779,8 @@ footer a{display:block;padding:3px 0}
   var SMALL=matchMedia('(hover:none)').matches || matchMedia('(pointer:coarse)').matches ||
             matchMedia('(max-width:600px)').matches ||
             (navigator.deviceMemory && navigator.deviceMemory<=4);
-  Starfield1(document.getElementById('space'),{quantity:SMALL?320:640,speed:SMALL?2.4:3.2,easing:1,warpFactor:10,opacity:0.1,
+  var stopStars=Starfield1(document.getElementById('space'),{quantity:SMALL?170:640,
+    minFrameMs:SMALL?32:0,speed:SMALL?2.6:3.2,easing:1,warpFactor:10,opacity:0.1,
     mouseAdjust:false,clickToWarp:false,starColor:'rgba(255,255,255,1)',bgColor:'rgba(0,0,0,1)',zIndex:1});
 
   /* two lines, same timings, started in the same tick: they melt into the next phrase together */
@@ -855,8 +856,15 @@ footer a{display:block;padding:3px 0}
     if(cv){ cv.remove(); cv=null; }
   }
   function wakeTubes(){ if(!SMALL && !app && !cv) buildTubes(); }
-  if(SMALL) return;                      /* no tube scene on phones and tablets */
+  /* Phones get the ribbons too, but rendered at half resolution and scaled back up: a quarter
+     of the pixels for the same picture. Without this the WebGL scene was what melted the phone. */
   var layer=document.getElementById('tubelayer');
+  if(SMALL){
+    layer.style.width='50%'; layer.style.height='50%';
+    layer.style.transformOrigin='0 0';
+    layer.style.transform='scale(2)';
+    GLOW={l:.38,i:90};
+  }
   var cv=null;
   buildTubes();
   function buildTubes(){
@@ -872,6 +880,27 @@ footer a{display:block;padding:3px 0}
   }
 
   /* tubes walk the same palette as the text, one step behind it */
+  /* Watchdog: measure real frame times for the first two seconds. If the device cannot keep a
+     reasonable rate, drop the 3D scene and thin the starfield instead of stuttering forever. */
+  (function(){
+    var frames=0, t0=0, checked=false;
+    function tick(now){
+      if(checked) return;
+      if(!t0){ t0=now; requestAnimationFrame(tick); return; }
+      frames++;
+      if(now-t0<2000){ requestAnimationFrame(tick); return; }
+      checked=true;
+      var fps=frames/((now-t0)/1000);
+      if(fps<34){
+        parkTubes();
+        SMALL=true;                        /* keep it parked: do not wake on scroll */
+        if(stopStars&&stopStars.setQuantity) stopStars.setQuantity(110);
+        console.info('Solutions101: light mode, measured '+fps.toFixed(1)+' fps');
+      }
+    }
+    requestAnimationFrame(tick);
+  })();
+
   var hue=0,last=0;
   (function cycle(now){
     requestAnimationFrame(cycle);

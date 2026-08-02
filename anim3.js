@@ -15,6 +15,8 @@ function Starfield1(host, o) {
   var opacity    = o.opacity    != null ? o.opacity    : 0.1;
   var speed      = o.speed      != null ? o.speed      : 1;
   var quantity   = o.quantity   != null ? o.quantity   : 512;
+  /* a phone does not need 60 fps of starfield: capping the rate is the cheapest big saving */
+  var minFrameMs = o.minFrameMs != null ? o.minFrameMs : 0;
 
   var cv = document.createElement('canvas');
   cv.style.cssText = 'position:absolute;inset:0;z-index:' + (o.zIndex != null ? o.zIndex : 0);
@@ -104,11 +106,15 @@ function Starfield1(host, o) {
       ctx.stroke();
     }
   }
-  var raf=0, running=true;
-  function animate(){
+  var raf=0, running=true, lastFrame=0;
+  function animate(now){
     if (!running) return;
     raf=requestAnimationFrame(animate);
     if (document.hidden) return;            /* nobody is looking: skip the work, keep the loop */
+    if (minFrameMs){
+      if (now && now-lastFrame < minFrameMs) return;
+      lastFrame = now || 0;
+    }
     resizeIfNeeded(); update(); draw();
   }
   function onMove(e){
@@ -119,12 +125,17 @@ function Starfield1(host, o) {
   if (mouseAdjust) host.addEventListener('mousemove', onMove, {passive:true});
   if (clickToWarp){ host.addEventListener('mousedown', onDown); addEventListener('mouseup', onUp); }
   setup(); bigBang(); animate();
-  return function stop(){
+  stop.setQuantity=function(n){
+    if (n>=arr.length){ return; }
+    arr.length=n; quantity=n; ratio=quantity/2;
+  };
+  function stop(){
     running=false; cancelAnimationFrame(raf);
     if (mouseAdjust) host.removeEventListener('mousemove', onMove);
     if (clickToWarp){ host.removeEventListener('mousedown', onDown); removeEventListener('mouseup', onUp); }
     cv.remove();
-  };
+  }
+  return stop;
 }
 
 
