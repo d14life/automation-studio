@@ -38,7 +38,7 @@ export function Projects() {
             </div>
           </div></div>
           <div className="body">
-            <LiquidMetalButton label="Стройка · Казахстан · работает у клиента" />
+            <div className="tagrow"><LiquidMetalButton label="Стройка · Казахстан" width={165} /><em>· работает у клиента</em></div>
             <h3>Учёт взаиморасчётов</h3>
             <p>Долги нам и наши долги против 1С: 48 контрагентов, 3 юрлица, мультивалюта, старение долга,
               платёжный календарь. Собрано за один день, развёрнуто внутри сети клиента.</p>
@@ -72,7 +72,7 @@ export function Projects() {
             </div>
           </div></div>
           <div className="body">
-            <LiquidMetalButton label="Логистика · работает у клиента" />
+            <div className="tagrow"><LiquidMetalButton label="Логистика" width={99} /><em>· работает у клиента</em></div>
             <h3>Доска отслеживания посылок</h3>
             <p>Документы создаются из состояния сделки, а посылка видна от заказа до двери на одном экране.
               Клиент перестал звонить менеджеру, чтобы узнать, где груз.</p>
@@ -107,7 +107,7 @@ export function Projects() {
             </div>
           </div></div>
           <div className="body">
-            <LiquidMetalButton label="Продажи · макет" />
+            <div className="tagrow"><LiquidMetalButton label="Продажи" width={96} /><em>· макет</em></div>
             <h3>CRM под ваш процесс</h3>
             <p>Не коробка, а ваши этапы: заявка, замер, счёт, отгрузка. История клиента остаётся в компании,
               когда менеджер уходит. Сюда же телефония и автообзвон.</p>
@@ -132,7 +132,7 @@ export function Projects() {
             <div className="sh-comp"><span className="sh-inp">Написать сообщение</span><span className="sh-send">{'→'}</span></div>
           </div></div>
           <div className="body">
-            <LiquidMetalButton label="ИИ · макет" />
+            <div className="tagrow"><LiquidMetalButton label="ИИ" width={96} /><em>· макет</em></div>
             <h3>Бот на ваших документах</h3>
             <p>Отвечает клиенту по вашему прайсу и остаткам, выставляет счёт, заносит контакт в базу.
               Первая линия работает ночью и в выходные.</p>

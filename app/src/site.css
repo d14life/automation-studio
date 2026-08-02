@@ -22,16 +22,38 @@ header{position:absolute;top:0;left:0;right:0;z-index:20}
 @media (hover:hover){.cta:hover{background:rgba(127,216,255,.12);border-color:var(--ice2)}}
 .cta:active{transform:scale(.97)}
 
+/* Gradient-menu nav (donor gradient-menu). The donor pill is 60px resting and 180px open;
+   in a header that is too tall, and our lines are longer than "Photo", so both are re-sized here
+   rather than in the donor file. The title span is the fourth in the item, after the gradient,
+   the glow and the icon. */
+.gmenu li{width:44px;height:44px}
+.gmenu li:hover{width:250px}
+.gmenu li > span:nth-of-type(3) span{font-size:19px}
+.gmenu li > span:nth-of-type(4){font-size:12px;letter-spacing:.02em;text-transform:none;
+  white-space:nowrap;font-weight:800}
+@media (max-width:700px){
+  /* in the phone panel there is room for words, so the items sit open and full width */
+  .gmenu{width:100%}
+  .gmenu ul{flex-direction:column;width:100%}
+  .gmenu li{width:100%;height:46px;justify-content:flex-start;padding-left:14px;background:rgba(255,255,255,.06)}
+  .gmenu li > span:nth-of-type(1){opacity:1}
+  .gmenu li > span:nth-of-type(3){transform:none;margin-right:10px}
+  .gmenu li > span:nth-of-type(4){position:static;transform:none;text-align:left}
+}
+
 /* the starfield is fixed behind the whole document, so every section flies through space */
 #space{position:fixed;inset:0;z-index:0;pointer-events:none;background:#000}
 #space canvas{position:absolute;inset:0}
 
 /* ---------- hero stage ---------- */
+/* the runway for the hero parallax is this height minus one screen: 148vh gave 48vh of scroll
+   and the dissolve was over too fast. 210vh gives 110vh - well over twice as long. */
 #stage{position:relative;height:155vh;background:transparent}
 @media (max-width:700px){#stage{height:136vh}}
-/* no pull-up: the hero needs its full screen for the drift to be visible at all */
-/* Actually sticky, which the name always claimed. As position:relative the hero scrolled away
-   after one screen while #stage kept going, and the leftover was a screenful of empty stars. */
+/* Actually sticky, which the name always claimed. It was position:relative, so the hero
+   scrolled away after one screen while #stage kept going to 210vh - and the leftover 110vh was
+   the screenful of empty stars he kept seeing. Pinned, the parallax plays over the whole
+   runway and the next section arrives the instant it ends. */
 .stagesticky{position:sticky;top:0;height:100svh;overflow:hidden}
 /* same as the bench: the tubes own the whole stage and screen-blend over the starfield */
 /* The tubes live in their own fixed layer at the root, beside the starfield. Two reasons:
@@ -68,39 +90,47 @@ h1 em{font-style:normal;color:var(--ice2)}
 @media (max-width:700px){.numblock{position:relative;top:auto;margin-top:clamp(40px,8vh,90px)}}
 .actswrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:6}
 
-/* Liquid glass, the two buttons riding in front of the 101. The pane itself is nearly clear so
-   the number reads straight through it; the refraction comes from the donor's displacement
-   filter on a backdrop layer, with a blur and a lift in brightness so the glass has body.
-   The label sits in its own layer above, otherwise the filter would smear the text too. */
-.glassbtn{position:relative;isolation:isolate;display:inline-flex;align-items:center;
-  justify-content:center;padding:15px 30px;border:0;border-radius:16px;cursor:pointer;
-  text-decoration:none;color:#fff;font:800 15.5px/1.2 Nunito,sans-serif;
-  background:rgba(255,255,255,.06);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.45), inset 0 -1px 0 rgba(255,255,255,.12),
-             0 8px 26px rgba(0,0,0,.45);
-  transition:background .2s ease,box-shadow .2s ease,transform .16s ease}
-/* The refracting pane. It reads the page behind the button, which is why the 101 shows through.
+/* One glass track holding both actions, with a thumb that slides between them - the shape of
+   the donor theme switcher. The track is the glass: a near-clear pane over a blurred, brightened
+   backdrop, so the 101 reads straight through it.
 
-   The donor also ran its SVG displacement filter here, and that is what made the page crawl: a
-   url() filter stacked on a backdrop means the browser re-reads everything behind the button and
-   pushes it through a raster displacement map EVERY frame - and behind these two buttons sit the
-   starfield and the WebGL ribbons, both repainting constantly, so nothing can ever be cached.
-   The blur, the lift in brightness and the rim below carry the glass on their own. */
-.glassbtn::before{content:'';position:absolute;inset:0;border-radius:inherit;z-index:-1;
-  -webkit-backdrop-filter:blur(3px) brightness(1.25) saturate(1.4);
-  backdrop-filter:blur(3px) brightness(1.25) saturate(1.4)}
-/* the rim: a hairline of brighter glass around the edge */
-.glassbtn::after{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
-  padding:1px;background:linear-gradient(150deg,rgba(255,255,255,.75),rgba(255,255,255,.08) 45%,
-    rgba(223,246,255,.55));
+   The donor also ran an SVG displacement filter on this backdrop. That is what made the page
+   crawl and it is deliberately gone: a url() filter stacked on a backdrop makes the browser
+   re-read everything behind the element and push it through a raster map every frame, and behind
+   this sit the starfield and the WebGL ribbons, both repainting constantly, so nothing can be
+   cached. The blur, the brightness lift and the rim carry the glass on their own.
+
+   The thumb moves with :has(), so there is no script and no state. */
+.switchbar{position:relative;isolation:isolate;display:inline-grid;grid-auto-flow:column;
+  grid-auto-columns:1fr;padding:6px;border-radius:999px;
+  background:rgba(255,255,255,.06);
+  -webkit-backdrop-filter:blur(6px) brightness(1.22) saturate(1.35);
+  backdrop-filter:blur(6px) brightness(1.22) saturate(1.35);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.5), inset 0 -1px 0 rgba(255,255,255,.14),
+             0 10px 30px rgba(0,0,0,.5)}
+/* the rim: a hairline of brighter glass around the whole track */
+.switchbar::after{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  padding:1px;background:linear-gradient(150deg,rgba(255,255,255,.8),rgba(255,255,255,.08) 45%,
+    rgba(223,246,255,.6));
   -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
   -webkit-mask-composite:xor;mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
   mask-composite:exclude}
-.glassbtn span{position:relative;z-index:1;text-shadow:0 1px 3px rgba(0,0,0,.55)}
-@media (hover:hover){.glassbtn:hover{background:rgba(255,255,255,.12)}}
-.glassbtn:active{transform:scale(.98)}
-/* Safari and Firefox drop url() filters on a backdrop; the blur alone still reads as glass */
-@supports not (filter:url(#liquid-glass)){.glassbtn::before{filter:none}}
+/* the sliding thumb, sitting on the track behind the labels */
+.sw-thumb{position:absolute;z-index:-1;top:6px;bottom:6px;left:6px;width:calc(50% - 6px);
+  border-radius:999px;background:rgba(255,255,255,.17);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.55), 0 4px 14px rgba(0,0,0,.35);
+  transition:transform .42s cubic-bezier(.34,1.3,.5,1)}
+/* :last-child, NOT :last-of-type. The two halves are a <button> and an <a>, so each is the
+   only one of its own type and :last-of-type matched BOTH - the thumb slid right whichever
+   half you hovered. */
+.switchbar:has(.sw-item:last-child:hover) .sw-thumb{transform:translateX(100%)}
+.sw-item{position:relative;z-index:1;appearance:none;border:0;background:none;cursor:pointer;
+  padding:13px 26px;border-radius:999px;text-decoration:none;color:#fff;white-space:nowrap;
+  font:800 15.5px/1.2 Nunito,sans-serif;transition:color .2s ease}
+/* the label you are hovering goes ice blue while the thumb travels to it */
+@media (hover:hover){.sw-item:hover{color:var(--ice2)}}
+.sw-item:focus-visible{outline:2px solid var(--ice2);outline-offset:2px}
+@media (max-width:700px){.sw-item{padding:13px 16px;font-size:14.5px}}
 .acts{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
 .btn{border:0;cursor:pointer;font-family:Nunito,sans-serif;border-radius:99px;padding:14px 26px;text-decoration:none;font-weight:900;font-size:15.5px;
   transition:transform .16s ease,background .18s ease,border-color .18s ease;display:inline-block}
@@ -216,6 +246,14 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
 .card p{margin:0;color:var(--dim);font-size:14.5px}
 .card .gain{display:block;margin-top:14px;padding-top:12px;border-top:1px solid var(--line);
   color:var(--ice2);font-size:14px;font-weight:700}
+
+/* Skew-gradient service cards (donor gradient-card-showcase). The donor card is a hard
+   320x400; our Russian copy runs longer and spilled out of the bottom, so the height follows the
+   content with 400 as the floor. The gradient panels are h-full and stretch with it. Scoped here
+   so the donor file stays untouched. */
+.skewrow{gap:0}
+.skewrow .group{height:auto;min-height:400px}
+.skewrow .group > .z-20{height:100%}
 
 /* ---------- section: how ---------- */
 .steps{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));margin-top:34px;counter-reset:s}
@@ -475,10 +513,10 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
    anything, and a failed script just means no class and no animation. Neither can go blank.
 
    The window ENDS at entry 100% - the moment the element is completely inside the viewport.
-   That is the rule: if you can see all of a thing, it has finished arriving. Ending at cover 46%
-   is much further up the screen, which left a second row of cards half faded while its whole
-   section was already visible. Only the START is staggered; every element lands by the time it
-   is fully in frame.
+   That is the rule: if you can see all of a thing, it has finished arriving. It used to end at
+   cover 46%, which is much further up the screen, so a second row of cards sat half-faded while
+   its whole section was already on screen. Only the START is staggered; every element still
+   lands by the time it is fully in frame.
    --rd shifts each element's window, so a heading, its copy and its card are never at the same
    point at the same moment: catch the page mid-scroll and you see a gradient of half-arrived
    things, which is exactly what Apple's pages look like in a screenshot. */

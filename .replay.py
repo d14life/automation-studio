@@ -128,7 +128,11 @@ if __name__ == '__main__':
         # everything that shapes files, minus the one-off scaffolding and installs which have
         # already run once. The converter script that generated the section components is
         # re-inserted at its original moment so later hand edits land on top of it, not under it.
-        SKIP = ('npm ', 'npx ', 'git checkout', 'cp -R', 'create vite')
+        # Skip ONLY the one-off scaffolding and installs. The earlier filter dropped anything
+        # containing 'npx', which silently threw away every site.css patch script that ended
+        # with '&& npx vite build' - that is why ten hero values were missing after the first
+        # recovery. Match on the scaffold/install verbs themselves, not on the build tail.
+        SKIP = ('npm create', 'create vite', 'npm install', 'npm i ', 'git checkout', 'cp -R ')
         ops = [o for o in ops if not (o[1] == 'Bash' and any(k in o[2].get('command','') for k in SKIP))]
         ops.append(('2026-08-02T02:46:54.500Z', 'Bash',
                     {'command': 'node /Users/damir12/solutions101/.recovery/convert.mjs'}))
