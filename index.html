@@ -586,6 +586,21 @@ footer a{display:block;padding:3px 0}
     mouseAdjust:false,clickToWarp:false,starColor:'rgba(255,255,255,1)',bgColor:'rgba(0,0,0,1)',zIndex:1});
 
   /* two lines, same timings, started in the same tick: they melt into the next phrase together */
+  /* The ribbon path is centred on the viewport, but the words sit above the middle of the
+     screen. The layer is nudged so the path's centre lands on the morph lines: that is what
+     puts the ribbons behind the text instead of over the number below it. */
+  function aimTubesAtText(){
+    var layer=document.getElementById('tubelayer');
+    var a=document.getElementById('liq1'), b=document.getElementById('liq2');
+    if(!layer||!a||!b) return;
+    var ra=a.getBoundingClientRect(), rb=b.getBoundingClientRect();
+    var textMid=(ra.top+rb.bottom)/2, screenMid=(innerHeight||1)/2;
+    layer.style.transform='translateY('+Math.round(textMid-screenMid)+'px)';
+  }
+  addEventListener('resize',aimTubesAtText,{passive:true});
+  addEventListener('load',aimTubesAtText);
+  aimTubesAtText();
+
   var heroOn=true;
   if ('IntersectionObserver' in window){
     new IntersectionObserver(function(es){
