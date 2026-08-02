@@ -57,6 +57,8 @@ declare global {
     dispose(): void
   }
   interface TubesOptions {
+    /** the library builds a whole post-processing chain only `if (options.bloom)`; false skips it */
+    bloom?: false | { threshold?: number; strength?: number; radius?: number }
     tubes?: {
       colors?: string[]
       /** how many ribbons; the library's own default is 16 */

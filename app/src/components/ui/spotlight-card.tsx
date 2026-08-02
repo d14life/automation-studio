@@ -39,18 +39,28 @@ const GlowCard: React.FC<GlowCardProps> = ({
   const innerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    /* Only edit to the donor's behaviour, and it is a throttle, not a change: the original wrote
+       four inherited custom properties on every single pointermove, and a mouse fires those far
+       faster than the screen repaints, so most of the style recalcs it caused were thrown away
+       unseen. One write per painted frame looks identical and costs a fraction. */
+    let px = 0, py = 0, queued = false
+    const paint = () => {
+      queued = false
+      const el = cardRef.current
+      if (!el) return
+      el.style.setProperty('--x', px.toFixed(2));
+      el.style.setProperty('--xp', (px / window.innerWidth).toFixed(2));
+      el.style.setProperty('--y', py.toFixed(2));
+      el.style.setProperty('--yp', (py / window.innerHeight).toFixed(2));
+    }
     const syncPointer = (e: PointerEvent) => {
-      const { clientX: x, clientY: y } = e;
-      
-      if (cardRef.current) {
-        cardRef.current.style.setProperty('--x', x.toFixed(2));
-        cardRef.current.style.setProperty('--xp', (x / window.innerWidth).toFixed(2));
-        cardRef.current.style.setProperty('--y', y.toFixed(2));
-        cardRef.current.style.setProperty('--yp', (y / window.innerHeight).toFixed(2));
-      }
+      px = e.clientX; py = e.clientY;
+      if (queued) return
+      queued = true
+      requestAnimationFrame(paint)
     };
 
-    document.addEventListener('pointermove', syncPointer);
+    document.addEventListener('pointermove', syncPointer, { passive: true });
     return () => document.removeEventListener('pointermove', syncPointer);
   }, []);
 

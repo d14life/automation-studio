@@ -17,7 +17,12 @@ export function useStarfield(ready: boolean): RefObject<HTMLDivElement | null> {
          raising the count pushed the whole field outward and lost the extras off the edges. */
       quantity: SMALL ? 900 : 4400,
       spread: SMALL ? 150 : 1100,
-      minFrameMs: SMALL ? 32 : 0,
+      /* 4400 stars redrawn every frame, for the whole life of the page, is the single largest
+         standing cost on the desktop version. Uncapped it ran at the screen's refresh - 120 a
+         second on this Mac. Capped to ~45 that is well under half the work, and because the
+         drift is now measured against the clock rather than counted in frames, the field moves
+         at exactly the same visible speed as before. */
+      minFrameMs: SMALL ? 32 : 22,
       speed: SMALL ? 3.12 : 3.84,
       easing: 1,
       warpFactor: 10,

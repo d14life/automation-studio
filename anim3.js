@@ -64,11 +64,15 @@ function Starfield1(host, o) {
       }
     }
   }
-  function update(){
+  function update(dtScale){
     /* mouseAdjust off = the field flies straight at the viewer, no drift */
     mouse.x = mouseAdjust ? (cursor.x - cx)/easing : 0;
     mouse.y = mouseAdjust ? (cursor.y - cy)/easing : 0;
-    var compSpeed = hyper ? speed*warpFactor : speed;
+    /* Motion used to be per-FRAME, so the field drifted twice as fast on a 120Hz screen as on a
+       60Hz one, and any frame cap visibly slowed it down. Scaling by elapsed time pins the look
+       to the clock instead of the refresh rate, which is what lets minFrameMs be raised without
+       changing anything the eye can see. */
+    var compSpeed = (hyper ? speed*warpFactor : speed) * dtScale;
     for (var i=0;i<arr.length;i++){
       var s=arr[i];
       s[7]=true; s[5]=s[3]; s[6]=s[4];
@@ -110,16 +114,20 @@ function Starfield1(host, o) {
       ctx.stroke();
     }
   }
-  var raf=0, running=true, lastFrame=0;
+  var raf=0, running=true, lastFrame=0, prevT=0;
   function animate(now){
     if (!running) return;
     raf=requestAnimationFrame(animate);
-    if (document.hidden) return;            /* nobody is looking: skip the work, keep the loop */
+    if (document.hidden) { prevT=0; return; }  /* nobody is looking: skip the work, keep the loop */
     if (minFrameMs){
       if (now && now-lastFrame < minFrameMs) return;
       lastFrame = now || 0;
     }
-    resizeIfNeeded(); update(); draw();
+    /* elapsed since the last frame we actually DREW, expressed in 60fps frames. Clamped so a
+       stall or a return from a background tab does not teleport the field. */
+    var dtScale = prevT ? Math.min((now-prevT)/16.67, 4) : 1;
+    prevT = now || 0;
+    resizeIfNeeded(); update(dtScale); draw();
   }
   function onMove(e){
     var r=host.getBoundingClientRect();
