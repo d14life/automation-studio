@@ -861,3 +861,19 @@ footer a{display:block;padding:3px 0}
 .glowspin{animation:glow-turn 9s linear infinite;will-change:transform}
 .glowspin-slow{animation-duration:14s}
 @media (prefers-reduced-motion:reduce){.glowspin{animation:none}}
+
+/* ---------- contact rows on the interactive-hover donor ----------
+   The row keeps the .way look; the donor supplies the three layers. The dot that grows into the
+   row is the glass tint rather than a solid, so it reads as the row lighting up. */
+.ihl{position:relative;isolation:isolate}
+.ihl .ihl-rest{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;
+  gap:14px;width:100%}
+.ihl .ihl-hover{z-index:2;padding:0 var(--way-pad,18px);color:var(--ink)}
+.ihl .ihl-hover small{margin-left:auto;color:var(--dim)}
+.ihl .ihl-arrow{width:18px;height:18px;flex:none;color:var(--ice2)}
+.ihl .ihl-dot{z-index:0;background:rgba(127,216,255,.16);border-radius:12px}
+@media (hover:hover){.ihl:hover .ihl-dot{border-radius:inherit}}
+@media (hover:none){
+  /* no hover on a phone: the resting row is the only one, and it must not be pushed aside */
+  .ihl .ihl-hover{display:none}
+}
