@@ -1,20 +1,12 @@
-import SkewCards from '@/components/ui/gradient-card-showcase'
-import type { SkewCard } from '@/components/ui/gradient-card-showcase'
+import { EdgeCards } from '@/components/ui/edge-card'
+import type { EdgeCard } from '@/components/ui/edge-card'
 
-/* The six service cards use the skew-gradient showcase instead of the beam ring, on his word:
-   "for some of the containers use this and replace the old beaming light animation".
+/* Second design for the six service cards. The skew-gradient donor is gone on his word - it was
+   the heaviest thing on the page, a card-sized 30px blur per card plus twelve blob spans
+   animating forever. These cards do not animate at rest at all; the sheen and the lift happen
+   on hover, in transform and opacity only. */
 
-   The donor's neon pairs are gone - he asked for no colour, just liquid glass. Passing
-   translucent whites through the component's own gradient props keeps every skew, blur and
-   transition of the original while turning the panels into panes of glass: the sharp copy is
-   the pane, the 30px-blurred copy behind it is the light it casts. */
-const G: [string, string][] = [
-  ['rgba(255,255,255,0.20)', 'rgba(223,246,255,0.05)'],
-  ['rgba(223,246,255,0.17)', 'rgba(255,255,255,0.05)'],
-  ['rgba(255,255,255,0.16)', 'rgba(127,216,255,0.06)'],
-]
-
-const SERVICES: SkewCard[] = [
+const SERVICES: EdgeCard[] = [
   {
     title: 'Счета, акты, сверка',
     desc: 'Документы создаются из состояния сделки, долги и переплаты видны по каждому контрагенту, платёжный календарь сам показывает, что горит.',
@@ -45,15 +37,14 @@ const SERVICES: SkewCard[] = [
     desc: 'Заказы, остатки, маршруты и статусы отгрузок на одной доске. Клиент видит, где его груз, без звонка менеджеру.',
     cta: 'Меньше звонков, меньше потерянных заказов',
   },
-].map((c, i) => ({ ...c, gradientFrom: G[i % 3][0], gradientTo: G[i % 3][1] }))
+]
 
 export function Services() {
   return (
     <section className="band" id="services"><div className="wrap">
       <p className="eyebrow">Услуги</p>
       <h2>Что умеем и что это снимает с вас</h2>
-      {/* the donor's own wrapper minus its full-screen height, which a page section does not want */}
-      <SkewCards cards={SERVICES} className="skewrow flex justify-center items-start flex-wrap" />
+      <EdgeCards cards={SERVICES} />
     </div></section>
   )
 }

@@ -28,6 +28,14 @@ export function useCardTilt(): void {
     let last = 0
     let px = 0
     let py = 0
+    /* The fan is one section out of ten. Tracking the cursor while it is somewhere else on the
+       page bought nothing and cost five forced layouts per frame, so the whole thing sleeps
+       unless the fan is actually on screen. */
+    let onScreen = false
+    const io = new IntersectionObserver(([e]) => {
+      onScreen = e.isIntersecting
+      if (!onScreen) flatten()
+    })
 
     function paint() {
       const boxes = cards.map((el) => el.getBoundingClientRect())
@@ -72,6 +80,7 @@ export function useCardTilt(): void {
        frame it happens at most once per frame, which is all the screen can show anyway. */
     let queued = false
     const onMove = (e: PointerEvent) => {
+      if (!onScreen) return
       px = e.clientX
       py = e.clientY
       if (queued) return
@@ -79,7 +88,7 @@ export function useCardTilt(): void {
       requestAnimationFrame(() => { queued = false; last = 0; paint() })
     }
 
-    const flatten = () => {
+    function flatten() {
       for (const el of cards) {
         el.removeAttribute('data-tilt')
         el.style.removeProperty('--tx')
@@ -88,11 +97,13 @@ export function useCardTilt(): void {
       }
     }
 
+    io.observe(wrap)
     window.addEventListener('pointermove', onMove, true)
     window.addEventListener('blur', flatten)
     document.addEventListener('visibilitychange', flatten)
 
     return () => {
+      io.disconnect()
       window.removeEventListener('pointermove', onMove, true)
       window.removeEventListener('blur', flatten)
       document.removeEventListener('visibilitychange', flatten)

@@ -34,6 +34,9 @@ function tubeSet(p: number): string[] {
 export function useTubeScene(ready: boolean, heroVisible: boolean): RefObject<HTMLDivElement | null> {
   const layerRef = useRef<HTMLDivElement>(null)
   const appRef = useRef<TubesApp | null>(null)
+  /* read by the aiming effect, which must not re-subscribe every time the hero flips */
+  const heroOn = useRef(heroVisible)
+  heroOn.current = heroVisible
 
   /* The ribbon path is centred on the viewport, but the words sit above the middle of the
      screen. The layer is nudged so the path's centre lands on the morph lines: that is what
@@ -42,6 +45,11 @@ export function useTubeScene(ready: boolean, heroVisible: boolean): RefObject<HT
     const layer = layerRef.current
     if (!layer) return
     const aimTubesAtText = () => {
+      /* THE fix for "it lags everywhere else": this reads two boxes, which forces a fresh
+         layout, and it was doing it on every scroll frame for the entire length of the page -
+         long after the ribbons had left the screen and there was nothing left to aim. Below the
+         hero there is nothing to do, so it does nothing. */
+      if (!heroOn.current) return
       const a = document.getElementById('liq1'), b = document.getElementById('liq2')
       if (!a || !b) return
       const ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect()
