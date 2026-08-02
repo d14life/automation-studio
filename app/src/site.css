@@ -909,3 +909,15 @@ footer a{display:block;padding:3px 0}
 .fig-of{display:block;margin-top:6px;font-weight:800;font-size:14.5px}
 .fig-sub{display:block;margin-top:6px;color:var(--dim);font-size:13px;line-height:1.45}
 @media (max-width:700px){.sparkstrip{height:110px}}
+
+/* ---------- border beam, turned by the browser instead of by script ----------
+   The donor runs one animation frame loop per panel, writing --mk-beam-a sixty times a second.
+   Eight panels on this page, and every one of them uses the same idle and hover speed because
+   nothing here reacts to hover - so the spring inside that loop only ever produces a constant
+   rate. A constant rotation is what a CSS animation is for, and it runs off the main thread.
+   The component skips its loop whenever the two speeds match and hands the job to this. */
+@property --mk-beam-a{syntax:'<angle>';inherits:false;initial-value:0deg}
+@keyframes mk-beam-spin{to{--mk-beam-a:360deg}}
+.mk-beam-css{animation:mk-beam-spin var(--mk-beam-dur,8.5s) linear infinite;
+  animation-delay:var(--mk-beam-delay,0s)}
+@media (prefers-reduced-motion:reduce){.mk-beam-css{animation:none}}

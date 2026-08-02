@@ -158,8 +158,12 @@ export function useTubeScene(ready: boolean, heroVisible: boolean): RefObject<HT
     }
   }, [ready, heroVisible])
 
-  /* colour cycle: runs for the life of the page, idles while there is no scene */
+  /* Colour cycle. It used to keep an animation frame loop alive for the whole life of the page
+     and simply return early while there was no scene - a wake-up sixty times a second, for the
+     entire time the visitor is anywhere below the hero, to do nothing. Now the loop only exists
+     while the hero does. */
   useEffect(() => {
+    if (!heroVisible) return
     let hue = 0, last = 0, raf = 0, warned = false
     const cycle = (now: number) => {
       raf = requestAnimationFrame(cycle)
@@ -184,7 +188,7 @@ export function useTubeScene(ready: boolean, heroVisible: boolean): RefObject<HT
     }
     cycle(0)
     return () => { cancelAnimationFrame(raf) }
-  }, [])
+  }, [heroVisible])
 
   return layerRef
 }

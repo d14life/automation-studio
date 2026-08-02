@@ -229,8 +229,19 @@ function BorderBeamPanelBase({
     rootRef.current?.style.setProperty("--mk-beam-a", `${(((angle % 360) + 360) % 360).toFixed(2)}deg`);
   }, []);
 
+  /* The donor gives every panel its own animation frame loop, running a spring and writing a
+     custom property sixty times a second. On this page there are eight of them, and because
+     idleSpeed and hoverSpeed are set to the same value everywhere - nothing here reacts to
+     hover - that spring only ever produces one constant rate. A constant rotation is exactly
+     what a CSS animation does, off the main thread and for free.
+
+     So: no script at all when the two speeds match, which is every panel on this page. The
+     donor's loop is kept for the case where they differ, so the component still behaves as
+     written for anyone using it properly. */
+  const constantRate = idleSpeed === hoverSpeed;
+
   React.useEffect(() => {
-    if (!animate) return;
+    if (!animate || constantRate) return;
     let raf = 0;
     let last = 0;
     const frame = (now: number) => {
@@ -243,7 +254,7 @@ function BorderBeamPanelBase({
     };
     raf = requestAnimationFrame(frame);
     return () => cancelAnimationFrame(raf);
-  }, [animate, paint]);
+  }, [animate, paint, constantRate]);
 
   React.useEffect(() => {
     if (!staticMode) return;
@@ -294,6 +305,10 @@ function BorderBeamPanelBase({
       onBlur={settle}
       className={cn(
         "relative w-full border border-[var(--motiq-border,#263449)] bg-[var(--motiq-surface,#111827)] p-7",
+        /* Constant rate: the browser turns the angle itself and no frame loop is ever created.
+           Not gated on the visibility pause the way the script was - that gate existed to stop
+           a main-thread loop, and a CSS animation on something off screen costs nothing. */
+        !staticMode && constantRate ? "mk-beam-css" : null,
         cls,
         className,
       )}
@@ -301,6 +316,10 @@ function BorderBeamPanelBase({
         borderRadius: `${radius}px`,
         isolation: "isolate",
         ["--mk-beam-a" as string]: `${startAngle.toFixed(2)}deg`,
+        /* one turn at idleSpeed degrees a second, started part-way round so the panels are
+           not all in step - the same job the seed did for the script */
+        ["--mk-beam-dur" as string]: `${(360 / Math.max(1, idleSpeed)).toFixed(3)}s`,
+        ["--mk-beam-delay" as string]: `${(-startAngle / Math.max(1, idleSpeed)).toFixed(3)}s`,
         ...style,
       }}
       {...props}
