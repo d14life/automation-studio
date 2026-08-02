@@ -117,8 +117,13 @@ header{position:absolute;top:0;left:0;right:0;z-index:20}
 #tubelayer canvas{display:block;width:100%;height:100%}
 /* the bottom padding is what lifts the slogan: the block is centred, so padding at the foot
    pushes the centre - and the slogan with it - up the screen. */
+/* The whole first screen moves down as ONE block - slogan, number and buttons together - rather
+   than the gaps between them opening up. A transform on this element carries every child with
+   it, including the absolutely positioned number, so nothing stretches. The ribbons follow on
+   their own: they are aimed at the slogan and re-measure its position. */
 .stageui{position:relative;z-index:5;height:100%;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;text-align:center;gap:0;padding:92px 24px 300px}
+  align-items:center;justify-content:center;text-align:center;gap:0;padding:92px 24px 300px;
+  transform:translateY(var(--herodrop,34px))}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 /* half again as big as it was: 21pt -> 31.5pt, 3.2rem -> 4.8rem, heights to match */
 .morph{position:relative;height:3.5rem;width:100%;max-width:1400px;margin:0 auto;
