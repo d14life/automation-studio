@@ -63,7 +63,7 @@ h1{font:900 clamp(28px,4.6vw,54px)/1.12 Nunito,sans-serif;letter-spacing:-.02em;
 h1 em{font-style:normal;color:var(--ice2)}
 .lede{color:var(--dim);max-width:60ch;margin:18px auto 0;font-size:clamp(15px,1.5vw,17.5px)}
 /* the number and the buttons are one block: the buttons sit centred on top of the 101 */
-.numblock{position:absolute;left:0;right:0;top:57%;display:flex;justify-content:center}
+.numblock{position:absolute;left:0;right:0;top:calc(50% + 120px);display:flex;justify-content:center}
 @media (max-width:700px){.numblock{position:relative;top:auto;margin-top:clamp(40px,8vh,90px)}}
 .actswrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:6}
 .acts{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
@@ -80,7 +80,7 @@ h1 em{font-style:normal;color:var(--ice2)}
   background:radial-gradient(46% 40% at 50% 50%,rgba(127,216,255,.22),transparent 70%),
              radial-gradient(30% 26% at 66% 60%,rgba(142,123,232,.18),transparent 70%)}
 .hero101{position:relative;z-index:4;text-align:center;pointer-events:none;
-  font:900 clamp(150px,25vw,340px)/.84 Nunito,sans-serif;color:transparent;letter-spacing:-.05em;
+  font:900 clamp(140px,22vw,290px)/.84 Nunito,sans-serif;color:transparent;letter-spacing:-.05em;
   -webkit-text-stroke:2px rgba(223,246,255,.20);
   filter:drop-shadow(0 0 34px rgba(127,216,255,.14))}
 @media (max-width:700px){.hero101{-webkit-text-stroke-width:2px}}
