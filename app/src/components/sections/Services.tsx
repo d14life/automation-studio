@@ -3,11 +3,15 @@ import type { SkewCard } from '@/components/ui/gradient-card-showcase'
 
 /* The six service cards use the skew-gradient showcase instead of the beam ring, on his word:
    "for some of the containers use this and replace the old beaming light animation".
-   The three gradient pairs are the donor's own, cycled across six cards. */
+
+   The donor's neon pairs are gone - he asked for no colour, just liquid glass. Passing
+   translucent whites through the component's own gradient props keeps every skew, blur and
+   transition of the original while turning the panels into panes of glass: the sharp copy is
+   the pane, the 30px-blurred copy behind it is the light it casts. */
 const G: [string, string][] = [
-  ['#ffbc00', '#ff0058'],
-  ['#03a9f4', '#ff0058'],
-  ['#4dff03', '#00d0ff'],
+  ['rgba(255,255,255,0.20)', 'rgba(223,246,255,0.05)'],
+  ['rgba(223,246,255,0.17)', 'rgba(255,255,255,0.05)'],
+  ['rgba(255,255,255,0.16)', 'rgba(127,216,255,0.06)'],
 ]
 
 const SERVICES: SkewCard[] = [
