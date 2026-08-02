@@ -840,3 +840,11 @@ footer a{display:block;padding:3px 0}
 /* the two number cards are panels, not pills: square off the radius and let the copy breathe */
 .stats .shiny-cta{padding:0;border-radius:18px;font:inherit;text-align:left;display:block;width:100%}
 .stats .shiny-cta > span{display:block}
+
+/* the donor glow is absolutely positioned, so it needs a positioned parent to fill; z-index
+   keeps the panel above the light rather than inside it */
+.glowwrap{position:relative;isolation:isolate}
+/* the glow is the wrapper's first child and stays at the back; everything else rides above it.
+   Opacity keeps it as light around the panel rather than a slab of colour behind it. */
+.glowwrap > :first-child{z-index:0;opacity:.42}
+.glowwrap > :not(:first-child){position:relative;z-index:1}
