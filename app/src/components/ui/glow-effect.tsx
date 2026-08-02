@@ -1,5 +1,7 @@
 import { cn } from '@/lib/utils';
-import { motion, type Transition } from 'motion/react';
+import { motion, type Transition } from 'framer-motion';
+/* was 'motion/react'. `motion` and `framer-motion` are the same library under two names, and
+   importing both shipped two full copies of it in one bundle. One name everywhere. */
 
 /* Donor component, unchanged apart from importing Transition as a type, which this project's
    verbatimModuleSyntax requires. Every mode, timing and gradient below is the original. */

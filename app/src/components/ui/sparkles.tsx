@@ -69,7 +69,10 @@ export const SparklesCore = (props: ParticlesProps) => {
               zIndex: 1,
             },
 
-            fpsLimit: 120,
+            /* was 120. This is a decorative strip of slow drifting specks; it does not need a
+               frame for every frame the screen can draw. At 30 it looks the same and the
+               particle engine does a quarter of the work. */
+            fpsLimit: 30,
             interactivity: {
               events: {
                 onClick: {
