@@ -123,7 +123,8 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
 
 
 /* ---------- projects: a gentle fan of cards, each showing a mock of what we build ---------- */
-.projects{position:relative;height:min(520px,58vw);margin:52px 0 18px}
+#projects > .wrap{max-width:1560px}
+.projects{position:relative;height:min(760px,46vw);margin:52px 0 18px}
 .projects .proj{position:absolute;left:50%;top:50%;width:var(--cardw,300px);aspect-ratio:1;
   margin:calc(var(--cardw,300px)/-2) 0 0 calc(var(--cardw,300px)/-2);
   border:1px solid var(--line);border-radius:22px;overflow:hidden;background:rgba(6,12,16,.86);
@@ -263,11 +264,13 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
 .beam{position:relative;isolation:isolate}
 .beam .beam-ring{position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;
   background:conic-gradient(from var(--beam-a,40deg), transparent 0deg,
-    color-mix(in srgb, #7FD8FF 4%, transparent) 18deg, color-mix(in srgb, #7FD8FF 55%, transparent) 46deg,
-    #DFF6FF 56deg, color-mix(in srgb, #DFF6FF 22%, #ffffff) 60deg, transparent 63deg, transparent 198deg,
-    color-mix(in srgb, #8E7BE8 4%, transparent) 216deg, color-mix(in srgb, #8E7BE8 50%, transparent) 244deg,
-    #8E7BE8 254deg, color-mix(in srgb, #8E7BE8 26%, #ffffff) 258deg, transparent 261deg, transparent 360deg)}
-.beam .beam-ring{padding:1.5px;
+    color-mix(in srgb, #7FD8FF 10%, transparent) 14deg, color-mix(in srgb, #7FD8FF 80%, transparent) 44deg,
+    #EAFBFF 56deg, #ffffff 60deg, color-mix(in srgb, #DFF6FF 40%, transparent) 66deg, transparent 74deg,
+    transparent 190deg,
+    color-mix(in srgb, #8E7BE8 10%, transparent) 210deg, color-mix(in srgb, #8E7BE8 75%, transparent) 242deg,
+    #C9BEFF 254deg, #ffffff 258deg, color-mix(in srgb, #8E7BE8 40%, transparent) 264deg,
+    transparent 272deg, transparent 360deg)}
+.beam .beam-ring{padding:2px;
   -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
   -webkit-mask-composite:xor;mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
   mask-composite:exclude}
@@ -343,7 +346,7 @@ footer a{display:block;padding:3px 0}
   <h2>Что уже собрано и как это выглядит</h2>
   <div class="projects">
 
-    <article class="proj glow">
+    <article class="proj beam"><i class="beam-ring"></i>
       <div class="shot">
         <div class="bar w1"></div>
         <div class="row"><span class="cell num"></span><span class="cell"></span><span class="cell"></span></div>
@@ -378,7 +381,7 @@ footer a{display:block;padding:3px 0}
       </div>
     </article>
 
-    <article class="proj glow">
+    <article class="proj beam"><i class="beam-ring"></i>
       <div class="shot">
         <div class="cols">
           <div class="col"><span class="chip"></span><span class="chip hi"></span><span class="chip"></span></div>
@@ -521,7 +524,7 @@ footer a{display:block;padding:3px 0}
      of the next one, so six cards read as a fan instead of a pile on a narrow screen. */
   function cardW(){
     var avail=wrap.clientWidth;
-    return Math.round(Math.max(210,Math.min(330,avail/4.6)));
+    return Math.round(Math.max(260,Math.min(520,avail/2.9)));
   }
   function edgeX(){ return Math.max(60,(wrap.clientWidth-cardW())/2*0.92); }
   function slotCfg(slot){
