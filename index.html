@@ -36,8 +36,8 @@ header{position:absolute;top:0;left:0;right:0;z-index:20}
 /* ---------- hero stage ---------- */
 /* a tall track so the first screen has room to travel: the visitor scrolls for two and a bit
    viewports while the hero stays put and its layers drift apart */
-#stage{position:relative;height:165vh;background:transparent}
-@media (max-width:900px){#stage{height:150vh}}
+#stage{position:relative;height:138vh;background:transparent}
+@media (max-width:900px){#stage{height:132vh}}
 .stagesticky{position:sticky;top:0;height:100svh;overflow:hidden}
 /* same as the bench: the tubes own the whole stage and screen-blend over the starfield */
 /* The tubes live in their own fixed layer at the root, beside the starfield. Two reasons:
@@ -591,7 +591,7 @@ footer a{display:block;padding:3px 0}
   var SMALL=matchMedia('(hover:none)').matches || matchMedia('(pointer:coarse)').matches ||
             matchMedia('(max-width:600px)').matches ||
             (navigator.deviceMemory && navigator.deviceMemory<=4);
-  Starfield1(document.getElementById('space'),{quantity:SMALL?260:420,speed:2.1,easing:1,warpFactor:10,opacity:0.1,
+  Starfield1(document.getElementById('space'),{quantity:SMALL?320:640,speed:SMALL?2.4:3.2,easing:1,warpFactor:10,opacity:0.1,
     mouseAdjust:false,clickToWarp:false,starColor:'rgba(255,255,255,1)',bgColor:'rgba(0,0,0,1)',zIndex:1});
 
   /* two lines, same timings, started in the same tick: they melt into the next phrase together */
@@ -713,21 +713,25 @@ footer a{display:block;padding:3px 0}
      the browser already fires scroll at most once a frame. No animation-frame queue to miss. */
   function paint(){
     var y=window.pageYOffset||0, h=innerHeight||1;
-    var track=h*0.62;                         /* the drift finishes well inside the track */
-    if(y>track*1.25) return;                  /* past the hero: stop paying for it */
+    /* the track is exactly the scrollable part of the hero, so the text is gone at the very
+       moment the next section reaches the top: no empty stretch of stars in between */
+    var track=Math.max(120,(document.getElementById('stage').offsetHeight||h)-h);
+    if(y>track*1.4) return;                   /* past the hero: stop paying for it */
     var f=Math.min(1,y/track);
+    /* hold, then fade: the words stay readable for the first half of the scroll */
+    var fade=Math.max(0,(f-0.42)/0.58);
     l1.style.transform='translateY('+(f*430).toFixed(1)+'px)';
-    l1.style.opacity=(1-f*1.25).toFixed(3);
+    l1.style.opacity=(1-fade*1.1).toFixed(3);
     l2.style.transform='translateY('+(f*250).toFixed(1)+'px)';
-    l2.style.opacity=(1-f*1.05).toFixed(3);
+    l2.style.opacity=(1-fade).toFixed(3);
     if(acts){ acts.style.transform='translateY('+(-f*190).toFixed(1)+'px)';
-              acts.style.opacity=(1-f*1.4).toFixed(3); }
+              acts.style.opacity=(1-fade*1.2).toFixed(3); }
     if(num){ num.style.transform='translateY('+(f*90).toFixed(1)+'px) scale('+(1+f*0.12).toFixed(3)+')';
-             num.style.opacity=(1-f*1.2).toFixed(3); }
+             num.style.opacity=(1-fade*1.1).toFixed(3); }
     if(hint) hint.style.opacity=(1-f*3.2).toFixed(3);
     /* the ribbons sit behind the words, so they travel slower: that difference is the depth */
     if(!tubes) tubes=document.getElementById('tubelayer');
-    if(tubes){ var op=Math.max(0,1-f*1.0);
+    if(tubes){ var op=Math.max(0,1-fade);
                tubes.style.transform='translateY('+(f*150).toFixed(1)+'px)';
                tubes.style.opacity=op.toFixed(3);
                tubes.style.visibility=op<0.02?'hidden':'visible'; }
