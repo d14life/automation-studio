@@ -51,8 +51,13 @@ header{position:absolute;top:0;left:0;right:0;z-index:20}
 /* The runway is this height minus one screen, and the hero is pinned for all of it - so this
    is literally how far you must scroll to play the opening. 155vh gave 55vh of it; 210vh gives
    110vh, twice the scroll for the same effect. */
-#stage{position:relative;height:300vh;background:transparent}
-@media (max-width:700px){#stage{height:230vh}}
+/* The runway ends while the 101 is still on screen, on purpose. Past that point the only thing
+   left in the pinned hero is the number creeping up on its own, which reads as a screenful of
+   empty stars - measured at ~700px of scroll with nothing else in frame. Ending here lets the
+   pin release with the number still in view; the hero then leaves at normal scroll speed as the
+   next section arrives behind it, so there is no dead stretch at all. */
+#stage{position:relative;height:195vh;background:transparent}
+@media (max-width:700px){#stage{height:155vh}}
 /* Actually sticky, which the name always claimed. It was position:relative, so the hero
    scrolled away after one screen while #stage kept going to 210vh - and the leftover 110vh was
    the screenful of empty stars he kept seeing. Pinned, the parallax plays over the whole
