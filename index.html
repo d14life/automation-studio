@@ -575,7 +575,8 @@ footer a{display:block;padding:3px 0}
      killed mobile, and 700 stars redrawn every frame is more than a phone should pay */
   /* no WebGL scene where there is no mouse: phones and tablets paid for it in heat and frame
      drops, and the ribbons follow nothing there anyway */
-  var SMALL=matchMedia('(max-width:900px)').matches || matchMedia('(hover:none)').matches ||
+  var SMALL=matchMedia('(hover:none)').matches || matchMedia('(pointer:coarse)').matches ||
+            matchMedia('(max-width:600px)').matches ||
             (navigator.deviceMemory && navigator.deviceMemory<=4);
   Starfield1(document.getElementById('space'),{quantity:SMALL?260:420,speed:2.1,easing:1,warpFactor:10,opacity:0.1,
     mouseAdjust:false,clickToWarp:false,starColor:'rgba(255,255,255,1)',bgColor:'rgba(0,0,0,1)',zIndex:1});
