@@ -78,9 +78,10 @@ export function useTubeScene(ready: boolean, heroVisible: boolean): RefObject<HT
     const cancelInit = window.TubesCursorInit(cv, {
       tubes: {
         colors: tubeSet(p0),
-        /* trail length back to the library's own 32-128: at 38-154 he said the streaks ran too long */
-        minTubularSegments: 32,
-        maxTubularSegments: 128,
+        /* The ribbon's own length, which is its tubular segment count - not the reach of the
+           path, which is sleepRadiusX/Y below. +30% on the library's 32-128. */
+        minTubularSegments: 42,
+        maxTubularSegments: 166,
         lights: {
           intensity: GLOW.i,
           colors: [
