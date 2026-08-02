@@ -48,13 +48,23 @@ export function useTubeScene(ready: boolean, heroVisible: boolean): RefObject<HT
       const textMid = (ra.top + rb.bottom) / 2, screenMid = (innerHeight || 1) / 2
       layer.style.transform = 'translateY(' + Math.round(textMid - screenMid) + 'px)'
     }
-    addEventListener('resize', aimTubesAtText, { passive: true })
-    addEventListener('scroll', aimTubesAtText, { passive: true }) /* the words move, the band follows */
+    /* This reads two boxes and then writes a transform. Run straight off the scroll event it
+       forces the browser to lay the page out again mid-scroll, once per event, on top of the
+       parallax doing its own work - the classic read-write-read sawtooth. Folded into an
+       animation frame it happens once per painted frame at most, after layout is already done. */
+    let queued = false
+    const onScroll = () => {
+      if (queued) return
+      queued = true
+      requestAnimationFrame(() => { queued = false; aimTubesAtText() })
+    }
+    addEventListener('resize', onScroll, { passive: true })
+    addEventListener('scroll', onScroll, { passive: true }) /* the words move, the band follows */
     addEventListener('load', aimTubesAtText)
     aimTubesAtText()
     return () => {
-      removeEventListener('resize', aimTubesAtText)
-      removeEventListener('scroll', aimTubesAtText)
+      removeEventListener('resize', onScroll)
+      removeEventListener('scroll', onScroll)
       removeEventListener('load', aimTubesAtText)
     }
   }, [])
@@ -76,6 +86,12 @@ export function useTubeScene(ready: boolean, heroVisible: boolean): RefObject<HT
     const resizeRef: { current: (() => void) | null } = { current: null }
 
     const cancelInit = window.TubesCursorInit(cv, {
+      /* Bloom off. In the library this is not a strength dial - the whole post-processing chain
+         is built inside `if (options.bloom)`, so false means the frame goes straight from the
+         scene to the screen with no extra full-canvas passes at all. It was the largest piece
+         of GPU work left on the page. The ribbons keep their own four lights, so they stay lit;
+         what they lose is the halo bleeding out past their edges. One word to put it back. */
+      bloom: false,
       tubes: {
         colors: tubeSet(p0),
         /* The ribbon's own length, which is its tubular segment count - not the reach of the
