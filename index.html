@@ -84,7 +84,9 @@ h1 em{font-style:normal;color:var(--ice2)}
 
 /* ---------- section: about ---------- */
 /* transparent so the starfield runs behind every section, which is the whole point of it */
-section.band{position:relative;z-index:6;padding:58px 0 56px;background:transparent}
+/* far-off sections are not laid out until they approach the viewport: a real saving on phones */
+section.band{position:relative;z-index:6;padding:58px 0 56px;background:transparent;
+  content-visibility:auto;contain-intrinsic-size:auto 900px}
 .eyebrow{font-size:12.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ice2);margin:0 0 14px}
 h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;margin:0;max-width:22ch}
 .about{display:grid;gap:44px;grid-template-columns:minmax(320px,1.15fr) minmax(280px,.85fr);
@@ -354,10 +356,25 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
 @media (forced-colors:active){.beam .beam-ring{display:none}}
 
 
+/* the burger only exists on the phone: the desktop keeps its plain row of links */
+.burger{display:none;background:none;border:0;cursor:pointer;padding:12px 10px;margin-left:auto}
+.burger i{display:block;width:22px;height:2px;border-radius:2px;background:var(--ink);margin:4px 0;
+  transition:transform .2s ease,opacity .2s ease}
+.burger[aria-expanded="true"] i:nth-child(1){transform:translateY(6px) rotate(45deg)}
+.burger[aria-expanded="true"] i:nth-child(2){opacity:0}
+.burger[aria-expanded="true"] i:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+
 /* ---------- phone ---------- */
 @media (max-width:700px){
-  /* the header used to wrap onto two rows: text links go, the action button stays */
-  .topnav a:not(.cta){display:none}
+  .burger{display:block}
+  /* the links live in a panel under the header, opened by the burger */
+  .topnav{position:absolute;top:100%;right:16px;left:16px;flex-direction:column;align-items:stretch;
+    gap:0;padding:8px;border-radius:16px;background:rgba(5,9,12,.96);border:1px solid var(--line);
+    box-shadow:0 20px 50px rgba(0,0,0,.6);display:none}
+  .topnav.open{display:flex}
+  .topnav a{padding:14px 12px;border-radius:10px;font-size:16px}
+  .topnav a:not(.cta):active{background:rgba(127,216,255,.08)}
+  .cta{text-align:center;margin-top:4px;padding:15px 18px}
   .topbar{padding:16px 0;gap:10px}
   .mark{font-size:18px;padding:6px 0}
   .cta{padding:11px 16px}
@@ -368,10 +385,10 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
   .acts .btn{width:100%;text-align:center}
   .hero101{font-size:clamp(120px,34vw,190px)}
   /* finger-sized targets everywhere */
-  footer .cols a{padding:12px 0}
+  footer .cols a{padding:15px 0}
   .mark{padding:9px 0}
-  .proj .go{padding:8px 0;display:inline-block}
-  .way{padding:16px}
+  .proj .go{padding:13px 0;display:inline-block}
+  .way{padding:17px 16px}
   section.band{padding:46px 0 44px}
 }
 
@@ -390,7 +407,10 @@ footer a{display:block;padding:3px 0}
 
 <header><div class="wrap topbar">
   <a class="mark" href="/">Solutions<span>101</span></a>
-  <nav class="topnav">
+  <button class="burger" id="burger" type="button" aria-label="Меню" aria-expanded="false">
+    <i></i><i></i><i></i>
+  </button>
+  <nav class="topnav" id="topnav">
     <a href="#about">О нас</a>
     <a href="#services">Услуги</a>
     <a href="demo/index.html" target="_blank" rel="noopener">Живой продукт</a>
@@ -758,6 +778,17 @@ footer a{display:block;padding:3px 0}
   addEventListener('resize',refresh,{passive:true});
   addEventListener('load',refresh);
   refresh();
+})();
+</script>
+<script>
+/* phone menu: one toggle, closes after a jump so the page is not left covered */
+(function(){
+  var b=document.getElementById('burger'), n=document.getElementById('topnav');
+  if(!b||!n) return;
+  function set(open){ n.classList.toggle('open',open); b.setAttribute('aria-expanded',open?'true':'false'); }
+  b.addEventListener('click',function(){ set(!n.classList.contains('open')); });
+  n.addEventListener('click',function(e){ if(e.target.tagName==='A'||e.target.tagName==='BUTTON') set(false); });
+  addEventListener('resize',function(){ if(innerWidth>700) set(false); },{passive:true});
 })();
 </script>
 <script src="win.js?v=1"></script>
