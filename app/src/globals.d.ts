@@ -47,6 +47,8 @@ declare global {
 
   /* threejs-components tubes1 instance, only the members the page touches */
   interface TubesApp {
+    /** the renderer wrapper; carries the pixel-ratio knobs and resize() */
+    three?: { minPixelRatio?: number; maxPixelRatio?: number; resize?: () => void }
     options: { sleepRadiusX: number; sleepRadiusY: number }
     tubes: {
       setColors(colors: string[]): void
@@ -57,6 +59,8 @@ declare global {
   interface TubesOptions {
     tubes?: {
       colors?: string[]
+      /** how many ribbons; the library's own default is 16 */
+      count?: number
       /* trail length of each ribbon; the library's own defaults are 32 and 128 */
       minTubularSegments?: number
       maxTubularSegments?: number

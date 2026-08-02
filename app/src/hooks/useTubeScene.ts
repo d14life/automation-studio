@@ -82,6 +82,10 @@ export function useTubeScene(ready: boolean, heroVisible: boolean): RefObject<HT
            path, which is sleepRadiusX/Y below. +30% on the library's 32-128. */
         minTubularSegments: 42,
         maxTubularSegments: 166,
+        /* Every ribbon rebuilds its geometry each frame, so the count is the main-thread cost
+           of this scene almost by itself. The library's 16 overlap heavily - at 11 the bundle
+           reads the same and there is a third less geometry to rebuild sixty times a second. */
+        count: 11,
         lights: {
           intensity: GLOW.i,
           colors: [
@@ -95,6 +99,18 @@ export function useTubeScene(ready: boolean, heroVisible: boolean): RefObject<HT
     }, (a) => {
       if (parked) { try { a.dispose() } catch { /* already gone */ } return }
       appRef.current = a
+
+      /* The library pins the renderer to pixel ratio 2 and runs a bloom pass over the whole
+         canvas every frame. On a Retina screen that is a 2850x1662 surface going through a
+         multi-pass glow - GPU work, which is why it never showed up in the main-thread numbers
+         that said this scene was "only" three.js JS. Dropping to 1.4 is 51% fewer pixels
+         through every pass; on a soft glowing effect the softening is not visible. */
+      try {
+        const r = a.three as { minPixelRatio?: number; maxPixelRatio?: number; resize?: () => void }
+        r.minPixelRatio = 1
+        r.maxPixelRatio = 1.4
+        r.resize?.()
+      } catch { /* older build without the knob: leave it alone */ }
       /* A flat wide figure keeps the ribbons in the line of the text instead of looping down
          across the number below it.
 

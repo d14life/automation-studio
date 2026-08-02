@@ -351,9 +351,17 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
 /* Blur high enough that the light has no edge. At 5 the blob's rim showed through as a hard
    yellow ring sweeping across the cards - the circles he asked to remove. The rotation and the
    hue cycle are untouched; only the softness and the strength change. */
-/* 14 meant a 140px blur repainted on a rotating element, four times over - expensive for a
-   soft edge. 7 is 70px, still far past the point where the rim is visible, at half the area. */
-.steps .glow-container{--animation-speed:7s;--glow-blur:7;--glow-opacity:.5}
+/* The donor's light is a solid colour on a rounded box, so it HAS an edge, and the only thing
+   hiding it was a huge blur - which is both expensive and, at any blur I could afford, still
+   showed as a ring sweeping across the cards. Replaced with a radial gradient that fades to
+   nothing at its own edge: there is no rim left to see at any blur, so the blur can be small.
+   The hue still comes from the donor's own variable, so the colour cycle is untouched. */
+.steps .glow-container{--animation-speed:7s;--glow-blur:3;--glow-opacity:.55}
+.steps .glow::after{
+  background:radial-gradient(closest-side,
+    hsl(calc(var(--hue) * var(--hue-speed) * 1deg) 100% 62%) 0%,
+    hsl(calc(var(--hue) * var(--hue-speed) * 1deg) 100% 62% / .55) 45%,
+    transparent 78%)}
 /* Damir: nothing may react to hover. Restate the resting state over the donor's hover rules. */
 .steps .glow-container:hover .glow-content{mix-blend-mode:normal;box-shadow:none;animation:none}
 .steps .glow-container:hover .glow-content:before,
