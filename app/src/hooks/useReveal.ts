@@ -62,7 +62,11 @@ const PARALLAX: [string, string][] = [
 
 export function useReveal(): void {
   useEffect(() => {
-    if (!CSS.supports('animation-timeline', 'view()')) return
+    /* Chrome 115+ and Safari 26 drive both effects off the browser's own scroll timeline, which
+       costs nothing. Anywhere else they would silently do nothing at all - the hidden state and
+       the drift both live inside @supports - so the same two effects run from script instead. */
+    const native = CSS.supports('animation-timeline', 'view()')
+    if (!native) document.documentElement.classList.add('no-view-timeline')
 
     const drifted: HTMLElement[] = []
     for (const [sel, amount] of PARALLAX) {
@@ -80,19 +84,70 @@ export function useReveal(): void {
         /* an element caught by two selectors keeps the first delay it was given */
         if (el.classList.contains('rise')) return
         el.classList.add('rise')
-        if (i) el.style.setProperty('--rd', Math.min(i, MAX_STAGGER) * STEP + '%')
+        const nth = Math.min(i, MAX_STAGGER)
+        if (i) el.style.setProperty('--rd', nth * STEP + '%')
+        if (i && !native) el.style.setProperty('--rd-ms', nth * 90 + 'ms')
         marked.push(el)
       })
     }
 
+    /* --- script fallback, only where the browser has no scroll timeline --- */
+    let io: IntersectionObserver | null = null
+    let onScroll: (() => void) | null = null
+    if (!native) {
+      io = new IntersectionObserver(
+        (entries) => {
+          for (const e of entries) {
+            if (!e.isIntersecting) continue
+            e.target.classList.add('in')
+            io!.unobserve(e.target) /* one shot: it must not fade back out on the way up */
+          }
+        },
+        { threshold: 0, rootMargin: '0px 0px -14% 0px' },
+      )
+      marked.forEach((el) => io!.observe(el))
+      /* safety: these start invisible, so if the observer never fires the page would read as
+         blank. Two seconds later, show everything regardless. */
+      window.setTimeout(() => marked.forEach((el) => el.classList.add('in')), 2000)
+
+      let queued = false
+      onScroll = () => {
+        if (queued) return
+        queued = true
+        requestAnimationFrame(() => {
+          queued = false
+          const h = innerHeight || 1
+          for (const el of drifted) {
+            const b = el.getBoundingClientRect()
+            if (b.bottom < -200 || b.top > h + 200) continue
+            /* -1 at the bottom of the screen, +1 at the top: the same ramp the keyframes use */
+            const p = 1 - 2 * ((b.top + b.height / 2) / (h + b.height))
+            const amt = parseFloat(el.style.getPropertyValue('--par')) || 0
+            el.style.translate = '0 ' + (p * amt).toFixed(1) + 'px'
+          }
+        })
+      }
+      addEventListener('scroll', onScroll, { passive: true })
+      addEventListener('resize', onScroll, { passive: true })
+      onScroll()
+    }
+
     return () => {
+      if (io) io.disconnect()
+      if (onScroll) {
+        removeEventListener('scroll', onScroll)
+        removeEventListener('resize', onScroll)
+      }
+      document.documentElement.classList.remove('no-view-timeline')
       marked.forEach((el) => {
-        el.classList.remove('rise')
+        el.classList.remove('rise', 'in')
         el.style.removeProperty('--rd')
+        el.style.removeProperty('--rd-ms')
       })
       drifted.forEach((el) => {
         el.classList.remove('par')
         el.style.removeProperty('--par')
+        el.style.removeProperty('translate')
       })
     }
   }, [])

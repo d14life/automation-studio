@@ -688,6 +688,20 @@ footer a{display:block;padding:3px 0}
    It animates `translate`, not `transform`: the reveal animation already owns transform on these
    same elements, and the two properties compose instead of one cancelling the other. */
 @keyframes par-drift{from{translate:0 var(--par,46px)}to{translate:0 calc(var(--par,46px) * -1)}}
+/* Fallback for a browser without scroll timelines. Everything above lives inside
+   @supports (animation-timeline:view()), so where that is missing the page simply shows no
+   reveal and no drift - which is exactly what he was seeing everywhere except the hero, whose
+   parallax is JavaScript. Here the same two effects are driven from script instead: the reveal
+   becomes a one-shot transition fired by an observer, the drift a transform written on scroll.
+   Only reachable when useReveal has put .no-view-timeline on <html>. */
+.no-view-timeline .rise{opacity:0;transform:translateY(40px);
+  transition:opacity .85s cubic-bezier(.28,.11,.32,1) var(--rd-ms,0ms),
+             transform .85s cubic-bezier(.28,.11,.32,1) var(--rd-ms,0ms)}
+.no-view-timeline .rise.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  .no-view-timeline .rise{opacity:1;transform:none;transition:none}
+}
+
 @supports (animation-timeline:view()){
   @media (prefers-reduced-motion:no-preference){
     .par{animation:par-drift linear both;animation-timeline:view();animation-range:cover 0% cover 100%}
