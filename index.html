@@ -885,59 +885,56 @@ footer a{display:block;padding:3px 0}
     });
   },true);
 
-  function parkTubes(){
-    if(!app) return;
-    try{ app.dispose(); }catch(e){}
-    app=null;
-    if(cv){ cv.remove(); cv=null; }
-  }
-  function wakeTubes(){ if(!SMALL && !app && !cv) buildTubes(); }
-  /* No WebGL on a phone at all. Half resolution was still too much: the scene is simply not
-     worth a stuttering page on the device most visitors will use. */
-  var layer=document.getElementById('tubelayer');
-  if(SMALL){ layer.style.display='none'; return; }
-  var cv=null;
-  buildTubes();
-  function buildTubes(){
-  cv=document.createElement('canvas'); cv.className='tubes'; layer.appendChild(cv);
-  var k=GLOW.l/0.64, sp=ICE.length*0.12, p0=ICE.length*0.10, app=null;
+  /* Scene state lives in one scope. It used to sit inside the builder while the colour cycle
+     read it from outside, so every frame threw and the ribbons stopped changing colour. */
+  var layer=document.getElementById('tubelayer'), cv=null, app=null;
+  var k=GLOW.l/0.64, sp=ICE.length*0.12, p0=ICE.length*0.10;
   function tubeSet(p){
     return [dim(paletteAt(ICE,p),k),dim(paletteAt(ICE,p+sp),k),dim(paletteAt(ICE,p+sp*2),k)];
   }
-  TubesCursorInit(cv,{tubes:{colors:tubeSet(p0),
-    lights:{intensity:GLOW.i,colors:[dim(paletteAt(ICE,p0),k),dim(paletteAt(ICE,p0+sp*0.9),k),
-                                     dim(paletteAt(ICE,p0+sp*1.5),k),dim(paletteAt(ICE,p0+sp*2.1),k)]}}},
-    function(a){
-      app=a;
-      /* a flat, wide figure keeps the ribbons in the line of the text instead of looping down
-         across the number below it */
-      app.options.sleepRadiusX=360;
-      app.options.sleepRadiusY=64;
-    });
+  function buildTubes(){
+    if(SMALL||cv) return;
+    cv=document.createElement('canvas'); cv.className='tubes'; layer.appendChild(cv);
+    TubesCursorInit(cv,{tubes:{colors:tubeSet(p0),
+      lights:{intensity:GLOW.i,colors:[dim(paletteAt(ICE,p0),k),dim(paletteAt(ICE,p0+sp*0.9),k),
+                                       dim(paletteAt(ICE,p0+sp*1.5),k),dim(paletteAt(ICE,p0+sp*2.1),k)]}}},
+      function(a){
+        app=a;
+        /* a flat wide figure keeps the ribbons in the line of the text instead of looping down
+           across the number below it */
+        app.options.sleepRadiusX=360;
+        app.options.sleepRadiusY=64;
+      });
+  }
+  function parkTubes(){
+    if(app){ try{ app.dispose(); }catch(e){} app=null; }
+    if(cv){ cv.remove(); cv=null; }
+  }
+  function wakeTubes(){ buildTubes(); }
+
+  /* No WebGL on a phone: half resolution was still too much for the device most visitors use. */
+  if(SMALL){ layer.style.display='none'; }
+  else { buildTubes(); }
+
+  /* Watchdog, phones only and only after the page has settled: at load the first seconds are
+     always slow (fonts, first paint, scene init) and judging the machine on those was wrong. */
+  if(SMALL){
+    setTimeout(function(){
+      var frames=0,t0=0,done=false;
+      (function tick(now){
+        if(done) return;
+        requestAnimationFrame(tick);
+        if(!t0){ t0=now; return; }
+        frames++;
+        if(now-t0<2000) return;
+        done=true;
+        var fps=frames/((now-t0)/1000);
+        if(fps<26 && stopStars && stopStars.setQuantity) stopStars.setQuantity(70);
+      })(0);
+    },3000);
   }
 
   /* tubes walk the same palette as the text, one step behind it */
-  /* Watchdog: measure real frame times for the first two seconds. If the device cannot keep a
-     reasonable rate, drop the 3D scene and thin the starfield instead of stuttering forever. */
-  (function(){
-    var frames=0, t0=0, checked=false;
-    function tick(now){
-      if(checked) return;
-      if(!t0){ t0=now; requestAnimationFrame(tick); return; }
-      frames++;
-      if(now-t0<2000){ requestAnimationFrame(tick); return; }
-      checked=true;
-      var fps=frames/((now-t0)/1000);
-      if(fps<34){
-        parkTubes();
-        SMALL=true;                        /* keep it parked: do not wake on scroll */
-        if(stopStars&&stopStars.setQuantity) stopStars.setQuantity(110);
-        console.info('Solutions101: light mode, measured '+fps.toFixed(1)+' fps');
-      }
-    }
-    requestAnimationFrame(tick);
-  })();
-
   var hue=0,last=0;
   (function cycle(now){
     requestAnimationFrame(cycle);
@@ -949,6 +946,7 @@ footer a{display:block;padding:3px 0}
       app.tubes.setColors(tubeSet(p));
       app.tubes.setLightsColors([dim(paletteAt(ICE,p+sp*0.3),k),dim(paletteAt(ICE,p+sp*0.9),k),
                                  dim(paletteAt(ICE,p+sp*1.5),k),dim(paletteAt(ICE,p+sp*2.1),k)]);
+      window.__tubeHue=Math.round(hue);      /* readable proof that the cycle is alive */
     }catch(e){ if(!cycle.warned){cycle.warned=1;console.warn('tube colours:',e);} }
   })(0);
 })();
