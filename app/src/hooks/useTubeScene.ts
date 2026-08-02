@@ -134,15 +134,17 @@ export function useTubeScene(ready: boolean, heroVisible: boolean): RefObject<HT
         colors: tubeSet(p0),
         /* The ribbon's own length, which is its tubular segment count - not the reach of the
            path, which is sleepRadiusX/Y below. +30% on the library's 32-128. */
-        /* same ribbons as the Mac - his word. The light mobile build (6 short tubes) read as
-           'very short and only a few'; what made the old scene kill phones was bloom and the
-           pinned pixel ratio, both long gone, not the geometry. */
-        minTubularSegments: 42,
-        maxTubularSegments: 166,
+        /* The mobile middle. Full Mac geometry (11 long tubes) was tried on his word and his
+           phone answered: bad lag, and in a screen three ribbons wide the full bundle reads as
+           a tangle, not a cursor. The first light build (6 short) read as 'short and few'. This
+           sits between - and unlike either extreme, he approved neither yet, so this one is the
+           bet that matches both complaints. */
+        minTubularSegments: SMALL ? 36 : 42,
+        maxTubularSegments: SMALL ? 120 : 166,
         /* Every ribbon rebuilds its geometry each frame, so the count is the main-thread cost
            of this scene almost by itself. The library's 16 overlap heavily - at 11 the bundle
            reads the same and there is a third less geometry to rebuild sixty times a second. */
-        count: 11,
+        count: SMALL ? 8 : 11,
         lights: {
           intensity: GLOW.i,
           colors: [
@@ -165,7 +167,7 @@ export function useTubeScene(ready: boolean, heroVisible: boolean): RefObject<HT
       try {
         const r = a.three as { minPixelRatio?: number; maxPixelRatio?: number; resize?: () => void }
         r.minPixelRatio = 1
-        r.maxPixelRatio = 1.4
+        r.maxPixelRatio = SMALL ? 1 : 1.4 /* full ratio on the phone was a real frame cost */
         r.resize?.()
       } catch { /* older build without the knob: leave it alone */ }
       /* A flat wide figure keeps the ribbons in the line of the text instead of looping down
