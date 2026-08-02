@@ -129,6 +129,23 @@ h1 em{font-style:normal;color:var(--ice2)}
 .gbtn.alt{--c2:#0b1030;--c3:#3a3374;--c4:#6f63c9;--c5:#8E7BE8;--bd-angle:200deg;
   --bd-1:hsla(258,70%,88%,.5);--bd-2:hsla(258,50%,88%,.15)}
 
+
+/* ---------- liquid metal pills ----------
+   The original drives a WebGL shader from a shaders package. A static page should not carry a
+   GPU pipeline for a label, so the same read is built from a dark capsule, an inset highlight
+   and one sheen sweeping across: metal, without the shader. */
+.metal{position:relative;overflow:hidden;border-radius:100px;
+  background:linear-gradient(180deg,#20262b 0%,#0a0d10 100%);
+  box-shadow:0 0 0 1px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.10),
+             inset 0 -1px 2px rgba(0,0,0,.55),0 2px 5px rgba(0,0,0,.35);
+  color:#B9C4CC}
+.metal::after{content:'';position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(105deg,transparent 30%,rgba(223,246,255,.30) 46%,
+    rgba(255,255,255,.55) 50%,rgba(142,123,232,.28) 55%,transparent 72%);
+  background-size:260% 100%;animation:metal-sweep 5.5s linear infinite}
+@keyframes metal-sweep{from{background-position:180% 0}to{background-position:-80% 0}}
+@media (prefers-reduced-motion:reduce){.metal::after{animation:none;opacity:.35}}
+
 /* ---------- section: about ---------- */
 /* transparent so the starfield runs behind every section, which is the whole point of it */
 /* content-visibility was tried here and removed: it defers painting until a frame runs, which
@@ -294,7 +311,7 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
 .sh-send{flex:none;width:1.6em;height:1.6em;border-radius:99px;display:grid;place-items:center;
   font-weight:900;line-height:1;background:var(--ice2);color:#04121b}
 .proj .body{padding:16px 18px 18px;display:flex;flex-direction:column;flex:1;min-height:0}
-.proj .tag{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ice2);margin-bottom:8px}
+.proj .tag{display:inline-block;padding:5px 12px;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ice2);margin-bottom:8px}
 .proj .tag em{font-style:normal;color:var(--dim)}
 .proj h3{margin:0 0 6px;font:900 17px/1.2 Nunito,sans-serif}
 .proj p{margin:0;color:var(--dim);font-size:13px;line-height:1.45;flex:1;overflow:hidden;
@@ -624,7 +641,7 @@ footer a{display:block;padding:3px 0}
         </div>
       </div></div>
       <div class="body">
-        <p class="tag">Стройка · Казахстан <em>· работает у клиента</em></p>
+        <p class="tag metal">Стройка · Казахстан <em>· работает у клиента</em></p>
         <h3>Учёт взаиморасчётов</h3>
         <p>Долги нам и наши долги против 1С: 48 контрагентов, 3 юрлица, мультивалюта, старение долга,
           платёжный календарь. Собрано за один день, развёрнуто внутри сети клиента.</p>
@@ -657,7 +674,7 @@ footer a{display:block;padding:3px 0}
         </div>
       </div></div>
       <div class="body">
-        <p class="tag">Логистика <em>· работает у клиента</em></p>
+        <p class="tag metal">Логистика <em>· работает у клиента</em></p>
         <h3>Доска отслеживания посылок</h3>
         <p>Документы создаются из состояния сделки, а посылка видна от заказа до двери на одном экране.
           Клиент перестал звонить менеджеру, чтобы узнать, где груз.</p>
@@ -691,7 +708,7 @@ footer a{display:block;padding:3px 0}
         </div>
       </div></div>
       <div class="body">
-        <p class="tag">Продажи <em>· макет</em></p>
+        <p class="tag metal">Продажи <em>· макет</em></p>
         <h3>CRM под ваш процесс</h3>
         <p>Не коробка, а ваши этапы: заявка, замер, счёт, отгрузка. История клиента остаётся в компании,
           когда менеджер уходит. Сюда же телефония и автообзвон.</p>
@@ -716,7 +733,7 @@ footer a{display:block;padding:3px 0}
         <div class="sh-comp"><span class="sh-inp">Написать сообщение</span><span class="sh-send">&#8594;</span></div>
       </div></div>
       <div class="body">
-        <p class="tag">ИИ <em>· макет</em></p>
+        <p class="tag metal">ИИ <em>· макет</em></p>
         <h3>Бот на ваших документах</h3>
         <p>Отвечает клиенту по вашему прайсу и остаткам, выставляет счёт, заносит контакт в базу.
           Первая линия работает ночью и в выходные.</p>
