@@ -74,8 +74,13 @@ header{position:absolute;top:0;left:0;right:0;z-index:20}
    the page fixes both. z-index 0 keeps it above the stars and below everything in the flow. */
 #tubelayer{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
   mix-blend-mode:screen;
-  -webkit-mask-image:linear-gradient(180deg,transparent 12%,#000 26%,#000 74%,transparent 88%);
-  mask-image:linear-gradient(180deg,transparent 12%,#000 26%,#000 74%,transparent 88%)}
+  /* The layer is aimed at the slogan, which shifts it about 100px up the screen - so a fade that
+     ended at 88% of its own box came to rest around y=629 in the viewport, right under the 101,
+     and read as a hard horizontal line where the glow stopped. The bottom stop now runs past the
+     bottom of the layer (118%), so the edge itself is always off-screen and what is left on
+     screen is a 300px-long fall-off with no boundary in it. */
+  -webkit-mask-image:linear-gradient(180deg,transparent 8%,#000 22%,#000 82%,transparent 118%);
+  mask-image:linear-gradient(180deg,transparent 8%,#000 22%,#000 82%,transparent 118%)}
 #tubelayer canvas{display:block;width:100%;height:100%}
 /* the bottom padding is what lifts the slogan: the block is centred, so padding at the foot
    pushes the centre - and the slogan with it - up the screen. */
