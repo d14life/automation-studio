@@ -581,38 +581,13 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
       hsl(0 0% 100% / .75), transparent 100%)}
 }
 
-/* Border beam. The angle is animated by the browser through a registered custom property, so
-   there is no per-frame JavaScript writing styles and no hover speed-up: one constant sweep.
-   The blurred glow copy was dropped - a full-size blur repainted every frame was the single
-   most expensive thing on the page. */
-@property --beam-a{syntax:'<angle>';inherits:true;initial-value:40deg}
-@keyframes beam-spin{to{--beam-a:400deg}}
-:root{animation:beam-spin 8.5s linear infinite}   /* 42 deg/s, the resting speed of the panel */
-@media (prefers-reduced-motion:reduce){:root{animation:none}}
-.beam{position:relative;isolation:isolate}
-.beam .beam-ring,.beam .beam-glow{position:absolute;inset:0;border-radius:inherit;pointer-events:none;
-  /* two comets 180 degrees apart: a long tail easing into a bright head with a white tip.
-     The toe is a 4% mix rather than `transparent`, because transparent is rgba(0,0,0,0) and a
-     conic ramp through it dips visibly grey. */
-  background:conic-gradient(from var(--beam-a,40deg), transparent 0deg,
-    color-mix(in srgb, #7FD8FF 4%, transparent) 18deg,
-    color-mix(in srgb, #7FD8FF 85%, transparent) 46deg,
-    #DFF6FF 56deg, color-mix(in srgb, #DFF6FF 22%, #ffffff) 60deg, transparent 63deg,
-    transparent 198deg,
-    color-mix(in srgb, #8E7BE8 4%, transparent) 216deg,
-    color-mix(in srgb, #8E7BE8 85%, transparent) 244deg,
-    #8E7BE8 254deg, color-mix(in srgb, #8E7BE8 26%, #ffffff) 258deg, transparent 261deg,
-    transparent 360deg)}
-.beam .beam-ring{padding:3px;
-  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
-  -webkit-mask-composite:xor;mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
-  mask-composite:exclude}
-/* the cast light: a blurred copy of the ring behind the panel. Kept off phones, where it is
-   the single most expensive thing on the page. */
-.beam .beam-glow{filter:blur(16px);opacity:.55;z-index:-1}
-@media (max-width:820px){.beam .beam-glow{display:none}}
-@media (forced-colors:active){.beam .beam-ring,.beam .beam-glow{display:none}}
-
+/* The border beam lives entirely in the donor component now (border-beam-panel.tsx), which
+   writes --mk-beam-a on each panel's own element. The old static-site version that used to live
+   here animated --beam-a on :root - and because that property is declared inherits:true, the
+   browser re-resolved inherited custom properties for the WHOLE document on every frame.
+   Nothing read it any more: there are zero .beam elements on the page. Measured cost of that
+   dead rule: 160 ms/s, half of all main-thread time, style recalc alone 170 -> 28 ms/s.
+   Deleted, with no visual change whatsoever. */
 
 /* the burger only exists on the phone: the desktop keeps its plain row of links */
 .burger{display:none;background:none;border:0;cursor:pointer;padding:12px 10px;margin-left:auto}
@@ -706,5 +681,6 @@ footer a{display:block;padding:3px 0}
 @supports (animation-timeline:view()){
   @media (prefers-reduced-motion:no-preference){
     .par{animation:par-drift linear both;animation-timeline:view();animation-range:cover 0% cover 100%}
+
   }
 }

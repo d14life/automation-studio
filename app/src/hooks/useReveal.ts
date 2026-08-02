@@ -43,18 +43,18 @@ const GROUPS = [
 const STEP = 7
 const MAX_STAGGER = 5
 
-/* Elements that drift against the scroll. Kept apart from the reveal list on purpose: the
-   reveal owns `transform`, the parallax owns `translate`, and the two compose. Headings and the
-   card rows move; body copy does not, or the page reads as seasick. */
+/* Elements that drift against the scroll. They must NOT overlap the reveal list above: an
+   element carrying both view() animations plays neither - both report a null progress, which is
+   what silently killed the arrive-from-below on every heading. So the text reveals and the
+   containers around it drift, and no element does both. */
 const PARALLAX: [string, string][] = [
-  ['.band .eyebrow', '58px'],
-  ['.band > .wrap > h2', '46px'],
-  ['.band .claim', '30px'],
-  ['.srv', '26px'],
-  ['.skewrow', '26px'],
-  ['.steps', '26px'],
-  ['.stats', '34px'],
-  ['#contacts .ways', '26px'],
+  ['.srv', '30px'],
+  ['.skewrow', '30px'],
+  ['.steps', '30px'],
+  ['.stats', '38px'],
+  ['.projects', '34px'],
+  ['#contacts .ways', '30px'],
+  ['.qs', '30px'],
 ]
 
 export function useReveal(): void {
