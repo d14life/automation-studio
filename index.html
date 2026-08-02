@@ -37,6 +37,7 @@ header{position:absolute;top:0;left:0;right:0;z-index:20}
 /* a tall track so the first screen has room to travel: the visitor scrolls for two and a bit
    viewports while the hero stays put and its layers drift apart */
 #stage{position:relative;height:260vh;background:transparent}
+@media (max-width:900px){#stage{height:190vh}}
 .stagesticky{position:sticky;top:0;height:100svh;overflow:hidden}
 /* same as the bench: the tubes own the whole stage and screen-blend over the starfield */
 /* The tubes live in their own fixed layer at the root, beside the starfield. Two reasons:
@@ -65,6 +66,10 @@ h1 em{font-style:normal;color:var(--ice2)}
 .btn:active{transform:scale(.97)}
 .trust{margin-top:26px;color:var(--dim);font-size:13.5px;letter-spacing:.02em}
 /* the big outlined number sits low in the hero with the buttons riding in front of it */
+.hero101::before{content:'';position:absolute;left:50%;top:52%;width:150%;height:220%;
+  transform:translate(-50%,-50%);pointer-events:none;z-index:-1;
+  background:radial-gradient(46% 40% at 50% 50%,rgba(127,216,255,.22),transparent 70%),
+             radial-gradient(30% 26% at 66% 60%,rgba(142,123,232,.18),transparent 70%)}
 .hero101{position:absolute;left:0;right:0;bottom:18px;z-index:4;text-align:center;pointer-events:none;
   font:900 clamp(170px,32vw,440px)/.82 Nunito,sans-serif;color:transparent;letter-spacing:-.05em;
   -webkit-text-stroke:3px rgba(223,246,255,.42);
@@ -568,13 +573,23 @@ footer a{display:block;padding:3px 0}
 
   /* a phone gets a lighter field and no WebGL at all: the tube scene was the thing that
      killed mobile, and 700 stars redrawn every frame is more than a phone should pay */
-  var SMALL=matchMedia('(max-width:760px)').matches ||
+  /* no WebGL scene where there is no mouse: phones and tablets paid for it in heat and frame
+     drops, and the ribbons follow nothing there anyway */
+  var SMALL=matchMedia('(max-width:900px)').matches || matchMedia('(hover:none)').matches ||
             (navigator.deviceMemory && navigator.deviceMemory<=4);
   Starfield1(document.getElementById('space'),{quantity:SMALL?260:420,speed:2.1,easing:1,warpFactor:10,opacity:0.1,
     mouseAdjust:false,clickToWarp:false,starColor:'rgba(255,255,255,1)',bgColor:'rgba(0,0,0,1)',zIndex:1});
 
   /* two lines, same timings, started in the same tick: they melt into the next phrase together */
-  var MORPH={morphTime:4.5,cooldownTime:0.45,colors:ICE,flow:FLOW,drift:FLOW*3,spread:ICE.length*0.08};
+  var heroOn=true;
+  if ('IntersectionObserver' in window){
+    new IntersectionObserver(function(es){
+      heroOn=es[0].isIntersecting;
+      if(!heroOn) parkTubes(); else wakeTubes();
+    },{rootMargin:'80px'}).observe(stage);
+  }
+  var MORPH={morphTime:4.5,cooldownTime:0.45,colors:ICE,flow:FLOW,drift:FLOW*3,spread:ICE.length*0.08,
+             activeWhen:function(){return heroOn;}};
   var L1=document.getElementById('liq1'), L2=document.getElementById('liq2');
   LiquidText(L1,['АВТОМАТИЗИРУЕМ','БЫСТРО','ТОЛЬКО ПРАКТИКА'],MORPH);
   LiquidText(L2,['БИЗНЕС-ПРОЦЕССЫ','НЕ ЗНАЧИТ ПЛОХО','НОЛЬ ТЕОРИИ'],MORPH);
@@ -583,9 +598,19 @@ footer a{display:block;padding:3px 0}
      the capture phase leaves the tubes drifting on their own, which is what we picked */
   window.addEventListener('pointermove',function(e){e.stopPropagation();},true);
 
-  if(SMALL) return;                      /* no tube scene on phones */
+  function parkTubes(){
+    if(!app) return;
+    try{ app.dispose(); }catch(e){}
+    app=null;
+    if(cv){ cv.remove(); cv=null; }
+  }
+  function wakeTubes(){ if(!SMALL && !app && !cv) buildTubes(); }
+  if(SMALL) return;                      /* no tube scene on phones and tablets */
   var layer=document.getElementById('tubelayer');
-  var cv=document.createElement('canvas'); cv.className='tubes'; layer.appendChild(cv);
+  var cv=null;
+  buildTubes();
+  function buildTubes(){
+  cv=document.createElement('canvas'); cv.className='tubes'; layer.appendChild(cv);
   var k=GLOW.l/0.64, sp=ICE.length*0.12, p0=ICE.length*0.10, app=null;
   function tubeSet(p){
     return [dim(paletteAt(ICE,p),k),dim(paletteAt(ICE,p+sp),k),dim(paletteAt(ICE,p+sp*2),k)];
@@ -594,6 +619,7 @@ footer a{display:block;padding:3px 0}
     lights:{intensity:GLOW.i,colors:[dim(paletteAt(ICE,p0),k),dim(paletteAt(ICE,p0+sp*0.9),k),
                                      dim(paletteAt(ICE,p0+sp*1.5),k),dim(paletteAt(ICE,p0+sp*2.1),k)]}}},
     function(a){app=a;});
+  }
 
   /* tubes walk the same palette as the text, one step behind it */
   var hue=0,last=0;

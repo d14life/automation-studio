@@ -79,23 +79,37 @@ function Starfield1(host, o) {
       s[4]=cy+(s[1]/s[2])*ratio;
     }
   }
+  /* Batched drawing: the original opened a path and stroked once PER STAR, which is hundreds
+     of draw calls a frame. Stars are bucketed by line width and each bucket is stroked once,
+     so a full field costs three calls instead of several hundred. */
+  var BUCKETS=3, bx=[], by=[], bpx=[], bpy=[], bn=[];
+  for (var b=0;b<BUCKETS;b++){ bx[b]=[]; by[b]=[]; bpx[b]=[]; bpy[b]=[]; bn[b]=0; }
   function draw(){
     ctx.fillStyle = hyper ? 'rgba(0,0,0,'+opacity+')' : bgColor;
     ctx.fillRect(0,0,w,h);
     ctx.strokeStyle = starColor;
+    for (var b=0;b<BUCKETS;b++) bn[b]=0;
     for (var i=0;i<arr.length;i++){
       var s=arr[i];
-      if (s[5]>0 && s[5]<w && s[6]>0 && s[6]<h && s[7]){
-        ctx.lineWidth = (1-colorRatio*s[2])*2;
-        ctx.beginPath(); ctx.moveTo(s[5],s[6]); ctx.lineTo(s[3],s[4]); ctx.stroke(); ctx.closePath();
-      }
+      if (!(s[5]>0 && s[5]<w && s[6]>0 && s[6]<h && s[7])) continue;
+      var lw=(1-colorRatio*s[2])*2;
+      var k=lw<0.9?0:(lw<1.6?1:2), n=bn[k]++;
+      bpx[k][n]=s[5]; bpy[k][n]=s[6]; bx[k][n]=s[3]; by[k][n]=s[4];
+    }
+    for (var k2=0;k2<BUCKETS;k2++){
+      if (!bn[k2]) continue;
+      ctx.lineWidth = k2===0?0.6:(k2===1?1.2:2);
+      ctx.beginPath();
+      for (var j=0;j<bn[k2];j++){ ctx.moveTo(bpx[k2][j],bpy[k2][j]); ctx.lineTo(bx[k2][j],by[k2][j]); }
+      ctx.stroke();
     }
   }
   var raf=0, running=true;
   function animate(){
     if (!running) return;
-    resizeIfNeeded(); update(); draw();
     raf=requestAnimationFrame(animate);
+    if (document.hidden) return;            /* nobody is looking: skip the work, keep the loop */
+    resizeIfNeeded(); update(); draw();
   }
   function onMove(e){
     var r=host.getBoundingClientRect();
@@ -172,6 +186,8 @@ function LiquidText(host, texts, o) {
   /* letters: each character becomes its own inline-block, so a caller can push them around
      without touching the melt. Rebuilt only when the word actually changes, never per frame. */
   var letters      = !!o.letters;
+  /* a caller can say when the text is worth animating at all, e.g. only while it is on screen */
+  var activeWhen   = typeof o.activeWhen==='function' ? o.activeWhen : null;
   if (!texts || texts.length < 2) throw new Error('LiquidText: need 2+ texts');
 
   if (!document.getElementById('lt-threshold-svg')){
@@ -266,6 +282,7 @@ function LiquidText(host, texts, o) {
   function animate(){
     if(!running) return;
     raf=requestAnimationFrame(animate);
+    if (document.hidden || (activeWhen && !activeWhen())){ time=Date.now(); return; }
     var now=Date.now(), dt=(now-time)/1000; time=now;
     cooldown-=dt; morph+=dt>0?dt:0;
     if (cooldown<=0) doMorph(); else doCooldown();
