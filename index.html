@@ -346,22 +346,31 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
    most expensive thing on the page. */
 @property --beam-a{syntax:'<angle>';inherits:true;initial-value:40deg}
 @keyframes beam-spin{to{--beam-a:400deg}}
-:root{animation:beam-spin 9s linear infinite}
+:root{animation:beam-spin 8.5s linear infinite}   /* 42 deg/s, the resting speed of the panel */
 @media (prefers-reduced-motion:reduce){:root{animation:none}}
 .beam{position:relative;isolation:isolate}
-.beam .beam-ring{position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;
+.beam .beam-ring,.beam .beam-glow{position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;
+  /* two comets 180 degrees apart: a long tail easing into a bright head with a white tip.
+     The toe is a 4% mix rather than `transparent`, because transparent is rgba(0,0,0,0) and a
+     conic ramp through it dips visibly grey. */
   background:conic-gradient(from var(--beam-a,40deg), transparent 0deg,
-    color-mix(in srgb, #7FD8FF 10%, transparent) 14deg, color-mix(in srgb, #7FD8FF 80%, transparent) 44deg,
-    #EAFBFF 56deg, #ffffff 60deg, color-mix(in srgb, #DFF6FF 40%, transparent) 66deg, transparent 74deg,
-    transparent 190deg,
-    color-mix(in srgb, #8E7BE8 10%, transparent) 210deg, color-mix(in srgb, #8E7BE8 75%, transparent) 242deg,
-    #C9BEFF 254deg, #ffffff 258deg, color-mix(in srgb, #8E7BE8 40%, transparent) 264deg,
-    transparent 272deg, transparent 360deg)}
+    color-mix(in srgb, #7FD8FF 4%, transparent) 18deg,
+    color-mix(in srgb, #7FD8FF 55%, transparent) 46deg,
+    #DFF6FF 56deg, color-mix(in srgb, #DFF6FF 22%, #ffffff) 60deg, transparent 63deg,
+    transparent 198deg,
+    color-mix(in srgb, #8E7BE8 4%, transparent) 216deg,
+    color-mix(in srgb, #8E7BE8 50%, transparent) 244deg,
+    #8E7BE8 254deg, color-mix(in srgb, #8E7BE8 26%, #ffffff) 258deg, transparent 261deg,
+    transparent 360deg)}
 .beam .beam-ring{padding:2px;
   -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
   -webkit-mask-composite:xor;mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
   mask-composite:exclude}
-@media (forced-colors:active){.beam .beam-ring{display:none}}
+/* the cast light: a blurred copy of the ring behind the panel. Kept off phones, where it is
+   the single most expensive thing on the page. */
+.beam .beam-glow{filter:blur(14px);opacity:.35;z-index:-1}
+@media (max-width:820px){.beam .beam-glow{display:none}}
+@media (forced-colors:active){.beam .beam-ring,.beam .beam-glow{display:none}}
 
 
 /* the burger only exists on the phone: the desktop keeps its plain row of links */
@@ -472,37 +481,37 @@ footer a{display:block;padding:3px 0}
   <p class="eyebrow">Услуги</p>
   <h2>Что умеем и что это снимает с вас</h2>
   <div class="srv">
-    <div class="card glow">
+    <div class="card beam"><i class="beam-ring"></i>
       <h3>Счета, акты, сверка</h3>
       <p>Документы создаются из состояния сделки, долги и переплаты видны по каждому контрагенту,
         платёжный календарь сам показывает, что горит.</p>
       <span class="gain">Закрытие месяца за день вместо недели</span>
     </div>
-    <div class="card glow">
+    <div class="card beam"><i class="beam-ring"></i>
       <h3>Заявки, клиенты, звонки</h3>
       <p>CRM под ваши этапы, телефония с записью разговоров, автообзвон по базе, проверка компании
         по реквизитам перед сделкой.</p>
       <span class="gain">Ни одна заявка не теряется в мессенджерах</span>
     </div>
-    <div class="card glow">
+    <div class="card beam"><i class="beam-ring"></i>
       <h3>Сбор данных</h3>
       <p>Сайты конкурентов, прайсы поставщиков в двенадцати форматах, почта, выгрузки из 1С и
         маркетплейсов - всё стекается в одну таблицу само.</p>
       <span class="gain">Никто не переносит цифры руками</span>
     </div>
-    <div class="card glow">
+    <div class="card beam"><i class="beam-ring"></i>
       <h3>Отчёты руководителю</h3>
       <p>Один экран с деньгами, долгами, загрузкой и просрочками. Письмо в тот час, когда показатель
         вышел за границу, а не через месяц на планёрке.</p>
       <span class="gain">Цифры утром, а не в конце квартала</span>
     </div>
-    <div class="card glow">
+    <div class="card beam"><i class="beam-ring"></i>
       <h3>Боты и ИИ</h3>
       <p>Отвечают клиенту по вашему прайсу и остаткам, читают счета и договоры, заполняют формы,
         заносят контакт в базу и передают человеку сложное.</p>
       <span class="gain">Первая линия работает ночью и в выходные</span>
     </div>
-    <div class="card glow">
+    <div class="card beam"><i class="beam-ring"></i>
       <h3>Склад и доставка</h3>
       <p>Заказы, остатки, маршруты и статусы отгрузок на одной доске. Клиент видит, где его груз,
         без звонка менеджеру.</p>
@@ -516,7 +525,7 @@ footer a{display:block;padding:3px 0}
   <h2>Что уже собрано и как это выглядит</h2>
   <div class="projects">
 
-    <article class="proj beam"><i class="beam-ring"></i>
+    <article class="proj beam"><i class="beam-glow"></i><i class="beam-ring"></i>
       <div class="shot sh-shot"><div class="sh-w">
         <div class="sh-hd">
           <span class="sh-dots"><i></i><i></i><i></i></span>
@@ -542,7 +551,7 @@ footer a{display:block;padding:3px 0}
       </div>
     </article>
 
-    <article class="proj glow">
+    <article class="proj beam"><i class="beam-glow"></i><i class="beam-ring"></i>
       <div class="shot sh-shot"><div class="sh-w">
         <div class="sh-hd">
           <span class="sh-dots"><i></i><i></i><i></i></span>
@@ -574,7 +583,7 @@ footer a{display:block;padding:3px 0}
       </div>
     </article>
 
-    <article class="proj beam"><i class="beam-ring"></i>
+    <article class="proj beam"><i class="beam-glow"></i><i class="beam-ring"></i>
       <div class="shot sh-shot"><div class="sh-w">
         <div class="sh-hd">
           <span class="sh-dots"><i></i><i></i><i></i></span>
@@ -609,7 +618,7 @@ footer a{display:block;padding:3px 0}
     </article>
 
 
-    <article class="proj glow">
+    <article class="proj beam"><i class="beam-glow"></i><i class="beam-ring"></i>
       <div class="shot sh-shot"><div class="sh-w">
         <div class="sh-hd">
           <span class="sh-dots"><i></i><i></i><i></i></span>
@@ -641,13 +650,13 @@ footer a{display:block;padding:3px 0}
   <p class="eyebrow">Как идёт работа</p>
   <h2>Четыре шага, никаких сюрпризов</h2>
   <div class="steps">
-    <div class="step glow"><b>Разбор задачи</b><span>Разговор и взгляд на то, как работа устроена сейчас.
+    <div class="step beam"><i class="beam-ring"></i><b>Разбор задачи</b><span>Разговор и взгляд на то, как работа устроена сейчас.
       На выходе письменное описание, что именно будет собрано и в какой срок. Бесплатно, ни к чему не обязывает.</span></div>
-    <div class="step glow"><b>Сначала пробуете</b><span>Первая рабочая версия приходит за дни, а не в конце проекта.
+    <div class="step beam"><i class="beam-ring"></i><b>Сначала пробуете</b><span>Первая рабочая версия приходит за дни, а не в конце проекта.
       Вы гоняете её на реальной работе. Не помогло - расходимся, вы ничего не должны.</span></div>
-    <div class="step glow"><b>Передача</b><span>Исходный код, документация, обучение сотрудников и доступы.
+    <div class="step beam"><i class="beam-ring"></i><b>Передача</b><span>Исходный код, документация, обучение сотрудников и доступы.
       Ничего не заперто: захотите передать другому подрядчику - сможете.</span></div>
-    <div class="step glow"><b>Поддержка</b><span>Фиксированная месячная сумма или по часам, на ваш выбор.
+    <div class="step beam"><i class="beam-ring"></i><b>Поддержка</b><span>Фиксированная месячная сумма или по часам, на ваш выбор.
       Или вообще без поддержки. Это ваша система.</span></div>
   </div>
 </div></section>
@@ -676,7 +685,7 @@ footer a{display:block;padding:3px 0}
   <p class="eyebrow">Заявка</p>
   <h2>Расскажите, что съедает время</h2>
   <div class="req">
-    <form class="form beam" id="reqform"><i class="beam-ring"></i>
+    <form class="form beam" id="reqform"><i class="beam-glow"></i><i class="beam-ring"></i>
       <label for="rq-name">Как вас зовут</label>
       <input id="rq-name" required>
       <label for="rq-co">Компания</label>
