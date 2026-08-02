@@ -268,9 +268,14 @@ h1 em{font-style:normal;color:var(--ice2)}
 
 /* ---------- section: about ---------- */
 /* transparent so the starfield runs behind every section, which is the whole point of it */
-/* content-visibility was tried here and removed: it defers painting until a frame runs, which
-   showed whole sections as black on a slow device. Not worth it for the saving. */
-section.band{position:relative;z-index:6;padding:58px 0 56px;background:transparent}
+/* content-visibility, second attempt - the first was rolled back when sections painted black on
+   a slow device. Two things were different then: the page was carrying a dead root animation
+   that ate half the main thread, and there was no intrinsic size, so the browser had nothing to
+   hold the layout with before first paint. With auto+size the browser skips ALL rendering work
+   - style, layout, paint, the glass - for every section that is off screen, which is exactly
+   the cost of a fast scroll through the page. The hero stays out: it is sticky and always on. */
+section.band{position:relative;z-index:6;padding:58px 0 56px;background:transparent;
+  content-visibility:auto;contain-intrinsic-size:auto 720px}
 .eyebrow{font-size:12.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ice2);margin:0 0 14px}
 h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;margin:0;max-width:22ch}
 .about{display:grid;gap:44px;grid-template-columns:minmax(320px,1.15fr) minmax(280px,.85fr);
