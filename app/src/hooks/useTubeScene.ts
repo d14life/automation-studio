@@ -69,14 +69,36 @@ export function useTubeScene(ready: boolean, heroVisible: boolean): RefObject<HT
     }
   }, [])
 
-  /* build / park. The scene is disposed and the canvas removed the moment the hero leaves,
-     so nothing is left running behind the rest of the page. */
+  /* build / park. The scene used to be disposed the MOMENT the hero left and rebuilt the moment
+     it returned - and building means creating a WebGL context, compiling shaders and eleven
+     tube geometries. Scrolled up and down fast, the hero boundary was crossed on every turn,
+     so every turn paid a full scene construction mid-scroll. That was his exact symptom: fine
+     until you go up and down quick, many times. Now leaving only HIDES the layer, and the
+     teardown runs on a delay: bounce back within eight seconds and the scene is simply shown
+     again, for free. Only a visitor who actually stays below the hero pays the disposal, once. */
+  const parkTimer = useRef<number>(0)
+  /* the one function that fully kills the current scene; null means there is no scene */
+  const teardownRef = useRef<(() => void) | null>(null)
   useEffect(() => {
     const layer = layerRef.current
     if (!ready || !layer) return
     /* No WebGL on a phone: half resolution was still too much for the device most visitors use. */
     if (isSmallDevice()) { layer.style.display = 'none'; return }
-    if (!heroVisible) return
+
+    if (!heroVisible) {
+      layer.style.visibility = 'hidden' /* off screen NOW; the GPU stops compositing it */
+      if (teardownRef.current) {
+        parkTimer.current = window.setTimeout(() => {
+          teardownRef.current?.()
+          teardownRef.current = null
+        }, 8000)
+      }
+      /* coming back inside the grace period cancels the execution, and the scene was never gone */
+      return () => clearTimeout(parkTimer.current)
+    }
+
+    layer.style.visibility = ''
+    if (teardownRef.current) return /* still warm from the grace period: nothing to build */
 
     const cv = document.createElement('canvas')
     cv.className = 'tubes'
@@ -163,7 +185,11 @@ export function useTubeScene(ready: boolean, heroVisible: boolean): RefObject<HT
       resizeRef.current = sweep
     })
 
-    return () => {
+    /* NOT returned as this effect's cleanup - that is the whole fix. React would run a cleanup
+       on every visibility flip, which is what made every fast scroll pay a scene rebuild. The
+       teardown now belongs to whoever decides the scene is truly done: the grace timer above,
+       or the unmount effect below. */
+    teardownRef.current = () => {
       parked = true
       cancelInit()
       if (resizeRef.current) removeEventListener('resize', resizeRef.current)
@@ -173,6 +199,13 @@ export function useTubeScene(ready: boolean, heroVisible: boolean): RefObject<HT
       cv.remove()
     }
   }, [ready, heroVisible])
+
+  /* unmount only: whatever state the scene is in, end it */
+  useEffect(() => () => {
+    clearTimeout(parkTimer.current)
+    teardownRef.current?.()
+    teardownRef.current = null
+  }, [])
 
   /* Colour cycle. It used to keep an animation frame loop alive for the whole life of the page
      and simply return early while there was no scene - a wake-up sixty times a second, for the
