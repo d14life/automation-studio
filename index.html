@@ -267,6 +267,44 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
   color:var(--dim);font-size:15.5px}
 .qs li b{color:var(--ice2);font-weight:900;flex:none}
 
+
+/* ---------- travelling edge beams (ported from the sign-in card) ----------
+   Four light bars run along the four edges with a stagger, plus faint corner
+   sparks. Pure CSS keyframes: no per-frame JavaScript anywhere. */
+.edges{position:absolute;inset:-1px;border-radius:inherit;overflow:hidden;pointer-events:none;z-index:3}
+.edges i{position:absolute;opacity:.75;filter:blur(1.6px)}
+.edges i.t,.edges i.b{height:3px;width:52%;
+  background:linear-gradient(90deg,transparent,#EAFBFF,transparent)}
+.edges i.l,.edges i.r{width:3px;height:52%;
+  background:linear-gradient(180deg,transparent,#EAFBFF,transparent)}
+.edges i.t{top:0;left:-52%;animation:edge-x 2.6s ease-in-out infinite}
+.edges i.r{top:-52%;right:0;animation:edge-y 2.6s ease-in-out .65s infinite}
+.edges i.b{bottom:0;right:-52%;animation:edge-x-back 2.6s ease-in-out 1.3s infinite}
+.edges i.l{bottom:-52%;left:0;animation:edge-y-back 2.6s ease-in-out 1.95s infinite}
+@keyframes edge-x{0%{left:-52%}55%,100%{left:100%}}
+@keyframes edge-x-back{0%{right:-52%}55%,100%{right:100%}}
+@keyframes edge-y{0%{top:-52%}55%,100%{top:100%}}
+@keyframes edge-y-back{0%{bottom:-52%}55%,100%{bottom:100%}}
+.edges b{position:absolute;width:7px;height:7px;border-radius:99px;background:rgba(223,246,255,.55);
+  filter:blur(2px);animation:spark 2.2s ease-in-out infinite}
+.edges b:nth-of-type(1){top:0;left:0}
+.edges b:nth-of-type(2){top:0;right:0;animation-delay:.5s}
+.edges b:nth-of-type(3){bottom:0;right:0;animation-delay:1s}
+.edges b:nth-of-type(4){bottom:0;left:0;animation-delay:1.5s}
+@keyframes spark{0%,100%{opacity:.2}50%{opacity:.55}}
+
+/* ---------- glowing shadow (ported from the glowing-shadow component) ----------
+   A coloured light pooled behind the panel, its hue drifting inside our own
+   range instead of a full rainbow lap. */
+@property --gh{syntax:'<number>';inherits:true;initial-value:190}
+@keyframes hue-drift{0%{--gh:186}50%{--gh:292}100%{--gh:186}}
+.gshadow{position:relative;isolation:isolate}
+.gshadow::after{content:'';position:absolute;inset:2px;border-radius:inherit;z-index:-1;
+  background:hsl(calc(var(--gh) * 1deg) 92% 58%);filter:blur(22px);opacity:.30;
+  animation:hue-drift 9s linear infinite}
+@media (max-width:820px){.gshadow::after{display:none}}
+@media (prefers-reduced-motion:reduce){.edges i,.edges b,.gshadow::after{animation:none}}
+
 /* ---------- section: request ---------- */
 .req{display:grid;gap:34px;grid-template-columns:minmax(300px,1fr) minmax(300px,1fr);
   align-items:start;margin-top:32px}
@@ -525,7 +563,7 @@ footer a{display:block;padding:3px 0}
   <h2>Что уже собрано и как это выглядит</h2>
   <div class="projects">
 
-    <article class="proj beam"><i class="beam-glow"></i><i class="beam-ring"></i>
+    <article class="proj edged"><span class="edges"><i class="t"></i><i class="r"></i><i class="b"></i><i class="l"></i><b></b><b></b><b></b><b></b></span>
       <div class="shot sh-shot"><div class="sh-w">
         <div class="sh-hd">
           <span class="sh-dots"><i></i><i></i><i></i></span>
@@ -551,7 +589,7 @@ footer a{display:block;padding:3px 0}
       </div>
     </article>
 
-    <article class="proj beam"><i class="beam-glow"></i><i class="beam-ring"></i>
+    <article class="proj edged"><span class="edges"><i class="t"></i><i class="r"></i><i class="b"></i><i class="l"></i><b></b><b></b><b></b><b></b></span>
       <div class="shot sh-shot"><div class="sh-w">
         <div class="sh-hd">
           <span class="sh-dots"><i></i><i></i><i></i></span>
@@ -583,7 +621,7 @@ footer a{display:block;padding:3px 0}
       </div>
     </article>
 
-    <article class="proj beam"><i class="beam-glow"></i><i class="beam-ring"></i>
+    <article class="proj edged"><span class="edges"><i class="t"></i><i class="r"></i><i class="b"></i><i class="l"></i><b></b><b></b><b></b><b></b></span>
       <div class="shot sh-shot"><div class="sh-w">
         <div class="sh-hd">
           <span class="sh-dots"><i></i><i></i><i></i></span>
@@ -618,7 +656,7 @@ footer a{display:block;padding:3px 0}
     </article>
 
 
-    <article class="proj beam"><i class="beam-glow"></i><i class="beam-ring"></i>
+    <article class="proj edged"><span class="edges"><i class="t"></i><i class="r"></i><i class="b"></i><i class="l"></i><b></b><b></b><b></b><b></b></span>
       <div class="shot sh-shot"><div class="sh-w">
         <div class="sh-hd">
           <span class="sh-dots"><i></i><i></i><i></i></span>
@@ -650,13 +688,13 @@ footer a{display:block;padding:3px 0}
   <p class="eyebrow">Как идёт работа</p>
   <h2>Четыре шага, никаких сюрпризов</h2>
   <div class="steps">
-    <div class="step beam"><i class="beam-ring"></i><b>Разбор задачи</b><span>Разговор и взгляд на то, как работа устроена сейчас.
+    <div class="step gshadow"><b>Разбор задачи</b><span>Разговор и взгляд на то, как работа устроена сейчас.
       На выходе письменное описание, что именно будет собрано и в какой срок. Бесплатно, ни к чему не обязывает.</span></div>
-    <div class="step beam"><i class="beam-ring"></i><b>Сначала пробуете</b><span>Первая рабочая версия приходит за дни, а не в конце проекта.
+    <div class="step gshadow"><b>Сначала пробуете</b><span>Первая рабочая версия приходит за дни, а не в конце проекта.
       Вы гоняете её на реальной работе. Не помогло - расходимся, вы ничего не должны.</span></div>
-    <div class="step beam"><i class="beam-ring"></i><b>Передача</b><span>Исходный код, документация, обучение сотрудников и доступы.
+    <div class="step gshadow"><b>Передача</b><span>Исходный код, документация, обучение сотрудников и доступы.
       Ничего не заперто: захотите передать другому подрядчику - сможете.</span></div>
-    <div class="step beam"><i class="beam-ring"></i><b>Поддержка</b><span>Фиксированная месячная сумма или по часам, на ваш выбор.
+    <div class="step gshadow"><b>Поддержка</b><span>Фиксированная месячная сумма или по часам, на ваш выбор.
       Или вообще без поддержки. Это ваша система.</span></div>
   </div>
 </div></section>
@@ -987,13 +1025,13 @@ footer a{display:block;padding:3px 0}
     var f=Math.min(1,y/track);
     /* hold, then fade: the words stay readable for the first half of the scroll */
     var fade=Math.max(0,(f-0.10)/0.90);
-    l1.style.transform='translateY('+(f*190).toFixed(1)+'px)';
+    l1.style.transform='translateY('+(f*360).toFixed(1)+'px)';
     l1.style.opacity=(1-fade).toFixed(3);
-    l2.style.transform='translateY('+(f*115).toFixed(1)+'px)';
+    l2.style.transform='translateY('+(f*215).toFixed(1)+'px)';
     l2.style.opacity=(1-fade).toFixed(3);
-    if(acts){ acts.style.transform='translateY('+(-f*80).toFixed(1)+'px)';
+    if(acts){ acts.style.transform='translateY('+(-f*165).toFixed(1)+'px)';
               acts.style.opacity=(1-fade*1.05).toFixed(3); }
-    if(num){ num.style.transform='translateY('+(f*46).toFixed(1)+'px) scale('+(1+f*0.07).toFixed(3)+')';
+    if(num){ num.style.transform='translateY('+(f*95).toFixed(1)+'px) scale('+(1+f*0.14).toFixed(3)+')';
              num.style.opacity=(1-fade).toFixed(3); }
     if(hint) hint.style.opacity=(1-f*3.2).toFixed(3);
     /* the ribbons sit behind the words, so they travel slower: that difference is the depth */
@@ -1002,7 +1040,7 @@ footer a{display:block;padding:3px 0}
                tubes.style.opacity=op.toFixed(3);
                tubes.style.visibility=op<0.02?'hidden':'visible';
                var tcv=tubes.firstElementChild;
-               if(tcv) tcv.style.transform='translateY('+(f*70).toFixed(1)+'px)'; }
+               if(tcv) tcv.style.transform='translateY('+(f*140).toFixed(1)+'px)'; }
   }
   addEventListener('scroll',paint,{passive:true});
   addEventListener('resize',paint,{passive:true});
