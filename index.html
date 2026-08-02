@@ -145,8 +145,8 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
 /* below the fan breakpoint the card stops being square, so the shot keeps the 46:100 share itself */
 @media (max-width:820px){.shot.sh-shot{height:auto;aspect-ratio:100/46}}
 .sh-w{display:flex;flex-direction:column;height:100%;min-height:0;overflow:hidden;color:var(--ink);
-  font:400 clamp(7.6px,3.4cqw,15px)/1.22 Nunito,system-ui,sans-serif;
-  --shg:clamp(3px,1.4cqw,7px);--shage:clamp(30px,11.5cqw,48px);
+  font:400 clamp(7.6px,3.4cqw,17px)/1.22 Nunito,system-ui,sans-serif;
+  --shg:clamp(3px,1.4cqw,9px);--shage:clamp(30px,11.5cqw,54px);
   --shm:ui-monospace,SFMono-Regular,Menlo,monospace}
 
 /* window bar */
@@ -175,18 +175,18 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
 .sh-p{font-style:normal;padding:.1em .42em;border-radius:.45em;font-size:.8em;font-weight:700;
   white-space:nowrap;background:rgba(127,216,255,.14);color:var(--ice2)}
 .sh-p2{background:rgba(142,123,232,.24);color:#C9BEFF}
-.sh-p3{background:rgba(92,130,201,.3);color:#CFE0FF}
-.sh-age{flex:none;width:var(--shage);text-align:center}       /* keeps the status column square */
+.sh-p3{background:rgba(92,130,201,.34);color:var(--ice1)}
+.sh-age{flex:none;width:var(--shage);text-align:center}   /* fixed column: amounts stay right-aligned */
 .sh-tot{flex:none;display:flex;align-items:center;gap:var(--shg);font-weight:900;
   padding:calc(var(--shg)*1.1) 0;border-top:1px solid rgba(127,216,255,.32)}
 .sh-tot .sh-n{color:var(--ice1);font-weight:700}
 
 /* 2. shipment: a rail of five stops, three done, one current */
-.sh-trk{justify-content:space-between}
 .sh-rail{flex:1;min-height:0;display:flex;align-items:center;padding:calc(var(--shg)*1.4) 0}
 .sh-st{flex:1;min-width:0;position:relative;display:flex;flex-direction:column;align-items:center;
   gap:.45em;font-size:.84em;color:var(--dim)}
 .sh-st em{font-style:normal;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sh-st b{margin-top:-.2em;font:400 .8em/1.2 var(--shm);color:var(--dim);opacity:.7}
 .sh-st i{position:relative;z-index:1;flex:none;width:.62em;height:.62em;border-radius:99px;
   background:rgba(159,170,161,.3);border:1px solid rgba(159,170,161,.45)}
 .sh-st::before{content:'';position:absolute;left:-50%;top:.31em;width:100%;height:1px;
@@ -196,6 +196,10 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
 .sh-done::before,.sh-now::before{background:rgba(127,216,255,.5)}
 .sh-now{color:var(--ice1);font-weight:700}
 .sh-now i{background:var(--ice1);border-color:var(--ice1);box-shadow:0 0 0 .22em rgba(127,216,255,.2)}
+.sh-ev{flex:none;display:flex;align-items:center;gap:.5em;font-size:.8em;color:var(--dim);
+  padding-bottom:calc(var(--shg)*1.1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sh-ev i{flex:none;width:.42em;height:.42em;border-radius:99px;background:var(--ice2);
+  box-shadow:0 0 0 .18em rgba(127,216,255,.18)}
 .sh-facts{flex:none;display:flex;gap:var(--shg);border-top:1px solid var(--line);
   padding:calc(var(--shg)*1.2) 0}
 .sh-facts>span{flex:1;min-width:0;display:flex;flex-direction:column;gap:.12em}
@@ -543,14 +547,15 @@ footer a{display:block;padding:3px 0}
           <span class="sh-n">KZ-4417-2290</span>
           <span class="sh-p sh-mr">В пути</span>
         </div>
-        <div class="sh-b sh-trk">
+        <div class="sh-b">
           <div class="sh-rail">
-            <span class="sh-st sh-done"><i></i><em>Принят</em></span>
-            <span class="sh-st sh-done"><i></i><em>Склад</em></span>
-            <span class="sh-st sh-done"><i></i><em>Отгрузка</em></span>
-            <span class="sh-st sh-now"><i></i><em>В пути</em></span>
-            <span class="sh-st"><i></i><em>Выдача</em></span>
+            <span class="sh-st sh-done"><i></i><em>Принят</em><b>11.03</b></span>
+            <span class="sh-st sh-done"><i></i><em>Склад</em><b>12.03</b></span>
+            <span class="sh-st sh-done"><i></i><em>Отгрузка</em><b>13.03</b></span>
+            <span class="sh-st sh-now"><i></i><em>В пути</em><b>13.03</b></span>
+            <span class="sh-st"><i></i><em>Выдача</em><b>14.03</b></span>
           </div>
+          <div class="sh-ev"><i></i>Обновлено 13.03, 09:14 · Астана - Алматы</div>
           <div class="sh-facts">
             <span><em>Перевозчик</em><b>СДЭК</b></span>
             <span><em>Город</em><b>Алматы</b></span>
