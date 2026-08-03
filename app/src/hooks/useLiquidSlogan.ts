@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { FLOW, ICE } from './heroTuning'
+import { FLOW, ICE, isSmallDevice } from './heroTuning'
 
 /* two lines, same timings, started in the same tick: they melt into the next phrase together */
 export const SLOGAN_LINE_1 = ['АВТОМАТИЗИРУЕМ', 'БЫСТРО', 'ТОЛЬКО ПРАКТИКА']
@@ -25,7 +25,12 @@ export function useLiquidSlogan(ready: boolean, heroVisible: boolean): void {
        same span, and iOS drops the clip on a blurred layer - so the background rectangle gets
        painted instead of the letters. Touch devices walk the same palette as a plain text
        colour instead. The melt itself, threshold included, is untouched. */
-    const TOUCH = matchMedia('(hover:none)').matches || matchMedia('(pointer:coarse)').matches
+    /* Was hover:none || pointer:coarse. That misses any phone-sized screen driven by a pointer -
+       the iOS Simulator reports a mouse, and so every phone-path fix I shipped tonight was
+       silently inactive there while I photographed the desktop behaviour and diagnosed it as a
+       phone bug. isSmallDevice is the predicate the ribbons already use: screen width, pointer
+       AND memory together. One test, one answer, everywhere. */
+    const TOUCH = isSmallDevice()
     /* The threshold went off on touch for one release and it was a mistake. The report that the
        slogan "was not morphing" came from the screenshot where a broken tint had flooded the
        whole page pale blue - the text was there, under the flood. Without the threshold what
