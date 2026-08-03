@@ -20,11 +20,14 @@ export function useLiquidSlogan(ready: boolean, heroVisible: boolean): void {
        threshold filter plus a per-frame blur on two short lines of text, which a modern phone
        handles; only a genuinely weak device keeps the crossfade. */
     const WEAK = !!(navigator.deviceMemory && navigator.deviceMemory <= 3)
-    /* The melt's MOTION is the per-layer blur and opacity curves - plain CSS, everywhere. The
-       hard gooey edge on top of it is an SVG filter referenced by url(#threshold), and that
-       reference is what stopped working on his phone: the slogan sat still. Touch devices keep
-       the melt and lose only the threshold. */
-    const TOUCH = matchMedia('(hover:none)').matches || matchMedia('(pointer:coarse)').matches
+    /* The threshold went off on touch for one release and it was a mistake. The report that the
+       slogan "was not morphing" came from the screenshot where a broken tint had flooded the
+       whole page pale blue - the text was there, under the flood. Without the threshold what
+       is left is a blurred cross-fade, and worse, the blur exposes the span's own background
+       box: the words are painted with background-clip:text over a flowing gradient, and iOS
+       stops honouring that clip once the layer is blurred, so a rectangle appears behind each
+       line. The threshold clamps everything under 55% alpha to nothing, which is exactly what
+       was hiding that box. It stays on everywhere. */
     const MORPH: LiquidTextOptions = {
       morphTime: WEAK ? 0.9 : 4.5,
       cooldownTime: WEAK ? 1.7 : 0.45,
@@ -33,7 +36,6 @@ export function useLiquidSlogan(ready: boolean, heroVisible: boolean): void {
       drift: FLOW * 3,
       spread: ICE.length * 0.08,
       simple: WEAK,
-      threshold: !TOUCH,
       activeWhen: () => activeRef.current,
     }
     const stop1 = window.LiquidText(L1, SLOGAN_LINE_1, MORPH)
