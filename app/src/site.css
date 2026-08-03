@@ -128,7 +128,14 @@ header{position:absolute;top:0;left:0;right:0;z-index:20}
    page and keeps the starfield visible behind the ribbons. Blending the video element directly
    is much better supported than blending a wrapper around it. */
 #tubelayer.tubefilm{overflow:hidden;mix-blend-mode:normal}
-.tubefilm video{display:block;width:100%;height:100%;object-fit:cover;mix-blend-mode:screen}
+/* CONTAIN, not cover, and the difference is the whole size problem. The clip is landscape
+   (1280x695); a phone is portrait. `cover` scaled it up until it covered 812px of height, which
+   blew the ribbons up to several times their proper size. `contain` lays it across the width
+   instead - and because the ribbons' sweep is a FIXED FRACTION of the frame (0.362 of the
+   width, the ratio measured off the live desktop page), fitting the frame to the viewport width
+   reproduces exactly the sweep the live scene would have computed from this screen's own
+   slogan. The black that `contain` leaves above and below is screened away and never seen. */
+.tubefilm video{display:block;width:100%;height:100%;object-fit:contain;mix-blend-mode:screen}
 /* the bottom padding is what lifts the slogan: the block is centred, so padding at the foot
    pushes the centre - and the slogan with it - up the screen. */
 /* The whole first screen moves down as ONE block - slogan, number and buttons together - rather

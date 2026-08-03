@@ -67,28 +67,51 @@ const ICE = ['#DFF6FF', '#7FD8FF', '#5C82C9']
 const GLOW = { l: 0.43, i: 135 }
 /* x = cos(t * 1), y = sin(t * 2): the whole figure repeats every 2*PI seconds. Recording
    exactly that long is what makes the loop seamless without touching the speed. */
-const PERIOD = 2 * Math.PI
+/* The clip is cut with a 1.2s crossfade of its head over its tail, which is what closes the
+   path loop (the tubes lag their target, so one period does NOT bring them home). That makes
+   the OUTPUT 1.2s shorter than the take, so the colour must complete its lap over the OUTPUT
+   length, not the take: then the last output frame and the first are on the same colour, and
+   the crossfade blends matching colours rather than fighting ones.
+   The lap is the slogan's own: FLOW*3 = 10.5s. Recording 10.5 + 1.2 gives exactly that. */
+const CYCLE = 10.5
+const FADE = 1.2
+const PERIOD = CYCLE + FADE
 const SETTLE_MS = 2600        /* the tubes lerp into the figure; let them arrive first */
 const log = (t) => (document.getElementById('log').textContent = t)
 
-/* Near-white so the clip is a luminance map the page can tint. Not pure white: the tubes keep
-   a trace of their own three-stop spread, which is what gives the bundle depth. */
-const PALE = ['#FFFFFF', '#EAF6FF', '#D6E8F7']
+/* The colour is IN the clip now. The first attempt filmed near-white and tinted on the page
+   with a multiply overlay; on iOS the video under that overlay never painted, so an opaque
+   sheet of pale blue got screened over the whole site. A colour that only looks right when a
+   video paints beneath it must not exist - so it is baked, on the slogan's own clock. */
+const k = GLOW.l / 0.64
+const sp = ICE.length * 0.12
+const p0 = ICE.length * 0.10
+const tubeSet = (p) => [
+  window.dim(window.paletteAt(ICE, p), k),
+  window.dim(window.paletteAt(ICE, p + sp), k),
+  window.dim(window.paletteAt(ICE, p + sp * 2), k),
+]
+const lightSet = (p) => [
+  window.dim(window.paletteAt(ICE, p + sp * 0.3), k),
+  window.dim(window.paletteAt(ICE, p + sp * 0.9), k),
+  window.dim(window.paletteAt(ICE, p + sp * 1.5), k),
+  window.dim(window.paletteAt(ICE, p + sp * 2.1), k),
+]
 
 /* 1. the guard: the library listens for pointermove on the document, exactly as on the site */
 addEventListener('pointermove', (e) => e.stopPropagation(), true)
 
 const cv = document.getElementById('cv')
 
-/* 2. the same measurement the site makes */
+/* 2. The sweep as a FRACTION of the frame, not as absolute pixels.
+   Measured off the running site: 532 x 202 in a 1470 x 797 window. Absolute pixels were wrong
+   here - the same 532px inside a wider recording window is a smaller share of the frame, and
+   that is exactly why the first take read as "less of them and much shorter". A fraction
+   records the same figure at any window size, and it survives being played back at any other. */
+const SWEEP_X = 532 / 1470
+const SWEEP_Y = 202 / 797
 function sweep() {
-  const a = document.getElementById('liq1').getBoundingClientRect()
-  const b = document.getElementById('liq2').getBoundingClientRect()
-  const s1 = document.querySelector('#liq1 span').getBoundingClientRect()
-  const s2 = document.querySelector('#liq2 span').getBoundingClientRect()
-  const textW = Math.max(s1.width, s2.width)
-  const blockH = Math.max(a.bottom, b.bottom) - Math.min(a.top, b.top)
-  return { x: Math.round(textW * 0.38), y: Math.round(blockH * 1.125) }
+  return { x: Math.round(innerWidth * SWEEP_X), y: Math.round(innerHeight * SWEEP_Y) }
 }
 
 const big = document.getElementById('big')
@@ -105,16 +128,25 @@ document.fonts.ready.then(() => {
     sleepRadiusX: s.x,
     sleepRadiusY: s.y,
     tubes: {
-      colors: PALE,
+      colors: tubeSet(p0),
       count: 11,
       minTubularSegments: 42,
       maxTubularSegments: 166,
       radialSegments: 8,
       capSegments: 4,
-      lights: { intensity: GLOW.i, colors: ['#FFFFFF', '#F2FAFF', '#E4F2FF', '#D8ECFF'] },
+      lights: { intensity: GLOW.i, colors: lightSet(p0) },
     },
   }, (app) => {
     try { app.three.minPixelRatio = 1; app.three.maxPixelRatio = 1; app.three.resize() } catch (e) {}
+    /* the colour clock, on wall time, one full lap every CYCLE seconds - the slogan's tempo */
+    let t0 = 0
+    const paint = (now) => {
+      requestAnimationFrame(paint)
+      if (!t0) t0 = now
+      const p = (((now - t0) / 1000) % CYCLE) / CYCLE * ICE.length + p0
+      try { app.tubes.setColors(tubeSet(p)); app.tubes.setLightsColors(lightSet(p)) } catch (e) {}
+    }
+    requestAnimationFrame(paint)
     run(cv, W, H)
   })
 })
