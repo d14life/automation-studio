@@ -20,6 +20,11 @@ export function useLiquidSlogan(ready: boolean, heroVisible: boolean): void {
        threshold filter plus a per-frame blur on two short lines of text, which a modern phone
        handles; only a genuinely weak device keeps the crossfade. */
     const WEAK = !!(navigator.deviceMemory && navigator.deviceMemory <= 3)
+    /* The melt's MOTION is the per-layer blur and opacity curves - plain CSS, everywhere. The
+       hard gooey edge on top of it is an SVG filter referenced by url(#threshold), and that
+       reference is what stopped working on his phone: the slogan sat still. Touch devices keep
+       the melt and lose only the threshold. */
+    const TOUCH = matchMedia('(hover:none)').matches || matchMedia('(pointer:coarse)').matches
     const MORPH: LiquidTextOptions = {
       morphTime: WEAK ? 0.9 : 4.5,
       cooldownTime: WEAK ? 1.7 : 0.45,
@@ -28,6 +33,7 @@ export function useLiquidSlogan(ready: boolean, heroVisible: boolean): void {
       drift: FLOW * 3,
       spread: ICE.length * 0.08,
       simple: WEAK,
+      threshold: !TOUCH,
       activeWhen: () => activeRef.current,
     }
     const stop1 = window.LiquidText(L1, SLOGAN_LINE_1, MORPH)

@@ -214,9 +214,14 @@ function LiquidText(host, texts, o) {
   /* simple mode for phones: the melt is an SVG threshold filter plus a per-frame blur, and that
      pair is what makes a phone stutter. Here the words simply cross-fade: same message, no cost. */
   var simple       = !!o.simple;
+  /* The threshold is an SVG filter referenced by url(#threshold). On a phone that reference is
+     the fragile part - the melt's MOTION is the per-layer blur and opacity curves below, which
+     are plain CSS and work everywhere. `threshold:false` keeps the motion and drops the filter,
+     so the words still melt into each other, just without the hard gooey edge. */
+  var threshold    = o.threshold !== false;
   if (!texts || texts.length < 2) throw new Error('LiquidText: need 2+ texts');
 
-  if (!simple && !document.getElementById('lt-threshold-svg')){
+  if (!simple && threshold && !document.getElementById('lt-threshold-svg')){
     var svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
     svg.id='lt-threshold-svg';
     svg.setAttribute('style','position:absolute;width:0;height:0');
@@ -224,7 +229,7 @@ function LiquidText(host, texts, o) {
     document.body.appendChild(svg);
   }
   host.style.position = host.style.position || 'relative';
-  if (!simple) host.style.filter = 'url(#threshold) blur(0.6px)';
+  if (!simple) host.style.filter = threshold ? 'url(#threshold) blur(0.6px)' : 'blur(0.5px)';
   if (colors && !document.getElementById('lt-flow-style')){
     var st=document.createElement('style'); st.id='lt-flow-style';
     st.textContent='@keyframes lt-flow{from{background-position:0% center}to{background-position:-200% center}}';

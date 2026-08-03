@@ -117,22 +117,18 @@ header{position:absolute;top:0;left:0;right:0;z-index:20}
 #tubelayer canvas{display:block;width:100%;height:100%}
 
 /* ---------- the filmed ribbons ----------
-   Same scene, played back instead of computed, for machines the live one hurts. The clip is a
-   near-white luminance map on black, so the colour is put back here rather than baked in:
-   multiply turns white into the palette stop and leaves black untouched, and the layer's own
-   screen blend then drops the black into the page. The palette walks the same three stops in
-   the same 10.5s the slogan uses, so the ribbons stay in step with the words - which is the one
-   thing a filmed clip normally cannot do.
-   isolation keeps the multiply inside this box; without it the tint would multiply the stars. */
-#tubelayer.tubefilm{isolation:isolate}
-.tubefilm video{display:block;width:100%;height:100%;object-fit:cover}
-.tubefilm-tint{position:absolute;inset:0;mix-blend-mode:multiply;
-  background:var(--ice1);animation:tubefilm-hue 10.5s linear infinite}
-@keyframes tubefilm-hue{
-  0%,100%{background-color:#DFF6FF}
-  33%{background-color:#7FD8FF}
-  66%{background-color:#5C82C9}}
-@media (prefers-reduced-motion:reduce){.tubefilm-tint{animation:none}}
+   Same scene, played back instead of computed, for machines the live one hurts.
+
+   There is no tint layer here any more and there must not be one. The clip used to be filmed
+   near-white and coloured by an overlay set to multiply inside an isolated group; on iOS the
+   video under that group never painted, the multiply had nothing to multiply against, and an
+   opaque sheet of pale blue was screened over the whole page. The colour is in the clip now.
+
+   What is left is one blend on the video itself - screen, which drops the filmed black into the
+   page and keeps the starfield visible behind the ribbons. Blending the video element directly
+   is much better supported than blending a wrapper around it. */
+#tubelayer.tubefilm{overflow:hidden;mix-blend-mode:normal}
+.tubefilm video{display:block;width:100%;height:100%;object-fit:cover;mix-blend-mode:screen}
 /* the bottom padding is what lifts the slogan: the block is centred, so padding at the foot
    pushes the centre - and the slogan with it - up the screen. */
 /* The whole first screen moves down as ONE block - slogan, number and buttons together - rather
