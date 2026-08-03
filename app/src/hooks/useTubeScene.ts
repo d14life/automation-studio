@@ -238,13 +238,19 @@ export function useTubeScene(ready: boolean, heroVisible: boolean): RefObject<HT
         /* These two are how FAR the ribbons travel, not how long the ribbon itself is.
            Narrower on his word: the path used to reach past the ends of the words, now it stays
            well inside them. Height is three quarters of the block, up 50% from a half. */
-        a.options.sleepRadiusX = Math.round(textW * 0.38)
-        /* His call, 4 Aug: wider in HEIGHT too, not just length. The 1.125 was chosen to keep a
-           flat figure that stayed in the line of the text and off the 101 - but on the Mac the
-           loop does reach down past the words, and that reach is what he is pointing at. A
-           phone's two lines are only ~80px tall against the desktop's ~179, so the same
-           multiplier buys less than half the vertical travel. Small screens get 2.4x. */
-        a.options.sleepRadiusY = Math.round(blockH * (SMALL ? 2.4 : 1.125))
+        /* The path is x=cos(t), y=sin(2t) - a lemniscate, the infinity figure. These two radii
+           are its half-width and half-height, so they are what wraps it around the words.
+           "Around the edges of the morph text": framed on the TEXT, which is what desktop
+           already does, not on the viewport. RY is the one being tuned by eye tonight. */
+        /* RX is the half-width of the figure, so at 0.38 of the text width the loop turned back
+           well INSIDE the words - that was a deliberate narrowing once, and it is what made the
+           infinity read as a small knot rather than something wrapping the slogan. At 0.55 the
+           full span is 1.1x the text, so the two lobes cross behind the middle of the line and
+           the ends reach just past the last letter on each side without leaving the screen. */
+        const RX = SMALL ? 0.55 : 0.38
+        const RY = SMALL ? 1.6 : 1.125
+        a.options.sleepRadiusX = Math.round(textW * RX)
+        a.options.sleepRadiusY = Math.round(blockH * RY)
         window.__tubeSweep = [a.options.sleepRadiusX, a.options.sleepRadiusY] /* readable proof */
       }
       sweep()

@@ -147,9 +147,19 @@ on Windows desktops with integrated graphics, which neither guess covers.
 - Mobile hero uses the same layout as the Mac hero
 
 ### Broken / open
-1. **The mobile slogan overlaps.** Six attempted fixes, still wrong on the
-   iOS Simulator. **This is the job.** See §6 for where to start — do not ship
-   a seventh guess.
+1. ~~The mobile slogan overlaps.~~ **Fixed 4 Aug, and it was never the melt.**
+   Both `.morph` hosts were flex items of `.stageui` whose only children are
+   `position:absolute` — so their min-content height is 0, `min-height:auto`
+   could not protect them, and when the phone column overflowed flex crushed
+   both to `height:0` at the same `top`. Two lines painted on the same y.
+   `flex:none` on `.morph`. Six fixes chased the animation; the animation was
+   working the whole time. See §6 for the method that found it.
+1b. **The live phone ribbons need his own iPhone.** The scene now runs live on
+   phones (§3), but the iOS Simulator measured **33fps**, so `usePerfGuard`
+   fired and swapped to the clip. The simulator runs WebGL through a
+   translation layer on the Mac and is **not** a real iPhone GPU — that number
+   proves nothing either way. Check on the real phone before tuning anything.
+   If it is genuinely slow there, §6b is the way out.
 2. **HTTPS** — cert stuck. Leave alone.
 3. **iPad** — never tested. Three simulators available.
 4. **Rainur's feedback** — `docs/feedback-rainur.md`, items 3/4/6 ready to
@@ -263,7 +273,52 @@ screenshots come back black. **Use the iOS Simulator instead** —
 
 ---
 
-## 6. Where to start on the slogan bug
+### 5.10 A shorthand on a `.wrap` element resets the gutter
+`.topbar` is `class="wrap topbar"`. `.wrap` sets `padding:0 24px`; `.topbar`
+then set `padding:22px 0`, a **shorthand**, which put the horizontal padding
+back to zero. The header had no side gutter at any width — invisible on desktop
+behind the 1180px max-width, and on a phone the logo sat at x=0. Use
+`padding-block` on anything that rides on `.wrap`.
+
+### 5.11 A filmed clip cannot do two of the things the ribbons are for
+The ribbons walk the ICE palette one step behind the slogan (`setColors` every
+frame), and their sweep is measured off the slogan's own ink whenever it
+changes. A clip has one fixed colour and the geometry of the screen it was
+filmed on. `record-tubes.html` knew this — its own note says the scene "records
+in near-white and **the page tints it live**". That live tint is what trap 5.5
+deleted, so the clip has been stuck white ever since. If the clip ever has to
+carry the colour again, the tint must be a `filter` on the `<video>` element
+itself, never an overlay in an isolated group.
+
+---
+
+## 6. The method that finally worked
+
+Print the facts into the page and photograph them. A `?diag=1` block that dumps
+`matchMedia` results, the anim3 URL actually requested, `host.style.filter`
+(empty ⇔ `simple` mode), every span's opacity, and the real `getBoundingClientRect`
+of both hosts. Six sessions inferred those values; the first one to *read* them
+found the bug in one screenshot, because `liq1 h=0.0` and `liq2 h=0.0` at the
+same `top` cannot be an animation bug.
+
+Two things that will waste an hour if not known:
+- **Safari on the simulator cannot resolve `localhost`.** Use `127.0.0.1`. A
+  `localhost` URL renders a blank white page with no error.
+- The page origin sits ~61pt below the screen top in Safari, so a tap at a
+  page-space y misses. Add the offset.
+
+## 6b. If the live phone ribbons are too slow on his real phone
+Re-film, but the clip must be re-filmed **near-white** and tinted by a CSS
+`filter` on the `<video>` element (element-local, so trap 5.5 does not apply) —
+animating `hue-rotate` on the palette clock is what gives a clip a colour cycle
+at video cost. `record-tubes.html` records at the recording window's size and
+uses `SWEEP_X/SWEEP_Y` fractions measured off a 1470x797 desktop; a phone take
+needs a portrait window and the phone's taller `sleepRadiusY`.
+**The preview pane cannot run the recorder** — it reports `document.hidden` and
+the tool aborts on exactly that (trap 5.9). It needs a real foregrounded browser
+window for ~10s.
+
+## 6c. The original slogan brief, kept for the record
 
 Do **not** ship another speculative fix. Six have failed. The last screenshot
 contradicts the deployed code, which means the assumption about which code path
