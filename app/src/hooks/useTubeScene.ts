@@ -141,10 +141,18 @@ export function useTubeScene(ready: boolean, heroVisible: boolean): RefObject<HT
         colors: tubeSet(p0, SMALL ? BOOST : 1),
         /* The ribbon's own length, which is its tubular segment count - not the reach of the
            path, which is sleepRadiusX/Y below. +30% on the library's 32-128. */
-        /* Length stays close to the Mac; the saving is taken around the tube instead of along
-           it, below. He complained the mobile ribbons were short - so they are not short. */
-        minTubularSegments: SMALL ? 40 : 42,
-        maxTubularSegments: SMALL ? 150 : 166,
+        /* This is the ribbon's OWN length - how far the trail streams behind the head - not the
+           reach of the path, which is sleepRadiusX/Y. It used to be held close to the Mac's
+           because he had said the mobile ribbons were too short. With the figure now wrapping
+           the slogan properly the opposite is true: at 150 the trail is long enough to lap its
+           own path and read as a tangle rather than a stroke. His word, 4 Aug: shorter.
+
+           Cut to about 62%. This is also the cheapest frame time on the page - the surface is
+           rebuilt every frame by a loop over tubularSegments x radialSegments, so a third off
+           the length is a third off that product, on top of the radialSegments 8 -> 5 already
+           taken below. It should help the 33fps the perf guard measured. */
+        minTubularSegments: SMALL ? 25 : 42,
+        maxTubularSegments: SMALL ? 95 : 166,
         /* THE mobile lever, and it costs nothing anyone can see. Each ribbon's surface is
            rebuilt every frame by a loop over tubularSegments x radialSegments, so the cost is
            the product - and radialSegments is how many facets go AROUND a tube whose radius is
