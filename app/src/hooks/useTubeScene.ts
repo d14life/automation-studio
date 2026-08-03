@@ -18,11 +18,18 @@ function textWidth(el: HTMLElement): number {
   return w || el.getBoundingClientRect().width
 }
 
-function tubeSet(p: number): string[] {
+/* dim() multiplies each channel by k and clamps at 255, so k IS the brightness: the ribbons
+   have been running at 0.672 of the palette. His word, 4 Aug: too shallow on the phone. A
+   phone has no bloom (it is the largest piece of GPU work on the page and stays off) and far
+   fewer, thinner tubes than the Mac, so the same k lands much darker there. BOOST takes the
+   phone to 0.97 - effectively the full palette, still clamped, with the desktop untouched. */
+const BOOST = 1.45
+
+function tubeSet(p: number, boost = 1): string[] {
   return [
-    window.dim(window.paletteAt(ICE, p), k),
-    window.dim(window.paletteAt(ICE, p + sp), k),
-    window.dim(window.paletteAt(ICE, p + sp * 2), k),
+    window.dim(window.paletteAt(ICE, p), k * boost),
+    window.dim(window.paletteAt(ICE, p + sp), k * boost),
+    window.dim(window.paletteAt(ICE, p + sp * 2), k * boost),
   ]
 }
 
@@ -131,7 +138,7 @@ export function useTubeScene(ready: boolean, heroVisible: boolean): RefObject<HT
          what they lose is the halo bleeding out past their edges. One word to put it back. */
       bloom: false,
       tubes: {
-        colors: tubeSet(p0),
+        colors: tubeSet(p0, SMALL ? BOOST : 1),
         /* The ribbon's own length, which is its tubular segment count - not the reach of the
            path, which is sleepRadiusX/Y below. +30% on the library's 32-128. */
         /* Length stays close to the Mac; the saving is taken around the tube instead of along
@@ -152,12 +159,14 @@ export function useTubeScene(ready: boolean, heroVisible: boolean): RefObject<HT
            reads the same and there is a third less geometry to rebuild sixty times a second. */
         count: SMALL ? 8 : 11,
         lights: {
-          intensity: GLOW.i,
+          /* the four lights are what actually lights the tube surface, so brightness is half
+             here and half in the colours above */
+          intensity: SMALL ? Math.round(GLOW.i * 1.6) : GLOW.i,
           colors: [
-            window.dim(window.paletteAt(ICE, p0), k),
-            window.dim(window.paletteAt(ICE, p0 + sp * 0.9), k),
-            window.dim(window.paletteAt(ICE, p0 + sp * 1.5), k),
-            window.dim(window.paletteAt(ICE, p0 + sp * 2.1), k),
+            window.dim(window.paletteAt(ICE, p0), k * (SMALL ? BOOST : 1)),
+            window.dim(window.paletteAt(ICE, p0 + sp * 0.9), k * (SMALL ? BOOST : 1)),
+            window.dim(window.paletteAt(ICE, p0 + sp * 1.5), k * (SMALL ? BOOST : 1)),
+            window.dim(window.paletteAt(ICE, p0 + sp * 2.1), k * (SMALL ? BOOST : 1)),
           ],
         },
       },
@@ -247,8 +256,22 @@ export function useTubeScene(ready: boolean, heroVisible: boolean): RefObject<HT
            infinity read as a small knot rather than something wrapping the slogan. At 0.55 the
            full span is 1.1x the text, so the two lobes cross behind the middle of the line and
            the ends reach just past the last letter on each side without leaving the screen. */
-        const RX = SMALL ? 0.55 : 0.38
-        const RY = SMALL ? 1.6 : 1.125
+        /* MEASURED off the live site at 1280x720, not guessed: sweep 462 x 202 against a
+           1217px slogan and a 179.2px block. That is RX 0.380, RY 1.127 - the values below -
+           and a figure whose own aspect is 2.29:1.
+
+           The phone cannot have the same composition, and it is worth writing down why: on the
+           Mac the slogan is 77px filling 95% of a 1280px window, so the two lines are 24.9% of
+           the viewport height. A 402px phone only fits 33px type, so its block is 11.8% - less
+           than half. Framing the figure on the VIEWPORT therefore blows it up (that was the 2.4x
+           he called too wide); framing it on the TEXT at the desktop's own multipliers makes it
+           small and flat. Nothing can satisfy both while the type has to shrink to fit.
+
+           So: keep the web's SHAPE and let it wrap the phone's slogan. RX 0.55 puts the span at
+           1.1x the text, and RY is then set to hold the measured 2.29:1 - 0.55/2.29*2 = 0.48 of
+           the block per side, x2 lines = 1.07. Same figure as the Mac, sized to these words. */
+        const RX = SMALL ? 0.55 : 0.380
+        const RY = SMALL ? 1.07 : 1.127
         a.options.sleepRadiusX = Math.round(textW * RX)
         a.options.sleepRadiusY = Math.round(blockH * RY)
         window.__tubeSweep = [a.options.sleepRadiusX, a.options.sleepRadiusY] /* readable proof */
@@ -292,6 +315,7 @@ export function useTubeScene(ready: boolean, heroVisible: boolean): RefObject<HT
   useEffect(() => {
     if (!heroVisible) return
     let hue = 0, last = 0, raf = 0, warned = false
+    const boost = isSmallDevice() ? BOOST : 1
     const cycle = (now: number) => {
       raf = requestAnimationFrame(cycle)
       const app = appRef.current
@@ -303,12 +327,14 @@ export function useTubeScene(ready: boolean, heroVisible: boolean): RefObject<HT
       hue = (hue + 360 * (now - last) / 1000 / (FLOW * 3)) % 360; last = now
       const p = hue / 360 * ICE.length + p0
       try {
-        app.tubes.setColors(tubeSet(p))
+        /* the cycle rewrites every colour ~16 times a second, so without the same boost the
+           ribbons would brighten for one frame at build and then sink back on the next tick */
+        app.tubes.setColors(tubeSet(p, boost))
         app.tubes.setLightsColors([
-          window.dim(window.paletteAt(ICE, p + sp * 0.3), k),
-          window.dim(window.paletteAt(ICE, p + sp * 0.9), k),
-          window.dim(window.paletteAt(ICE, p + sp * 1.5), k),
-          window.dim(window.paletteAt(ICE, p + sp * 2.1), k),
+          window.dim(window.paletteAt(ICE, p + sp * 0.3), k * boost),
+          window.dim(window.paletteAt(ICE, p + sp * 0.9), k * boost),
+          window.dim(window.paletteAt(ICE, p + sp * 1.5), k * boost),
+          window.dim(window.paletteAt(ICE, p + sp * 2.1), k * boost),
         ])
         window.__tubeHue = Math.round(hue) /* readable proof that the cycle is alive */
       } catch (e) { if (!warned) { warned = true; console.warn('tube colours:', e) } }
