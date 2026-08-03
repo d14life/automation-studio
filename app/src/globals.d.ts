@@ -66,6 +66,11 @@ declare global {
       /* trail length of each ribbon; the library's own defaults are 32 and 128 */
       minTubularSegments?: number
       maxTubularSegments?: number
+      /* facets around the tube and across its end cap. The library hardcodes 8 and 4; our
+         self-hosted copy passes them through, because their product with the segment count is
+         the per-frame surface rebuild and that is the whole mobile cost. */
+      radialSegments?: number
+      capSegments?: number
       lights?: { intensity?: number; colors?: string[] }
     }
   }

@@ -134,13 +134,19 @@ export function useTubeScene(ready: boolean, heroVisible: boolean): RefObject<HT
         colors: tubeSet(p0),
         /* The ribbon's own length, which is its tubular segment count - not the reach of the
            path, which is sleepRadiusX/Y below. +30% on the library's 32-128. */
-        /* The mobile middle. Full Mac geometry (11 long tubes) was tried on his word and his
-           phone answered: bad lag, and in a screen three ribbons wide the full bundle reads as
-           a tangle, not a cursor. The first light build (6 short) read as 'short and few'. This
-           sits between - and unlike either extreme, he approved neither yet, so this one is the
-           bet that matches both complaints. */
-        minTubularSegments: SMALL ? 36 : 42,
-        maxTubularSegments: SMALL ? 120 : 166,
+        /* Length stays close to the Mac; the saving is taken around the tube instead of along
+           it, below. He complained the mobile ribbons were short - so they are not short. */
+        minTubularSegments: SMALL ? 40 : 42,
+        maxTubularSegments: SMALL ? 150 : 166,
+        /* THE mobile lever, and it costs nothing anyone can see. Each ribbon's surface is
+           rebuilt every frame by a loop over tubularSegments x radialSegments, so the cost is
+           the product - and radialSegments is how many facets go AROUND a tube whose radius is
+           at most 0.05 world units, a few pixels on screen. The library had it hardcoded to 8
+           (our self-hosted copy now takes it as an option). At 5 the silhouette of something
+           this thin is identical and the per-frame work drops by a third, on the CPU and in
+           what gets uploaded to the GPU. Same trick on the end caps: 4 -> 2. */
+        radialSegments: SMALL ? 5 : 8,
+        capSegments: SMALL ? 2 : 4,
         /* Every ribbon rebuilds its geometry each frame, so the count is the main-thread cost
            of this scene almost by itself. The library's 16 overlap heavily - at 11 the bundle
            reads the same and there is a third less geometry to rebuild sixty times a second. */
