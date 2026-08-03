@@ -16,8 +16,9 @@
     "noEmit": true,
     "jsx": "react-jsx",
 
-    /* shadcn path alias: pasted components import from "@/..." verbatim */
-    "baseUrl": ".",
+    /* shadcn path alias: pasted components import from "@/..." verbatim.
+       No baseUrl: TS 6 deprecated it and errors the build. The paths below are already
+       tsconfig-relative ("./src/*"), so baseUrl was doing nothing. */
     "paths": { "@/*": ["./src/*"] },
 
     /* Unused-checks off so donor components paste in unedited. */
