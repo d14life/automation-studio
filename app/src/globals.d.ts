@@ -30,6 +30,8 @@ declare global {
   }
 
   interface LiquidTextOptions {
+    /** the SVG url(#threshold) goo. false keeps the melt and drops the filter (touch devices) */
+    threshold?: boolean
     morphTime?: number
     cooldownTime?: number
     colors?: string[]
