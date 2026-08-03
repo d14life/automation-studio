@@ -273,6 +273,9 @@ function BorderBeamPanelBase({
 
   const gradient = React.useMemo(() => ringGradient(beams, colors), [beams, colors]);
   /* the same gradient with the live angle swapped for a fixed one - see .mk-beam-glow below */
+  /* Both the ring and its halo now use a fixed-angle gradient: the ring is a static layer that
+     gets TURNED, the halo does not move at all. The live-angle form is kept only for a caller
+     that drives --mk-beam-a from script (idleSpeed !== hoverSpeed), which this page never does. */
   const glowGradient = React.useMemo(
     () => gradient.replace('from var(--mk-beam-a, 0deg)', 'from 0deg'),
     [gradient],
@@ -284,14 +287,35 @@ function BorderBeamPanelBase({
   inset: -1px;
   border-radius: ${radius}px;
   pointer-events: none;
-  background: ${gradient};
 }
 .${cls} .mk-beam-ring {
   padding: ${Math.max(1, thickness)}px;
+  overflow: hidden;
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask-composite: exclude;
+}
+/* The comets no longer come from an animated angle. Animating a registered custom property
+   makes the browser recalculate style and REPAINT the element on every single frame - the
+   gradient is rebuilt sixty times a second - and eight of these were doing it at once. The
+   same picture is a STATIC conic gradient on a layer that is simply turned, and turning is
+   the one thing the compositor does for free without waking the main thread.
+   The layer is twice the panel so no corner is ever uncovered as it turns, and the ring mask
+   above clips it back to a hairline border. */
+.${cls} .mk-beam-ring::before {
+  content: "";
+  position: absolute;
+  inset: -50%;
+  background: ${glowGradient};
+  animation: mk-beam-turn var(--mk-beam-dur, 8.5s) linear infinite;
+  animation-delay: var(--mk-beam-delay, 0s);
+  will-change: transform;
+}
+.${cls} .mk-beam-glow { background: ${glowGradient}; }
+@keyframes mk-beam-turn { to { transform: rotate(360deg) } }
+@media (prefers-reduced-motion: reduce) {
+  .${cls} .mk-beam-ring::before { animation: none }
 }
 /* The halo is a second copy of the ring gradient under a 14px blur. Reading the live angle
    meant the browser rebuilt a conic gradient AND re-blurred it, every frame, over the whole
@@ -299,12 +323,7 @@ function BorderBeamPanelBase({
    fixed angle it is painted once and never again. At 0.35 opacity behind a 14px blur, a halo
    that turns and a halo that does not are the same picture; the sharp ring above it still
    spins, and that is the part the eye follows. */
-.${cls} .mk-beam-glow {
-  background: ${glowGradient};
-  filter: blur(14px);
-  opacity: 0.35;
-  z-index: -1;
-}
+.${cls} .mk-beam-glow { filter: blur(14px); opacity: 0.35; z-index: -1; }
 @media (forced-colors: active) {
   .${cls} .mk-beam-ring, .${cls} .mk-beam-glow { display: none; }
   .${cls} { border-color: CanvasText; }
