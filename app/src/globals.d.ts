@@ -53,6 +53,15 @@ declare global {
     tubes: {
       setColors(colors: string[]): void
       setLightsColors(colors: string[]): void
+      /* the meshes and the four point lights, so the page can pin their matrices and, on a
+         machine that cannot cope, take two lights back out of the scene */
+      tubes?: {
+        updateMatrix(): void
+        matrixAutoUpdate: boolean
+        frustumCulled: boolean
+      }[]
+      lights?: { updateMatrix(): void; matrixAutoUpdate: boolean }[]
+      remove?(child: unknown): void
     }
     dispose(): void
   }
