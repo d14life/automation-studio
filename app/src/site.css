@@ -11,7 +11,12 @@ a{color:inherit}
 /* ---------- header ---------- */
 header{position:absolute;top:0;left:0;right:0;z-index:20}
 .wrap{max-width:1180px;margin:0 auto;padding:0 24px}
-.topbar{display:flex;align-items:center;gap:16px;padding:22px 0}
+/* padding-block, not the `22px 0` shorthand. .topbar always rides on .wrap, and a shorthand
+   here resets .wrap's `padding:0 24px` to zero - so the header had no side gutter at any width.
+   On a phone that put the logo at x=0 and the burger hard against the right edge (measured
+   0..111 and 358..402 at 402 wide). The sections below all keep .wrap's gutter; now the header
+   lines up with them. */
+.topbar{display:flex;align-items:center;gap:16px;padding-block:22px}
 .mark{font:900 20px/1 Nunito,sans-serif;letter-spacing:-.02em;text-decoration:none}
 .mark span{color:var(--ice2)}
 .topnav{margin-left:auto;display:flex;align-items:center;gap:22px;font-size:14.5px;color:var(--dim)}
@@ -776,7 +781,7 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
   .topnav a{padding:14px 12px;border-radius:10px;font-size:16px}
   .topnav a:not(.cta):active{background:rgba(127,216,255,.08)}
   .cta{text-align:center;margin-top:4px;padding:15px 18px}
-  .topbar{padding:16px 0;gap:10px}
+  .topbar{padding-block:16px;gap:10px}
   .mark{font-size:18px;padding:14px 0;display:inline-block}
   .cta{padding:11px 16px}
   /* on a narrow screen the buttons covered the whole number, so they sit under it */
