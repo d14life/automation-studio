@@ -984,6 +984,12 @@ footer a{display:block;padding:3px 0}
 [data-perf="low"] .steps .glow,
 [data-perf="low"] .steps .glow-content:before{animation:none} /* main-thread custom-property loops */
 [data-perf="low"] .edgecard-sheen{display:none}
+/* the two shiny buttons walk --gradient-angle, which is a registered property: style recalc
+   and a repaint of the conic border every frame. Rewriting them the way the beam rings were
+   rewritten is not worth it for two elements - the donor weaves that gradient into the border
+   itself - but on a machine that is struggling it can simply stop. The inner shimmer, which is
+   a plain rotate and therefore free, keeps running. */
+[data-perf="low"] .shiny-cta,[data-perf="low"] .shiny-cta::before{animation:none}
 /* one property, not two: the minifier collapses the prefixed pair and keeps only the -webkit-
    one, which then loses to the unprefixed blur in the base rule. Unprefixed alone survives. */
 [data-perf="low"] .sp-mask{backdrop-filter:none}

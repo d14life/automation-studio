@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<title>Запись лент — Solutions101</title>
+<style>
+  html,body{margin:0;height:100%;background:#000;color:#DFF6FF;font:600 15px/1.5 system-ui,sans-serif}
+  #stage{position:fixed;inset:0}
+  canvas{position:absolute;inset:0;width:100%;height:100%}
+  #ui{position:fixed;left:0;right:0;bottom:0;padding:14px 18px;background:rgba(0,0,0,.72);
+      display:flex;gap:14px;align-items:center;z-index:9}
+  b{color:#7FD8FF}
+  #log{font:500 13px/1.5 ui-monospace,Menlo,monospace;color:#9fb3c8}
+</style>
+</head>
+<body>
+<div id="stage"><canvas id="cv"></canvas></div>
+<div id="ui"><span id="log">запуск…</span></div>
+
+<script src="./anim3.js"></script>
+<script>
+/* Records the real ribbon scene to a video file, so the page can play a clip on machines that
+   cannot afford to render it live. Not part of the site - a tool, opened by hand.
+
+   The loop has to be seamless, which means the clip must be a whole number of periods of
+   everything moving inside it:
+
+     colour   - the palette walks a full lap in FLOW*3 = 10.5s
+     path     - the ribbons trace x = cos(t*s1), y = sin(t*s2), so the figure repeats every
+                2*PI/s1 seconds
+
+   The library's defaults (s1=1, s2=2) give a 6.283s path against a 10.5s colour lap: those two
+   never line up, so any cut would jump. Choosing s1 = 2*PI*2/10.5 puts exactly two laps of the
+   path inside one lap of the colour, and the whole clip closes on itself.
+
+   Recorded on black, not on transparency: the page composites it with mix-blend-mode, where
+   black disappears and only the light adds. That avoids alpha in video entirely, which is the
+   one thing browsers still disagree about. */
+
+const FLOW = 3.5
+const CYCLE = FLOW * 3                    /* 10.5s - one full lap of the palette */
+const S1 = (2 * Math.PI * 2) / CYCLE      /* two laps of the path inside one of the colour */
+const S2 = S1 * 2
+const ICE = ['#DFF6FF', '#7FD8FF', '#5C82C9']
+const GLOW = { l: 0.43, i: 135 }
+const k = GLOW.l / 0.64
+const sp = ICE.length * 0.12
+const p0 = ICE.length * 0.10
+
+const W = 1280, H = 720                   /* soft glowing light: 720p upscales without showing */
+const SETTLE_MS = 4000                    /* the tubes lerp into the figure; let them arrive */
+const log = (t) => (document.getElementById('log').textContent = t)
+
+const set = (p) => [
+  window.dim(window.paletteAt(ICE, p), k),
+  window.dim(window.paletteAt(ICE, p + sp), k),
+  window.dim(window.paletteAt(ICE, p + sp * 2), k),
+]
+const lightSet = (p) => [
+  window.dim(window.paletteAt(ICE, p + sp * 0.3), k),
+  window.dim(window.paletteAt(ICE, p + sp * 0.9), k),
+  window.dim(window.paletteAt(ICE, p + sp * 1.5), k),
+  window.dim(window.paletteAt(ICE, p + sp * 2.1), k),
+]
+
+const cv = document.getElementById('cv')
+cv.width = W; cv.height = H
+
+window.TubesCursorInit(cv, {
+  bloom: false,
+  sleepRadiusX: Math.round(W * 0.30),
+  sleepRadiusY: Math.round(H * 0.34),
+  sleepTimeScale1: S1,
+  sleepTimeScale2: S2,
+  tubes: {
+    colors: set(p0),
+    count: 11,
+    minTubularSegments: 42,
+    maxTubularSegments: 166,
+    radialSegments: 8,
+    capSegments: 4,
+    lights: { intensity: GLOW.i, colors: lightSet(p0) },
+  },
+}, (app) => {
+  try {
+    app.three.minPixelRatio = 1
+    app.three.maxPixelRatio = 1
+    app.three.resize()
+  } catch (e) { /* older build */ }
+
+  /* the colour clock, driven by wall time so the recorded lap is exactly CYCLE long */
+  let t0 = 0
+  const paint = (now) => {
+    requestAnimationFrame(paint)
+    if (!t0) t0 = now
+    const p = (((now - t0) / 1000) % CYCLE) / CYCLE * ICE.length + p0
+    try { app.tubes.setColors(set(p)); app.tubes.setLightsColors(lightSet(p)) } catch (e) {}
+  }
+  requestAnimationFrame(paint)
+
+  log('сцена собирается, ' + (SETTLE_MS / 1000) + ' сек на разгон…')
+  setTimeout(() => record(cv), SETTLE_MS)
+})
+
+function record(canvas) {
+  const stream = canvas.captureStream(30)
+  const types = ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm']
+  const mime = types.find((t) => MediaRecorder.isTypeSupported(t))
+  if (!mime) return log('этот браузер не умеет записывать webm')
+
+  const chunks = []
+  const rec = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 4_000_000 })
+  rec.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data) }
+  rec.onstop = () => {
+    const blob = new Blob(chunks, { type: 'video/webm' })
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(blob)
+    a.download = 'tubes-loop.webm'
+    a.click()
+    log('готово: ' + (blob.size / 1048576).toFixed(2) + ' МБ, файл ушёл в Загрузки')
+  }
+
+  /* Start on a frame boundary and stop exactly one colour lap later. The extra 40ms covers the
+     recorder's own start latency; the trim happens on the way into the repo. */
+  rec.start()
+  log('пишу ровно ' + CYCLE + ' сек…')
+  setTimeout(() => rec.stop(), CYCLE * 1000 + 40)
+}
+</script>
+</body>
+</html>
