@@ -219,6 +219,13 @@ function LiquidText(host, texts, o) {
      are plain CSS and work everywhere. `threshold:false` keeps the motion and drops the filter,
      so the words still melt into each other, just without the hard gooey edge. */
   var threshold    = o.threshold !== false;
+  /* The gradient that travels through the letters is painted as the span's BACKGROUND and cut to
+     the glyphs with background-clip:text, the text itself being transparent. The melt blurs that
+     same span every frame - and iOS stops honouring the clip on a blurred layer, which paints
+     the whole background rectangle instead of the letters. That is the grey box he photographed
+     behind each line. `flat:true` walks the same palette as a plain text colour: no clip, no
+     box, and the melt is untouched. */
+  var flat         = !!o.flat;
   if (!texts || texts.length < 2) throw new Error('LiquidText: need 2+ texts');
 
   if (!simple && threshold && !document.getElementById('lt-threshold-svg')){
@@ -238,7 +245,7 @@ function LiquidText(host, texts, o) {
   function mkSpan(){
     var s=document.createElement('span');
     s.style.cssText='position:absolute;left:0;right:0;top:0;margin:auto;display:inline-block;width:100%;text-align:center';
-    if (colors){
+    if (colors && !flat){
       /* the cycle is laid twice across a 200% background, so sliding it by its own width
          lands on an identical frame and the travel never jumps */
       s.style.backgroundSize='200% auto';
@@ -264,6 +271,11 @@ function LiquidText(host, texts, o) {
     if (!colors || now-gradAt < 100) return;
     pos += (now-gradAt)/1000/driftSeconds*colors.length;
     gradAt=now;
+    if (flat){
+      var c=paletteAt(colors,pos);
+      t1.style.color=c; t2.style.color=c;
+      return;
+    }
     var g=flowGrad([paletteAt(colors,pos), paletteAt(colors,pos+spread), paletteAt(colors,pos+spread*2)]);
     t1.style.backgroundImage=g; t2.style.backgroundImage=g;
   }

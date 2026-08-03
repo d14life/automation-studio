@@ -1,0 +1,998 @@
+{
+ "ru": [
+  {
+   "n": "",
+   "cat": "Собрано под вашу отрасль",
+   "title": "Для юридических фирм",
+   "desc": "Мониторинг судов и картотеки, сборка документов по утверждённым шаблонам, помощник, который отвечает по архиву дел, клиентский портал и учёт часов по фактической работе.",
+   "kills": "",
+   "demo": "Стол дел · понедельник 08:30"
+  },
+  {
+   "n": "",
+   "cat": "Собрано под вашу отрасль",
+   "title": "Для строительных компаний",
+   "desc": "Отметки о выходе на объект и ежедневные отчёты с телефонов бригады, согласование закупок по сумме, обслуживание техники до поломки, смета против факта по каждому объекту.",
+   "kills": "",
+   "demo": "Доска объекта · Объект 7"
+  },
+  {
+   "n": "01",
+   "cat": "Сбор данных и интеграции",
+   "title": "Парсеры сайтов и конкурентов",
+   "desc": "Бот обходит сайты, которые вы каждое утро проверяете вручную: цены конкурентов, остатки поставщиков, карточки на маркетплейсах, курсы валют, и складывает данные в вашу таблицу, базу или CRM до открытия офиса.",
+   "kills": "",
+   "demo": "Мониторинг цен · ежедневный запуск"
+  },
+  {
+   "n": "02",
+   "cat": "Сбор данных и интеграции",
+   "title": "Импорт каталогов поставщиков",
+   "desc": "Поставщики присылают прайсы в любом удобном им формате. Один импортёр принимает все, сопоставляет товары с вашими SKU, отмечает изменения и обновляет систему по расписанию, за которым никому не нужно следить.",
+   "kills": "",
+   "demo": "Импорт от поставщиков"
+  },
+  {
+   "n": "03",
+   "cat": "Сбор данных и интеграции",
+   "title": "Мониторинг маркетплейсов",
+   "desc": "Отслеживаем ваши и конкурентские карточки на Amazon, Wildberries, Ozon, eBay, Etsy: позиция, цена, остатки, отзывы, статус карточки-победителя. Оповещение приходит в тот момент, когда конкурент опускает цену или карточка перестаёт работать.",
+   "kills": "",
+   "demo": "Оповещения маркетплейсов"
+  },
+  {
+   "n": "04",
+   "cat": "Сбор данных и интеграции",
+   "title": "Мониторинг тендеров и реестров",
+   "desc": "Автоматическое отслеживание закупочных площадок, реестров компаний, судебных баз и сообщений о банкротстве, с фильтром по вашим критериям и отправкой на почту или в Telegram.",
+   "kills": "",
+   "demo": "Мониторинг реестров → Telegram"
+  },
+  {
+   "n": "05",
+   "cat": "Сбор данных и интеграции",
+   "title": "Сбор лидов из справочников и карт",
+   "desc": "Выгружаем карточки компаний из Google Maps, отраслевых каталогов и справочников, чистим их, отсеиваем дубли по вашей базе и загружаем в CRM готовыми к обзвону.",
+   "kills": "",
+   "demo": "Сбор лидов → CRM"
+  },
+  {
+   "n": "06",
+   "cat": "Сбор данных и интеграции",
+   "title": "Интеграции между системами, которые не общаются",
+   "desc": "Самая частая проблема в среднем бизнесе: у бухгалтерии, CRM, сайта и склада своя версия данных, и кто-то переносит их руками. Мы делаем связку.",
+   "kills": "",
+   "demo": "Системы связаны"
+  },
+  {
+   "n": "07",
+   "cat": "Сбор данных и интеграции",
+   "title": "Переход со старой системы",
+   "desc": "Двенадцать лет данных выгружаются из старой базы Access, снятой с поддержки ERP или самописной системы без сопровождения: очищаются, сопоставляются и загружаются в современное решение без потери истории.",
+   "kills": "",
+   "demo": "Миграция со старой системы"
+  },
+  {
+   "n": "08",
+   "cat": "Бухгалтерия и финансы",
+   "title": "Понятные отчёты из вашей учётной системы",
+   "desc": "Бухгалтерская программа хранит всё и не показывает ничего полезного. Мы строим слой выгрузки, который показывает данные в том виде, в каком они реально нужны директору, бухгалтеру или налоговому консультанту.",
+   "kills": "",
+   "demo": "Месячный отчёт"
+  },
+  {
+   "n": "09",
+   "cat": "Бухгалтерия и финансы",
+   "title": "Автоматическое создание счетов и документов",
+   "desc": "Счета, накладные, договоры и закрывающие документы формируются в момент смены статуса сделки: с правильной нумерацией, подшитые куда нужно, отправленные клиенту автоматически.",
+   "kills": "",
+   "demo": "Сделка выиграна → документы"
+  },
+  {
+   "n": "10",
+   "cat": "Бухгалтерия и финансы",
+   "title": "Сверка банковской выписки",
+   "desc": "Входящие платежи сопоставляются со счетами автоматически, включая частичную оплату и неаккуратные назначения платежа. Человеку достаётся только то, что не сошлось.",
+   "kills": "",
+   "demo": "Сверка с банком"
+  },
+  {
+   "n": "11",
+   "cat": "Бухгалтерия и финансы",
+   "title": "Работа с дебиторской задолженностью",
+   "desc": "Система ведёт, кто и сколько должен и на сколько просрочил, затем рассылает напоминания по вашему графику, ужесточая тон с каждым днём: на 30-й день в копию идёт менеджер клиента, на 60-й юрист. Компании держат в просрочке шестизначные суммы только потому, что никому некогда напоминать.",
+   "kills": "",
+   "demo": "Реестр просрочки"
+  },
+  {
+   "n": "12",
+   "cat": "Бухгалтерия и финансы",
+   "title": "Распознавание чеков и счетов",
+   "desc": "Сфотографируйте чек, и система вытащит поставщика, дату, сумму, НДС и категорию, а затем отнесёт расход на нужный период. Всё, что читается неуверенно, помечается, а не додумывается.",
+   "kills": "",
+   "demo": "Входящие чеки"
+  },
+  {
+   "n": "13",
+   "cat": "Бухгалтерия и финансы",
+   "title": "Расчёт зарплаты и смен",
+   "desc": "Часы, смены, переработки, премии, сдельная оплата и удержания берутся напрямую из реальных данных учёта времени, а не из чьей-то тетради. Наиболее полезно там, где оплата зависит от выработки или нерегулярного графика.",
+   "kills": "",
+   "demo": "Расчёт зарплаты · март"
+  },
+  {
+   "n": "14",
+   "cat": "Бухгалтерия и финансы",
+   "title": "Прогноз денежного потока",
+   "desc": "Одна панель собирает подтверждённую дебиторку, плановые платежи, даты зарплаты и постоянные расходы и показывает, где будут деньги через 30, 60 и 90 дней. Малый бизнес обычно идёт здесь вслепую и встречает разрыв на той неделе, когда он наступает.",
+   "kills": "",
+   "demo": "Денежная позиция"
+  },
+  {
+   "n": "15",
+   "cat": "Продажи и CRM",
+   "title": "CRM под ваш процесс",
+   "desc": "Когда коробочные системы не ложатся на то, как вы реально продаёте, мы делаем ту, которая ложится: ваши этапы, ваши поля, ваши правила, ваши отчёты. За три года это дешевле, чем лицензии по числу мест на отдел продаж из 20 человек, и бизнес перестаёт подстраиваться под чужие представления.",
+   "kills": "",
+   "demo": "Воронка · ваши этапы"
+  },
+  {
+   "n": "16",
+   "cat": "Продажи и CRM",
+   "title": "Телефония, почта и мессенджеры в CRM",
+   "desc": "Звонки записываются и прикрепляются к карточке клиента, письма связываются в цепочки, переписки в WhatsApp и Telegram сохраняются там, где их прочитает следующий сотрудник. Отношения с клиентом принадлежат компании, а не одному телефону.",
+   "kills": "",
+   "demo": "Карточка клиента · Northgate Ltd"
+  },
+  {
+   "n": "17",
+   "cat": "Продажи и CRM",
+   "title": "Распределение и скоринг заявок",
+   "desc": "Заявки распределяются автоматически по региону, продукту, текущей загрузке и квалификации, а модель скоринга поднимает серьёзных покупателей в начало очереди. Скорость ответа на заявку с сайта предсказывает сделку лучше любого другого фактора, которым вы управляете.",
+   "kills": "",
+   "demo": "Входящие заявки"
+  },
+  {
+   "n": "18",
+   "cat": "Продажи и CRM",
+   "title": "Генератор коммерческих предложений",
+   "desc": "Менеджер выбирает товары и условия, а система меньше чем за минуту возвращает фирменное предложение в PDF с верными ценами и расчётом. Каждая цифра берётся из актуального прайса, а не из памяти.",
+   "kills": "",
+   "demo": "Сборка КП"
+  },
+  {
+   "n": "19",
+   "cat": "Продажи и CRM",
+   "title": "Дашборд воронки продаж",
+   "desc": "Живая картина воронки по менеджеру, продукту, источнику и стадии, с конверсией и сигналами по сделкам, которые перестали двигаться. Еженедельная планёрка превращается в пятиминутный разговор о двух сделках, которые действительно важны.",
+   "kills": "",
+   "demo": "Воронка · этот месяц"
+  },
+  {
+   "n": "20",
+   "cat": "Продажи и CRM",
+   "title": "Автоматизация email- и SMS-рассылок",
+   "desc": "Сегментированные триггерные цепочки, которые работают сами: приветственная серия, брошенная корзина, возврат спящих клиентов, поздравления и напоминания о продлении. Список спящих клиентов обычно самая дешёвая выручка в компании, и с ним никто не работает.",
+   "kills": "",
+   "demo": "Движок рассылок"
+  },
+  {
+   "n": "21",
+   "cat": "Продажи и CRM",
+   "title": "Клиентский портал самообслуживания",
+   "desc": "Клиенты заходят и видят свои заказы, документы, баланс, статус доставки и всю историю, а повторный заказ оформляют сами, ни у кого не спрашивая. Каждый вопрос, на который отвечает портал, это звонок, который не примут ваши сотрудники.",
+   "kills": "",
+   "demo": "Клиентский портал · Northgate Ltd"
+  },
+  {
+   "n": "22",
+   "cat": "Продажи и CRM",
+   "title": "Учёт лояльности, рефералов и партнёров",
+   "desc": "Баллы, уровни, реферальные коды и партнёрские комиссии считаются и попадают в отчёты сами, а всё спорное задерживается, а не выплачивается неверно. Партнёры видят те же цифры, что и вы.",
+   "kills": "",
+   "demo": "Лояльность и партнёры"
+  },
+  {
+   "n": "23",
+   "cat": "Искусственный интеллект",
+   "title": "Чат-бот поддержки на ваших материалах",
+   "desc": "Бот отвечает по вашей документации, прайс-листу, регламентам и прошлым обращениям, а не выдумывает ответ, и передаёт переписку человеку, как только вопрос выходит за его рамки. Работает на сайте, в WhatsApp и в Telegram и обычно снимает с очереди 60-80% повторяющихся вопросов.",
+   "kills": "",
+   "demo": "Бот поддержки, WhatsApp"
+  },
+  {
+   "n": "24",
+   "cat": "Искусственный интеллект",
+   "title": "Внутренний ассистент по документам компании",
+   "desc": "Сотрудники спрашивают обычными словами и получают ответ из договоров, регламентов, технической документации, архивов проектов и внутренней базы знаний, со ссылкой на конкретный документ-источник. Это решает случай, когда ответ есть, но только один коллега знает, в какой он папке.",
+   "kills": "",
+   "demo": "Внутренний ассистент"
+  },
+  {
+   "n": "25",
+   "cat": "Искусственный интеллект",
+   "title": "Расшифровка звонков, итоги и напоминания",
+   "desc": "Каждый звонок продаж и поддержки расшифровывается, кратко излагается и размечается по итогу, следующему шагу и прозвучавшим возражениям, а затем записывается прямо в CRM. Менеджеры слушают, а не конспектируют, а директор может разобрать сотню звонков за неделю, не включив ни одной записи.",
+   "kills": "",
+   "demo": "Звонок · Northgate Ltd"
+  },
+  {
+   "n": "26",
+   "cat": "Искусственный интеллект",
+   "title": "Классификация документов и извлечение данных",
+   "desc": "Входящие договоры, счета, сертификаты, заявки и переписка читаются при поступлении: определяется тип, извлекаются ключевые условия, документ уходит нужному человеку или в нужную систему. Всё спорное откладывается, а не угадывается.",
+   "kills": "",
+   "demo": "Почта · входящие документы"
+  },
+  {
+   "n": "27",
+   "cat": "Искусственный интеллект",
+   "title": "ИИ-контент для карточек товаров и SEO",
+   "desc": "Описания, характеристики, мета-теги и тексты категорий генерируются для тысяч товаров прямо из атрибутов, которые у вас уже есть, в вашем тоне. Каталог на 5 000 позиций иначе превращается в бюджет на копирайтинг, который никто не согласует.",
+   "kills": "",
+   "demo": "Генерация каталога"
+  },
+  {
+   "n": "28",
+   "cat": "Искусственный интеллект",
+   "title": "Отбор резюме и ранжирование кандидатов",
+   "desc": "Отклики разбираются, сопоставляются с требованиями, ранжируются и кратко описываются для нанимающего руководителя, а для каждого финалиста готовится первое сообщение. Это убирает простой между откликом хорошего кандидата и моментом, когда кто-то наконец открыл резюме.",
+   "kills": "",
+   "demo": "Вакансия · начальник склада"
+  },
+  {
+   "n": "29",
+   "cat": "Искусственный интеллект",
+   "title": "Прогноз спроса и запасов",
+   "desc": "Модель, обученная на вашей истории продаж, сезонности, акциях и сроках поставки, подсказывает, что и когда заказывать. Она бьёт по двум потерям, которые стоят реальных денег и не видны в отчётности напрямую: капитал, замороженный в неликвиде, и продажи, потерянные из-за пустой полки.",
+   "kills": "",
+   "demo": "План закупок · неделя 12"
+  },
+  {
+   "n": "30",
+   "cat": "Искусственный интеллект",
+   "title": "Распознавание изображений",
+   "desc": "Подсчёт остатков по фотографиям, контроль качества продукции на линии, считывание серийных номеров и этикеток, проверка того, что мерчандайзер действительно выставил полку по планограмме. Подходит везде, где сейчас человек смотрит и ставит галочку.",
+   "kills": "",
+   "demo": "Проверки полки и линии"
+  },
+  {
+   "n": "31",
+   "cat": "Искусственный интеллект",
+   "title": "Голосовой бот для входящих и исходящих звонков",
+   "desc": "Он подтверждает записи, бронирует слоты доставки, сообщает статус заказа и разбирает простые обращения без человека на линии, и отвечает в 23:00 и в воскресенье. Наиболее полезен там, где звонки теряются в пик, или где сотрудникам платят за то, чтобы они повторяли одну и ту же фразу четыреста раз в неделю.",
+   "kills": "",
+   "demo": "Голосовой бот · воскресенье 23:04"
+  },
+  {
+   "n": "56",
+   "cat": "Искусственный интеллект",
+   "title": "Контент-фабрика",
+   "desc": "Конвейер, который превращает ваш каталог, вашу экспертизу и реальные вопросы клиентов в ровный поток постов, статей и сценариев видео в вашем тоне, по расписанию, и ничего не выходит без вашего одобрения.",
+   "kills": "",
+   "demo": "Контент-фабрика · эта неделя"
+  },
+  {
+   "n": "32",
+   "cat": "Операции и внутренние процессы",
+   "title": "Свой учёт задач и проектов",
+   "desc": "Универсальные трекеры загоняют вашу работу в чужую форму. Этот строится вокруг ваших этапов, чек-листов, точек передачи и сроков, со своим представлением для каждого, кому оно нужно. Сильнее всего в производстве, стройке, монтаже и агентской работе.",
+   "kills": "",
+   "demo": "Доска отделочных работ"
+  },
+  {
+   "n": "33",
+   "cat": "Операции и внутренние процессы",
+   "title": "Процессы согласования и подписания",
+   "desc": "Заявки на закупку, скидки, отпуска, расходы и договоры уходят нужному согласующему автоматически по сумме и типу, с напоминаниями, сроками и полной историей за каждым решением.",
+   "kills": "",
+   "demo": "Маршруты согласования"
+  },
+  {
+   "n": "34",
+   "cat": "Операции и внутренние процессы",
+   "title": "Формирование документов по шаблонам",
+   "desc": "Договоры, акты, доверенности, спецификации и отчёты собираются из данных, которые у вас уже есть, с правильной нумерацией и версиями, а переменные пункты подставляются по правилу. Юрист согласует шаблон один раз вместо чтения каждого документа.",
+   "kills": "",
+   "demo": "Сборка документов"
+  },
+  {
+   "n": "35",
+   "cat": "Операции и внутренние процессы",
+   "title": "Планирование смен и графиков работы",
+   "desc": "График строится сам с учётом доступности, навыков, трудовых норм и прогноза спроса, публикуется прямо на телефоны сотрудников и обрабатывает запросы на обмен сменами. В рознице, общепите и логистике на это уходит вся пятница руководителя.",
+   "kills": "",
+   "demo": "График на 11 неделю"
+  },
+  {
+   "n": "36",
+   "cat": "Операции и внутренние процессы",
+   "title": "Выездной сервис и приложение для бригад",
+   "desc": "Заявки приходят на телефон инженера с маршрутом, историей клиента, чек-листами, съёмкой фото, списком израсходованных запчастей и подписью клиента, а отчёт о выполнении попадает в офис сразу после окончания работы.",
+   "kills": "",
+   "demo": "Приложение бригады · машина 7"
+  },
+  {
+   "n": "37",
+   "cat": "Операции и внутренние процессы",
+   "title": "Управление складом и запасами",
+   "desc": "Приёмка, отбор, перемещение и инвентаризация по штрихкоду или QR с телефона или сканера, а актуальные остатки в тот же момент уходят на сайт и в учёт.",
+   "kills": "",
+   "demo": "Складской сканер"
+  },
+  {
+   "n": "38",
+   "cat": "Операции и внутренние процессы",
+   "title": "Система онлайн-записи",
+   "desc": "Онлайн-запись по реальному расписанию, автоматические напоминания, которые снижают неявки, распределение кабинетов и оборудования, предоплата вперёд. Для клиник, салонов, студий, мастерских, консультантов и проката оборудования.",
+   "kills": "",
+   "demo": "Запись клиентов"
+  },
+  {
+   "n": "39",
+   "cat": "Операции и внутренние процессы",
+   "title": "Планирование маршрутов и контроль автопарка",
+   "desc": "Доставки выстраиваются в кратчайший рейс с учётом временных окон и вместимости машин, водители видны онлайн, клиент знает, когда ждать фургон. Топливо и часы водителей обычно две самые крупные управляемые статьи расходов в доставке.",
+   "kills": "",
+   "demo": "Маршруты на завтра"
+  },
+  {
+   "n": "58",
+   "cat": "Операции и внутренние процессы",
+   "title": "Приём и увольнение сотрудников",
+   "desc": "Как только кандидат принят, учётные записи, доступы, техника, чек-листы и расписание первого дня создаются без напоминаний в ИТ. Когда человек уходит, все доступы закрываются в один клик.",
+   "kills": "",
+   "demo": "Пакет нового сотрудника · M. Reinholt , логистика"
+  },
+  {
+   "n": "59",
+   "cat": "Операции и внутренние процессы",
+   "title": "Планировщик ТО техники и транспорта",
+   "desc": "Интервалы обслуживания считаются по моточасам, пробегу или календарю, что наступит раньше. Наряды создаются до поломки, а запчасти, стоимость и простой учитываются по каждой машине.",
+   "kills": "",
+   "demo": "Парк и техника · подходит ТО"
+  },
+  {
+   "n": "40",
+   "cat": "Веб и работа с клиентами",
+   "title": "Корпоративный сайт и лендинги",
+   "desc": "Быстрые, корректные на мобильных страницы, сделанные ради заявок, а не ради красивой картинки. Формы подключены к вашей CRM с первого дня работы.",
+   "kills": "",
+   "demo": "Лендинг в CRM"
+  },
+  {
+   "n": "41",
+   "cat": "Веб и работа с клиентами",
+   "title": "Интернет-магазин",
+   "desc": "Каталог, оплата, расчёт доставки и остатки, связанные со складом, а онлайн-заказы попадают в ту же систему, где уже идут офлайн-продажи.",
+   "kills": "",
+   "demo": "Интернет-магазин"
+  },
+  {
+   "n": "42",
+   "cat": "Веб и работа с клиентами",
+   "title": "Личные кабинеты клиентов и биллинг подписок",
+   "desc": "Регулярные списания, смена тарифов, напоминания по неудачным платежам, лимиты по использованию и счета, которые выставляются без участия человека.",
+   "kills": "",
+   "demo": "Подписки"
+  },
+  {
+   "n": "43",
+   "cat": "Веб и работа с клиентами",
+   "title": "Интеграция платежей",
+   "desc": "Карты, банковский перевод, рассрочка, счета и криптовалюта там, где это уместно, с полной сверкой каждого платежа в бухгалтерии.",
+   "kills": "",
+   "demo": "Платежи и сверка"
+  },
+  {
+   "n": "44",
+   "cat": "Веб и работа с клиентами",
+   "title": "Бот в Telegram или WhatsApp как канал продаж",
+   "desc": "Каталог, оформление заказа, статус, поддержка и уведомления внутри мессенджера, который у клиента уже открыт. В большинстве потребительских категорий это работает лучше мобильной веб-формы.",
+   "kills": "",
+   "demo": "Бот продаж в мессенджере"
+  },
+  {
+   "n": "45",
+   "cat": "Веб и работа с клиентами",
+   "title": "Инструмент управления маркетплейсами",
+   "desc": "Карточки, цены, остатки и заказы нескольких маркетплейсов в одном месте, с автоматическими правилами переоценки, если они вам нужны.",
+   "kills": "",
+   "demo": "Панель управления маркетплейсами"
+  },
+  {
+   "n": "46",
+   "cat": "Веб и работа с клиентами",
+   "title": "Аналитика, трекинг и атрибуция",
+   "desc": "Событийная аналитика, настроенная как положено, и расходы на рекламу, связанные с закрытой выручкой, а не с отправкой формы, чтобы в отчётах была видна реальная стоимость клиента по каналам.",
+   "kills": "",
+   "demo": "Дашборд атрибуции"
+  },
+  {
+   "n": "57",
+   "cat": "Веб и работа с клиентами",
+   "title": "Автопилот отзывов и репутации",
+   "desc": "После каждого выполненного заказа система просит довольного клиента об отзыве в тот момент, когда он вероятнее всего его оставит. О плохом отзыве вы узнаёте за минуты, вместе с уже готовым спокойным ответом на ваше согласование.",
+   "kills": "",
+   "demo": "Мониторинг отзывов · Google, Trustpilot, маркетплейс"
+  },
+  {
+   "n": "47",
+   "cat": "Отчётность и видимость для руководства",
+   "title": "Управленческие дашборды",
+   "desc": "Выручка, маржа, деньги, воронка, склад, производство и результаты сотрудников на одном экране, автоматически обновляемые из систем, где лежат данные. Та версия правды, которую директор читает до совещания, а не во время него.",
+   "kills": "",
+   "demo": "Экран директора"
+  },
+  {
+   "n": "48",
+   "cat": "Отчётность и видимость для руководства",
+   "title": "Учёт KPI сотрудников",
+   "desc": "Показатели сотрудника и команды считаются по записям самой системы, а не по тому, что люди сообщают о себе, и сразу идут в расчёт премии.",
+   "kills": "",
+   "demo": "KPI продаж · март"
+  },
+  {
+   "n": "49",
+   "cat": "Отчётность и видимость для руководства",
+   "title": "Отчёты по расписанию",
+   "desc": "Отчёт, который кто-то собирает вручную каждое утро понедельника, формируется и отправляется по расписанию на почту или в Telegram, уже оформленный и готовый к пересылке. Небольшое изменение, которое чувствуется сразу.",
+   "kills": "",
+   "demo": "Понедельничный пакет"
+  },
+  {
+   "n": "50",
+   "cat": "Отчётность и видимость для руководства",
+   "title": "Оповещения и поиск отклонений",
+   "desc": "Вам сообщают в тот момент, когда что-то выходит за обычные рамки: падает маржа по товару, затихает постоянный клиент, запас ниже нормы, лежит сервер, не проходит платёж, скачут расходы.",
+   "kills": "",
+   "demo": "Контроль отклонений"
+  },
+  {
+   "n": "60",
+   "cat": "Отчётность и видимость для руководства",
+   "title": "Радар оттока клиентов",
+   "desc": "Частота и объём заказов отслеживаются по каждому клиенту, поэтому те, кто уходит, видны за недели до того, как перестанут отвечать. Менеджер получает задачу на возврат со всей историей клиента.",
+   "kills": "",
+   "demo": "Радар оттока · последние 90 дней"
+  },
+  {
+   "n": "51",
+   "cat": "Инфраструктура и поддержка",
+   "title": "Excel заменён настоящим приложением",
+   "desc": "Критичная таблица, которую ведёт один человек, которая ломается при открытии вдвоём и не хранит историю, становится многопользовательским приложением с правами доступа и резервными копиями.",
+   "kills": "",
+   "demo": "Таблица в приложение"
+  },
+  {
+   "n": "52",
+   "cat": "Инфраструктура и поддержка",
+   "title": "Автоматизация старой настольной программы, которую никто не может изменить",
+   "desc": "Когда у устаревшего Windows-приложения нет API и не осталось разработчика, мы автоматизируем сами клики и ввод. Некрасиво, эффективно и часто единственный путь.",
+   "kills": "",
+   "demo": "Старая программа под Windows"
+  },
+  {
+   "n": "53",
+   "cat": "Инфраструктура и поддержка",
+   "title": "Резервное копирование, восстановление и контроль доступа",
+   "desc": "Автоматические резервные копии, которые действительно проверяются, права по ролям, журнал того, кто что видел и менял, и отключение уходящего сотрудника сразу от всего.",
+   "kills": "",
+   "demo": "Резервные копии и доступы"
+  },
+  {
+   "n": "54",
+   "cat": "Инфраструктура и поддержка",
+   "title": "Хостинг, деплой и мониторинг",
+   "desc": "Серверы настроены, релизы автоматизированы, доступность и производительность под наблюдением с оповещениями, которые доходят до человека. Именно это держит систему в работе после запуска.",
+   "kills": "",
+   "demo": "Хостинг и мониторинг"
+  },
+  {
+   "n": "55",
+   "cat": "Инфраструктура и поддержка",
+   "title": "Обучение, документация и передача",
+   "desc": "Письменные инструкции, видеоразборы и обучение сотрудников, чтобы системой пользовались, а не тихо забросили на третий месяц. Доступен договор на поддержку и дальнейшие доработки.",
+   "kills": "",
+   "demo": "Пакет передачи"
+  }
+ ],
+ "en": [
+  {
+   "n": "",
+   "cat": "Built for your industry",
+   "title": "For law firms",
+   "desc": "Court and registry monitoring, document assembly from approved templates, an assistant that answers from the case archive, a client portal, and hours billed from real activity.",
+   "kills": "",
+   "demo": "Case desk · Monday 08:30"
+  },
+  {
+   "n": "",
+   "cat": "Built for your industry",
+   "title": "For construction companies",
+   "desc": "Site check-ins and daily reports from the crew's phones, purchase approvals by amount, equipment service before the breakdown, and estimate-versus-actual per object.",
+   "kills": "",
+   "demo": "Site board · Object 7"
+  },
+  {
+   "n": "01",
+   "cat": "Data collection and integration",
+   "title": "Website and competitor parsers",
+   "desc": "A bot visits the sites you already check by hand every morning (competitor prices, supplier stock, marketplace listings, exchange rates) and drops the data into your spreadsheet, database or CRM before the office opens.",
+   "kills": "",
+   "demo": "Price watch · daily run"
+  },
+  {
+   "n": "02",
+   "cat": "Data collection and integration",
+   "title": "Supplier catalogue import",
+   "desc": "Suppliers send price lists in whatever format they feel like. One importer takes all of them, matches products to your own SKUs, flags what changed, and updates your system on a schedule nobody watches.",
+   "kills": "",
+   "demo": "Supplier import"
+  },
+  {
+   "n": "03",
+   "cat": "Data collection and integration",
+   "title": "Marketplace monitoring",
+   "desc": "Track your own and competitor cards on Amazon, Wildberries, Ozon, eBay, Etsy: position, price, stock, reviews, buy-box status. Alerts fire the moment a competitor undercuts you or a listing dies.",
+   "kills": "",
+   "demo": "Marketplace alerts"
+  },
+  {
+   "n": "04",
+   "cat": "Data collection and integration",
+   "title": "Tender and registry monitoring",
+   "desc": "Automated watching of procurement portals, company registries, court databases and bankruptcy notices, filtered to your criteria and pushed to email or Telegram.",
+   "kills": "",
+   "demo": "Registry watch → Telegram"
+  },
+  {
+   "n": "05",
+   "cat": "Data collection and integration",
+   "title": "Lead scraping from directories and maps",
+   "desc": "Pull business listings from Google Maps, industry catalogues and directories, clean them, deduplicate against your existing base, and load them into the CRM ready to call.",
+   "kills": "",
+   "demo": "Lead harvest → CRM"
+  },
+  {
+   "n": "06",
+   "cat": "Data collection and integration",
+   "title": "Integrations between systems that don't talk",
+   "desc": "The most common problem in a mid-sized company: accounting, CRM, website and warehouse each hold a version of the truth, and someone retypes between them. We build the connector.",
+   "kills": "",
+   "demo": "Systems, connected"
+  },
+  {
+   "n": "07",
+   "cat": "Data collection and integration",
+   "title": "Migration off a legacy system",
+   "desc": "Twelve years of data pulled out of an old Access database, a discontinued ERP or an unsupported custom system: cleaned, mapped and loaded into something modern without losing history.",
+   "kills": "",
+   "demo": "Legacy migration"
+  },
+  {
+   "n": "08",
+   "cat": "Accounting and finance",
+   "title": "Readable reports out of your accounting system",
+   "desc": "Accounting software stores everything and shows nothing useful. We build the export layer that renders the data the way the director, the accountant or the tax adviser actually needs it.",
+   "kills": "",
+   "demo": "Monthly report"
+  },
+  {
+   "n": "09",
+   "cat": "Accounting and finance",
+   "title": "Automatic invoice and document generation",
+   "desc": "Invoices, delivery notes, contracts and closing documents generated the moment a deal changes state: numbered correctly, filed correctly, sent to the client automatically.",
+   "kills": "",
+   "demo": "Deal won → paperwork"
+  },
+  {
+   "n": "10",
+   "cat": "Accounting and finance",
+   "title": "Bank statement reconciliation",
+   "desc": "Incoming payments matched against invoices automatically, including partial payments and messy payment references. Only what doesn't match reaches a human.",
+   "kills": "",
+   "demo": "Bank reconciliation"
+  },
+  {
+   "n": "11",
+   "cat": "Accounting and finance",
+   "title": "Receivables chasing",
+   "desc": "The system tracks who owes what and how overdue it is, then sends the reminders on your schedule, hardening the tone as days pass and copying the account manager at day 30, the lawyer at day 60. Companies sit on six figures outstanding purely because nobody had time to chase.",
+   "kills": "",
+   "demo": "Overdue ledger"
+  },
+  {
+   "n": "12",
+   "cat": "Accounting and finance",
+   "title": "Receipt and invoice OCR",
+   "desc": "Photograph a receipt and the system pulls the vendor, date, amount, VAT and category, then files the expense against the right period. Anything it cannot read clearly gets flagged instead of guessed.",
+   "kills": "",
+   "demo": "Receipt inbox"
+  },
+  {
+   "n": "13",
+   "cat": "Accounting and finance",
+   "title": "Payroll and shift calculation",
+   "desc": "Hours, shifts, overtime, bonuses, piece rates and deductions come straight out of the real timekeeping data rather than somebody's notebook. Most valuable where pay follows output or irregular hours.",
+   "kills": "",
+   "demo": "Payroll run · March"
+  },
+  {
+   "n": "14",
+   "cat": "Accounting and finance",
+   "title": "Cash flow forecasting",
+   "desc": "One dashboard takes confirmed receivables, scheduled payables, payroll dates and recurring costs and shows where the cash stands 30, 60 and 90 days out. Small businesses usually fly blind here and meet the gap in the week it lands.",
+   "kills": "",
+   "demo": "Cash position"
+  },
+  {
+   "n": "15",
+   "cat": "Sales and CRM",
+   "title": "Custom CRM",
+   "desc": "When the off the shelf systems do not fit the way you actually sell, we build one that does: your stages, your fields, your rules, your reports. Over three years it costs less than per seat licensing for a 20 person sales team, and the business stops reshaping itself around someone else's assumptions.",
+   "kills": "",
+   "demo": "Pipeline · your stages"
+  },
+  {
+   "n": "16",
+   "cat": "Sales and CRM",
+   "title": "Telephony, email and messengers in the CRM",
+   "desc": "Calls are recorded and attached to the client card, emails threaded, WhatsApp and Telegram conversations logged where the next person can read them. The client relationship belongs to the company, not to one handset.",
+   "kills": "",
+   "demo": "Client card · Northgate Ltd"
+  },
+  {
+   "n": "17",
+   "cat": "Sales and CRM",
+   "title": "Lead routing and scoring",
+   "desc": "Enquiries are assigned automatically by region, product, current load and skill, and a scoring model pushes the serious buyers to the front of the queue. How fast you answer a web lead predicts whether it closes better than anything else you control.",
+   "kills": "",
+   "demo": "Incoming enquiries"
+  },
+  {
+   "n": "18",
+   "cat": "Sales and CRM",
+   "title": "Commercial proposal generator",
+   "desc": "Sales picks the products and terms and the system returns a branded, correctly priced, correctly calculated proposal as a PDF in under a minute. Every number comes from the live price list, not from memory.",
+   "kills": "",
+   "demo": "Proposal builder"
+  },
+  {
+   "n": "19",
+   "cat": "Sales and CRM",
+   "title": "Sales pipeline dashboard",
+   "desc": "A live view of the funnel by manager, product, source and stage, with conversion rates and alerts on deals that have stopped moving. The weekly sales meeting becomes a five minute conversation about the two deals that matter.",
+   "kills": "",
+   "demo": "Funnel · this month"
+  },
+  {
+   "n": "20",
+   "cat": "Sales and CRM",
+   "title": "Email and SMS campaign automation",
+   "desc": "Segmented, triggered sequences that run themselves: welcome series, abandoned cart, dormant client re-engagement, birthday and renewal reminders. The dormant client list is usually the cheapest revenue in the building and nobody is working it.",
+   "kills": "",
+   "demo": "Campaign engine"
+  },
+  {
+   "n": "21",
+   "cat": "Sales and CRM",
+   "title": "Client self-service portal",
+   "desc": "Clients log in to see their orders, documents, balance, delivery status and full history, and place repeat orders without asking anyone. Every question the portal answers is a phone call your staff never takes.",
+   "kills": "",
+   "demo": "Client portal · Northgate Ltd"
+  },
+  {
+   "n": "22",
+   "cat": "Sales and CRM",
+   "title": "Loyalty, referral and partner tracking",
+   "desc": "Points, tiers, referral codes and partner commissions are calculated and reported on their own, with anything unclear held back rather than paid out wrong. Partners see the same numbers you do.",
+   "kills": "",
+   "demo": "Loyalty and partners"
+  },
+  {
+   "n": "23",
+   "cat": "Artificial intelligence",
+   "title": "Support chatbot on your own materials",
+   "desc": "The bot answers from your documentation, price list, policies and past tickets instead of inventing an answer, and passes the thread to a person the moment it is out of its depth. It runs on the site, in WhatsApp and in Telegram, and typically takes 60-80% of repeat questions off the queue.",
+   "kills": "",
+   "demo": "Support bot, WhatsApp"
+  },
+  {
+   "n": "24",
+   "cat": "Artificial intelligence",
+   "title": "Internal assistant over company documents",
+   "desc": "Staff ask in plain language and get the answer out of contracts, regulations, technical manuals, project archives and the internal wiki, with a link to the exact source document. It fixes the case where the answer exists but only one colleague knows which folder holds it.",
+   "kills": "",
+   "demo": "Internal assistant"
+  },
+  {
+   "n": "25",
+   "cat": "Artificial intelligence",
+   "title": "Call transcription, summary and follow-up",
+   "desc": "Every sales and support call is transcribed, summarised and tagged with the outcome, the next step and the objections raised, then written straight into the CRM. Managers listen instead of taking notes, and a director can review a hundred calls a week without playing a single recording.",
+   "kills": "",
+   "demo": "Call · Northgate Ltd"
+  },
+  {
+   "n": "26",
+   "cat": "Artificial intelligence",
+   "title": "Document classification and data extraction",
+   "desc": "Incoming contracts, invoices, certificates, applications and correspondence are read on arrival: the type is identified, the key terms are pulled out, and the document is routed to the right person or system. Anything ambiguous is held rather than guessed at.",
+   "kills": "",
+   "demo": "Inbox · incoming documents"
+  },
+  {
+   "n": "27",
+   "cat": "Artificial intelligence",
+   "title": "AI content for product cards and SEO",
+   "desc": "Descriptions, specifications, meta tags and category text are generated for thousands of products straight from the attribute data you already hold, in your own tone of voice. A catalogue of 5,000 items is otherwise a copywriting budget nobody signs off.",
+   "kills": "",
+   "demo": "Catalogue generation"
+  },
+  {
+   "n": "28",
+   "cat": "Artificial intelligence",
+   "title": "CV screening and candidate ranking",
+   "desc": "Applications are parsed, matched against the requirements, ranked and summarised for the hiring manager, with a first-contact message drafted for each shortlisted name. It closes the dead days between a good candidate applying and somebody finally opening the CV.",
+   "kills": "",
+   "demo": "Vacancy · Warehouse supervisor"
+  },
+  {
+   "n": "29",
+   "cat": "Artificial intelligence",
+   "title": "Demand and inventory forecasting",
+   "desc": "A model trained on your own sales history, seasonality, promotions and supplier lead times tells you what to order and when. It targets the two failures that cost real money and never show up cleanly in the accounts: capital frozen in dead stock, and sales lost to an empty shelf.",
+   "kills": "",
+   "demo": "Purchase plan · week 12"
+  },
+  {
+   "n": "30",
+   "cat": "Artificial intelligence",
+   "title": "Image recognition",
+   "desc": "Counting stock from photographs, checking product quality on the line, reading serial numbers and labels, and verifying that a merchandiser really set the shelf up the way the planogram said. It fits anywhere a person currently looks at something and ticks a box.",
+   "kills": "",
+   "demo": "Shelf and line checks"
+  },
+  {
+   "n": "31",
+   "cat": "Artificial intelligence",
+   "title": "Voice bot for inbound and outbound calls",
+   "desc": "It confirms appointments, books delivery slots, reports order status and qualifies simple enquiries without a person on the line, and it answers at 11pm and on a Sunday. Most valuable where calls are lost at peak, or where staff are paid to repeat the same sentence four hundred times a week.",
+   "kills": "",
+   "demo": "Voice bot · Sunday 23:04"
+  },
+  {
+   "n": "32",
+   "cat": "Artificial intelligence",
+   "title": "Content factory",
+   "desc": "A pipeline that turns your catalogue, your expertise and your clients' real questions into a steady stream of posts, articles and video scripts in your tone of voice, on a schedule, with nothing published until you approve it.",
+   "kills": "",
+   "demo": "Content factory · this week"
+  },
+  {
+   "n": "33",
+   "cat": "Operations and internal workflow",
+   "title": "Custom task and project tracking",
+   "desc": "Generic trackers force your work into someone else's shape. This one is built around your stages, checklists, handover points and deadlines, with the right view for each person who needs it. Strongest in production, construction, installation and agency work.",
+   "kills": "",
+   "demo": "Fit-out job board"
+  },
+  {
+   "n": "34",
+   "cat": "Operations and internal workflow",
+   "title": "Approval and sign-off workflows",
+   "desc": "Purchase requests, discounts, leave, expenses and contracts go to the right approver automatically by amount and type, with reminders, deadlines and a complete audit trail behind every decision.",
+   "kills": "",
+   "demo": "Approval routing"
+  },
+  {
+   "n": "35",
+   "cat": "Operations and internal workflow",
+   "title": "Document generation from templates",
+   "desc": "Contracts, acts, powers of attorney, specifications and reports built from data you already hold, correctly numbered and versioned, with variable clauses picked by rule. Legal approves the template once instead of reading every document.",
+   "kills": "",
+   "demo": "Document assembly"
+  },
+  {
+   "n": "36",
+   "cat": "Operations and internal workflow",
+   "title": "Shift scheduling and rostering",
+   "desc": "The rota builds itself against availability, skills, labour rules and forecast demand, then publishes straight to staff phones and handles swap requests. In retail, hospitality and logistics this is a manager's entire Friday.",
+   "kills": "",
+   "demo": "Week 11 rota"
+  },
+  {
+   "n": "37",
+   "cat": "Operations and internal workflow",
+   "title": "Field service and mobile crew app",
+   "desc": "Jobs land on the engineer's phone with route, client history, checklists, photo capture, parts used and a client signature, and the completion report reaches the office the moment the job ends.",
+   "kills": "",
+   "demo": "Crew app · van 7"
+  },
+  {
+   "n": "38",
+   "cat": "Operations and internal workflow",
+   "title": "Warehouse and inventory management",
+   "desc": "Receiving, picking, moving and stocktaking done by barcode or QR on a phone or scanner, with live stock levels feeding the website and the accounts at the same moment.",
+   "kills": "",
+   "demo": "Warehouse scanner"
+  },
+  {
+   "n": "39",
+   "cat": "Operations and internal workflow",
+   "title": "Booking and appointment system",
+   "desc": "Online booking against real availability, automatic reminders that cut no-shows, room and resource allocation, deposits taken up front. Built for clinics, salons, studios, workshops, consultancies and equipment hire.",
+   "kills": "",
+   "demo": "Booking desk"
+  },
+  {
+   "n": "40",
+   "cat": "Operations and internal workflow",
+   "title": "Route planning and fleet tracking",
+   "desc": "Deliveries sequenced for the shortest run with time windows and vehicle capacity respected, drivers tracked live, clients told when to expect the van. Fuel and driver hours are usually the two largest controllable costs in a delivery operation.",
+   "kills": "",
+   "demo": "Tomorrow's routes"
+  },
+  {
+   "n": "41",
+   "cat": "Operations and internal workflow",
+   "title": "Staff onboarding and offboarding",
+   "desc": "The moment a hire is accepted, accounts, accesses, equipment, checklists and the day-one schedule are created without anyone chasing IT. When someone leaves, every access dies in one click.",
+   "kills": "",
+   "demo": "New hire packet · M. Reinholt , logistics"
+  },
+  {
+   "n": "42",
+   "cat": "Operations and internal workflow",
+   "title": "Equipment and vehicle maintenance scheduler",
+   "desc": "Service intervals are tracked from running hours, mileage or the calendar, whichever comes first. Work orders are raised before the breakdown, with parts, cost and downtime logged per machine.",
+   "kills": "",
+   "demo": "Fleet and machines · service due"
+  },
+  {
+   "n": "43",
+   "cat": "Web and customer-facing",
+   "title": "Corporate site and landing pages",
+   "desc": "Fast, mobile-correct pages built to convert instead of to look busy. Forms are wired into your CRM from the first day live.",
+   "kills": "",
+   "demo": "Landing page to CRM"
+  },
+  {
+   "n": "44",
+   "cat": "Web and customer-facing",
+   "title": "Online store",
+   "desc": "Catalogue, payments, delivery calculation and stock tied to the warehouse, with online orders landing in the same system your offline sales already use.",
+   "kills": "",
+   "demo": "Online store"
+  },
+  {
+   "n": "45",
+   "cat": "Web and customer-facing",
+   "title": "Customer accounts and subscription billing",
+   "desc": "Recurring charges, plan changes, dunning on failed cards, usage limits and invoices issued without anyone touching them.",
+   "kills": "",
+   "demo": "Subscriptions"
+  },
+  {
+   "n": "46",
+   "cat": "Web and customer-facing",
+   "title": "Payment integration",
+   "desc": "Card, bank transfer, instalments, invoicing and crypto where it makes sense, with every payment reconciled back into accounting.",
+   "kills": "",
+   "demo": "Payments and reconciliation"
+  },
+  {
+   "n": "47",
+   "cat": "Web and customer-facing",
+   "title": "Telegram or WhatsApp bot as a sales channel",
+   "desc": "Catalogue, ordering, order status, support and notifications inside the messenger your customer already has open. In most consumer categories that beats a mobile web form.",
+   "kills": "",
+   "demo": "Messenger sales bot"
+  },
+  {
+   "n": "48",
+   "cat": "Web and customer-facing",
+   "title": "Marketplace management tool",
+   "desc": "Listings, prices, stock and orders for several marketplaces in one place, with automatic repricing rules if you want them.",
+   "kills": "",
+   "demo": "Marketplace control panel"
+  },
+  {
+   "n": "49",
+   "cat": "Web and customer-facing",
+   "title": "Analytics, tracking and attribution",
+   "desc": "Event tracking done properly and ad spend joined to closed revenue rather than to form submissions, so dashboards show real cost per client by channel.",
+   "kills": "",
+   "demo": "Attribution dashboard"
+  },
+  {
+   "n": "50",
+   "cat": "Web and customer-facing",
+   "title": "Reviews and reputation autopilot",
+   "desc": "After each completed order the system asks the happy client for a review at the moment they are most likely to leave one. A bad review pings you within minutes with a calm reply already drafted for your approval.",
+   "kills": "",
+   "demo": "Review watch · Google, Trustpilot, marketplace"
+  },
+  {
+   "n": "51",
+   "cat": "Reporting and management visibility",
+   "title": "Management dashboards",
+   "desc": "Revenue, margin, cash, pipeline, stock, production and staff performance on one screen, refreshed automatically from the systems that hold the data. The version of the truth the director reads before the meeting, not during it.",
+   "kills": "",
+   "demo": "Director's screen"
+  },
+  {
+   "n": "52",
+   "cat": "Reporting and management visibility",
+   "title": "Staff KPI tracking",
+   "desc": "Individual and team performance measured from the system's own records rather than what people report about themselves, feeding straight into the bonus calculation.",
+   "kills": "",
+   "demo": "Sales KPIs · March"
+  },
+  {
+   "n": "53",
+   "cat": "Reporting and management visibility",
+   "title": "Scheduled reports",
+   "desc": "The report someone assembles by hand every Monday morning is generated and delivered on schedule to email or Telegram, already formatted and ready to forward. A small change that is felt immediately.",
+   "kills": "",
+   "demo": "Monday pack"
+  },
+  {
+   "n": "54",
+   "cat": "Reporting and management visibility",
+   "title": "Alerting and anomaly detection",
+   "desc": "You get told the moment something leaves its normal range: margin slipping on a product, a regular client going quiet, stock under cover, a server down, a payment failing, expenses spiking.",
+   "kills": "",
+   "demo": "Anomaly watch"
+  },
+  {
+   "n": "55",
+   "cat": "Reporting and management visibility",
+   "title": "Client churn radar",
+   "desc": "Order frequency and volume are watched per client, so the ones drifting away are flagged weeks before they stop answering. The manager gets a win-back task with the client's whole history attached.",
+   "kills": "",
+   "demo": "Churn radar · last 90 days"
+  },
+  {
+   "n": "56",
+   "cat": "Infrastructure and support",
+   "title": "Excel replaced with a real application",
+   "desc": "The critical spreadsheet one person maintains, that breaks when two people open it and keeps no history, becomes a multi-user application with permissions and backups.",
+   "kills": "",
+   "demo": "Spreadsheet to application"
+  },
+  {
+   "n": "57",
+   "cat": "Infrastructure and support",
+   "title": "Automating an old desktop program nobody can change",
+   "desc": "When a legacy Windows application has no API and no vendor left, we automate the clicking and typing instead. Ugly, effective, and often the only route.",
+   "kills": "",
+   "demo": "Legacy Windows program"
+  },
+  {
+   "n": "58",
+   "cat": "Infrastructure and support",
+   "title": "Backup, disaster recovery and access control",
+   "desc": "Automated backups that are actually tested, role-based permissions, a log of who saw and changed what, and offboarding that revokes everything at once.",
+   "kills": "",
+   "demo": "Backup and access"
+  },
+  {
+   "n": "59",
+   "cat": "Infrastructure and support",
+   "title": "Hosting, deployment and monitoring",
+   "desc": "Servers set up, releases automated, uptime and performance watched with alerts that reach a human. This is what keeps the thing running after launch.",
+   "kills": "",
+   "demo": "Hosting and monitoring"
+  },
+  {
+   "n": "60",
+   "cat": "Infrastructure and support",
+   "title": "Training, documentation and handover",
+   "desc": "Written instructions, video walkthroughs and staff training, so the system is used rather than quietly abandoned in month three. Support agreement available for ongoing changes.",
+   "kills": "",
+   "demo": "Handover pack"
+  }
+ ]
+}

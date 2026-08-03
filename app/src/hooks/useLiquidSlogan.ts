@@ -20,6 +20,12 @@ export function useLiquidSlogan(ready: boolean, heroVisible: boolean): void {
        threshold filter plus a per-frame blur on two short lines of text, which a modern phone
        handles; only a genuinely weak device keeps the crossfade. */
     const WEAK = !!(navigator.deviceMemory && navigator.deviceMemory <= 3)
+    /* The grey box he photographed behind each line: the travelling colour is painted as the
+       span's BACKGROUND and cut to the glyphs with background-clip:text. The melt blurs that
+       same span, and iOS drops the clip on a blurred layer - so the background rectangle gets
+       painted instead of the letters. Touch devices walk the same palette as a plain text
+       colour instead. The melt itself, threshold included, is untouched. */
+    const TOUCH = matchMedia('(hover:none)').matches || matchMedia('(pointer:coarse)').matches
     /* The threshold went off on touch for one release and it was a mistake. The report that the
        slogan "was not morphing" came from the screenshot where a broken tint had flooded the
        whole page pale blue - the text was there, under the flood. Without the threshold what
@@ -36,6 +42,7 @@ export function useLiquidSlogan(ready: boolean, heroVisible: boolean): void {
       drift: FLOW * 3,
       spread: ICE.length * 0.08,
       simple: WEAK,
+      flat: TOUCH,
       activeWhen: () => activeRef.current,
     }
     const stop1 = window.LiquidText(L1, SLOGAN_LINE_1, MORPH)
