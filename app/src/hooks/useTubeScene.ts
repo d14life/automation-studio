@@ -239,7 +239,12 @@ export function useTubeScene(ready: boolean, heroVisible: boolean): RefObject<HT
            Narrower on his word: the path used to reach past the ends of the words, now it stays
            well inside them. Height is three quarters of the block, up 50% from a half. */
         a.options.sleepRadiusX = Math.round(textW * 0.38)
-        a.options.sleepRadiusY = Math.round(blockH * 1.125)
+        /* His call, 4 Aug: wider in HEIGHT too, not just length. The 1.125 was chosen to keep a
+           flat figure that stayed in the line of the text and off the 101 - but on the Mac the
+           loop does reach down past the words, and that reach is what he is pointing at. A
+           phone's two lines are only ~80px tall against the desktop's ~179, so the same
+           multiplier buys less than half the vertical travel. Small screens get 2.4x. */
+        a.options.sleepRadiusY = Math.round(blockH * (SMALL ? 2.4 : 1.125))
         window.__tubeSweep = [a.options.sleepRadiusX, a.options.sleepRadiusY] /* readable proof */
       }
       sweep()
