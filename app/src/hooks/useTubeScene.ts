@@ -177,6 +177,26 @@ export function useTubeScene(ready: boolean, heroVisible: boolean): RefObject<HT
         r.resize?.()
       } catch { /* older build without the knob: leave it alone */ }
 
+      /* Two per-object settings the library leaves at three.js defaults, checked on a live scene
+         before touching anything:
+
+         matrixAutoUpdate - three.js recomputes an object's world matrix every frame in case it
+         moved. These ribbons never move: what changes is the geometry inside them, and their
+         transform stays the identity from build to teardown. Same for the four lights. Fifteen
+         matrix recomputations a frame, for nothing.
+
+         frustumCulled - the cull test needs a bounding sphere, which three.js derives ONCE from
+         the geometry and then caches. This geometry is rewritten every frame, so that cached
+         sphere is stale by design; the tubes fill the screen and are never off camera anyway.
+         Turning the test off is both cheaper and safer than a stale sphere that could cull a
+         visible ribbon. */
+      try {
+        for (const t of a.tubes.tubes ?? []) {
+          t.updateMatrix(); t.matrixAutoUpdate = false; t.frustumCulled = false
+        }
+        for (const l of a.tubes.lights ?? []) { l.updateMatrix(); l.matrixAutoUpdate = false }
+      } catch { /* a build that exposes neither list: nothing to pin */ }
+
       /* If the frame guard finds the machine is not coping - integrated graphics on Windows is
          the case that started this - the scene halves its own resolution rather than the page
          losing the ribbons. Quarter the pixels through every pass, one live resize. */
@@ -186,6 +206,12 @@ export function useTubeScene(ready: boolean, heroVisible: boolean): RefObject<HT
           r.minPixelRatio = 0.7
           r.maxPixelRatio = 0.7
           r.resize?.()
+          /* The ribbons use a physically-based material lit by FOUR point lights, so every pixel
+             of every ribbon runs the full lighting model four times - the dominant per-pixel cost
+             on a weak GPU. Dropping two of the lights out of the scene makes three.js recompile
+             the shader for two, halving that work. The colour cycle keeps writing all four; the
+             two that are gone simply stop being read. */
+          for (const l of (a.tubes.lights ?? []).slice(2)) a.tubes.remove?.(l)
         } catch { /* nothing to thin */ }
       }
       if (document.documentElement.dataset.perf === 'low') thin()
