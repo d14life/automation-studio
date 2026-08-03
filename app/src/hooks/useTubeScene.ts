@@ -176,6 +176,20 @@ export function useTubeScene(ready: boolean, heroVisible: boolean): RefObject<HT
         r.maxPixelRatio = SMALL ? 1 : 1.4 /* full ratio on the phone was a real frame cost */
         r.resize?.()
       } catch { /* older build without the knob: leave it alone */ }
+
+      /* If the frame guard finds the machine is not coping - integrated graphics on Windows is
+         the case that started this - the scene halves its own resolution rather than the page
+         losing the ribbons. Quarter the pixels through every pass, one live resize. */
+      const thin = () => {
+        try {
+          const r = a.three as { minPixelRatio?: number; maxPixelRatio?: number; resize?: () => void }
+          r.minPixelRatio = 0.7
+          r.maxPixelRatio = 0.7
+          r.resize?.()
+        } catch { /* nothing to thin */ }
+      }
+      if (document.documentElement.dataset.perf === 'low') thin()
+      else addEventListener('perf-low', thin, { once: true })
       /* A flat wide figure keeps the ribbons in the line of the text instead of looping down
          across the number below it.
 

@@ -116,6 +116,8 @@ declare global {
     __tubeHue?: number
     /* [sleepRadiusX, sleepRadiusY] - how far the ribbons travel, readable for checking */
     __tubeSweep?: [number, number]
+    /* last measured frame rate, written once by usePerfGuard - proof on a real machine */
+    __perfFps?: number
   }
 
   interface Navigator {
