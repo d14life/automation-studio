@@ -35,8 +35,13 @@ export function useLiquidSlogan(ready: boolean, heroVisible: boolean): void {
        line. The threshold clamps everything under 55% alpha to nothing, which is exactly what
        was hiding that box. It stays on everywhere. */
     const MORPH: LiquidTextOptions = {
-      morphTime: WEAK ? 0.9 : 4.5,
-      cooldownTime: WEAK ? 1.7 : 0.45,
+      /* Desktop: 4.5s melting against 0.45s still, so the words are in transition 91% of the
+         time. At 77px that reads as liquid and he approved it. Photographed at 34px on a real
+         iPhone it reads as a collision - two phrases sharing one line with nothing legible.
+         Touch gets the same melt, just weighted the other way: a quick 1.6s morph and a 2.6s
+         hold, so most of the time there is a readable sentence on screen. */
+      morphTime: WEAK ? 0.9 : TOUCH ? 1.6 : 4.5,
+      cooldownTime: WEAK ? 1.7 : TOUCH ? 2.6 : 0.45,
       colors: ICE,
       flow: FLOW,
       drift: FLOW * 3,
