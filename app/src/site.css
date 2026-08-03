@@ -967,3 +967,26 @@ footer a{display:block;padding:3px 0}
 .mk-beam-css{animation:mk-beam-spin var(--mk-beam-dur,8.5s) linear infinite;
   animation-delay:var(--mk-beam-delay,0s)}
 @media (prefers-reduced-motion:reduce){.mk-beam-css{animation:none}}
+
+/* ---------- the low-power tier ----------
+   usePerfGuard measures the real frame rate a moment after the first screen settles and writes
+   data-perf="low" here when the machine is not keeping up. It started with Windows: a desktop
+   browser on integrated graphics is fill-rate bound, and every rule below is a large blurred
+   surface - the exact thing that costs fill rate. Nothing here changes the layout or removes a
+   component; the soft haloes go and the crisp parts stay. */
+[data-perf="low"] .mk-beam-glow{display:none}                 /* 8 blurred rings; the sharp ring stays */
+[data-perf="low"] .glowspin{filter:none;opacity:.5}           /* two panel-sized 24px blurs */
+[data-perf="low"] .steps .glow-container{--glow-blur:0;--glow-opacity:.4}
+[data-perf="low"] .steps .glow,
+[data-perf="low"] .steps .glow-content:before{animation:none} /* main-thread custom-property loops */
+[data-perf="low"] .edgecard-sheen{display:none}
+/* one property, not two: the minifier collapses the prefixed pair and keeps only the -webkit-
+   one, which then loses to the unprefixed blur in the base rule. Unprefixed alone survives. */
+[data-perf="low"] .sp-mask{backdrop-filter:none}
+[data-perf="low"] .hero101{filter:none}                       /* a 34px drop-shadow on a 380px glyph */
+/* live glass is the most expensive thing a weak GPU does: it must re-read and re-blur whatever
+   is behind it whenever that moves, and the starfield behind it moves. Flat glass instead. */
+/* !important because the two .stat cards carry their blur as a Tailwind utility on the element,
+   which a plain rule of the same weight cannot beat. .skewrow is gone with the old cards. */
+[data-perf="low"] .navpill,[data-perf="low"] .switchbar,[data-perf="low"] .stat{
+  backdrop-filter:none !important;background:rgba(255,255,255,.14)}

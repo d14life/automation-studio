@@ -41,6 +41,13 @@ export function useStarfield(ready: boolean): RefObject<HTMLDivElement | null> {
       zIndex: 1,
     })
 
+    /* The page-wide frame guard: on a machine that is not coping, the field thins to a third
+       rather than the page losing its stars. Thinning is free - the library keeps the same
+       array and just shortens it. */
+    const thin = () => { stopStars.setQuantity?.(Math.round((SMALL ? 1100 : 4400) * 0.34)) }
+    if (document.documentElement.dataset.perf === 'low') thin()
+    else addEventListener('perf-low', thin, { once: true })
+
     /* Watchdog, phones only and only after the page has settled: at load the first seconds are
        always slow (fonts, first paint, scene init) and judging the machine on those was wrong. */
     let raf = 0
@@ -62,6 +69,7 @@ export function useStarfield(ready: boolean): RefObject<HTMLDivElement | null> {
 
     return () => {
       done = true
+      removeEventListener('perf-low', thin)
       clearTimeout(settle)
       cancelAnimationFrame(raf)
       stopStars()

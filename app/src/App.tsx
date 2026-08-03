@@ -21,6 +21,7 @@ import { useSpotlight } from '@/hooks/useSpotlight'
 import { useCardFan } from '@/hooks/useCardFan'
 import { useCardTilt } from '@/hooks/useCardTilt'
 import { useReveal } from '@/hooks/useReveal'
+import { usePerfGuard } from '@/hooks/usePerfGuard'
 import { useBurgerMenu } from '@/hooks/useBurgerMenu'
 import { useRequestForm } from '@/hooks/useRequestForm'
 import { useAiPanel } from '@/hooks/useAiPanel'
@@ -38,6 +39,7 @@ export default function App() {
   useCardFan()
   useCardTilt()
   useReveal()
+  usePerfGuard()
 
   return (
     <>
