@@ -4,112 +4,165 @@
 <meta charset="utf-8" />
 <title>Запись лент — Solutions101</title>
 <style>
-  html,body{margin:0;height:100%;background:#000;color:#DFF6FF;font:600 15px/1.5 system-ui,sans-serif}
-  #stage{position:fixed;inset:0}
-  canvas{position:absolute;inset:0;width:100%;height:100%}
-  #ui{position:fixed;left:0;right:0;bottom:0;padding:14px 18px;background:rgba(0,0,0,.72);
-      display:flex;gap:14px;align-items:center;z-index:9}
-  b{color:#7FD8FF}
-  #log{font:500 13px/1.5 ui-monospace,Menlo,monospace;color:#9fb3c8}
+  /* the same subset files the site ships, so the measured slogan has the site's metrics */
+  @font-face{font-family:Nunito;font-weight:700 900;font-display:block;
+    src:url(./fonts/nunito-cyrillic.woff2) format('woff2')}
+  html,body{margin:0;height:100%;background:#000;color:#DFF6FF;
+    font:600 15px/1.5 Nunito,system-ui,sans-serif;overflow:hidden}
+  #cv{position:fixed;inset:0;width:100%;height:100%}
+  /* the slogan is rendered for MEASUREMENT only - the ribbon sweep on the real site is derived
+     from the width of these very words, so the only way to record the same figure is to have
+     the same words on screen. Invisible, but laid out exactly as the site lays them out. */
+  #measure{position:fixed;left:0;right:0;top:50%;transform:translateY(-50%);
+    text-align:center;visibility:hidden;pointer-events:none}
+  .morph{position:relative;height:3.5rem;width:100%;max-width:1400px;margin:0 auto;
+    font:900 31.5pt/1 Nunito,system-ui,sans-serif}
+  @media (min-width:1024px){.morph{font-size:4.8rem;height:5.6rem}}
+  .morph span{position:absolute;inset:0;display:block;text-align:center;white-space:nowrap}
+  #ui{position:fixed;left:0;right:0;bottom:0;padding:14px 18px;background:rgba(0,0,0,.75);z-index:9}
+  #log{font:500 13px/1.6 ui-monospace,Menlo,monospace;color:#9fb3c8;white-space:pre}
+  /* The capture dies the moment the tab goes to the background - the canvas simply stops
+     producing frames - so the page has to say, loudly, how long it still needs. */
+  #big{position:fixed;inset:0;display:grid;place-content:center;text-align:center;z-index:10;
+    font:900 clamp(28px,7vw,84px)/1.15 Nunito,system-ui,sans-serif;color:#DFF6FF;
+    text-shadow:0 0 40px rgba(0,0,0,.9);pointer-events:none}
+  #big small{display:block;margin-top:14px;font:700 clamp(13px,1.6vw,20px)/1.4 Nunito,sans-serif;
+    color:#7FD8FF}
+  #big.done{color:#7FD8FF}
 </style>
 </head>
 <body>
-<div id="stage"><canvas id="cv"></canvas></div>
+<canvas id="cv"></canvas>
+<div id="measure">
+  <div class="morph" id="liq1"><span>АВТОМАТИЗИРУЕМ</span></div>
+  <div class="morph" id="liq2"><span>БИЗНЕС-ПРОЦЕССЫ</span></div>
+</div>
+<div id="big">…<small>не уходи с этой вкладки</small></div>
 <div id="ui"><span id="log">запуск…</span></div>
 
 <script src="./anim3.js"></script>
 <script>
-/* Records the real ribbon scene to a video file, so the page can play a clip on machines that
-   cannot afford to render it live. Not part of the site - a tool, opened by hand.
+/* Records the real ribbon scene to a video loop, so the page can play a clip where it cannot
+   afford to render one live. A tool, not part of the site.
 
-   The loop has to be seamless, which means the clip must be a whole number of periods of
-   everything moving inside it:
+   Three things had to be right, and the first version got all three wrong:
 
-     colour   - the palette walks a full lap in FLOW*3 = 10.5s
-     path     - the ribbons trace x = cos(t*s1), y = sin(t*s2), so the figure repeats every
-                2*PI/s1 seconds
+   1. THE RIBBONS MUST NOT FOLLOW THE CURSOR. On the site a capture-phase listener swallows
+      pointermove before the library can see it, so the ribbons trace their own idle figure.
+      Without that guard here they chased the mouse and the recording would have been of
+      something the site never does. The same guard is installed below.
 
-   The library's defaults (s1=1, s2=2) give a 6.283s path against a 10.5s colour lap: those two
-   never line up, so any cut would jump. Choosing s1 = 2*PI*2/10.5 puts exactly two laps of the
-   path inside one lap of the colour, and the whole clip closes on itself.
+   2. THE FIGURE MUST BE THE SAME FIGURE. The sweep on the site is measured off the slogan's
+      ink - 38% of its width across, 112.5% of the two lines' height down - not off the window.
+      So the slogan is rendered here too, invisibly, and measured with the same formula, at the
+      recording browser's own size. Same words, same font, same numbers.
 
-   Recorded on black, not on transparency: the page composites it with mix-blend-mode, where
-   black disappears and only the light adds. That avoids alpha in video entirely, which is the
-   one thing browsers still disagree about. */
+   3. THE COLOUR MUST STILL FOLLOW THE TEXT. That is the one thing a baked clip cannot do, so
+      it is not baked: the scene records in near-white and the page tints it live, on the same
+      palette clock the slogan uses. That also lets the clip be exactly ONE period of the path
+      (2*PI seconds at the library's own time scales), which closes the loop with no seam and
+      keeps the motion at exactly the site's speed. */
 
-const FLOW = 3.5
-const CYCLE = FLOW * 3                    /* 10.5s - one full lap of the palette */
-const S1 = (2 * Math.PI * 2) / CYCLE      /* two laps of the path inside one of the colour */
-const S2 = S1 * 2
 const ICE = ['#DFF6FF', '#7FD8FF', '#5C82C9']
 const GLOW = { l: 0.43, i: 135 }
-const k = GLOW.l / 0.64
-const sp = ICE.length * 0.12
-const p0 = ICE.length * 0.10
-
-const W = 1280, H = 720                   /* soft glowing light: 720p upscales without showing */
-const SETTLE_MS = 4000                    /* the tubes lerp into the figure; let them arrive */
+/* x = cos(t * 1), y = sin(t * 2): the whole figure repeats every 2*PI seconds. Recording
+   exactly that long is what makes the loop seamless without touching the speed. */
+const PERIOD = 2 * Math.PI
+const SETTLE_MS = 2600        /* the tubes lerp into the figure; let them arrive first */
 const log = (t) => (document.getElementById('log').textContent = t)
 
-const set = (p) => [
-  window.dim(window.paletteAt(ICE, p), k),
-  window.dim(window.paletteAt(ICE, p + sp), k),
-  window.dim(window.paletteAt(ICE, p + sp * 2), k),
-]
-const lightSet = (p) => [
-  window.dim(window.paletteAt(ICE, p + sp * 0.3), k),
-  window.dim(window.paletteAt(ICE, p + sp * 0.9), k),
-  window.dim(window.paletteAt(ICE, p + sp * 1.5), k),
-  window.dim(window.paletteAt(ICE, p + sp * 2.1), k),
-]
+/* Near-white so the clip is a luminance map the page can tint. Not pure white: the tubes keep
+   a trace of their own three-stop spread, which is what gives the bundle depth. */
+const PALE = ['#FFFFFF', '#EAF6FF', '#D6E8F7']
+
+/* 1. the guard: the library listens for pointermove on the document, exactly as on the site */
+addEventListener('pointermove', (e) => e.stopPropagation(), true)
 
 const cv = document.getElementById('cv')
-cv.width = W; cv.height = H
 
-window.TubesCursorInit(cv, {
-  bloom: false,
-  sleepRadiusX: Math.round(W * 0.30),
-  sleepRadiusY: Math.round(H * 0.34),
-  sleepTimeScale1: S1,
-  sleepTimeScale2: S2,
-  tubes: {
-    colors: set(p0),
-    count: 11,
-    minTubularSegments: 42,
-    maxTubularSegments: 166,
-    radialSegments: 8,
-    capSegments: 4,
-    lights: { intensity: GLOW.i, colors: lightSet(p0) },
-  },
-}, (app) => {
-  try {
-    app.three.minPixelRatio = 1
-    app.three.maxPixelRatio = 1
-    app.three.resize()
-  } catch (e) { /* older build */ }
+/* 2. the same measurement the site makes */
+function sweep() {
+  const a = document.getElementById('liq1').getBoundingClientRect()
+  const b = document.getElementById('liq2').getBoundingClientRect()
+  const s1 = document.querySelector('#liq1 span').getBoundingClientRect()
+  const s2 = document.querySelector('#liq2 span').getBoundingClientRect()
+  const textW = Math.max(s1.width, s2.width)
+  const blockH = Math.max(a.bottom, b.bottom) - Math.min(a.top, b.top)
+  return { x: Math.round(textW * 0.38), y: Math.round(blockH * 1.125) }
+}
 
-  /* the colour clock, driven by wall time so the recorded lap is exactly CYCLE long */
-  let t0 = 0
-  const paint = (now) => {
-    requestAnimationFrame(paint)
-    if (!t0) t0 = now
-    const p = (((now - t0) / 1000) % CYCLE) / CYCLE * ICE.length + p0
-    try { app.tubes.setColors(set(p)); app.tubes.setLightsColors(lightSet(p)) } catch (e) {}
-  }
-  requestAnimationFrame(paint)
+const big = document.getElementById('big')
+const say = (t, sub) => { big.innerHTML = t + '<small>' + (sub || 'не уходи с этой вкладки') + '</small>' }
 
-  log('сцена собирается, ' + (SETTLE_MS / 1000) + ' сек на разгон…')
-  setTimeout(() => record(cv), SETTLE_MS)
+document.fonts.ready.then(() => {
+  const s = sweep()
+  const W = Math.round(innerWidth), H = Math.round(innerHeight)
+  cv.width = W; cv.height = H
+  log('экран ' + W + '×' + H + ', размах лент ' + s.x + '×' + s.y + ' — как на сайте')
+
+  window.TubesCursorInit(cv, {
+    bloom: false,
+    sleepRadiusX: s.x,
+    sleepRadiusY: s.y,
+    tubes: {
+      colors: PALE,
+      count: 11,
+      minTubularSegments: 42,
+      maxTubularSegments: 166,
+      radialSegments: 8,
+      capSegments: 4,
+      lights: { intensity: GLOW.i, colors: ['#FFFFFF', '#F2FAFF', '#E4F2FF', '#D8ECFF'] },
+    },
+  }, (app) => {
+    try { app.three.minPixelRatio = 1; app.three.maxPixelRatio = 1; app.three.resize() } catch (e) {}
+    run(cv, W, H)
+  })
 })
 
-function record(canvas) {
+/* One attempt, counted down out loud. If the tab is backgrounded at any point the canvas stops
+   feeding the recorder - the first take came back 0.4s long for exactly that reason - so the
+   run aborts and starts again the moment the tab is looked at. */
+function run(canvas, W, H) {
+  const NEED = Math.ceil(SETTLE_MS / 1000 + PERIOD) + 1
+  let left = NEED, timer = 0, rec = null, alive = true
+
+  const abort = () => {
+    if (!alive) return
+    clearInterval(timer)
+    if (rec && rec.state === 'recording') { rec.onstop = null; rec.stop() }
+    rec = null
+    say('пауза', 'вернись на эту вкладку — начну заново')
+  }
+  const start = () => {
+    if (document.hidden) { say('пауза', 'вернись на эту вкладку — начну заново'); return }
+    left = NEED
+    clearInterval(timer)
+    say(left, 'разгоняю сцену, не уходи с вкладки')
+    timer = setInterval(() => {
+      if (document.hidden) return abort()
+      left--
+      if (left > 0) say(left, rec ? 'пишу — не уходи с вкладки' : 'разгоняю сцену')
+    }, 1000)
+    setTimeout(() => {
+      if (document.hidden) return abort()
+      rec = record(canvas, W, H, () => { alive = false; clearInterval(timer) })
+    }, SETTLE_MS)
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) abort()
+    else if (alive && !rec) start()
+  })
+  start()
+}
+
+function record(canvas, W, H, done) {
   const stream = canvas.captureStream(30)
-  const types = ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm']
-  const mime = types.find((t) => MediaRecorder.isTypeSupported(t))
-  if (!mime) return log('этот браузер не умеет записывать webm')
+  const mime = ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm']
+    .find((t) => MediaRecorder.isTypeSupported(t))
+  if (!mime) { log('этот браузер не умеет записывать webm'); return null }
 
   const chunks = []
-  const rec = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 4_000_000 })
+  const rec = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 6_000_000 })
   rec.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data) }
   rec.onstop = () => {
     const blob = new Blob(chunks, { type: 'video/webm' })
@@ -117,14 +170,16 @@ function record(canvas) {
     a.href = URL.createObjectURL(blob)
     a.download = 'tubes-loop.webm'
     a.click()
-    log('готово: ' + (blob.size / 1048576).toFixed(2) + ' МБ, файл ушёл в Загрузки')
+    done()
+    big.className = 'done'
+    say('готово', (blob.size / 1048576).toFixed(2) + ' МБ · файл в Загрузках')
+    log('готово: ' + (blob.size / 1048576).toFixed(2) + ' МБ, ' + W + '×' + H +
+        ', ' + PERIOD.toFixed(3) + ' сек — файл ушёл в Загрузки')
   }
-
-  /* Start on a frame boundary and stop exactly one colour lap later. The extra 40ms covers the
-     recorder's own start latency; the trim happens on the way into the repo. */
   rec.start()
-  log('пишу ровно ' + CYCLE + ' сек…')
-  setTimeout(() => rec.stop(), CYCLE * 1000 + 40)
+  log('пишу ровно один оборот фигуры: ' + PERIOD.toFixed(3) + ' сек…')
+  setTimeout(() => { if (rec.state === 'recording') rec.stop() }, PERIOD * 1000)
+  return rec
 }
 </script>
 </body>
