@@ -46,7 +46,14 @@ export function useLiquidSlogan(ready: boolean, heroVisible: boolean): void {
       flow: FLOW,
       drift: FLOW * 3,
       spread: ICE.length * 0.08,
-      simple: WEAK,
+      /* The melt works by showing BOTH words at once and letting a heavy blur plus the SVG
+         threshold fuse them into one liquid mass. That needs room: at the desktop's 77px it
+         reads as liquid. At 34px on a phone there is no room - photographed on a real iPhone it
+         was first blue blobs (blur three times the letter height) and then, once the blur was
+         capped, two crisp phrases sitting on top of each other. Neither is the effect.
+         Touch gets a clean crossfade instead: one phrase out, the next in, never both legible
+         at once. Same palette, same tempo, and it costs no per-frame blur at all. */
+      simple: WEAK || TOUCH,
       flat: TOUCH,
       /* Photographed on a real iPhone: the slogan turned into blue blobs. The library caps the
          melt blur at a flat 100px, which was written for a 77px desktop slogan - on a phone the
