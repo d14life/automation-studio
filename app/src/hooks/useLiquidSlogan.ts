@@ -45,8 +45,13 @@ export function useLiquidSlogan(ready: boolean, heroVisible: boolean): void {
          iPhone it reads as a collision - two phrases sharing one line with nothing legible.
          Touch gets the same melt, just weighted the other way: a quick 1.6s morph and a 2.6s
          hold, so most of the time there is a readable sentence on screen. */
-      morphTime: WEAK ? 0.9 : TOUCH ? 1.6 : 4.5,
-      cooldownTime: WEAK ? 1.7 : TOUCH ? 2.6 : 0.45,
+      /* His call, 4 Aug, looking at the Mac next to the phone: the phone must be the web
+         version. Same 4.5s melt against 0.45s still, in transition 91% of the time. The reason
+         the phone was given a quick morph and a long hold was that the two lines were colliding
+         - and that turned out to be flex crushing both hosts to height 0, not the melt. With the
+         hosts holding their 40px there is room to melt. */
+      morphTime: WEAK ? 0.9 : 4.5,
+      cooldownTime: WEAK ? 1.7 : 0.45,
       colors: ICE,
       flow: FLOW,
       drift: FLOW * 3,
@@ -58,7 +63,12 @@ export function useLiquidSlogan(ready: boolean, heroVisible: boolean): void {
          capped, two crisp phrases sitting on top of each other. Neither is the effect.
          Touch gets a clean crossfade instead: one phrase out, the next in, never both legible
          at once. Same palette, same tempo, and it costs no per-frame blur at all. */
-      simple: WEAK || TOUCH,
+      /* `simple` is the sequential fade, and it is NOT the effect - it was a workaround for the
+         collision. The melt is what the site sells, so the phone gets the melt and only a
+         genuinely weak device keeps the fade. flat:true below still protects it from trap 5.4
+         (iOS drops background-clip:text on a blurred layer), and maxBlur keeps the blur
+         proportional to the 34px type instead of the desktop's 100px. */
+      simple: WEAK,
       flat: TOUCH,
       /* Photographed on a real iPhone: the slogan turned into blue blobs. The library caps the
          melt blur at a flat 100px, which was written for a 77px desktop slogan - on a phone the

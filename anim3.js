@@ -229,6 +229,14 @@ function LiquidText(host, texts, o) {
   /* how far the melt may blur, in px. Default 100 keeps the desktop look exactly as approved;
      a caller on a small screen passes something near half its own font size. */
   var maxBlur      = o.maxBlur != null ? o.maxBlur : 100;
+  /* The melt's blur curve below was written as 8/fraction - 8, and that 8 is in ABSOLUTE px:
+     it was tuned against the 77px desktop slogan. The same 8px laid on a phone's 34px type is
+     2.3x heavier relative to the letters, which is why the phone melted into blue blobs while
+     the Mac read as liquid - the cap was never the problem, the unit was. Derived from the
+     host's own type size it is self-correcting at any scale, and 77 * 0.104 is 8.0, so the
+     desktop curve is unchanged to the pixel. */
+  var blurUnit     = o.blurUnit != null ? o.blurUnit
+                     : parseFloat(getComputedStyle(host).fontSize || '77') * 0.104;
   if (!texts || texts.length < 2) throw new Error('LiquidText: need 2+ texts');
 
   if (!simple && threshold && !document.getElementById('lt-threshold-svg')){
@@ -326,10 +334,10 @@ function LiquidText(host, texts, o) {
          same words are 34px, so at the start of a morph the library was putting 70-100px of blur
          on 34px letters and the line dissolved into blobs - photographed on a real iPhone. The
          cap is now proportional to the type size, so the melt looks the same at any scale. */
-      t2.style.filter='blur('+Math.min(8/fraction-8,maxBlur)+'px)';
+      t2.style.filter='blur('+Math.min(blurUnit/fraction-blurUnit,maxBlur)+'px)';
       t2.style.opacity=(Math.pow(fraction,0.4)*100)+'%';
       var inv=1-fraction;
-      t1.style.filter='blur('+Math.min(8/inv-8,maxBlur)+'px)';
+      t1.style.filter='blur('+Math.min(blurUnit/inv-blurUnit,maxBlur)+'px)';
       t1.style.opacity=(Math.pow(inv,0.4)*100)+'%';
     }
     setWord(t1,texts[textIndex%texts.length]);

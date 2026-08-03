@@ -169,7 +169,17 @@ header{position:absolute;top:0;left:0;right:0;z-index:20}
 /* A phone is narrower than the word. At the fixed 42px the longest line was 423px against a
    327px screen and the slogan showed as its own first thirteen letters. Sized off the screen
    it always fits; 8.4vw lands on 31.5px at 375 wide, and the height follows the font. */
-@media (max-width:700px){.morph{font-size:clamp(19px,8.4vw,42px);height:clamp(24px,10vw,56px)}}
+/* Measured, not guessed: the widest phrase is БИЗНЕС-ПРОЦЕССЫ at 10.63x the font size. At
+   8.4vw on a 402px screen that is 359px against 354px of room, so it broke at the hyphen and
+   took two lines inside a 40px host - the desktop never wraps, so nor should this. 16px of side
+   padding instead of 24 and 8.2vw clears it on every phone width down to 320 (279 needed
+   against 288). nowrap is the guarantee: if a longer phrase is ever added it overhangs by a few
+   pixels rather than silently stacking two lines on top of each other again. */
+@media (max-width:700px){
+  .stageui{padding-inline:16px}
+  .morph{font-size:clamp(19px,8.2vw,42px);height:clamp(24px,10vw,56px)}
+  .morph span{white-space:nowrap}
+}
 h1{font:900 clamp(28px,4.6vw,54px)/1.12 Nunito,sans-serif;letter-spacing:-.02em;
   margin:14px 0 0;max-width:20ch}
 h1 em{font-style:normal;color:var(--ice2)}
