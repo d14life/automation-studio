@@ -226,6 +226,9 @@ function LiquidText(host, texts, o) {
      behind each line. `flat:true` walks the same palette as a plain text colour: no clip, no
      box, and the melt is untouched. */
   var flat         = !!o.flat;
+  /* how far the melt may blur, in px. Default 100 keeps the desktop look exactly as approved;
+     a caller on a small screen passes something near half its own font size. */
+  var maxBlur      = o.maxBlur != null ? o.maxBlur : 100;
   if (!texts || texts.length < 2) throw new Error('LiquidText: need 2+ texts');
 
   if (!simple && threshold && !document.getElementById('lt-threshold-svg')){
@@ -310,10 +313,14 @@ function LiquidText(host, texts, o) {
       t2.style.opacity=fraction.toFixed(3);
       t1.style.opacity=(1-fraction).toFixed(3);
     } else {
-      t2.style.filter='blur('+Math.min(8/fraction-8,100)+'px)';
+      /* The blur cap used to be a flat 100px, written for a 77px desktop slogan. On a phone the
+         same words are 34px, so at the start of a morph the library was putting 70-100px of blur
+         on 34px letters and the line dissolved into blobs - photographed on a real iPhone. The
+         cap is now proportional to the type size, so the melt looks the same at any scale. */
+      t2.style.filter='blur('+Math.min(8/fraction-8,maxBlur)+'px)';
       t2.style.opacity=(Math.pow(fraction,0.4)*100)+'%';
       var inv=1-fraction;
-      t1.style.filter='blur('+Math.min(8/inv-8,100)+'px)';
+      t1.style.filter='blur('+Math.min(8/inv-8,maxBlur)+'px)';
       t1.style.opacity=(Math.pow(inv,0.4)*100)+'%';
     }
     setWord(t1,texts[textIndex%texts.length]);

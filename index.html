@@ -16,6 +16,9 @@
          from our own origin on a connection the browser has already opened, and the Cyrillic one
          is preloaded because the first screen is Russian. -->
     <link rel="preload" href="/fonts/nunito-cyrillic.woff2" as="font" type="font/woff2" crossorigin />
+    <!-- the tubes library is 775KB and is only ever used by the live WebGL scene, which phones
+         never build. Telling the browser about it here would make every phone pay for it. It
+         stays a dynamic import, fetched only when a desktop actually builds the scene. -->
     <style>
       /* font-display:swap keeps the text readable while the file arrives; the hero handles its
          own swap separately below, because there it would be a jarring flash. */
@@ -40,14 +43,17 @@
         var d = document.documentElement
         var shown = false
         function go() { if (shown) return; shown = true; d.classList.add('fonts-in') }
-        setTimeout(go, 1500)
+        /* was 1500. That is 1.5s of black hero on a slow phone waiting for a font that is now
+           self-hosted, preloaded, and 20KB - it arrives in a fraction of that. 500ms is a
+           safety net, not a wait. */
+        setTimeout(go, 500)
         if (document.fonts && document.fonts.load) {
           document.fonts.load('900 40px Nunito').then(go, go)
         } else { go() }
       })()
     </script>
-    <script type="module" crossorigin src="/assets/index-Db8IqlKM.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-dLqDTW2M.css">
+    <script type="module" crossorigin src="/assets/index-B23CJq38.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-DMLbkaf8.css">
   </head>
   <body>
     <div id="root"></div>

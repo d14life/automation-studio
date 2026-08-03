@@ -43,6 +43,11 @@ export function useLiquidSlogan(ready: boolean, heroVisible: boolean): void {
       spread: ICE.length * 0.08,
       simple: WEAK,
       flat: TOUCH,
+      /* Photographed on a real iPhone: the slogan turned into blue blobs. The library caps the
+         melt blur at a flat 100px, which was written for a 77px desktop slogan - on a phone the
+         same words are 34px, so the blur was twice the letter height and ate them. Half the
+         measured font size keeps the melt and keeps the words readable. */
+      maxBlur: TOUCH ? Math.round(parseFloat(getComputedStyle(L1).fontSize || '34') * 0.5) : 100,
       activeWhen: () => activeRef.current,
     }
     const stop1 = window.LiquidText(L1, SLOGAN_LINE_1, MORPH)
