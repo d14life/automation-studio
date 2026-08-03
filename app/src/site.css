@@ -151,7 +151,13 @@ header{position:absolute;top:0;left:0;right:0;z-index:20}
   transform:translateY(var(--herodrop,108px))}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 /* half again as big as it was: 21pt -> 31.5pt, 3.2rem -> 4.8rem, heights to match */
-.morph{position:relative;height:3.5rem;width:100%;max-width:1400px;margin:0 auto;
+/* flex:none is load-bearing, not tidiness. .morph is a flex item of .stageui, and every child
+   it has is position:absolute - so its min-content height is 0 and min-height:auto cannot stop
+   it shrinking. On a phone .numblock joins the flow (it is absolute on desktop) and the column
+   overflows, so flex crushed BOTH hosts to height 0 and they landed on the same y: the two
+   slogan lines painted on top of each other. Measured on iPhone 16 Pro: cssH=0px, liq1 and liq2
+   both top=199.7. That, not the melt, was the overlap six fixes chased. */
+.morph{position:relative;flex:none;height:3.5rem;width:100%;max-width:1400px;margin:0 auto;
   font:900 31.5pt/1 Nunito,system-ui,sans-serif}
 /* height only a little over the 4.8rem text, so the two lines sit close together */
 @media (min-width:1024px){.morph{font-size:4.8rem;height:5.6rem}}
