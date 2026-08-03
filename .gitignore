@@ -4,3 +4,4 @@ app/dist/
 .replay.log
 .recovery/
 .claude/
+.catalogue/
