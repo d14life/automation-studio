@@ -30,8 +30,11 @@ declare global {
   }
 
   interface LiquidTextOptions {
-    /** the SVG url(#threshold) goo. false keeps the melt and drops the filter (touch devices) */
+    /** the SVG url(#threshold) goo. false keeps the melt and drops the filter */
     threshold?: boolean
+    /** paint the travelling palette as a plain text colour instead of a clipped background.
+        iOS drops background-clip:text on a blurred layer and paints the whole box instead. */
+    flat?: boolean
     morphTime?: number
     cooldownTime?: number
     colors?: string[]
