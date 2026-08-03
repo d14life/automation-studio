@@ -35,6 +35,9 @@ declare global {
     /** paint the travelling palette as a plain text colour instead of a clipped background.
         iOS drops background-clip:text on a blurred layer and paints the whole box instead. */
     flat?: boolean
+    /** how far the melt may blur, in px. The library's flat 100 was written for a 77px desktop
+        slogan and destroys a 34px one on a phone. Pass about half the font size there. */
+    maxBlur?: number
     morphTime?: number
     cooldownTime?: number
     colors?: string[]

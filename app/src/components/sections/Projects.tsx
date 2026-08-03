@@ -1,6 +1,13 @@
 import { BorderBeamPanel } from '@/components/ui/border-beam-panel'
 import { TravelingBeams } from '@/components/ui/traveling-beams'
-import { LiquidMetalButton } from '@/components/ui/liquid-metal-button'
+import { lazy, Suspense } from 'react'
+/* The liquid-metal label carries a WebGL shader library with it. Projects sits far below the
+   fold, so making every visitor - including every phone, which never scrolls that far on the
+   first look - download and parse that shader on load was pure waste. Split out and fetched
+   only when this section is built. */
+const LiquidMetalButton = lazy(() =>
+  import('@/components/ui/liquid-metal-button').then((m) => ({ default: m.LiquidMetalButton })),
+)
 
 /* Card radius must match .projects .proj in site.css — BorderBeamPanel writes it inline. */
 const R = 22
@@ -38,7 +45,7 @@ export function Projects() {
             </div>
           </div></div>
           <div className="body">
-            <div className="tagrow"><LiquidMetalButton label="Стройка · Казахстан" width={165} /><em>· работает у клиента</em></div>
+            <div className="tagrow"><Suspense fallback={null}><LiquidMetalButton label="Стройка · Казахстан" width={165} /></Suspense><em>· работает у клиента</em></div>
             <h3>Учёт взаиморасчётов</h3>
             <p>Долги нам и наши долги против 1С: 48 контрагентов, 3 юрлица, мультивалюта, старение долга,
               платёжный календарь. Собрано за один день, развёрнуто внутри сети клиента.</p>
@@ -72,7 +79,7 @@ export function Projects() {
             </div>
           </div></div>
           <div className="body">
-            <div className="tagrow"><LiquidMetalButton label="Логистика" width={99} /><em>· работает у клиента</em></div>
+            <div className="tagrow"><Suspense fallback={null}><LiquidMetalButton label="Логистика" width={99} /></Suspense><em>· работает у клиента</em></div>
             <h3>Доска отслеживания посылок</h3>
             <p>Документы создаются из состояния сделки, а посылка видна от заказа до двери на одном экране.
               Клиент перестал звонить менеджеру, чтобы узнать, где груз.</p>
@@ -107,7 +114,7 @@ export function Projects() {
             </div>
           </div></div>
           <div className="body">
-            <div className="tagrow"><LiquidMetalButton label="Продажи" width={96} /><em>· макет</em></div>
+            <div className="tagrow"><Suspense fallback={null}><LiquidMetalButton label="Продажи" width={96} /></Suspense><em>· макет</em></div>
             <h3>CRM под ваш процесс</h3>
             <p>Не коробка, а ваши этапы: заявка, замер, счёт, отгрузка. История клиента остаётся в компании,
               когда менеджер уходит. Сюда же телефония и автообзвон.</p>
@@ -132,7 +139,7 @@ export function Projects() {
             <div className="sh-comp"><span className="sh-inp">Написать сообщение</span><span className="sh-send">{'→'}</span></div>
           </div></div>
           <div className="body">
-            <div className="tagrow"><LiquidMetalButton label="ИИ" width={96} /><em>· макет</em></div>
+            <div className="tagrow"><Suspense fallback={null}><LiquidMetalButton label="ИИ" width={96} /></Suspense><em>· макет</em></div>
             <h3>Бот на ваших документах</h3>
             <p>Отвечает клиенту по вашему прайсу и остаткам, выставляет счёт, заносит контакт в базу.
               Первая линия работает ночью и в выходные.</p>
