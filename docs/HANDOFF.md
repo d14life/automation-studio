@@ -161,6 +161,46 @@ on Windows desktops with integrated graphics, which neither guess covers.
 
 ---
 
+## 4b. What is already written down — the 62 offers
+
+If Damir says **"remember those 62 prototypes we made"**, this is what he means.
+It is not lost, it is in `docs/` and it is verified.
+
+### `docs/catalogue.md` — 36KB, 582 lines
+**60 numbered offers + 2 industry packages = 62.** Recovered verbatim from
+commit `90df847` (the first version of the site). Every offer has a title, who
+it is for, what it replaces and what it produces.
+
+Grouped as: Сбор данных и интеграции (01–07) · Бухгалтерия и финансы (08–14) ·
+and on through to №55 «Обучение, документация и передача» and beyond.
+The two packages are **Для юридических фирм** and **Для строительных компаний**.
+
+### `docs/software-types.md` — 38KB, 345 lines
+The same 62 sorted into **12 kinds of software**, each offer assigned exactly
+once — verified by script, not by eye:
+
+Сборщик · Мост · Конвейер документов · Распознаватель · Рабочее приложение ·
+Сторож · Экран правды · Отчёт по расписанию · Собеседник · Предсказатель ·
+Публичная витрина · Генератор контента и рассылок
+
+Plus: one offer that does not fit the classification, the two industry
+packages, and a proposed **order of work for building the prototypes**.
+
+**Why it matters:** the plan is to build a small number of clickable prototypes
+— one per software type, not one per offer — so a visitor can touch a real
+example of each kind. Rainur's verdict on the current animated placeholders was
+blunt and correct: they are not a demonstration of anything.
+
+### The other two
+- `docs/feedback-rainur.md` — his 7 points from 3 Aug, with the exact file and
+  line each one touches, and the 2 decisions blocked on Damir.
+- `docs/tools-verdict.md` — Figma vs Base44 vs Claude Code, re-verified against
+  real documentation and reviews, including the five things stated wrongly the
+  first time. Bottom line: the site stays on Claude Code; Base44 is disqualified
+  for Russian clients by 152-ФЗ, no Russian data region, and Wix's blocking.
+
+---
+
 ## 5. Traps — each of these cost a full evening
 
 ### 5.1 Never animate a registered `@property`
