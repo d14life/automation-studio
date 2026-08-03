@@ -962,11 +962,15 @@ footer a{display:block;padding:3px 0}
    nothing here reacts to hover - so the spring inside that loop only ever produces a constant
    rate. A constant rotation is what a CSS animation is for, and it runs off the main thread.
    The component skips its loop whenever the two speeds match and hands the job to this. */
+/* This used to run `animation:mk-beam-spin` here, walking the registered --mk-beam-a from 0 to
+   360deg. Animating a REGISTERED custom property is not free the way transform is: the browser
+   has to recalculate style and repaint the element every frame, because the gradient that reads
+   the property has to be built again. Eight panels were doing that at once.
+   The turn now lives on the ring's own layer inside border-beam-panel.tsx, as a plain
+   transform:rotate - the one thing the compositor does without waking the main thread. The
+   property and its keyframes stay declared for a caller that still drives the angle from
+   script; nothing on this page does. */
 @property --mk-beam-a{syntax:'<angle>';inherits:false;initial-value:0deg}
-@keyframes mk-beam-spin{to{--mk-beam-a:360deg}}
-.mk-beam-css{animation:mk-beam-spin var(--mk-beam-dur,8.5s) linear infinite;
-  animation-delay:var(--mk-beam-delay,0s)}
-@media (prefers-reduced-motion:reduce){.mk-beam-css{animation:none}}
 
 /* ---------- the low-power tier ----------
    usePerfGuard measures the real frame rate a moment after the first screen settles and writes
