@@ -310,8 +310,17 @@ function LiquidText(host, texts, o) {
 
   function setStyles(fraction){
     if (simple){
-      t2.style.opacity=fraction.toFixed(3);
-      t1.style.opacity=(1-fraction).toFixed(3);
+      /* Sequential, not a crossfade. A crossfade holds BOTH words at half opacity in the middle,
+         and at 34px on a phone two different phrases at 50% read as a collision, not a
+         transition - photographed on a real iPhone twice. Here the old phrase leaves completely
+         before the new one starts, so there is never more than one thing to read. */
+      if (fraction < 0.5){
+        t1.style.opacity=(1-fraction*2).toFixed(3);
+        t2.style.opacity='0';
+      } else {
+        t1.style.opacity='0';
+        t2.style.opacity=((fraction-0.5)*2).toFixed(3);
+      }
     } else {
       /* The blur cap used to be a flat 100px, written for a 77px desktop slogan. On a phone the
          same words are 34px, so at the start of a morph the library was putting 70-100px of blur
