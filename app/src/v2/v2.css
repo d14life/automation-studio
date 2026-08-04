@@ -19,6 +19,27 @@ html{scroll-behavior:auto}
 .v2bg video{max-width:100%;max-height:100%;width:auto;height:auto;
   object-fit:contain;display:block}
 
+/* PORTRAIT: turn the strand on its side rather than cropping it.
+
+   A 16:9 clip in a 0.69:1 window is the problem in the screenshot - contain letterboxes it
+   into a band with half the screen black, and cover would fix that by throwing away about 60%
+   of the frame width, which is the extreme close-up he already rejected once.
+
+   Neither is necessary, because the helix runs across the frame and a phone is tall. Rotating
+   the video a quarter turn puts the chain DOWN the screen, where all the room is - and it
+   suits the interaction, since the strand now unwinds in the direction you are scrolling.
+   The element is sized in swapped units so that after the rotation its footprint is exactly
+   the viewport, and cover then crops 1.78 against 1.44 - about a quarter - instead of 60%. */
+@media (max-aspect-ratio: 1/1){
+  /* Centred by absolute position, not by the grid. Before the rotation this element's box is
+     100svh WIDE - wider than the container it sits in - and a grid aligns an overflowing item
+     to the start rather than centring it, which left a black band down one side. Positioning
+     from the centre and translating back by half is immune to that. */
+  .v2bg video{position:absolute;top:50%;left:50%;
+    width:100svh;height:100svw;max-width:none;max-height:none;
+    object-fit:cover;transform:translate(-50%,-50%) rotate(90deg)}
+}
+
 /* Nothing in here. It exists only so the page has something to scroll, which is what drives
    the strand. Its height is set in the component, in screens. */
 .v2runway{position:relative;z-index:1;pointer-events:none}
