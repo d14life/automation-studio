@@ -5,6 +5,29 @@ lives, what is broken, and the traps that have each cost a full evening.
 
 ---
 
+## 0. THERE ARE TWO PAGES. Know which one you are working on.
+
+This is the single most confusing thing about the repo and it is not obvious from
+the file tree.
+
+| | `index.html` — the OLD page | `v2.html` — the NEW page |
+|---|---|---|
+| source | `app/src/` (App, Projects, `anim3.js`…) | `app/src/v2/` — `V2.tsx` + `v2.css`, two files |
+| the hero | morphing liquid slogan, giant "101", WebGL ribbons, starfield | a scroll-scrubbed 3D DNA video |
+| styling | Tailwind + `index.css` | its own `v2.css`. **Deliberately does not load Tailwind** |
+| status | live, feature-complete, **not being worked on** | where every hour since 4 Aug has gone |
+
+**Everything in sections 2, 3, 4, 5.1–5.11, 6, 6b and 6c below is about the OLD
+page.** It is kept because it is hard-won and the old page is still live, but if
+you are here to build the site, it is history, not instructions. The current work
+is section 4c and traps 5.12–5.15.
+
+The two pages share a repo and a build but no code. Changing one cannot break the
+other, and a fix written for one will usually not apply to the other — `v2.css`
+in particular re-declares everything from scratch on purpose.
+
+---
+
 ## 1. What this is
 
 **solutions101.net** — Russian-language landing page for Damir's one-man
@@ -168,6 +191,68 @@ on Windows desktops with integrated graphics, which neither guess covers.
 5. **Projects section** contains invented company names and money figures
    (`Projects.tsx:94-105`). Two of four are labelled «· макет». Damir has
    dismissed this as unimportant for now.
+
+---
+
+## 4c. THE V2 PAGE — the current work, state as of 2026-08-04 late evening
+
+Two files: `app/src/v2/V2.tsx` (761 lines) and `app/src/v2/v2.css` (546). No other
+file in the repo affects it.
+
+### Verified working live
+- **The DNA header.** A 3D clip scrubbed by `currentTime`, on a `position:sticky`
+  runway. Scroll moves it; when you stop, it plays itself forward and backward
+  forever while the page stays put. Traps 5.12–5.13 explain the model; do not
+  re-derive it.
+- **Four tiers of the clip**, chosen by DEVICE pixels (`innerWidth * devicePixelRatio`),
+  not CSS pixels. All-intra (`-g 1 -bf 0`) so a seek costs exactly one decode.
+  H.264 only — see "HEVC" under Settled below.
+- **Six pages** as hash routes (`PAGES` in `V2.tsx`): Главная · О нас · Услуги ·
+  Инструменты · Работы · Контакты. Hash routing because GitHub Pages cannot
+  rewrite clean URLs. The strand renders on the home page only.
+- **A persistent top bar** with a working theme toggle (light/dark), and three
+  liquid-glass chapter cards over the video with an orbiting two-comet beam.
+
+### The four feel knobs — change these, not the tick
+All at the top of `V2.tsx`. A "faster" or "slower" note from Damir is one number
+here and nothing else.
+
+| knob | now | what it does |
+|---|---|---|
+| `RUNWAY` | 4.6 | screens of scroll the sticky header occupies |
+| `SCROLL_GAIN` | 1.8 | clip covered per screen scrolled. 1 = a full runway is one pass |
+| `LOOP_SPEED` | 1.7 | idle playback rate. 1 = real time |
+| `HOLD_FADE` | 0.16 | fraction of a card's slice spent fading. **Smaller = card stays longer** |
+
+`RUNWAY` and `SCROLL_GAIN` pull against each other on purpose: the longer runway
+is what gives a card distance to be readable in, and the gain buys the strand's
+speed back on top.
+
+### Settled — do not reopen without a measurement
+- **HEVC is out.** It halved the file, but libx265 all-intra emits profile `Rext`
+  and Apple hardware decodes Main only. Switching to `hevc_videotoolbox` produced
+  a Main-profile file that still would not scrub on his real iPhone, so H.264 is
+  what ships. A `<source>` fallback does NOT rescue this: a codec that decodes and
+  then fails is not a codec the browser rejects.
+- **Only 293 frames are real.** The 583-frame clip that arrived was those 293
+  motion-interpolated — proven by PSNR (consecutive frames 29.3dB apart, every
+  SECOND frame 25.0dB, the master's true spacing). Everything ships from the 293,
+  AI-upscaled with Real-ESRGAN. Phones get 50fps (interpolated, invisible at that
+  size), laptops and 4K get real frames only at 25fps — Damir spotted the smearing
+  on a 1440p laptop unprompted.
+- **The glass panels cost nothing.** A/B on the phone, video motion over 3s:
+  28.85 with them, 27.82 with `?nopanel=1`. That switch is still in the CSS as a
+  measuring tool, not a feature.
+- **Morph text is removed**, and the vendor scripts it needed are no longer
+  fetched by v2. It made the whole page lag. Do not bring it back.
+
+### Open on v2
+1. **Portrait phones stretch the clip.** The CSS fills a 9:19.5 screen with a 16:9
+   source, so it is magnified ~3x vertically no matter which tier is served. The
+   real cure is a portrait-cropped encode, not a bigger landscape one.
+2. **Content.** The five non-home pages need real depth. Everything needed is in
+   `docs/BRIEF.md`, `catalogue.md`, `software-types.md` — do not reinvent it.
+3. **Prices and contacts** are «указать» on purpose. Damir supplies them. Ask once.
 
 ---
 
