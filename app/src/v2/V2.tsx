@@ -97,8 +97,8 @@ export default function V2() {
 
   const videoRef = useRef<HTMLVideoElement | null>(null)
   const stageRef = useRef<HTMLElement | null>(null)
-  const target = useRef(0)
-  const shown = useRef(0)
+  const scrollP = useRef(0)      /* progress through the runway, 0..1 */
+  const offscreen = useRef(false) /* header fully scrolled away - stop burning battery */
 
   const nudge = useCallback((el: HTMLVideoElement | null) => {
     videoRef.current = el
@@ -124,29 +124,68 @@ export default function V2() {
     const onScroll = () => {
       const stage = stageRef.current
       if (!stage) return
+      const rect = stage.getBoundingClientRect()
       const travel = stage.offsetHeight - innerHeight
-      target.current = travel > 0
-        ? Math.min(1, Math.max(0, -stage.getBoundingClientRect().top / travel))
-        : 0
+      scrollP.current = travel > 0 ? Math.min(1, Math.max(0, -rect.top / travel)) : 0
+      offscreen.current = rect.bottom <= 0
     }
 
-    const tick = () => {
+    /* THE STRAND IS ALIVE NOW - his idea. The clip is no longer an absolute function of
+       scroll position; it is a creature with one clock:
+
+         - while you scroll, your scroll DELTA drives the frames, continuing from whatever
+           frame is on screen right now;
+         - while you don't, the clip plays itself, forward then backward, ping-ponging
+           between intact and destroyed, forever. The page never moves - only the frames do.
+
+       The handoff between the two is a VELOCITY BLEND, not a timer: the loop's share grows
+       as the measured scroll speed dies. That is deliberately also the fix for the iOS
+       momentum tail he kept reporting - the last laggy crawl of a flick is slower than V0,
+       so by then the loop already owns most of the motion and the crawl disappears into it.
+
+       Two anchors keep the story readable: the last EDGE of runway at each end pulls the
+       frame toward its meaning - top = intact, bottom = destroyed - but only while you are
+       actually scrolling there ((1 - idle) weight). At rest the anchors let go, so the loop
+       plays even on the untouched hero: land at the top, the strand settles intact, then
+       quietly starts building and unbuilding on its own. */
+    let pos = 0    /* fraction of the clip on screen, the one true state */
+    let dir = 1    /* idle playback direction; scrubbing re-aims it so release carries on */
+    let lastP = 0
+    let vel = 0    /* smoothed |scroll speed|, clip-fractions per second */
+    let last = performance.now()
+    const V0 = 0.15   /* speed at which the loop is fully handed the wheel */
+    const EDGE = 0.12 /* anchor zone at each end of the runway */
+
+    const tick = (now: number) => {
       if (!alive) return
       raf = requestAnimationFrame(tick)
       const el = videoRef.current
       if (!el || !el.duration || Number.isNaN(el.duration)) return
+      const dt = Math.min(0.05, (now - last) / 1000)
+      last = now
 
-      /* NO EASING. It was here to smooth a trackpad's coarse jumps, but the frame grid below
-         already does that - and everything else it did was tail: motion continuing after the
-         scroll stopped, which is what he kept reporting. The clip now tracks the scroll 1:1,
-         so whatever movement is left after his finger lifts is the page genuinely still
-         scrolling under iOS momentum, not us lagging behind it.
+      const p = scrollP.current
+      const dp = p - lastP
+      lastP = p
+      if (offscreen.current) return
 
-         No turnaround bend either. That existed because the clip was the take plus its own
-         reverse and flipped direction at the halfway frame. The clip is forward-only now -
-         scrolling UP is what rebuilds the strand, because scrubbing backwards IS reverse
-         playback - so there is no midpoint to ease through. */
-      const t = Math.round(target.current * (el.duration - 0.05) * FPS) / FPS
+      /* scroll delta scrubs from the current frame; down = toward destroyed, clamped */
+      pos = Math.min(1, Math.max(0, pos + dp))
+      if (Math.abs(dp) > 0.0005) dir = dp > 0 ? 1 : -1
+      /* fast attack, ~150ms release - the loop fades in a beat BEFORE the page fully stops */
+      vel = Math.max(Math.abs(dp) / dt, vel * Math.exp(-dt / 0.15))
+      const idle = Math.max(0, 1 - vel / V0)
+
+      /* the loop: real speed, full range, reflecting at both ends */
+      pos += dir * (dt / el.duration) * idle
+      if (pos > 1) { pos = 2 - pos; dir = -1 }
+      if (pos < 0) { pos = -pos; dir = 1 }
+
+      /* the anchors */
+      if (p < EDGE) pos += (0 - pos) * Math.min(1, (1 - p / EDGE) * (1 - idle) * 8 * dt)
+      else if (p > 1 - EDGE) pos += (1 - pos) * Math.min(1, ((p - 1 + EDGE) / EDGE) * (1 - idle) * 8 * dt)
+
+      const t = Math.round(pos * (el.duration - 0.05) * FPS) / FPS
       if (Math.abs(el.currentTime - t) >= HALF_FRAME) el.currentTime = t
     }
 
