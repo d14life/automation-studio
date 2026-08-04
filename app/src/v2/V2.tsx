@@ -27,26 +27,36 @@ import './v2.css'
    shorter runway rather than a faster clip - the clip is scrubbed, it has no speed of its own.
    5 / 1.3 = 3.85. */
 const RUNWAY = 3.85
-/* The clip is 25fps by construction (585 frames over 23.4s). Seeking finer than one frame
+/* 25, back down from 50. The 583-frame clip was not 583 rendered frames: it was the master's
+   293 real frames MOTION-INTERPOLATED to 50fps, so every second frame was a synthetic blend.
+   Proven by PSNR - consecutive frames measured 29.3dB apart while every SECOND frame measured
+   25.0dB, which is what the master's true consecutive frames measure. Half the frames you
+   scrubbed onto were invented, and invented frames are mush.
+   The clip is now the master's 293 real frames and nothing else. Seeking finer than one frame
    just decodes the same picture again, so the scrubber works on this grid. */
-const FPS = 50
+const FPS = 25
 const HALF_FRAME = 0.5 / FPS
 
-/* 1920x1080 is the source, so it is also the ceiling - there is no higher master to unlock,
-   and the only thing left to spend on quality is bitrate. Two encodes of the same frames:
-   CRF 21 at 15.7MB for a screen big enough to see the difference, CRF 30 at 6.3MB for
-   everything else. A phone cannot resolve the extra detail and would just pay for it in data
-   and decode, and decode is what the whole scrub depends on staying cheap.
+/* ?v=3: REBUILT FROM THE MASTER. He said the clip looked better the day it arrived than it
+   does now, and he was right - it had been re-encoded from its own output twice and
+   interpolated once, each step spending quality it could never earn back. The 15.7MB
+   1920x1080 original still sits in git history (blob 4038131, commit 5c86d28) at 26.8 KB per
+   frame against the shipped file's 15.7 - so both files are now ONE lossy step from that
+   master instead of three, built from its 293 real frames as lossless PNG.
+
+   All-intra as well (-g 1 -bf 0): the old files carried a keyframe every ten frames, so each
+   seek decoded up to nine frames it would never show, and the idle loop seeks ~25 times a
+   second, half of them in reverse where a GOP is pure cost. Every frame is its own keyframe,
+   so a seek costs exactly one decode in either direction.
+
+   Two encodes of the same frames: CRF 18 at 24MB for a screen big enough to see it, CRF 21 at
+   9MB scaled to 720p for everything else - a phone cannot resolve the extra detail and would
+   pay for it in data and decode, and cheap decode is what the whole scrub rests on.
    Chosen once at module load rather than per render - the file cannot be swapped mid-scroll
    without losing the seek position, so a resize does not re-pick. */
-/* ?v=2: ALL-INTRA encodes. The keyframe-every-10 files made each seek decode up to nine
-   extra frames, and the idle loop seeks ~50 times a second - in REVERSE half the time, where
-   a GOP is pure cost. Every frame is its own keyframe now (-g 1 -bf 0), so a seek decodes
-   exactly one frame in either direction. Price: 9.1MB -> 28MB desktop, 2.3MB -> 8.9MB phone.
-   The query string busts the cache; the filenames stay. */
 const SRC = matchMedia('(min-width:1100px) and (min-height:700px)').matches
-  ? '/dna-loop-hq.mp4?v=2'
-  : '/dna-loop.mp4?v=2'
+  ? '/dna-loop-hq.mp4?v=3'
+  : '/dna-loop.mp4?v=3'
 
 /* RELOAD MUST START THE STRAND OVER. The browser restores scrollY on reload, which for an
    ordinary page is a kindness and for this one is a bug: the scroll is restored but the video
