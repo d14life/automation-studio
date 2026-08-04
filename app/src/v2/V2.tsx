@@ -23,7 +23,10 @@ import './v2.css'
 
 /* Back to 5. The +30% was his idea and he has changed his mind having felt it - it made the
    header too long to get through. */
-const RUNWAY = 5
+/* 3.85, not 5. His ask: the same scroll should move the strand 30% further, which is a
+   shorter runway rather than a faster clip - the clip is scrubbed, it has no speed of its own.
+   5 / 1.3 = 3.85. */
+const RUNWAY = 3.85
 /* The clip is 25fps by construction (585 frames over 23.4s). Seeking finer than one frame
    just decodes the same picture again, so the scrubber works on this grid. */
 const FPS = 50
@@ -64,10 +67,12 @@ export default function V2() {
 
   const switchTheme = useCallback((next: boolean) => {
     if (phase !== 'idle') return   /* ignore a second tap mid-animation */
-    /* His call: the curtain only on the way INTO light. Going back to dark it switches
-       straight away - the dark theme arriving behind a dark curtain has almost nothing to
-       reveal, so the panel reads as a pause rather than a transition. */
-    if (!next) { setLight(false); return }
+    /* The curtain is off in BOTH directions now. He asked for it gone going into dark, then
+       pointed out it was still there going into light - so it is out either way. The code
+       stays, and the phases with it, because turning it back on is one line: delete this
+       return. The panel itself is still styled in v2.css. */
+    setLight(next)
+    return
     /* the curtain wears the colour of the theme arriving, so the reveal is already correct */
     curtainBg.current = next ? '#f2e9e1' : '#0f1e25'
     setPhase('falling')
