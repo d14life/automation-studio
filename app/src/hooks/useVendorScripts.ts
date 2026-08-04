@@ -25,7 +25,7 @@ function loadScript(src: string): Promise<void> {
 
 /* the same query strings the static page used, so the cache behaves identically */
 /* bump anim3's version on EVERY change to it - a stale cached copy has cost a whole evening before */
-export const VENDOR_SCRIPTS = ['/win.js?v=1', '/anim3.js?v=11'] as const
+export const VENDOR_SCRIPTS = ['/win.js?v=1', '/anim3.js?v=10'] as const
 
 /** Loads win.js + anim3.js once. Returns true when window.WinMgr / window.Starfield1 exist. */
 export function useVendorScripts(): boolean {

@@ -42,9 +42,6 @@ function Starfield1(host, o) {
     measure();
     cv.width = w; cv.height = h;
   }
-  var onWinResize = function(){ needResize = true; };
-  addEventListener('resize', onWinResize, {passive:true});
-  addEventListener('orientationchange', onWinResize, {passive:true});
   function bigBang(){
     if (arr.length !== quantity){
       arr = new Array(quantity);
@@ -54,17 +51,7 @@ function Starfield1(host, o) {
       }
     }
   }
-  /* Polled from inside the animation loop, this called measure() - which reads
-     host.clientWidth and host.clientHeight - on EVERY FRAME. A layout read per frame, forever,
-     to learn something that only changes when the window resizes. With the parallax and the
-     melt writing styles in the same frame that is a read-write-read thrash, and the cost lands
-     as IRREGULAR FRAME TIMES: the field is always in the right place but the frames arrive
-     unevenly, which is the stutter he kept reporting after the frame cap was removed.
-     It now runs on the resize event instead, which is the only thing that can change it. */
-  var needResize = false;
   function resizeIfNeeded(){
-    if (!needResize) return;
-    needResize = false;
     var pw=w, ph=h;
     measure();
     if (cv.width!==w || cv.height!==h){
@@ -156,8 +143,6 @@ function Starfield1(host, o) {
   };
   function stop(){
     running=false; cancelAnimationFrame(raf);
-    removeEventListener('resize', onWinResize);
-    removeEventListener('orientationchange', onWinResize);
     if (mouseAdjust) host.removeEventListener('mousemove', onMove);
     if (clickToWarp){ host.removeEventListener('mousedown', onDown); removeEventListener('mouseup', onUp); }
     cv.remove();

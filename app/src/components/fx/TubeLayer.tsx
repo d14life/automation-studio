@@ -55,22 +55,7 @@ export function TubeLayer({ ready, heroVisible }: { ready: boolean; heroVisible:
      a watchdog: no frames after four seconds and the layer gives up. */
   const nudge = useCallback((el: HTMLVideoElement | null) => {
     if (!el) return
-    const tryPlay = () => el.play().catch(() => {
-      /* HIS idea, and he was right that we already detect it. iOS exposes no Low Power Mode
-         API, but it does not need to: a muted, playsInline, autoplay video is allowed to start
-         in every normal state, so a REJECTION here is the signal. That is exactly how the
-         missing ribbons on his phone were diagnosed.
-
-         So use it. Declaring the low tier here runs the same path the frame guard already
-         owns - the CSS drops its expensive blurs off [data-perf=low], the starfield thins, the
-         ribbons take the cheap route - and it runs IMMEDIATELY, instead of after the guard has
-         spent 2.6s waiting and 1.8s measuring on a device we already know is throttled. */
-      const d = document.documentElement
-      if (d.dataset.perf !== 'low') {
-        d.dataset.perf = 'low'
-        dispatchEvent(new Event('perf-low'))
-      }
-    })
+    const tryPlay = () => el.play().catch(() => { /* still refused; the watchdog decides */ })
     tryPlay()
     /* Seen on his own iPhone, 4 Aug: no ribbons at all, and a tap-to-play control where they
        should be. iOS refuses to autoplay video in Low Power Mode however muted and inline it
