@@ -21,7 +21,13 @@ export function useStarfield(ready: boolean): RefObject<HTMLDivElement | null> {
       /* spread is pinned to 1100 - the value the approved look had at 2200 stars - so the count
          below is now purely a count. Before this, the library derived spread from quantity, and
          raising the count pushed the whole field outward and lost the extras off the edges. */
-      quantity: SMALL ? Math.round(4400 * (innerWidth * innerHeight) / (1520 * 864)) : 4400,
+      /* Matching the Mac's DENSITY gave a phone 913 stars, and his verdict on that was "too
+         little" - which is right, because density per CSS pixel is not density per eye: a
+         402px-wide phone is held close and covers far less of your view than a 1520px window.
+         1.9x the faithful count is ~1735, and it is affordable now that it has been measured -
+         the whole starfield costs 1.2fps of the 60 on this device, against the slogan melt's
+         22.9. Cheap things can be generous. */
+      quantity: SMALL ? Math.round(4400 * 1.9 * (innerWidth * innerHeight) / (1520 * 864)) : 4400,
       spread: SMALL ? Math.round(1100 * z / 1192) : 1100,
       /* 4400 stars redrawn every frame, for the whole life of the page, is the single largest
          standing cost on the desktop version. Uncapped it ran at the screen's refresh - 120 a

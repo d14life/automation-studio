@@ -69,6 +69,20 @@ export function useLiquidSlogan(ready: boolean, heroVisible: boolean): void {
          (iOS drops background-clip:text on a blurred layer), and maxBlur keeps the blur
          proportional to the 34px type instead of the desktop's 100px. */
       simple: WEAK,
+      /* MEASURED on the iPhone 16 Pro simulator, 4 Aug: with the melt on the page ran 37.1fps,
+         and hiding the two slogan hosts took it to 60.0. Everything else on the first screen
+         together cost under 4fps - the starfield 1.2, the filmed ribbons 2.5, the glass and the
+         101's glow nothing at all. The melt WAS the mobile performance problem, and it is this
+         line: url(#threshold) is an SVG feColorMatrix re-run over the text every single frame.
+
+         It can go on touch without losing anything, and that is the part worth understanding.
+         The threshold earns its cost on desktop by clamping everything under 55% alpha to
+         nothing, which is what hides the background-clip:text rectangle the blur exposes (trap
+         5.4). Touch already passes flat:true, which paints the palette as a plain text colour -
+         there is no background box to hide, so the filter is guarding against a bug that cannot
+         happen here. The library keeps the motion either way: threshold:false leaves the blur
+         and opacity curves, which are the melt. */
+      threshold: !TOUCH,
       flat: TOUCH,
       /* Photographed on a real iPhone: the slogan turned into blue blobs. The library caps the
          melt blur at a flat 100px, which was written for a 77px desktop slogan - on a phone the
