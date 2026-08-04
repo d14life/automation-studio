@@ -502,17 +502,13 @@ html.v2light{--slogan:linear-gradient(100deg,#8A7261,#5C4536 46%,#33241A)}
 }
 @media (max-width:759px){
   .v2glass{background:color-mix(in srgb, var(--surface) 88%, transparent)}
-  /* MY CALL ON THE LAG, and it is a split rather than a yes or no.
-     The RING is cheap: a conic gradient and two mask layers, no filter, and it is what the eye
-     actually follows. The GLOW is a per-frame BLUR - the same class of cost as the melt that
-     had to be deleted, and a phone is where he feels it and where the video is already being
-     seeked fifty times a second beside it. So on phones the glow stops moving and stays as a
-     fixed halo: it still casts the azure and coral into the card, which is most of the look,
-     and it costs one paint instead of a blur per frame. Desktop keeps both moving - there is
-     headroom there and no report of trouble.
-     Frozen at 40deg rather than 0 so both comets sit on visible edges rather than one hiding
-     in a corner. */
-  .v2glass::before{animation:none;--beam:40deg;opacity:.6}
+  /* THE GLOW MOVES ON PHONES TOO, and that is a reversal backed by a measurement rather
+     than a guess. I had frozen it here as a precaution against lag - and freezing it was
+     precisely why he said the beam does not move like the reference: the thin ring alone is
+     nearly invisible, the GLOW is what the eye reads as travelling light.
+     A/B on the phone, same scroll position, video motion over three seconds as the proxy for
+     a starved frame budget: 28.85 with the panels against 27.82 with them stripped out. That
+     is noise, not a cost. The precaution was buying nothing and losing the effect. */
 }
 
 /* THE GLOW - negative z-index inside an isolated stacking context paints above the panel's own
@@ -537,3 +533,8 @@ html.v2light{--slogan:linear-gradient(100deg,#8A7261,#5C4536 46%,#33241A)}
 @media (prefers-reduced-motion:reduce){
   .v2glass::before,.v2glass::after{animation:none;--beam:40deg}
 }
+
+/* ?nopanel=1 strips the glass entirely - an A/B switch for measuring what it costs, not a
+   feature. Kept because "does this lag" should be answered with two numbers, not an opinion. */
+.v2chapters--flat .v2glass{background:none;border:0;backdrop-filter:none;-webkit-backdrop-filter:none}
+.v2chapters--flat .v2glass::before,.v2chapters--flat .v2glass::after{display:none}

@@ -581,7 +581,7 @@ export default function V2() {
               Each panel owns a slice of the scroll and fades through it, so the scroll earns
               its length: the strand is what you watch, these are what you learn. Short by
               instruction - ноль воды is the one rule Rainur repeated six times. */}
-          <div className="v2chapters" aria-hidden="false">
+          <div className={location.search.includes('nopanel=1') ? 'v2chapters v2chapters--flat' : 'v2chapters'} aria-hidden="false">
             <article className="v2ch v2ch--1"><div className="v2glass">
               <p className="v2eyebrow">Что мы делаем</p>
               <h2>Собираем инструмент под вашу компанию</h2>
