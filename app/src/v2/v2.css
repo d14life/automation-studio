@@ -12,14 +12,9 @@ html{scroll-behavior:auto}
 /* The clip is pinned to the viewport; the runway scrolls past behind it. */
 .v2bg{position:fixed;inset:0;background:#000;display:grid;place-items:center;z-index:0}
 
-/* LANDSCAPE gets a margin, and an uneven one. contain centres the frame in the viewport and
-   fills the height exactly, so the top of the strand ends up flush against the browser's own
-   chrome and reads as cut off. Padding the box shrinks what contain has to fit into, and more
-   of it at the top than the bottom drops the whole composition a little below the toolbar.
-   Portrait skips this - the video is absolutely positioned there and ignores it anyway. */
-@media (min-aspect-ratio: 1/1){
-  .v2bg{padding:7vh 2vw 3vh}
-}
+/* No padding on landscape. It was added to drop the strand clear of the browser chrome and it
+   did - but a padded box means contain has less room, so the result was a visible black border
+   round the whole frame, which reads worse than the crowding it was fixing. Full bleed. */
 
 /* CONTAIN and native size. cover crops to fill the window and what it crops is the ends of
    the helix, which is the opposite of what he asked for; the bars contain leaves are black
@@ -49,7 +44,11 @@ html{scroll-behavior:auto}
        LARGE viewport - the one with the browser chrome retracted - while svh is the SMALL
        one. So the video was always a toolbar's height shorter than the box it sits in, and
        that gap is the black band at the top and bottom of his phone. */
-    width:100lvh;height:100lvw;max-width:none;max-height:none;
+    /* 112, not 100. After the quarter turn the screen's VERTICAL axis is this element's
+       WIDTH, so this is the number that stretches it up and down - his ask. The extra 12%
+       also guarantees it covers past the top and bottom edges whatever Safari is doing with
+       its toolbars, rather than relying on lvh being exactly right at that moment. */
+    width:112lvh;height:100lvw;max-width:none;max-height:none;
     /* FILL, not cover: his call, stretch rather than zoom. cover would have to crop about a
        quarter of the frame to fill a 1.44:1 box with 1.78:1 footage, and cropping is what he
        has objected to twice. Stretching that ratio is a 24% distortion on an organic shape
