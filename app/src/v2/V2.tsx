@@ -79,19 +79,25 @@ const HALF_FRAME = 0.5 / FPS
    the right trade, because he reported the page felt laggier and 4K decodes at 299fps here
    against 1440p's 610fps. Sharpness nobody can see is not worth a scrub that stutters.
 
-   PORTABLE is capped at 1440p on purpose. By need alone a phone would ask for 4K, but 47.6MB
-   over cellular is indefensible and decoding 3840x2160 twenty-five times a second is exactly
-   how the lag comes back. Cheap decode is what the whole scrub rests on.
+   PHONES GET 720p, and that is not a downgrade in disguise - it is the answer to "keep the
+   video clean and sexy but don't add lag". Sharpness at rest and smoothness in motion are
+   bought with the same currency here, decode time per seek, so the phone spends it where the
+   eye actually notices: motion. What makes the picture clean is no longer resolution anyway -
+   it is that every frame is a real rendered frame, AI-upscaled and denoised from the master,
+   rather than the interpolated mush we shipped before. This 720p is cut from the same 3840x2160
+   frames as the 4K file, so it is a far better 720p than the one this page started with, and a
+   1280x720 intra frame costs a quarter of a 2560x1440 one to decode. He confirmed the 1080p
+   file stuttered on his iPhone when scrolling; this is that fix.
 
    Chosen once at module load rather than per render - the file cannot be swapped mid-scroll
    without losing the seek position, so a resize does not re-pick. */
 const DPR = Math.min(devicePixelRatio || 1, 3)
 const NEED = Math.max(innerWidth * DPR, (innerHeight * DPR * 16) / 9)
-const PORTABLE = innerWidth < 1100
 const SRC =
-  NEED > 3200 && !PORTABLE ? '/dna-loop-4k.mp4?v=4'
-  : NEED > 1920 ? '/dna-loop-hq.mp4?v=4'
-  : '/dna-loop.mp4?v=4'
+  innerWidth < 700 ? '/dna-loop-sm.mp4?v=5'   /* phones - decode cost rules here, see above */
+  : innerWidth < 1100 ? '/dna-loop.mp4?v=5'   /* tablets */
+  : NEED > 3200 ? '/dna-loop-4k.mp4?v=5'      /* an actual 4K display */
+  : '/dna-loop-hq.mp4?v=5'                    /* laptops and ordinary monitors */
 
 /* RELOAD MUST START THE STRAND OVER. The browser restores scrollY on reload, which for an
    ordinary page is a kindness and for this one is a bug: the scroll is restored but the video
