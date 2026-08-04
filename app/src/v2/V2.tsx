@@ -176,11 +176,23 @@ const SRC_H264 =
 
 /* The light theme's own file, same tier, same 50fps, cut from the same 4K masters and graded
    for cream rather than inverted at runtime. Only ever downloaded if the visitor switches. */
-/* REVERTED to the dark file + CSS invert while the grade is redone. The graded files exist
-   and are deployed, but the grade was validated on ONE frame - the intact end - and the clip
-   ends GOLD. Gold inverted and then desaturated is brown mud, which is what he saw across the
-   whole back half of the runway. A grade for this clip has to be checked at the intact end,
-   the middle AND the destroyed end before it ships. */
+/* LIGHT USES THE DARK FILE AND ONE CSS INVERT. This was tried the other way on 5 August and
+   reverted the same night, for two separate reasons - both worth keeping written down.
+
+   The grade was wrong. I validated it on ONE frame, the intact end, and shipped. The clip ENDS
+   GOLD (measured: frames 1-150 are blue-dominant at p95 luma 0.31, frames 220-293 are
+   yellow-dominant at 0.82). Gold inverted goes electric blue, and my grade then desaturated it
+   into brown mud, so the entire back half of the runway was ruined while the one frame I
+   checked looked clean. Any future grade has to be checked at the intact end, the middle AND
+   the destroyed end.
+
+   The download killed it anyway, and this is the part no grade can fix. A separate light file
+   means switching themes waits on a fresh 8.6-28MB download before anything appears. His call
+   after feeling it: an instant invert beats a prettier picture you have to wait for. Theme
+   toggles have to be free.
+
+   So: one file, both themes, one compositor filter. If a light version is ever wanted for real
+   it is a re-render on a light set, not a grade and not a second download. */
 const SRC_LIGHT = SRC_H264
 
 /* RELOAD MUST START THE STRAND OVER. The browser restores scrollY on reload, which for an
