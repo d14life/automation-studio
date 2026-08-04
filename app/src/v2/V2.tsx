@@ -174,6 +174,13 @@ const SRC_H264 =
   : TIER === 'md' ? '/dna-loop.mp4?v=9'
   : '/dna-loop-hq.mp4?v=10'
 
+/* The light theme's own file, same tier, same 50fps, cut from the same 4K masters and graded
+   for cream rather than inverted at runtime. Only ever downloaded if the visitor switches. */
+const SRC_LIGHT =
+  TIER === 'sm' ? '/dna-light-sm.mp4?v=1'
+  : TIER === 'md' ? '/dna-light-md.mp4?v=1'
+  : '/dna-light-hq.mp4?v=1'
+
 /* RELOAD MUST START THE STRAND OVER. The browser restores scrollY on reload, which for an
    ordinary page is a kindness and for this one is a bug: the scroll is restored but the video
    is not - it comes back at frame 0 - so the page is two thirds through the stage showing an
@@ -448,9 +455,27 @@ export default function V2() {
     document.documentElement.classList.toggle('v2light', light)
   }, [light])
 
-  /* Light and dark are the SAME clip. The donor's light hero is not a second video, it is the
-     same footage with `invert` over a pale background - so the switch costs one CSS filter and
-     no extra download. The strand is white on cream in light, dark on near-black in dark. */
+  /* LIGHT IS ITS OWN GRADED FILE NOW, not `filter:invert(1)` over the dark one.
+     He looked at light mode and said the doubled frames had only been done for dark. The frame
+     rate was never the difference - both themes played the same 50fps file, and seek cost
+     measured identical (2.71ms dark, 2.69ms light). What he was seeing was the grade: a raw
+     invert turns a dark blue background into cream but also turns the strand's black body white
+     and its white speculars black, so the metal reads as blue-violet mush and every bit of the
+     scale texture we paid for with Real-ESRGAN disappears.
+
+     So light is now cut from the same AI-upscaled 4K masters as dark, graded properly and
+     interpolated to 50fps the same way: background lands at 248,236,229 against the theme's
+     own 246,233,226, and the strand keeps crisp dark detail lines instead of mush.
+
+     What is NOT possible, and it is worth writing down so nobody tries: a "dark strand on a
+     light background" version cannot be graded out of this footage. Measured on the master,
+     the strand's dark body sits at 0.05 luminance and the background at 0.10-0.12 - five
+     hundredths apart, with nothing but the speculars separating them. Curves steep enough to
+     split them band the background and crush the strand. That version needs the 3D scene
+     re-rendered on a light set, which is the same answer as every other quality ceiling here.
+
+     Cost: one extra download, and only if you actually switch themes. The file is fetched
+     lazily on first switch, and currentTime is carried across so the strand does not jump. */
 
   /* THE CURTAIN. His reference component drops a full-screen panel in the colour of the theme
      you are switching TO, swaps the theme while the screen is covered, then lifts it - so you
@@ -484,6 +509,19 @@ export default function V2() {
   }, [phase])
 
   const videoRef = useRef<HTMLVideoElement | null>(null)
+
+  useEffect(() => {
+    const el = videoRef.current
+    if (!el) return
+    const want = light ? SRC_LIGHT : SRC_H264
+    if (el.getAttribute('src') === want) return
+    const at = el.currentTime
+    el.setAttribute('src', want)
+    el.load()
+    /* the new file starts at 0; put it back where the strand was */
+    const restore = () => { try { el.currentTime = at } catch { /* not seekable yet */ } }
+    el.addEventListener('loadedmetadata', restore, { once: true })
+  }, [light])
   const stageRef = useRef<HTMLElement | null>(null)
   const scrollP = useRef(0)      /* progress through the runway, 0..1 */
   const offscreen = useRef(false) /* header fully scrolled away - stop burning battery */
