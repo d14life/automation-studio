@@ -38,17 +38,23 @@ const RUNWAY = 3.85
                 CARD STAYS LONGER: at 0.28 it held still for 44% of its slice, at 0.16 it holds
                 for 68%.
 
-   SCROLL_GAIN HAS BEEN BOTH TOO FAST AND TOO SLOW, and the two complaints bracket the answer.
-   At 1.8 he said "scroll is too strong". Back at 1 he said the strand still gets destroyed too
-   quickly under the finger. So the truth is below 1: 0.55 means a full runway covers a bit
-   over half a pass, and the destruction takes roughly twice the scrolling it used to.
+   SCROLL_GAIN IS BACK TO 1, AND 0.55 UNDOING THE 50fps WORK IS THE REASON. He said the strand
+   looked laggy again, "like before we did extra frames" - and he was reading it correctly.
 
-   That is only safe because the strand is alive. Under the old absolute-position model a gain
-   under 1 would have meant the clip could never finish - the runway would run out first. Here
-   the idle loop keeps walking it, so the ending is always reachable; scrolling just stops
-   being the only thing that gets you there. LOOP_SPEED stays 1: he asked for the SCROLL to be
-   gentler, not the strand to be slower when he lets go. */
-const SCROLL_GAIN = 0.55
+   The arithmetic I missed: smoothness under the finger is FRAMES PER PIXEL SCROLLED, not
+   frames per second in the file. Doubling the file to 50fps doubled it. Setting the gain to
+   0.55 halved it again, because half as much clip passes under the same scroll. The two
+   cancelled almost exactly, which is why it looked like the 25fps version - it was showing
+   the same number of distinct frames per screen of scrolling.
+
+   And lengthening RUNWAY instead is the same lever wearing a hat: dp is deltaY/travelPx, so a
+   longer runway divides the delta by a bigger number. Identical effect, identical cost.
+
+   So slower destruction and smooth scrubbing are the SAME knob pulled in opposite directions,
+   and this file cannot give both. The only real way to have both is more frames still - a
+   100fps interpolation would let the gain sit at 0.55 and still show 50fps-per-scroll - and
+   that is a ~76MB download, which is a separate decision for him rather than a silent one. */
+const SCROLL_GAIN = 1
 const LOOP_SPEED = 1
 const HOLD_FADE = 0.08
 /* Frame rate is per tier, so it is declared with the tier below - seeking finer than one frame
