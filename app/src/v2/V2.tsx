@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useVendorScripts } from '@/hooks/useVendorScripts'
+import { ICE, FLOW } from '@/hooks/heroTuning'
 import './v2.css'
 
 /* v2: the DNA strand is driven by the scroll wheel, not by playback.
@@ -238,9 +240,80 @@ function usePage(): PageId {
   return page
 }
 
+/* THE MORPHING SLOGAN, brought over from the live page - his ask, and the right one: the first
+   thing a visitor meets should say what we are, and one static line says it once. These three
+   pairs are the argument in order: the devise, then what we are not, then what we are.
+   All three obey the width the phone can take - the longest line is 16 characters, against the
+   live page's БИЗНЕС-ПРОЦЕССЫ at 15, so the sizing that page arrived at still holds. */
+/* His new slogan, and it is the best line on the site because it finally explains the strand:
+   the footage is not decoration, it is the argument. A business has a DNA - the processes it
+   is built out of - and we go in and change it. So the strand comes apart and rebuilds while
+   the words say exactly that.
+   It leads, then the devise, then the positioning. Longest line is 14 characters. */
+const MORPH_1 = ['МЕНЯЕМ ДНК', 'БЫСТРО', 'НЕ КОНСУЛЬТИРУЕМ']
+const MORPH_2 = ['ВАШЕГО БИЗНЕСА', 'НЕ ЗНАЧИТ ПЛОХО', 'А ДЕЛАЕМ']
+
 export default function V2() {
   const page = usePage()
   const home = page === ''
+
+  /* win.js + anim3.js publish window.LiquidText. Loaded here rather than in the HTML so the
+     inner pages, which have no slogan, never pay for it. */
+  const vendorReady = useVendorScripts()
+  const liq1 = useRef<HTMLDivElement | null>(null)
+  const liq2 = useRef<HTMLDivElement | null>(null)
+  /* the melt may only run when it is both VISIBLE and the page is still - see the effect */
+  const meltOk = useRef(true)
+
+  useEffect(() => {
+    if (!vendorReady || !home) return
+    const a = liq1.current, b = liq2.current
+    if (!a || !b) return
+
+    /* THE MELT IS EXPENSIVE AND MUST BE FENCED. The live page measured it at 42fps of cost
+       WHILE SCROLLING - url(#threshold) is an SVG filter re-run over the text every frame, and
+       this page cannot afford that on top of a video being seeked 50 times a second.
+       Two fences, and together they mean it only ever runs on a still page at the very top:
+         - the overlay fades out over the first fifth of the runway, so past that the slogan is
+           invisible and there is nothing to compute;
+         - during any scroll it freezes, resuming 180ms after the page settles. Nobody reads a
+           morphing slogan mid-scroll, and this is the same trick the live page landed on. */
+    let t = 0
+    const onScroll = () => {
+      meltOk.current = false
+      clearTimeout(t)
+      t = window.setTimeout(() => { meltOk.current = true }, 180)
+    }
+    addEventListener('scroll', onScroll, { passive: true })
+
+    const SMALL = innerWidth < 700
+    const opts: LiquidTextOptions = {
+      morphTime: 4.5,
+      cooldownTime: 0.45,
+      colors: ICE,
+      flow: FLOW,
+      drift: FLOW * 3,
+      spread: ICE.length * 0.08,
+      /* the threshold IS the liquid - without it the melt degrades to two phrases ghosting
+         through each other. It stays on everywhere; the live page proved that the hard way. */
+      threshold: true,
+      /* iOS drops background-clip:text on a blurred layer and paints the span's box instead,
+         so touch paints the palette as a plain colour. */
+      flat: SMALL,
+      /* the library's flat 100px cap was written for a 77px desktop slogan; on phone type it is
+         twice the letter height and eats the words. */
+      maxBlur: SMALL ? Math.round(parseFloat(getComputedStyle(a).fontSize || '30') * 0.5) : 100,
+      stepMs: SMALL ? 30 : 0,
+      activeWhen: () => meltOk.current,
+    }
+    const stop1 = window.LiquidText(a, MORPH_1, opts)
+    const stop2 = window.LiquidText(b, MORPH_2, opts)
+    return () => {
+      clearTimeout(t)
+      removeEventListener('scroll', onScroll)
+      stop1(); stop2()
+    }
+  }, [vendorReady, home])
   /* Light and dark are the SAME clip. The donor's light hero is not a second video, it is the
      same footage with `invert` over a pale background - so the switch costs one CSS filter and
      no extra download. The strand is white on cream in light, dark on near-black in dark. */
@@ -417,7 +490,16 @@ export default function V2() {
       phase += dp
       if (dp !== 0) dir = dp > 0 ? 1 : -1
       if (touching) quiet = 0; else quiet += dt
-      const idle = Math.min(1, Math.max(0, (quiet - 0.02) / 0.12))
+      /* THE LOOP NEVER FULLY STOPS - that dead stop was the hitch at the START of a scroll.
+         Touching pinned idle to zero, so the ~39 frames a second the loop was contributing
+         vanished the instant a finger landed, while the finger itself had produced almost no
+         delta yet. The strand stalled for a moment and then picked up: his "it stops for a
+         split second and only then the video picks up".
+         A floor of 0.22 removes it, and it is safe now for a reason that was not true earlier:
+         dir follows the sign of dp, so the loop always pushes the SAME way the finger is
+         moving. It can add to a scroll, never oppose one - the old "goes down while I scroll
+         up" failure is structurally impossible in the phase model. */
+      const idle = Math.max(0.22, Math.min(1, Math.max(0, (quiet - 0.02) / 0.12)))
 
       const tri = ((phase % 2) + 2) % 2          /* 0..2, one full there-and-back */
       const bell = Math.max(Math.abs(Math.sin(tri * Math.PI)), 0.55)
@@ -581,10 +663,16 @@ export default function V2() {
 
           <div className="v2over">
             <p className="v2eyebrow">Автоматизация бизнес-процессов</p>
-            <h1 className="v2h1">Быстро <em>не значит</em> плохо</h1>
+            {/* the h1 stays for search engines and screen readers - the melt is two divs the
+                library paints into, and neither carries the sentence in a readable form */}
+            <h1 className="v2h1 v2h1--sr">Меняем ДНК вашего бизнеса. Быстро не значит плохо.</h1>
+            <div className="v2morphs" aria-hidden="true">
+              <div className="v2morph" ref={liq1} />
+              <div className="v2morph" ref={liq2} />
+            </div>
             <p className="v2lede">
-              Не консультируем и не учим теории — отдаём работающие инструменты
-              под вашу компанию. Прототип показываем до оплаты.
+              Процессы компании — это её ДНК. Мы переписываем их под вас: CRM, телефония,
+              боты, сборщики данных. Прототип показываем до оплаты.
             </p>
             <div className="v2cta">
               <a className="v2btn v2btn--go" href="#request">Оставить заявку</a>
