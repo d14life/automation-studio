@@ -38,12 +38,17 @@ const RUNWAY = 3.85
                 CARD STAYS LONGER: at 0.28 it held still for 44% of its slice, at 0.16 it holds
                 for 68%.
 
-   ALL THREE SPEED CHANGES ARE REVERTED - his call, the evening of 4 August, after feeling
-   1.8/1.7/4.6 on the phone: "scroll is too strong". The 50fps file made the motion smooth on
-   its own, and speed on top of smooth was too much. GAIN and LOOP back to 1, RUNWAY back to
-   3.85. HOLD_FADE keeps its new value: cards staying readable was a separate ask and costs
-   no speed anywhere. */
-const SCROLL_GAIN = 1
+   SCROLL_GAIN HAS BEEN BOTH TOO FAST AND TOO SLOW, and the two complaints bracket the answer.
+   At 1.8 he said "scroll is too strong". Back at 1 he said the strand still gets destroyed too
+   quickly under the finger. So the truth is below 1: 0.55 means a full runway covers a bit
+   over half a pass, and the destruction takes roughly twice the scrolling it used to.
+
+   That is only safe because the strand is alive. Under the old absolute-position model a gain
+   under 1 would have meant the clip could never finish - the runway would run out first. Here
+   the idle loop keeps walking it, so the ending is always reachable; scrolling just stops
+   being the only thing that gets you there. LOOP_SPEED stays 1: he asked for the SCROLL to be
+   gentler, not the strand to be slower when he lets go. */
+const SCROLL_GAIN = 0.55
 const LOOP_SPEED = 1
 const HOLD_FADE = 0.08
 /* Frame rate is per tier, so it is declared with the tier below - seeking finer than one frame
