@@ -12,6 +12,15 @@ html{scroll-behavior:auto}
 /* The clip is pinned to the viewport; the runway scrolls past behind it. */
 .v2bg{position:fixed;inset:0;background:#000;display:grid;place-items:center;z-index:0}
 
+/* LANDSCAPE gets a margin, and an uneven one. contain centres the frame in the viewport and
+   fills the height exactly, so the top of the strand ends up flush against the browser's own
+   chrome and reads as cut off. Padding the box shrinks what contain has to fit into, and more
+   of it at the top than the bottom drops the whole composition a little below the toolbar.
+   Portrait skips this - the video is absolutely positioned there and ignores it anyway. */
+@media (min-aspect-ratio: 1/1){
+  .v2bg{padding:7vh 2vw 3vh}
+}
+
 /* CONTAIN and native size. cover crops to fill the window and what it crops is the ends of
    the helix, which is the opposite of what he asked for; the bars contain leaves are black
    against a black page. The file ships at its native 1920 - it had been re-encoded down to
