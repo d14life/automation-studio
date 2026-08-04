@@ -664,6 +664,8 @@ export default function V2() {
     const DIAG = location.search.includes('loop=diag')
     let reversed = false
     let turnTimer = 0 as unknown as ReturnType<typeof setTimeout>
+    let mirrored = false
+    let flipTimer = 0 as unknown as ReturnType<typeof setTimeout>
     let pos = 0      /* the frame on screen, 0..1 - DERIVED from phase, never set directly */
     let phase = 0    /* unbounded; pos is a triangle wave of it, so there is no boundary */
     let dir = 1    /* idle playback direction; scrubbing re-aims it so release carries on */
@@ -737,28 +739,31 @@ export default function V2() {
       const t2 = ((phase % 2) + 2) % 2
       pos = t2 <= 1 ? t2 : 2 - t2
 
-      /* ?loop=diag - HIS IDEA, BUILT SO HE CAN JUDGE IT RATHER THAN TAKE MY WORD.
-         The complaint is that the strand visibly BOUNCES at the destroyed end instead of
-         carrying on. His fix: turn the return leg diagonally so the motion reads as continuing.
+      /* THE MIRROR TURN - his idea, and the reason it now works is WHERE the turn happens.
+         The complaint all along: the return leg reads as a rewind. It does, and the cause is
+         the rotation - played backwards the strand visibly spins the other way. A horizontal
+         mirror flips perceived rotation, so a mirrored reverse leg spins the SAME way as the
+         forward leg and reads as the motion carrying on rather than rewinding.
 
-         Measured on the master, the jump at the turn against a normal 8.6 frame-to-frame step:
-         rotate 180 = 59.7, mirror = 67.9, hard cut to the start = 46.7. His diagonal is the
-         best of them and none is seamless - so the honest move is to MASK that one jump rather
-         than pretend it is not there. The rotation itself is free: a compositor transform on a
-         layer that is already composited, no new file and no download.
+         The whole trick is that the flip is spent at the DESTROYED end, never at the intact
+         one. Measured pixel difference says the opposite - 24.6 at the intact end against 67.6
+         in the debris - and that number is a trap, the same one the crossfade fell into.
+         Mirroring a clean, recognisable helix is instantly obvious however few pixels move;
+         mirroring a cloud of flying debris is invisible however many do. Perception, not
+         pixel count, decides where an edit can hide.
 
-         The mask is a 260ms blur-and-lift that fires only at the turn, when the strand is
-         fully in pieces and the screen is chaos anyway - the one moment in the clip where a
-         cut can hide. Off by default; ?loop=diag turns it on. */
-      if (DIAG) {
-        const back = t2 > 1                       /* the return leg */
-        if (back !== reversed) {
-          reversed = back
-          el.classList.toggle('is-rev', back)
-          el.classList.add('is-turn')
-          clearTimeout(turnTimer)
-          turnTimer = setTimeout(() => el.classList.remove('is-turn'), 260)
-        }
+         So the state toggles only as pos passes 1, the destroyed turn. The intact end is
+         crossed with nothing happening at all. A 200ms blur rides the flip, which in a frame
+         already full of tumbling pieces reads as motion rather than as a cut.
+
+         transform and filter are compositor properties: this costs no decode and no paint. */
+      const nowMir = ((Math.floor(phase) % 2) + 2) % 2 === 1
+      if (nowMir !== mirrored) {
+        mirrored = nowMir
+        el.classList.toggle('is-mir', mirrored)
+        el.classList.add('is-flip')
+        clearTimeout(flipTimer)
+        flipTimer = setTimeout(() => el.classList.remove('is-flip'), 200)
       }
 
       if (dbg) dbg.textContent =

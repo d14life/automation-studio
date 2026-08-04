@@ -695,3 +695,11 @@ a.v2card:hover .v2card__win{color:var(--accent)}
 .v2bg video{transition:filter .26s ease}
 .v2bg video.is-rev{transform:rotate(180deg)}
 .v2bg video.is-turn{filter:blur(14px) brightness(1.15)}
+
+/* THE MIRROR TURN. The reverse leg plays mirrored so the strand keeps spinning the same way
+   instead of visibly rewinding; the flip is spent at the destroyed end, where a frame full of
+   debris hides it. Both properties are compositor-only, so the whole effect is free. */
+.v2bg video{transition:filter .2s ease}
+.v2bg video.is-mir{transform:scaleX(-1)}
+.v2bg video.is-flip{filter:blur(10px)}
+@media (prefers-reduced-motion:reduce){.v2bg video.is-flip{filter:none}}
