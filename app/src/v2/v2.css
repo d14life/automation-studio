@@ -20,8 +20,18 @@ html{scroll-behavior:auto}
    the helix, which is the opposite of what he asked for; the bars contain leaves are black
    against a black page. The file ships at its native 1920 - it had been re-encoded down to
    1280, which a 1440-wide window then had to scale back up, and that was the softness. */
-.v2bg video{max-width:100%;max-height:100%;width:auto;height:auto;
-  object-fit:contain;display:block}
+/* COVER, and framed low. This is the desktop crowding he reported and I never actually fixed:
+   contain sizes the frame to the viewport height exactly, so the top of the strand lands at
+   y=0, hard against the browser's own toolbar. Padding it was the obvious answer and it was
+   worse - a padded box gives contain less room, so it bought a visible black border.
+
+   cover fills the viewport instead, which removes the border question entirely, at the cost of
+   about 10% of the frame width at 1440x900. object-position then does the part padding was
+   really for: 62% pulls the visible window DOWN the source frame, so the composition sits
+   lower and the strand stops butting against the chrome. Nothing is letterboxed and nothing is
+   bordered. */
+.v2bg video{width:100%;height:100%;max-width:none;max-height:none;
+  object-fit:cover;object-position:center 62%;display:block}
 
 /* PORTRAIT: turn the strand on its side rather than cropping it.
 

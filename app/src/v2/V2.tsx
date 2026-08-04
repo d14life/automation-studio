@@ -21,7 +21,10 @@ import './v2.css'
    3. The time eases toward its target instead of snapping to it. A trackpad emits scroll in
       coarse jumps; easing turns those into motion. */
 
-const RUNWAY = 4 /* screens of scrolling to cross the clip once */
+/* 5 screens, settled rather than guessed. At 4 the whole 23.4s clip crossed in a flick, so
+   the strand raced and every scroll step jumped several frames - which is also what made the
+   seeking look coarse. 5 gives finer control per pixel of scroll and fewer frames skipped. */
+const RUNWAY = 5
 /* The clip is 25fps by construction (585 frames over 23.4s). Seeking finer than one frame
    just decodes the same picture again, so the scrubber works on this grid. */
 const FPS = 25
@@ -86,7 +89,11 @@ export default function V2() {
          same scroll distance buys less and less time as the strand approaches the turn, so it
          slows into it and picks up again coming out. 1.7 is gentle; higher dwells longer. */
       const u = shown.current * 2 - 1
-      const bent = (Math.sign(u) * Math.abs(u) ** 1.7 + 1) / 2
+      /* 1.9, settled. He called the turnaround rigid, and this exponent is what softens it -
+         higher means the strand dwells longer as it reaches the halfway frame where the
+         footage reverses. 1.7 was a first guess; 1.9 holds the turn noticeably without
+         slowing the ends, which stay near linear. */
+      const bent = (Math.sign(u) * Math.abs(u) ** 1.9 + 1) / 2
       /* Quantise to real frame boundaries. The clip is 25fps, so a frame is 0.04s and any
          seek finer than that decodes a picture you are already looking at - pure cost, and on
          iOS a queue of pending seeks that arrives late and looks like stutter. Rounding to the
