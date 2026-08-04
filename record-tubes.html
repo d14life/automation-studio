@@ -155,7 +155,15 @@ const BOOST = MOBILE ? 1.45 : 1
    the discount twice and it is why he said it looked cheaper than the web. There is no reason
    for a pre-rendered frame to carry the compromise the live scene needed. */
 const TUBE_BUILD = { count: 11, minTubularSegments: 42, maxTubularSegments: 166,
-                     radialSegments: 8, capSegments: 4 }
+                     radialSegments: 8, capSegments: 4,
+  /* Strand THICKNESS, which is the last thing that still read as cheaper than the Mac. The
+     library's own defaults are minRadius .005 / maxRadius .05, and a tube's radius is in world
+     units, so its thickness on screen scales with the CANVAS while the figure's size is set in
+     pixels by sleepRadiusX/Y. That is the whole mismatch: the Mac draws a 462px figure in a
+     1470px window, the clip draws a 792px figure in a 1633px one, so relative to the figure the
+     filmed strands come out about 58% as thick. 1.6x the radii puts them back.
+     Only on the mobile take - the desktop scene is what he already approved. */
+  ...(MOBILE ? { minRadius: 0.008, maxRadius: 0.08 } : {}) }
 
 const big = document.getElementById('big')
 const say = (t, sub) => { big.innerHTML = t + '<small>' + (sub || 'не уходи с этой вкладки') + '</small>' }
