@@ -177,8 +177,21 @@ header{position:absolute;top:0;left:0;right:0;z-index:20}
    against 288). nowrap is the guarantee: if a longer phrase is ever added it overhangs by a few
    pixels rather than silently stacking two lines on top of each other again. */
 @media (max-width:700px){
+  /* ONE gutter for the whole first screen. It was four different numbers: the header on
+     .wrap's 24, the hero on 16 (the slogan needs it - at 24 the longest phrase does not fit a
+     320px screen), the action pills on 41 because a 320px max-width centred them, and the nav
+     panel on its own 16. Nothing lined up with anything. 16 everywhere, and the pills simply
+     fill the column like every other block. */
+  .wrap{padding-inline:16px}
   .stageui{padding-inline:16px}
-  .morph{font-size:clamp(19px,8.2vw,42px);height:clamp(24px,10vw,56px)}
+  /* Smaller so the ribbon reads as going AROUND the words rather than through them. On the
+     phone the clip is filmed at a fixed fraction of the frame (195x86 of 402), so it does NOT
+     shrink with the type the way the live scene's measured sweep would - dropping the slogan
+     from 8.2vw to 7.2vw leaves the figure the same size and the words smaller inside it, which
+     is exactly the effect he asked for. 7.2vw is 29px at 402 wide and the longest phrase needs
+     10.63x that = 308px against 370px of column, so it still cannot wrap.
+     Height tracks the type instead of staying at 10vw, or the two lines drift apart. */
+  .morph{font-size:clamp(17px,7.2vw,38px);height:clamp(21px,8.6vw,46px)}
   .morph span{white-space:nowrap}
 }
 h1{font:900 clamp(28px,4.6vw,54px)/1.12 Nunito,sans-serif;letter-spacing:-.02em;
@@ -798,9 +811,12 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
   /* on a narrow screen the buttons covered the whole number, so they sit under it */
   .numblock{margin-top:clamp(30px,6vh,60px);flex-direction:column;align-items:center;gap:14px}
   .actswrap{position:static;inset:auto}
-  .acts{flex-direction:column;width:100%;max-width:320px}
+  /* was max-width:320px, which centred the pills at x=41 while the slogan and the header sat
+     at 16 - measured L=41 against L=16 for everything else. The pills fill the column now. */
+  .acts{flex-direction:column;width:100%}
   .acts .btn{width:100%;text-align:center}
-  .hero101{font-size:clamp(180px,51vw,285px)}  /* +50% on the phone too */
+  /* was 51vw - 205px on a 402 screen, which crowded the ribbon and the pills both */
+  .hero101{font-size:clamp(150px,42vw,240px)}
   /* finger-sized targets everywhere */
   footer .cols a{padding:15px 0}
   .proj .go{padding:13px 0;display:inline-block}
