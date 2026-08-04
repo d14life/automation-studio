@@ -49,6 +49,31 @@ export default function V2() {
     document.documentElement.classList.toggle('v2light', light)
   }, [light])
 
+  /* THE CURTAIN. His reference component drops a full-screen panel in the colour of the theme
+     you are switching TO, swaps the theme while the screen is covered, then lifts it - so you
+     never see the change happen, only the reveal. The donor ships it with inline styles and an
+     AppBar, a search field and an avatar; this page needs the mechanism and none of the
+     furniture, so the phases live here and the styling is in v2.css beside the sky toggle.
+
+     transform-origin:top with scaleY is the whole trick, and it is also why it is cheap: a
+     scale is a compositor transform, not a paint, which is the project's rule for anything
+     that moves. */
+  const [phase, setPhase] = useState<'idle' | 'falling' | 'rising'>('idle')
+  const curtainBg = useRef('#0f1e25')
+  const DURATION = 550
+
+  const switchTheme = useCallback((next: boolean) => {
+    if (phase !== 'idle') return   /* ignore a second tap mid-animation */
+    /* the curtain wears the colour of the theme arriving, so the reveal is already correct */
+    curtainBg.current = next ? '#f2e9e1' : '#0f1e25'
+    setPhase('falling')
+    window.setTimeout(() => {
+      setLight(next)               /* swapped while the screen is covered */
+      setPhase('rising')
+      window.setTimeout(() => setPhase('idle'), DURATION + 60)
+    }, DURATION)
+  }, [phase])
+
   const videoRef = useRef<HTMLVideoElement | null>(null)
   const stageRef = useRef<HTMLElement | null>(null)
   const target = useRef(0)
@@ -156,9 +181,16 @@ export default function V2() {
           styled-components file; this project animates with CSS and rAF and does not carry
           that dependency, so the markup and the mechanism are kept and the styling moves into
           v2.css. That is the same adaptation the handoff's 21st.dev convention asks for. */}
+      {/* the curtain sits above the page and below the switch, so the control stays visible
+          and clickable while the screen is covered */}
+      <div aria-hidden="true"
+           className={'v2curtain' + (phase === 'falling' ? ' is-down' : '')}
+           style={{ background: curtainBg.current,
+                    transition: phase === 'idle' ? 'none' : `transform ${DURATION}ms cubic-bezier(.76,0,.24,1)` }} />
+
       <label className="theme-switch">
         <input type="checkbox" className="theme-switch__checkbox"
-               checked={light} onChange={(e) => setLight(e.target.checked)} />
+               checked={light} onChange={(e) => switchTheme(e.target.checked)} />
         <div className="theme-switch__container">
           <div className="theme-switch__clouds" />
           <div className="theme-switch__stars-container">
