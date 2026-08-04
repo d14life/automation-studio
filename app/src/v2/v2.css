@@ -57,6 +57,20 @@ html{scroll-behavior:auto}
     object-fit:fill;transform:translate(-50%,-50%) rotate(90deg)}
 }
 
+/* His point, and it is the one that explains everything: on the live site the STARFIELD covers
+   the whole screen including behind the browser bars - because the starfield is black at its
+   edges. Safari tints its own chrome from the colour it finds at the top and bottom of the
+   page, so against black it disappears and against our blue clip it does not.
+
+   So give it black to sample. The clip fades to pure black across the last few percent at each
+   end, which does two things at once: Safari's bars blend into the page the way they do on the
+   live site, and the video stops ending on a hard edge against them. Painted once, not a
+   filter or a blend - trap 5.8 is about what per-frame passes cost. */
+.v2bg::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:1;
+  background:linear-gradient(180deg,
+    #000 0%, rgba(0,0,0,.72) 3%, rgba(0,0,0,0) 9%,
+    rgba(0,0,0,0) 89%, rgba(0,0,0,.75) 97%, #000 100%)}
+
 /* Nothing in here. It exists only so the page has something to scroll, which is what drives
    the strand. Its height is set in the component, in screens. */
 .v2runway{position:relative;z-index:1;pointer-events:none}
