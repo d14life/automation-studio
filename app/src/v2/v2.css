@@ -1,156 +1,79 @@
-/* Solutions101 v2 — the DNA strand, scrubbed by the scrollbar. Nothing written on it yet.
+/* Solutions101 v2 — the DNA strand as a header you scroll through once, then the real page.
    Its own stylesheet: site.css is a thousand lines of decisions made for the current hero and
    inheriting them would mean fighting them. The live page is untouched. */
 
 *{box-sizing:border-box}
 html,body{margin:0;background:#000}
-/* the strand is driven by scroll position, so the scroll must be the plain document one -
-   no smooth-scroll easing on top of the easing the scrubber already does. And no
-   overflow:hidden any more: the page now NEEDS to scroll, that is the whole interaction. */
 html{scroll-behavior:auto}
 
-/* The clip is pinned to the viewport; the runway scrolls past behind it. */
-/* height:100lvh, not just inset:0. On iOS the toolbar grows and shrinks as you scroll, and
-   inset:0 on a fixed element resolves against the viewport as it is AT THAT MOMENT - so at the
-   top of the page, where the toolbar is at its tallest, the layer came up short and left a
-   black band under the chrome. It was smaller mid-scroll because the toolbar had collapsed.
-   lvh is the LARGEST viewport height, the one with the chrome retracted, so the layer is always
-   at least as tall as the screen can ever be and there is nothing left for a gap to appear in. */
-/* THE HEADER. .v2stage is tall - that height is the scroll runway - and .v2pin sticks to the
-   top of the screen for exactly as long as the stage is passing, then releases. That release
-   is the difference from position:fixed, which pinned the clip forever and left no room for a
-   page underneath.
+/* ---------- the header ----------
+   .v2stage is tall - that height IS the scroll runway - and .v2pin sticks to the top for as
+   long as the stage is passing, then releases. That release is the difference from
+   position:fixed, which pinned the clip forever and left no room for a page underneath.
 
-   height:100lvh on the pin, not 100%: on iOS the toolbar grows at the top of a page and
-   collapses once you move, and a height that follows it leaves a black band under the chrome -
-   bigger at the very top, which is exactly what he photographed. lvh is the LARGEST viewport
-   height, so the pin is always at least as tall as the screen can ever be. */
+   height:100lvh on the pin, not 100%: iOS grows the toolbar at the top of a page and collapses
+   it once you move, and a height that follows it leaves a black band under the chrome, bigger
+   at the very top - which is what he photographed. lvh is the LARGEST viewport height. */
 .v2stage{position:relative}
 .v2pin{position:sticky;top:0;height:100lvh;min-height:100lvh;overflow:hidden}
 .v2bg{position:absolute;inset:0;background:#000;display:grid;place-items:center;z-index:0}
 
-/* No padding on landscape. It was added to drop the strand clear of the browser chrome and it
-   did - but a padded box means contain has less room, so the result was a visible black border
-   round the whole frame, which reads worse than the crowding it was fixing. Full bleed. */
-
-/* CONTAIN and native size. cover crops to fill the window and what it crops is the ends of
-   the helix, which is the opposite of what he asked for; the bars contain leaves are black
-   against a black page. The file ships at its native 1920 - it had been re-encoded down to
-   1280, which a 1440-wide window then had to scale back up, and that was the softness. */
-/* COVER, and framed low. This is the desktop crowding he reported and I never actually fixed:
-   contain sizes the frame to the viewport height exactly, so the top of the strand lands at
-   y=0, hard against the browser's own toolbar. Padding it was the obvious answer and it was
-   worse - a padded box gives contain less room, so it bought a visible black border.
-
-   cover fills the viewport instead, which removes the border question entirely, at the cost of
-   about 10% of the frame width at 1440x900. object-position then does the part padding was
-   really for: 62% pulls the visible window DOWN the source frame, so the composition sits
-   lower and the strand stops butting against the chrome. Nothing is letterboxed and nothing is
-   bordered. */
+/* DESKTOP: cover, framed low. contain sized the frame to the viewport height exactly, so the
+   top of the strand landed at y=0, hard against the browser toolbar. Padding was worse - it
+   gives contain less room and buys a visible black border. cover fills instead, at the cost of
+   ~10% of the frame width at 1440x900, and object-position pulls the visible window DOWN the
+   source so the composition sits lower. */
 .v2bg video{width:100%;height:100%;max-width:none;max-height:none;
   object-fit:cover;object-position:center 62%;display:block}
 
-/* PORTRAIT: turn the strand on its side rather than cropping it.
+/* THE FADE, on every orientation - his word. It began as a way to blend Safari's chrome into
+   the page, but it earns its place for a simpler reason: without it the clip ends on a hard
+   straight line against the black below, and pulling away from the video reads as rigid. That
+   is true on a desktop and on a phone held sideways, where there is no chrome at all.
 
-   A 16:9 clip in a 0.69:1 window is the problem in the screenshot - contain letterboxes it
-   into a band with half the screen black, and cover would fix that by throwing away about 60%
-   of the frame width, which is the extreme close-up he already rejected once.
+   Smoothstep stops, not two. Two interpolate linearly, so there is a point where the fade
+   abruptly begins and the eye finds it at once; these leave and arrive at zero slope, so there
+   is no moment where the gradient starts. One painted gradient, no per-frame cost. */
+.v2bg::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:1;
+  background:linear-gradient(180deg,
+    rgba(0,0,0,1) 0%, rgba(0,0,0,.972) 1.5%, rgba(0,0,0,.896) 3%,
+    rgba(0,0,0,.784) 4.5%, rgba(0,0,0,.648) 6%, rgba(0,0,0,.5) 7.5%,
+    rgba(0,0,0,.352) 9%, rgba(0,0,0,.216) 10.5%, rgba(0,0,0,.104) 12%,
+    rgba(0,0,0,.028) 13.5%, rgba(0,0,0,0) 15%,
+    rgba(0,0,0,0) 85%, rgba(0,0,0,.028) 86.5%, rgba(0,0,0,.104) 88%,
+    rgba(0,0,0,.216) 89.5%, rgba(0,0,0,.352) 91%, rgba(0,0,0,.5) 92.5%,
+    rgba(0,0,0,.648) 94%, rgba(0,0,0,.784) 95.5%, rgba(0,0,0,.896) 97%,
+    rgba(0,0,0,.972) 98.5%, rgba(0,0,0,1) 100%)}
 
-   Neither is necessary, because the helix runs across the frame and a phone is tall. Rotating
-   the video a quarter turn puts the chain DOWN the screen, where all the room is - and it
-   suits the interaction, since the strand now unwinds in the direction you are scrolling.
-   The element is sized in swapped units so that after the rotation its footprint is exactly
-   the viewport, and cover then crops 1.78 against 1.44 - about a quarter - instead of 60%. */
-/* A PHONE HELD SIDEWAYS was falling into the desktop path and being letterboxed into a stamp
-   in the middle of the screen. contain is right on a large display - it shows the whole frame -
-   and wrong on one about 350px tall, where the whole frame is tiny.
-
-   What separates those cases is not orientation, it is SIZE, so that is what this asks. A short
-   landscape viewport is a phone on its side: fill it and accept the crop, the same trade
-   portrait already makes. Desktop, being landscape AND tall, keeps contain and its full
-   uncropped frame. */
+/* A PHONE HELD SIDEWAYS was falling into the desktop rule and letterboxed into a stamp,
+   because contain shows the whole frame - right on a large display, wrong on one 350px tall.
+   What separates those cases is SIZE, not orientation. It fills as desktop does; only the low
+   framing is dropped, there being no chrome to clear. */
 @media (min-aspect-ratio: 1/1) and (max-height: 600px){
-  .v2bg video{width:100%;height:100%;max-width:none;max-height:none;object-fit:cover}
+  .v2bg video{object-position:center center}
 }
 
+/* PORTRAIT: turn the strand on its side rather than cropping it. A 16:9 clip in a 0.69:1
+   window letterboxes into a band, and cover would fix that by throwing away ~60% of the frame
+   width. Neither is needed - the helix runs across the frame and a phone is tall, so a quarter
+   turn puts the chain DOWN the screen where the room is, and it suits the interaction since
+   the strand unwinds in the direction you are scrolling.
+
+   Centred by absolute position, not by the grid: before rotating, this box is wider than its
+   container and a grid aligns an overflowing item to the start, which left a black band down
+   one side. 112lvh because after the turn the element's WIDTH is the screen's vertical axis,
+   and the extra 12% guarantees coverage past the edges. fill stretches rather than crops, and
+   -90 runs the strand the way he asked. */
 @media (max-aspect-ratio: 1/1){
-  /* Centred by absolute position, not by the grid. Before the rotation this element's box is
-     100svh WIDE - wider than the container it sits in - and a grid aligns an overflowing item
-     to the start rather than centring it, which left a black band down one side. Positioning
-     from the centre and translating back by half is immune to that. */
   .v2bg video{position:absolute;top:50%;left:50%;
-    /* lvh/lvw, not svh/svw. The parent is position:fixed, and a fixed element sizes to the
-       LARGE viewport - the one with the browser chrome retracted - while svh is the SMALL
-       one. So the video was always a toolbar's height shorter than the box it sits in, and
-       that gap is the black band at the top and bottom of his phone. */
-    /* 112, not 100. After the quarter turn the screen's VERTICAL axis is this element's
-       WIDTH, so this is the number that stretches it up and down - his ask. The extra 12%
-       also guarantees it covers past the top and bottom edges whatever Safari is doing with
-       its toolbars, rather than relying on lvh being exactly right at that moment. */
     width:112lvh;height:100lvw;max-width:none;max-height:none;
-    /* FILL, not cover: his call, stretch rather than zoom. cover would have to crop about a
-       quarter of the frame to fill a 1.44:1 box with 1.78:1 footage, and cropping is what he
-       has objected to twice. Stretching that ratio is a 24% distortion on an organic shape
-       nobody knows the true proportions of - it reads as a slightly longer helix, which is
-       the direction he asked for anyway. */
-    /* -90, not +90: his call, so the strand runs the other way down the screen and the
-       sequence reads as starting from black and travelling down rather than climbing up. */
-    object-fit:fill;transform:translate(-50%,-50%) rotate(-90deg)}
+    object-fit:fill;object-position:center center;
+    transform:translate(-50%,-50%) rotate(-90deg)}
 }
 
-/* His point, and it is the one that explains everything: on the live site the STARFIELD covers
-   the whole screen including behind the browser bars - because the starfield is black at its
-   edges. Safari tints its own chrome from the colour it finds at the top and bottom of the
-   page, so against black it disappears and against our blue clip it does not.
-
-   So give it black to sample. The clip fades to pure black across the last few percent at each
-   end, which does two things at once: Safari's bars blend into the page the way they do on the
-   live site, and the video stops ending on a hard edge against them. Painted once, not a
-   filter or a blend - trap 5.8 is about what per-frame passes cost. */
-/* PORTRAIT ONLY, on his word: the desktop version is full bleed and wants no fade at all -
-   there the browser chrome sits outside the page rather than over it, so there is nothing to
-   blend into and a fade would just be two grey smudges.
-
-   Deeper than the first attempt, which still showed an edge. The black now holds solid for a
-   few percent before it starts to give, and takes about a fifth of the screen to reach clear -
-   a short fade reads as a band with a boundary of its own, which is the thing being fixed. */
-@media (max-aspect-ratio: 1/1){
-  /* SMOOTH, not bigger. The last attempt made the black area deeper, which is not what he
-     asked for - the visible edge was never the amount of black, it was the fade CURVE. Two
-     stops interpolate linearly, so there is a point where the fade abruptly starts and the eye
-     finds it immediately.
-     These stops follow a smoothstep, which leaves and arrives at zero slope, so there is no
-     moment where the gradient begins - and the span is SHORTER than before, 15% rather than
-     22%, so there is less black than the version he objected to. */
-  .v2bg::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:1;
-    background:linear-gradient(180deg,
-      rgba(0,0,0,1.0) 0.0%,
-      rgba(0,0,0,0.972) 1.5%,
-      rgba(0,0,0,0.896) 3.0%,
-      rgba(0,0,0,0.784) 4.5%,
-      rgba(0,0,0,0.648) 6.0%,
-      rgba(0,0,0,0.5) 7.5%,
-      rgba(0,0,0,0.352) 9.0%,
-      rgba(0,0,0,0.216) 10.5%,
-      rgba(0,0,0,0.104) 12.0%,
-      rgba(0,0,0,0.028) 13.5%,
-      rgba(0,0,0,0.0) 15.0%,
-      rgba(0,0,0,0.0) 85.0%,
-      rgba(0,0,0,0.028) 86.5%,
-      rgba(0,0,0,0.104) 88.0%,
-      rgba(0,0,0,0.216) 89.5%,
-      rgba(0,0,0,0.352) 91.0%,
-      rgba(0,0,0,0.5) 92.5%,
-      rgba(0,0,0,0.648) 94.0%,
-      rgba(0,0,0,0.784) 95.5%,
-      rgba(0,0,0,0.896) 97.0%,
-      rgba(0,0,0,0.972) 98.5%,
-      rgba(0,0,0,1.0) 100.0%)}
-}
-
-/* The page proper, below the header. Deliberately bare for now - he asked for the background
-   first and the writing afterwards - but it exists so the header has something to release
-   INTO, which is the whole point of the change. */
+/* ---------- the page proper, below the header ----------
+   Deliberately bare - he asked for the background first and the writing afterwards - but it
+   exists so the header has something to release INTO, which is the point of the change. */
 .v2main{position:relative;z-index:2;background:#000;min-height:100svh;
   display:flex;align-items:center;padding-block:12vh}
 .v2wrap{width:100%;max-width:1280px;margin:0 auto;padding-inline:clamp(16px,3vw,54px)}
@@ -160,8 +83,6 @@ html{scroll-behavior:auto}
   background:linear-gradient(100deg,#DFF6FF,#7FD8FF 45%,#5C82C9);
   -webkit-background-clip:text;background-clip:text;color:transparent}
 
-/* Someone who has asked for less motion should not have an animation tied to their scrollbar:
-   the runway collapses, so the page does not scroll and the strand simply holds still. */
 @media (prefers-reduced-motion:reduce){
   .v2stage{height:100svh !important}
 }
