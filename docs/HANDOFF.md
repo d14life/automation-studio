@@ -330,6 +330,25 @@ an effect. The browser restores scroll as soon as the document is tall enough,
 which can be before React has mounted. Any future scroll-driven media on this
 site needs the same line.
 
+### 5.13 The strand is ALIVE now — scroll is a delta, not a position
+Since 2026-08-04 v2's clip is no longer an absolute function of scroll position.
+One virtual clock (`pos` in `V2.tsx`'s tick) is driven by two hands: the scroll
+DELTA scrubs from whatever frame is on screen, and when the measured scroll
+speed dies an idle loop plays the clip itself — forward, then backward,
+ping-ponging over the full range at 1x, while the page stays put.
+
+The handoff is a **velocity blend, not a timer** — and that is deliberately the
+fix for the iOS momentum tail: the last crawl of a flick is slower than `V0`,
+so by then the loop already owns the motion and the crawl disappears into it.
+Do not reintroduce a "start playing after N ms idle" timer; the blend IS the
+feature.
+
+Anchors: the last `EDGE` (12%) of runway at each end pulls the frame toward its
+meaning (top = intact, bottom = destroyed) — weighted by `(1 - idle)`, so they
+only grip while actually scrolling. At rest they let go so the loop can play on
+the untouched hero. Consequence he accepted: frame and scroll position are not
+strictly tied any more; mid-runway the strand can be in any state.
+
 ---
 
 ## 6. The method that finally worked
