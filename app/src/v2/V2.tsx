@@ -361,7 +361,8 @@ export default function V2() {
        actually scrolling there ((1 - idle) weight). At rest the anchors let go, so the loop
        plays even on the untouched hero: land at the top, the strand settles intact, then
        quietly starts building and unbuilding on its own. */
-    let pos = 0    /* fraction of the clip on screen, the one true state */
+    let pos = 0      /* the frame on screen, 0..1 - DERIVED from phase, never set directly */
+    let phase = 0    /* unbounded; pos is a triangle wave of it, so there is no boundary */
     let dir = 1    /* idle playback direction; scrubbing re-aims it so release carries on */
     let lastY = 0
     let quiet = 9  /* seconds since the last real INPUT - the only thing that arms the loop */
@@ -396,133 +397,38 @@ export default function V2() {
          keeps turning for as long as you keep scrolling. Every scroll produces motion, always,
          which is the property he actually wants. The while loop handles a flick big enough to
          cross the whole clip more than once. */
-      let raw = pos + dp
-      let bounces = 0
-      while (raw > 1 || raw < 0) { raw = raw > 1 ? 2 - raw : -raw; bounces++ }
-      pos = raw
+      /* ONE CONTINUOUS PHASE. No walls, no bounce counters, no direction flags to disagree.
+         His report was "it lags very bad, like up and down, and does not go in reverse" - and
+         "up and down" is the diagnosis. There were TWO reflection rules meeting at the same
+         boundary: the scroll folded when it crossed 1, and the pendulum independently flipped
+         its own direction there. Near the end they took turns rewriting pos every frame, so it
+         ping-ponged across the boundary instead of turning around once. That is the jitter,
+         and no amount of tuning either rule fixes a conflict between them.
 
-      /* A SCROLL EVENT IS NOT AN INPUT. This is the third attempt at the handoff and the first
-         one that satisfies both things he asked for, because the two earlier ones each solved
-         one and broke the other:
+         So the boundary is gone. phase runs unbounded and pos is a TRIANGLE WAVE of it:
+         walk phase forward and pos rises to 1, turns, falls to 0, turns, forever. Reversing at
+         the end is not a rule any more - it is the shape of the function, so it cannot fail,
+         cannot double-fire, and cannot fight anything. Scrolling adds to phase. The loop adds
+         to phase. Both hands push the same wheel in the same units.
 
-           - a VELOCITY blend read slow scrolling as stopped, so the loop overpowered his finger
-             and kept destroying the strand while he scrolled up;
-           - gating on scroll SILENCE fixed that, but silence only arrives once iOS momentum has
-             finished, which is precisely the crawling tail he wanted hidden - "there is like a
-             slight wait" and "the video should continue a bit before".
-
-         Both fall out of the same mistake: treating scroll events as evidence the user is
-         scrolling. During momentum the finger is already off the glass. The page is gliding,
-         not being driven. So the loop is armed by INPUT - touch and wheel - and momentum, which
-         fires scroll but neither of those, no longer holds it off. The strand starts moving
-         while the page is still gliding, which is exactly the ask: the loop's motion covers the
-         crawl instead of the crawl being the motion.
-         And while a finger is actually down, idle is pinned to zero, so no amount of slow,
-         deliberate scrolling can ever be overpowered again. */
-      /* an odd number of bounces means the strand is now travelling the OTHER way, so the loop
-         must carry on rebuilding rather than snapping back to destroying when you let go */
-      if (dp !== 0) dir = (dp > 0 ? 1 : -1) * (bounces % 2 ? -1 : 1)
+         The bell keeps the turn from being a corner - speed follows |sin| of the phase, which
+         is zero exactly at the turnaround - and the 0.55 floor keeps it from dwelling there,
+         which was the earlier "holds for half a second" complaint. */
+      phase += dp
+      if (dp !== 0) dir = dp > 0 ? 1 : -1
       if (touching) quiet = 0; else quiet += dt
+      const idle = Math.min(1, Math.max(0, (quiet - 0.02) / 0.12))
 
-      /* TWO GATES ON THE LOOP, for the two ways a human is still in charge:
-         - quiet: seconds since real INPUT (finger, wheel). A finger on the glass pins the
-           loop off entirely, so slow deliberate scrolling can never be overpowered.
-         - calm: how fast the page is actually MOVING. This one is for the glide. The loop
-           exists to cover the slow crawl at the END of a flick - but ramping it to full while
-           the page was still flying meant two motions writing frames at once, which is the
-           fast-scroll lag he reported on the phone. Fast glide -> the scrub owns the frames
-           alone, exactly like the pre-loop days; as the glide decays toward the crawl the
-           loop fades in and swallows the tail. Finger-down safety is untouched because calm
-           only ever multiplies idle, never replaces it. */
-      /* THE HANDOVER SITS AT THE TOP OF THE DECAY NOW. Twice was not enough - he still read the
-         tail as lag - so the loop takes the page as calm at four times the old speed, and the
-         window is squared so it reaches full strength almost as soon as the flick starts
-         bleeding off rather than creeping up over the whole glide. In practice the strand is
-         moving under its own power about a second earlier than it was.
-         It is still a MULTIPLIER on the input gate, which is what keeps it safe: a finger on
-         the glass pins idle to zero regardless, so none of this can overpower a real scroll.
-         Only a page that is coasting untouched can be taken over. */
-      /* He says he still cannot see a difference, and the reason is that SQUARING the window
-         was undoing the threshold I kept raising: at half the cut-off speed a squared window is
-         only a quarter open, so the loop stayed suppressed through most of the glide however
-         high the number went. Dropped the square and raised the cut-off to 2.5, so the loop is
-         already at 60% strength while the page is still travelling at a fair clip and reaches
-         full long before the crawl. That is the "two seconds earlier" - the change is in the
-         SHAPE of the ramp, not just where it starts.
-         Safety is unchanged and does not depend on this number: a finger on the glass pins
-         idle to zero through the other gate, so only a page coasting untouched is ever taken. */
-      /* THE GLIDE GATE IS GONE. Every round I raised its threshold he still felt торможение,
-         and the reason is that the gate itself was the brake: it measured how fast the PAGE
-         was moving and held the loop back in proportion, so the whole momentum tail - exactly
-         the stretch he wanted covered - was the stretch it suppressed hardest.
-         The input gate alone is enough, and it is the one that actually protects him: a finger
-         on the glass pins idle to zero, so a real scroll can never be overpowered. The instant
-         the finger leaves, the page is coasting rather than being driven, and there is nothing
-         left to protect - the loop should own it immediately. It now reaches full strength
-         0.14s after release instead of waiting out the decay. */
-      const calm = 1
-      /* AT A PINNED END, THE RAMP BUYS NOTHING. The gates exist so the loop never fights the
-         scrub - but once pos is clamped hard against 0 or 1, scrolling further that way moves
-         nothing, so there is no fight left to lose. Waiting the full 0.25s there just parks
-         the strand on the destroyed frame: his "it holds there for a good half a second"
-         before it bounces. Pinned means the loop starts at once. */
-      const pinned = (pos >= 1 && dir === 1) || (pos <= 0 && dir === -1)
-      const idle = pinned ? 1 : Math.min(1, Math.max(0, (quiet - 0.02) / 0.12)) * calm
+      const tri = ((phase % 2) + 2) % 2          /* 0..2, one full there-and-back */
+      const bell = Math.max(Math.abs(Math.sin(tri * Math.PI)), 0.55)
+      phase += dir * (Math.PI / (2 * el.duration)) * bell * dt * idle
+      const t2 = ((phase % 2) + 2) % 2
+      pos = t2 <= 1 ? t2 : 2 - t2
 
-      /* THE LOOP IS A PENDULUM, NOT A METRONOME. Every complaint that survived the earlier
-         fixes traced back to the loop being a second (and at one point third) controller
-         fighting the scroll for one variable - anchors ambushing the strand on the way back
-         up, native playback discarding momentum deltas so the flick's end stuttered, and a
-         constant-speed loop slamming into the ends and reversing "too fast, not smooth".
-
-         All of it is gone by construction now. The loop's position is a point on a cosine
-         wave: pos = (1 - cos θ) / 2. Advancing θ at a constant rate makes the strand's speed
-         a sine - naturally ZERO at both ends, full in the middle. The turnaround cannot be
-         abrupt, because arriving at an end and slowing to a stop are the same thing. No
-         reflection branch, no direction flip to mistime - the wave carries it through.
-
-         The scrub stays a plain delta on pos, and each frame θ is re-derived from wherever
-         pos actually is, so the two hands can never disagree: scrub moves the point along the
-         wave, the loop continues the wave from that exact point. dp keeps adding during iOS
-         momentum while idle ramps in, so the glide's crawl is covered by loop motion instead
-         of being the only motion - and while a finger is down, idle is pinned to zero, so slow
-         deliberate scrolling can never be overpowered.
-
-         Native playback is gone on purpose. It saved decode work but discarded scroll deltas
-         while cruising - his "it tried at the same time to finish my scroll and continue the
-         video". One mechanism, eased seeks, everywhere: at 30Hz against files that decode
-         sequentially at 610fps here, the whole loop costs a few percent of one core. */
-      /* EASED, WITH A FLOOR. The pure cosine wave dwelt too long at the ends: its speed goes
-         all the way to zero there, and at zero-ish speed the 25fps frame grid updates three
-         to eight times a second - sparse updates that his eye correctly read as LAG, both
-         when the loop arrived at an end by itself and when he scrolled it there. So the
-         bell curve stays (2*sqrt(pos*(1-pos)) is the same sine ease in closed form), but
-         speed never drops below 40% - which keeps frame updates above ~15 a second at the
-         very turnaround. The flip is explicit again, but at 0.4 of an eased approach it is
-         a soft catch, nothing like the full-speed slam he first complained about.
-         The end-press guard stays: while a glide holds the strand against a clamp, the loop
-         waits rather than flickering against it. */
-      if (idle > 0 && !(pos >= 1 && dp > 0) && !(pos <= 0 && dp < 0)) {
-        const bell = Math.max(2 * Math.sqrt(pos * (1 - pos)), 0.55)
-        pos += dir * (Math.PI / (2 * el.duration)) * bell * dt * idle
-        if (pos >= 1) { pos = 1; dir = -1 }
-        if (pos <= 0) { pos = 0; dir = 1 }
-      }
-
-      /* NEVER SEEK FASTER THAN THE CLIP HAS FRAMES. rAF runs at 60Hz (120 on a ProMotion
-         screen) and a fast scroll changes the target frame every single time, so this was
-         firing up to 60 seeks a second at a clip that only holds 25 distinct frames a second -
-         more than half of them decoding a picture identical to the one already on screen.
-         Every seek also flushes the decode pipeline, and these frames are all-intra 2560x1440,
-         which is the most expensive kind to decode cold. 30Hz is above the content rate, so
-         nothing visible is lost and roughly half the decode work disappears. */
-      /* ?dbg=1 prints the scrub's own state on screen. Behind a query flag so it can never
-         reach a visitor, and cheap enough to leave in - diagnosing this by reading the source
-         has cost more rounds than measuring it would have. */
       if (dbg) dbg.textContent =
-        `pos ${pos.toFixed(3)}  dir ${dir}  dp ${dp.toFixed(4)}  idle ${idle.toFixed(2)}` +
-        `  quiet ${quiet.toFixed(2)}  touch ${touching ? 1 : 0}  off ${offscreen.current ? 1 : 0}` +
-        `  y ${Math.round(rawY.current)}`
+        `pos ${pos.toFixed(3)}  phase ${phase.toFixed(2)}  dir ${dir}  dp ${dp.toFixed(4)}` +
+        `  idle ${idle.toFixed(2)}  quiet ${quiet.toFixed(2)}  touch ${touching ? 1 : 0}` +
+        `  off ${offscreen.current ? 1 : 0}  y ${Math.round(rawY.current)}`
 
       if (now - lastSeek < SEEK_MS) return
       const t = Math.round(pos * (el.duration - 0.05) * FPS) / FPS
