@@ -344,9 +344,14 @@ export default function V2() {
         const f = (b - a) * 0.28
         return String(Math.max(0, Math.min(1, Math.min((p - a) / f, (b - p) / f))))
       }
-      stage.style.setProperty('--c1', band(0.20, 0.44))
-      stage.style.setProperty('--c2', band(0.46, 0.70))
-      stage.style.setProperty('--c3', band(0.72, 0.97))
+      const c1 = band(0.20, 0.44), c2 = band(0.46, 0.70), c3 = band(0.72, 0.97)
+      stage.style.setProperty('--c1', c1)
+      stage.style.setProperty('--c2', c2)
+      stage.style.setProperty('--c3', c3)
+      /* the beam animates only on the panel actually being read - two of the three are always
+         parked, which is the whole reason this costs nothing next to the video */
+      const chs = stage.querySelectorAll('.v2ch')
+      ;[c1, c2, c3].forEach((v, i) => chs[i]?.classList.toggle('is-live', Number(v) > 0.05))
       /* the bar earns its backdrop once you are off the very top */
       document.documentElement.style.setProperty('--nav', scrollY > 40 ? '1' : '0')
     }
@@ -576,24 +581,24 @@ export default function V2() {
               its length: the strand is what you watch, these are what you learn. Short by
               instruction - ноль воды is the one rule Rainur repeated six times. */}
           <div className="v2chapters" aria-hidden="false">
-            <article className="v2ch v2ch--1">
+            <article className="v2ch v2ch--1"><div className="v2glass">
               <p className="v2eyebrow">Что мы делаем</p>
               <h2>Собираем инструмент под вашу компанию</h2>
               <p>CRM под ваши этапы. Телефония с записью и автообзвоном. Боты, которые отвечают
                  по вашему прайсу. Сборщики, которые сводят прайсы поставщиков в одну таблицу.</p>
-            </article>
-            <article className="v2ch v2ch--2">
+            </div></article>
+            <article className="v2ch v2ch--2"><div className="v2glass">
               <p className="v2eyebrow">Как это устроено</p>
               <h2>Сначала прототип, деньги потом</h2>
               <p>Показываем работающую версию бесплатно. Нравится — 50% и мы доводим до сдачи.
                  Исходный код, документация и обучение сотрудников остаются у вас.</p>
-            </article>
-            <article className="v2ch v2ch--3">
+            </div></article>
+            <article className="v2ch v2ch--3"><div className="v2glass">
               <p className="v2eyebrow">Почему это работает</p>
               <h2>100% практики, ноль теории</h2>
               <p>Мы не продаём курсы и не консультируем. Отдаём готовое и настроенное.
                  С нашими инструментами уже работает логистическая компания «Негабарит-12».</p>
-            </article>
+            </div></article>
           </div>
 
           <div className="v2over">

@@ -237,17 +237,19 @@ html.v2light{
    because it is the sentence he wants a stranger to leave with. */
 .v2eyebrow{margin:0 0 22px;font:500 12px/1 JBMono,monospace;letter-spacing:.16em;
   text-transform:uppercase;color:var(--ink-faint)}
-/* THE SLOGAN IS PAINTED IN THE CLIP'S OWN COLOURS, and they were SAMPLED off the master
-   frames rather than picked: averaging the most saturated pixels of a real frame gives
-   #2B6397 steel blue while the strand is intact, #C2AE5A midway, and #E8B22D at the
-   destroyed peak with its brightest at #F0E782. That warm arc is what the eye actually sees
-   behind these words, so the words are made of it - the same reasoning that set --bg from a
-   sampled pixel instead of a chosen one.
-   Light is his violet, and necessarily the DARK half of violet: that theme's page is cream, so
-   a pale gradient would vanish there exactly as a black one does on the dark theme.
-   One variable carries it, so the switch is the same one class on <html> as everything else. */
-:root{--slogan:linear-gradient(100deg,#F0E782,#E8B22D 46%,#B4600F)}
-html.v2light{--slogan:linear-gradient(100deg,#9B7BE8,#6D28D9 46%,#3B1D6E)}
+/* THE SLOGAN IS THE PAGE'S OWN COLOURS - the BACKGROUND family, not the strand.
+   I had it painted in the amber of the destroyed helix, and he corrected it: the words should
+   belong to the page, which is the same navy the clip's background is, because --bg was itself
+   sampled from a real frame's background rather than chosen.
+   So both ramps are that one colour walked up or down in lightness, nothing else invented.
+   Dark: --bg #0e202d opened toward the pale blue of the light shafts behind the helix
+   (sampled #9DAFBC), so the slogan reads as the background lit up.
+   Light: --bg #f6e9e2 walked down into its own warm shadow. It has to go DARKER there for the
+   same reason dark has to go lighter - a slogan the colour of the page it sits on is not a
+   slogan. One variable carries both, so the switch is the single class on <html> everything
+   else already keys off. */
+:root{--slogan:linear-gradient(100deg,#C6DCEA,#6E9CBE 46%,#2B6397)}
+html.v2light{--slogan:linear-gradient(100deg,#8A7261,#5C4536 46%,#33241A)}
 .v2h1{margin:0;max-width:16ch;text-wrap:balance;
   font:900 clamp(38px,6.4vw,104px)/1.02 Golos,sans-serif;letter-spacing:-.035em;
   background:var(--slogan);-webkit-background-clip:text;background-clip:text;color:transparent}
@@ -447,3 +449,61 @@ html.v2light{--slogan:linear-gradient(100deg,#9B7BE8,#6D28D9 46%,#3B1D6E)}
 /* inner pages have no strand above them, so they need to clear the fixed bar themselves */
 .v2main--inner{padding-top:clamp(96px,13vh,150px)}
 
+
+/* ---------- the glass panels on the runway ----------
+   The mechanism is the Motiq border-beam he sent: a conic gradient rotating behind the box,
+   cut to a ring by two stacked masks with mask-composite:exclude. That part is genuinely good
+   and is kept exactly.
+
+   What is NOT kept is its engine. That component drives the angle from requestAnimationFrame
+   in React, and this page has just had a per-frame effect removed for making the whole site
+   lag - the melt - while a video is being seeked up to fifty times a second on the same
+   thread. An @property-registered custom property animated by CSS keyframes gives the same
+   travelling light with no JavaScript at all, no rAF, no spring, and nothing for React to
+   re-render. It also parks by itself: the animation only runs on the chapter that is actually
+   being read, so two of the three are always doing nothing.
+
+   Tailwind is installed in this project but the v2 page deliberately does not load it - it has
+   its own stylesheet precisely so it is not fighting site.css - so the component's utility
+   classes would have been dead weight here anyway. */
+@property --beam{syntax:'<angle>';initial-value:0deg;inherits:false}
+@keyframes v2beam{to{--beam:360deg}}
+
+.v2glass{position:relative;isolation:isolate;border-radius:20px;
+  padding:clamp(22px,3vw,34px);
+  background:color-mix(in srgb, var(--surface) 42%, transparent)}
+/* Backdrop blur is the most expensive thing you can put over moving video, so it is desktop
+   only. A phone gets a denser tint instead, which reads as the same frosted panel and costs a
+   single paint rather than a per-frame readback of the frames underneath. */
+@media (min-width:760px){
+  .v2glass{backdrop-filter:blur(16px) saturate(1.35);
+    -webkit-backdrop-filter:blur(16px) saturate(1.35);
+    background:color-mix(in srgb, var(--surface) 52%, transparent)}
+}
+@media (max-width:759px){
+  .v2glass{background:color-mix(in srgb, var(--surface) 90%, transparent)}
+}
+
+/* the ring: one comet round the border, paused unless this chapter is the one on screen */
+.v2glass::before{content:'';position:absolute;inset:0;border-radius:inherit;padding:2px;
+  pointer-events:none;
+  background:conic-gradient(from var(--beam),
+    transparent 0deg,
+    color-mix(in srgb, var(--accent) 8%, transparent) 24deg,
+    color-mix(in srgb, var(--accent) 60%, transparent) 50deg,
+    var(--accent) 58deg,
+    color-mix(in srgb, #fff 30%, var(--accent)) 61deg,
+    transparent 66deg,
+    transparent 360deg);
+  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;
+  mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  mask-composite:exclude;
+  animation:v2beam 8.5s linear infinite;animation-play-state:paused}
+.v2ch.is-live .v2glass::before{animation-play-state:running}
+/* a hairline so the panel still reads as an object while the beam is on the far side */
+.v2glass::after{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--ink) 12%, transparent)}
+@media (prefers-reduced-motion:reduce){
+  .v2glass::before{animation:none;--beam:40deg}
+}
