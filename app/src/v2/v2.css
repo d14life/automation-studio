@@ -491,7 +491,15 @@ html.v2light{--slogan:linear-gradient(100deg,#8A7261,#5C4536 46%,#33241A)}
   position:relative;isolation:isolate;border-radius:20px;
   padding:clamp(22px,3vw,34px);
   border:1px solid color-mix(in srgb, var(--ink) 14%, transparent);
-  background:color-mix(in srgb, var(--surface) 62%, transparent)}
+  background:color-mix(in srgb, var(--surface) 62%, transparent);
+  /* THE ANIMATION LIVES HERE, NOT ON THE PSEUDOS, and that is the whole reason he kept seeing
+     a frozen beam. A var() inside a custom property is substituted when that property is
+     COMPUTED, on the element that declares it - so --bm-ring was resolved right here with
+     --beam at its 0deg initial value, and what the pseudos inherited was a finished gradient
+     with the angle already baked in. Animating --beam on ::before could not reach back into a
+     string that had already been built. Animate it on the element that owns --bm-ring and the
+     gradient is rebuilt every frame. */
+  animation:v2beam 8.5s linear infinite;animation-play-state:paused}
 
 /* Backdrop blur is the most expensive thing you can put over moving video, so it is desktop
    only; a phone gets a denser tint that reads the same for a single paint. */
@@ -515,8 +523,7 @@ html.v2light{--slogan:linear-gradient(100deg,#8A7261,#5C4536 46%,#33241A)}
    background but below its text, which is exactly where cast light belongs. */
 .v2glass::before{content:'';position:absolute;inset:-2px;border-radius:inherit;z-index:-1;
   pointer-events:none;background:var(--bm-ring);
-  filter:blur(18px);opacity:.55;
-  animation:v2beam 8.5s linear infinite;animation-play-state:paused}
+  filter:blur(18px);opacity:.55}
 
 /* THE RING - the same gradient cut to a border by two stacked masks. */
 .v2glass::after{content:'';position:absolute;inset:0;border-radius:inherit;padding:1.5px;
@@ -524,14 +531,13 @@ html.v2light{--slogan:linear-gradient(100deg,#8A7261,#5C4536 46%,#33241A)}
   -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
   -webkit-mask-composite:xor;
   mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
-  mask-composite:exclude;
-  animation:v2beam 8.5s linear infinite;animation-play-state:paused}
+  mask-composite:exclude}
 
 /* only the chapter being read animates - two of the three are always parked, which is why
    this costs nothing next to the video */
-.v2ch.is-live .v2glass::before,.v2ch.is-live .v2glass::after{animation-play-state:running}
+.v2ch.is-live .v2glass{animation-play-state:running}
 @media (prefers-reduced-motion:reduce){
-  .v2glass::before,.v2glass::after{animation:none;--beam:40deg}
+  .v2glass{animation:none;--beam:40deg}
 }
 
 /* ?nopanel=1 strips the glass entirely - an A/B switch for measuring what it costs, not a
