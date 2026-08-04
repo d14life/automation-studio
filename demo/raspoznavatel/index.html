@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Распознаватель накладных — демо · Solutions101</title>
+<style>
+  :root{
+    --bg:#0e202d; --text:#F2F7F5; --text-soft:rgba(242,247,245,.72);
+    --accent:#7FD8FF; --warm:#ff6b5e; --panel:#132937; --border:rgba(242,247,245,.13);
+    --green:#7fe0a8; --amber:#ffcf7f;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;}
+  header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:10}
+  header .brand{font-size:14px;color:var(--text-soft)}
+  header a{color:var(--text-soft);text-decoration:none;font-size:14px;display:flex;align-items:center;gap:6px}
+  header a:hover{color:var(--accent)}
+  main{max-width:1180px;margin:0 auto;padding:28px 20px 60px}
+  h1{font-size:22px;margin:0 0 4px}
+  p.lead{color:var(--text-soft);margin:0 0 24px;font-size:14px}
+  .grid{display:grid;grid-template-columns:1fr;gap:24px}
+  @media(min-width:900px){.grid{grid-template-columns:1fr 1fr;align-items:start}}
+
+  /* --- photo panel --- */
+  .photo-wrap{background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:24px;position:relative;overflow:hidden}
+  .photo-wrap .tag{position:absolute;top:14px;left:14px;font-size:11px;color:var(--text-soft);border:1px solid var(--border);padding:3px 8px;border-radius:100px;background:rgba(0,0,0,.2);z-index:5}
+  .stage{position:relative;aspect-ratio:4/5;max-width:420px;margin:26px auto 0;perspective:800px}
+  .sheet{
+    position:absolute;inset:0;
+    background:linear-gradient(160deg,#eee7da,#e3dccd 60%,#d9d1c0);
+    border-radius:4px;
+    transform:rotate(-3.5deg) skewY(1deg);
+    box-shadow:0 20px 50px rgba(0,0,0,.45), inset 0 0 40px rgba(0,0,0,.06);
+  }
+  .sheet::before{ /* corner fold */
+    content:"";position:absolute;top:0;right:0;width:38px;height:38px;
+    background:linear-gradient(135deg,transparent 49%,#cfc7b5 50%,#b9b09c 100%);
+    box-shadow:-2px 2px 6px rgba(0,0,0,.25);
+  }
+  .stain{position:absolute;width:70px;height:70px;border-radius:50%;
+    border:3px solid rgba(120,90,50,.18);
+    box-shadow:0 0 0 6px rgba(120,90,50,.05) inset;
+    bottom:14%;left:10%;transform:rotate(8deg);pointer-events:none;
+  }
+  .doc{position:absolute;inset:0;padding:9% 8%;transform:rotate(-3.5deg) skewY(1deg);color:#33302a;font-family:Georgia,'Times New Roman',serif}
+  .doc .h{text-align:center;font-size:clamp(10px,2.6vw,13px);font-weight:700;letter-spacing:.03em;transform:rotate(-.6deg)}
+  .doc .sub{text-align:center;font-size:clamp(8px,2vw,10px);color:#5c584e;margin-top:2px;transform:rotate(.4deg)}
+  .doc table{width:100%;border-collapse:collapse;margin-top:14px;font-size:clamp(7px,1.7vw,9px)}
+  .doc td{border:1px solid #9d9584;padding:4px 5px;transform:rotate(-.3deg)}
+  .doc tr:nth-child(3) td{transform:rotate(.5deg)} /* the row that'll be "uncertain" gets extra crookedness */
+  .doc .foot{margin-top:10px;font-size:clamp(7px,1.6vw,9px);color:#5c584e;display:flex;justify-content:space-between;transform:rotate(.3deg)}
+  .scanbeam{position:absolute;left:2%;right:2%;height:3px;top:0;
+    background:linear-gradient(90deg,transparent,var(--accent),transparent);
+    box-shadow:0 0 16px 4px var(--accent);
+    opacity:0;pointer-events:none;
+  }
+  .scanbeam.on{animation:sweep 1.5s linear forwards}
+  @keyframes sweep{
+    0%{opacity:1;top:2%}
+    95%{opacity:1}
+    100%{top:96%;opacity:0}
+  }
+
+  .controls{display:flex;gap:10px;margin-top:22px;flex-wrap:wrap}
+  button{font:inherit;font-size:14px;border-radius:10px;padding:10px 18px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text);display:inline-flex;align-items:center;gap:8px;transition:.15s}
+  button.primary{background:var(--accent);color:#082430;border-color:var(--accent);font-weight:600}
+  button.primary:hover{filter:brightness(1.08)}
+  button.primary:disabled{opacity:.45;cursor:default;filter:none}
+  button.ghost:hover{border-color:var(--text-soft)}
+  button.cta{border-style:dashed;color:var(--text-soft)}
+  button.cta:not(:disabled){color:var(--accent);border-color:var(--accent);border-style:solid}
+  button.cta:not(:disabled):hover{background:rgba(127,216,255,.1)}
+  svg.icon{width:16px;height:16px;flex:none}
+
+  /* --- results panel --- */
+  .results{background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:24px}
+  .results h2{font-size:15px;margin:0 0 14px;color:var(--text-soft);font-weight:600}
+  table.res{width:100%;border-collapse:collapse;font-size:13px}
+  table.res th{text-align:left;font-weight:500;color:var(--text-soft);font-size:11px;text-transform:uppercase;letter-spacing:.05em;padding:0 8px 8px;border-bottom:1px solid var(--border)}
+  table.res td{padding:10px 8px;border-bottom:1px solid var(--border);vertical-align:middle}
+  table.res tr.row{opacity:0;transform:translateY(6px);animation:rise .4s ease forwards}
+  @keyframes rise{to{opacity:1;transform:none}}
+  .badge{font-size:11px;font-weight:600;padding:3px 9px;border-radius:100px;display:inline-block;white-space:nowrap}
+  .badge.green{background:rgba(127,224,168,.15);color:var(--green)}
+  .badge.amber{background:rgba(255,207,127,.16);color:var(--amber)}
+  .qty-input{width:64px;background:transparent;border:1px dashed var(--amber);color:var(--text);border-radius:6px;padding:5px 6px;font:inherit;font-size:13px}
+  .note{font-size:11px;color:var(--amber);margin-top:3px}
+  .placeholder{color:var(--text-soft);font-size:13px;padding:30px 0;text-align:center;border:1px dashed var(--border);border-radius:12px}
+
+  .summary{margin-top:18px;padding-top:16px;border-top:1px solid var(--border);display:none}
+  .summary.show{display:block;animation:rise .35s ease}
+  .summary .line{font-size:13px;color:var(--text-soft);margin-bottom:12px}
+  .summary .line b{color:var(--text)}
+
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);
+    background:var(--panel);border:1px solid var(--accent);color:var(--text);
+    padding:12px 20px;border-radius:12px;font-size:13px;display:flex;align-items:center;gap:8px;
+    opacity:0;pointer-events:none;transition:.25s;box-shadow:0 10px 30px rgba(0,0,0,.4);z-index:50}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<header>
+  <span class="brand">Solutions101 · демо</span>
+  <a href="/v2.html">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    на сайт
+  </a>
+</header>
+
+<main>
+  <h1>Распознаватель накладных</h1>
+  <p class="lead">Фото бумажной ТН превращается в таблицу — за секунды, с пометкой того, в чём система не уверена.</p>
+
+  <div class="grid">
+    <div class="photo-wrap">
+      <span class="tag">демо-данные</span>
+      <div class="stage">
+        <div class="sheet">
+          <div class="stain"></div>
+        </div>
+        <div class="doc">
+          <div class="h">ТОВАРНАЯ НАКЛАДНАЯ № 4412</div>
+          <div class="sub">от 04.08.2026 г.</div>
+          <table>
+            <tr><td>Труба проф. 40×20</td><td>120 шт</td></tr>
+            <tr><td>Лист г/к 3мм</td><td>8 т</td></tr>
+            <tr><td>Электроды МР-3</td><td>40 пач</td></tr>
+            <tr><td>Уголок 50×50×5</td><td>65 шт</td></tr>
+            <tr><td>Круг стальной ⌀20</td><td>230 кг</td></tr>
+          </table>
+          <div class="foot"><span>Отпустил: Кладовщик</span><span>Получил: Иванов И.И.</span></div>
+        </div>
+        <div class="scanbeam" id="beam"></div>
+      </div>
+
+      <div class="controls">
+        <button class="primary" id="scanBtn">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V5a1 1 0 0 1 1-1h2M17 4h2a1 1 0 0 1 1 1v2M20 17v2a1 1 0 0 1-1 1h-2M7 20H5a1 1 0 0 1-1-1v-2"/><path d="M4 12h16"/></svg>
+          Распознать
+        </button>
+        <button class="ghost" id="resetBtn">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
+          Сбросить
+        </button>
+      </div>
+    </div>
+
+    <div class="results">
+      <h2>Результат распознавания</h2>
+      <div id="tableWrap">
+        <div class="placeholder" id="placeholder">Нажмите «Распознать», чтобы обработать фото</div>
+        <table class="res" id="resTable" style="display:none">
+          <thead><tr><th>Позиция</th><th>Кол-во</th><th>Точность</th></tr></thead>
+          <tbody id="resBody"></tbody>
+        </table>
+      </div>
+
+      <div class="summary" id="summary">
+        <div class="line" id="summaryLine"></div>
+        <button class="cta" id="pushBtn" disabled>
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          → в 1С
+        </button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="toast" id="toast">
+  <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+  <span id="toastText"></span>
+</div>
+
+<script>
+(function(){
+  var ROWS = [
+    {name:'Труба проф. 40×20', qty:'120 шт', conf:99},
+    {name:'Лист г/к 3мм', qty:'8 т', conf:97},
+    {name:'Электроды МР-3', qty:'40 пач', conf:81, unsure:true},
+    {name:'Уголок 50×50×5', qty:'65 шт', conf:98},
+    {name:'Круг стальной ⌀20', qty:'230 кг', conf:95}
+  ];
+
+  var beam = document.getElementById('beam');
+  var scanBtn = document.getElementById('scanBtn');
+  var resetBtn = document.getElementById('resetBtn');
+  var placeholder = document.getElementById('placeholder');
+  var resTable = document.getElementById('resTable');
+  var resBody = document.getElementById('resBody');
+  var summary = document.getElementById('summary');
+  var summaryLine = document.getElementById('summaryLine');
+  var pushBtn = document.getElementById('pushBtn');
+  var toast = document.getElementById('toast');
+  var toastText = document.getElementById('toastText');
+  var timers = [];
+
+  function clearTimers(){ timers.forEach(clearTimeout); timers = []; }
+
+  function reset(){
+    clearTimers();
+    beam.classList.remove('on');
+    void beam.offsetWidth;
+    resBody.innerHTML = '';
+    resTable.style.display = 'none';
+    placeholder.style.display = 'block';
+    summary.classList.remove('show');
+    pushBtn.disabled = true;
+    scanBtn.disabled = false;
+    toast.classList.remove('show');
+  }
+
+  function rowHtml(r){
+    var badgeClass = r.unsure ? 'amber' : 'green';
+    var qtyCell = r.unsure
+      ? '<input class="qty-input" value="'+r.qty+'"><div class="note">проверьте количество</div>'
+      : r.qty;
+    return '<tr class="row"><td>'+r.name+'</td><td>'+qtyCell+'</td>'+
+      '<td><span class="badge '+badgeClass+'">'+r.conf+'%</span></td></tr>';
+  }
+
+  function scan(){
+    scanBtn.disabled = true;
+    placeholder.style.display = 'none';
+    resTable.style.display = 'table';
+    resBody.innerHTML = '';
+    beam.classList.add('on');
+
+    ROWS.forEach(function(r, i){
+      var delay = 260 + i * 260; // matches beam sweeping past each printed row
+      timers.push(setTimeout(function(){
+        resBody.insertAdjacentHTML('beforeend', rowHtml(r));
+      }, delay));
+    });
+
+    timers.push(setTimeout(function(){
+      var unsureCount = ROWS.filter(function(r){return r.unsure;}).length;
+      summaryLine.innerHTML = '<b>'+ROWS.length+' позиций</b> распознано за <b>1.4 с</b> · '+unsureCount+' на проверку';
+      summary.classList.add('show');
+      pushBtn.disabled = false;
+    }, 1550));
+  }
+
+  scanBtn.addEventListener('click', scan);
+  resetBtn.addEventListener('click', reset);
+  pushBtn.addEventListener('click', function(){
+    if(pushBtn.disabled) return;
+    toastText.textContent = 'Проведено. Документ №4412 создан в 1С';
+    toast.classList.add('show');
+    timers.push(setTimeout(function(){ toast.classList.remove('show'); }, 3200));
+  });
+})();
+</script>
+
+</body>
+</html>

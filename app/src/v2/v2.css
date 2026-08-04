@@ -677,3 +677,9 @@ html.v2light{--slogan:linear-gradient(100deg,#8A7261,#5C4536 46%,#33241A)}
   .v2svc svg *,.a-wave,.a-rec{animation:none!important}
   .v2proc__line path{transition:none;stroke-dashoffset:0}
 }
+
+/* demo cards are links; the arrow line does the affordance, the card must not look different
+   from its siblings until hover */
+a.v2card{display:block;text-decoration:none;color:inherit;transition:border-color .15s}
+a.v2card:hover{border-color:var(--accent)}
+a.v2card:hover .v2card__win{color:var(--accent)}

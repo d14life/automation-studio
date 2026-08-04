@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CRM логиста — демо · Solutions101</title>
+<style>
+  :root{
+    --bg:#0e202d; --text:#F2F7F5; --text-soft:rgba(242,247,245,.72);
+    --accent:#7FD8FF; --warm:#ff6b5e; --panel:#132937;
+    --border:rgba(242,247,245,.13); --r:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+    min-height:100vh; overflow-x:hidden;
+  }
+  a{color:inherit}
+  svg{display:block}
+
+  header{
+    position:sticky; top:0; z-index:20; display:flex; align-items:center; justify-content:space-between;
+    padding:12px 20px; background:rgba(14,32,45,.9); backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--border);
+  }
+  header .brand{font-size:14px; color:var(--text-soft)}
+  header .back{font-size:14px; text-decoration:none; color:var(--text-soft); display:flex; align-items:center; gap:6px; transition:color .15s}
+  header .back:hover{color:var(--accent)}
+
+  main{padding:20px; max-width:1400px; margin:0 auto}
+
+  .summary{
+    display:flex; flex-wrap:wrap; gap:10px 24px; align-items:center;
+    background:var(--panel); border:1px solid var(--border); border-radius:var(--r);
+    padding:14px 18px; margin-bottom:18px; font-size:14px; color:var(--text-soft);
+  }
+  .summary b{color:var(--text); font-weight:600}
+  .summary .new{color:var(--warm)}
+  .summary .reset{
+    margin-left:auto; background:transparent; border:1px solid var(--border); color:var(--text);
+    padding:8px 14px; border-radius:10px; font-size:13px; cursor:pointer; transition:border-color .15s, color .15s;
+  }
+  .summary .reset:hover{border-color:var(--accent); color:var(--accent)}
+
+  .board{
+    display:grid; grid-template-columns:repeat(4,minmax(260px,1fr)); gap:14px;
+    overflow-x:auto; padding-bottom:8px;
+  }
+  .col{
+    background:var(--panel); border:1px solid var(--border); border-radius:var(--r);
+    padding:12px; min-height:200px; display:flex; flex-direction:column; gap:10px;
+  }
+  .col h2{
+    font-size:13px; font-weight:600; margin:2px 4px 4px; color:var(--text-soft);
+    display:flex; justify-content:space-between; text-transform:uppercase; letter-spacing:.03em;
+  }
+  .col h2 span{color:var(--accent); font-weight:700}
+  .col .dropzone{flex:1; display:flex; flex-direction:column; gap:10px; min-height:80px; border-radius:12px; transition:background .15s}
+  .col .dropzone.over{background:rgba(127,216,255,.08); outline:1px dashed var(--accent)}
+
+  .card{
+    background:#0f2330; border:1px solid var(--border); border-radius:14px; padding:12px 13px;
+    cursor:grab; touch-action:none; user-select:none;
+    transition:box-shadow .2s, transform .2s, border-color .3s;
+  }
+  .card:active{cursor:grabbing}
+  .card.dragging{opacity:.35}
+  .card .route{font-size:14px; font-weight:600; margin-bottom:4px}
+  .card .cargo{font-size:12.5px; color:var(--text-soft); margin-bottom:6px}
+  .card .client{font-size:12.5px; color:var(--text-soft); margin-bottom:8px}
+  .card .rate{font-size:15px; font-weight:700; color:var(--accent); margin-bottom:8px}
+  .card .chips{display:flex; flex-wrap:wrap; gap:6px}
+  .chip{
+    display:inline-flex; align-items:center; gap:5px; font-size:11.5px; color:var(--text-soft);
+    background:rgba(242,247,245,.06); border:1px solid var(--border); border-radius:999px;
+    padding:4px 9px; cursor:pointer; transition:border-color .15s, color .15s;
+  }
+  .chip:hover{border-color:var(--accent); color:var(--text)}
+  .chip svg{width:12px; height:12px; stroke:currentColor}
+
+  .card.fresh{
+    border-color:rgba(255,107,94,.55);
+    animation:pulse 1.8s ease-in-out infinite;
+  }
+  .card.fresh .note{font-size:11px; color:var(--warm); margin-top:6px}
+  @keyframes pulse{
+    0%,100%{box-shadow:0 0 0 0 rgba(255,107,94,.35)}
+    50%{box-shadow:0 0 0 6px rgba(255,107,94,0)}
+  }
+  .card.closed-glow{
+    border-color:rgba(127,216,255,.6);
+    box-shadow:0 0 0 3px rgba(127,216,255,.12), 0 0 20px rgba(127,216,255,.15);
+  }
+
+  .toast-wrap{position:fixed; right:18px; bottom:18px; z-index:50; display:flex; flex-direction:column; gap:8px}
+  .toast{
+    background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:12px 16px;
+    font-size:13.5px; max-width:300px; box-shadow:0 8px 30px rgba(0,0,0,.4);
+    transform:translateX(120%); animation:slidein .35s forwards, fadeout .35s 3.2s forwards;
+  }
+  @keyframes slidein{to{transform:translateX(0)}}
+  @keyframes fadeout{to{opacity:0; transform:translateX(20px)}}
+
+  .popover{
+    position:fixed; z-index:60; width:230px; background:var(--panel); border:1px solid var(--border);
+    border-radius:14px; padding:14px; box-shadow:0 12px 40px rgba(0,0,0,.5);
+  }
+  .popover .title{font-size:12.5px; color:var(--text-soft); margin-bottom:10px; display:flex; justify-content:space-between}
+  .popover .play{
+    width:32px; height:32px; border-radius:50%; border:1px solid var(--border); background:transparent;
+    color:var(--accent); display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0;
+  }
+  .popover .row{display:flex; align-items:center; gap:10px}
+  .waveform{display:flex; align-items:flex-end; gap:2px; height:28px; flex:1}
+  .waveform span{
+    width:3px; background:var(--accent); opacity:.4; border-radius:2px;
+  }
+  .waveform.playing span{animation:bar 1s ease-in-out infinite}
+  .waveform span:nth-child(odd){animation-delay:.1s}
+  .waveform span:nth-child(3n){animation-delay:.2s}
+  @keyframes bar{0%,100%{transform:scaleY(.4); opacity:.4}50%{transform:scaleY(1); opacity:1}}
+
+  @media (max-width:900px){
+    .board{grid-template-columns:none; grid-auto-flow:column; grid-auto-columns:82vw}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">Solutions101 · демо</div>
+  <a class="back" href="/v2.html">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    на сайт
+  </a>
+</header>
+
+<main>
+  <div class="summary">
+    <div><b id="dealCount">7</b> сделок</div>
+    <div><b id="dealSum">402 000 ₽</b> в работе</div>
+    <div class="new">● 1 новая заявка из почты</div>
+    <button class="reset" id="resetBtn">Сбросить</button>
+  </div>
+
+  <div class="board" id="board"></div>
+</main>
+
+<div class="toast-wrap" id="toasts"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---- демо-данные ----
+  var COLUMNS = [
+    {id:'new', title:'Заявка'},
+    {id:'found', title:'Машина найдена'},
+    {id:'transit', title:'В пути'},
+    {id:'closed', title:'Закрыто'}
+  ];
+
+  var INITIAL = [
+    {id:1, col:'new', route:'Казань → Москва', cargo:'металлопрокат, 18 т', client:'ООО «СтройМет»', rate:'74 000 ₽', fresh:true},
+    {id:2, col:'new', route:'Самара → Уфа', cargo:'пиломатериал, 12 т', client:'ИП Кузнецов', rate:'41 000 ₽', call:'1:02'},
+    {id:3, col:'found', route:'Москва → СПб', cargo:'стройматериалы, 20 т', client:'ООО «БетонСтрой»', rate:'58 000 ₽', call:'2:14', doc:true},
+    {id:4, col:'found', route:'Пермь → Казань', cargo:'зерно, 22 т', client:'АО «Агрохолдинг»', rate:'46 000 ₽', doc:true},
+    {id:5, col:'transit', route:'Волгоград → Ростов', cargo:'металлопрокат, 15 т', client:'ООО «ЮгМеталл»', rate:'39 000 ₽', call:'0:47'},
+    {id:6, col:'transit', route:'Екатеринбург → Тюмень', cargo:'оборудование, 9 т', client:'ЗАО «ПромТех»', rate:'52 000 ₽', doc:true},
+    {id:7, col:'closed', route:'Новосибирск → Омск', cargo:'уголь, 24 т', client:'ООО «СибУголь»', rate:'92 000 ₽', doc:true}
+  ];
+
+  var ICONS = {
+    phone:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.7a2 2 0 0 1-.5 2.1L8 9.6a16 16 0 0 0 6 6l1.1-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.1 2.4Z"/></svg>',
+    paperclip:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.4 11.1 12 20.5a5 5 0 0 1-7-7l9-9a3.5 3.5 0 0 1 5 5l-9 9a2 2 0 0 1-3-3l8-8"/></svg>',
+    play:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>',
+    pause:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>'
+  };
+
+  var board = document.getElementById('board');
+  var toastsEl = document.getElementById('toasts');
+  var state; // deep copy of INITIAL, mutated by drag
+
+  function clone(a){ return a.map(function(d){ return Object.assign({}, d); }); }
+
+  function render(){
+    board.innerHTML = '';
+    COLUMNS.forEach(function(col){
+      var colEl = document.createElement('div');
+      colEl.className = 'col';
+      var items = state.filter(function(d){ return d.col === col.id; });
+      colEl.innerHTML = '<h2>' + col.title + ' <span>' + items.length + '</span></h2>';
+      var zone = document.createElement('div');
+      zone.className = 'dropzone';
+      zone.dataset.col = col.id;
+      items.forEach(function(d){ zone.appendChild(makeCard(d)); });
+      colEl.appendChild(zone);
+      board.appendChild(colEl);
+    });
+    updateSummary();
+  }
+
+  function updateSummary(){
+    document.getElementById('dealCount').textContent = state.length;
+    var sum = state.reduce(function(s,d){ return s + parseInt(d.rate.replace(/\D/g,''),10); }, 0);
+    document.getElementById('dealSum').textContent = sum.toLocaleString('ru-RU') + ' ₽';
+  }
+
+  function makeCard(d){
+    var el = document.createElement('div');
+    el.className = 'card' + (d.fresh ? ' fresh' : '') + (d.col === 'closed' && d._glow ? ' closed-glow' : '');
+    el.dataset.id = d.id;
+    var chips = '';
+    if (d.call) chips += '<span class="chip chip-call" data-id="'+d.id+'">' + ICONS.phone + ' звонок ' + d.call + '</span>';
+    if (d.doc) chips += '<span class="chip">' + ICONS.paperclip + ' договор.pdf</span>';
+    el.innerHTML =
+      '<div class="route">' + d.route + '</div>' +
+      '<div class="cargo">' + d.cargo + '</div>' +
+      '<div class="client">' + d.client + '</div>' +
+      '<div class="rate">' + d.rate + '</div>' +
+      '<div class="chips">' + chips + '</div>' +
+      (d.fresh ? '<div class="note">из почты, 4 мин назад</div>' : '');
+    bindDrag(el, d);
+    return el;
+  }
+
+  // ---- drag & drop (pointer events) ----
+  var dragEl = null, dragData = null, offsetX = 0, offsetY = 0, placeholder = null;
+
+  function bindDrag(el, data){
+    el.addEventListener('pointerdown', function(e){
+      if (e.target.closest('.chip')) return; // let chip clicks through
+      startDrag(e, el, data);
+    });
+  }
+
+  function startDrag(e, el, data){
+    dragEl = el; dragData = data;
+    var rect = el.getBoundingClientRect();
+    offsetX = e.clientX - rect.left;
+    offsetY = e.clientY - rect.top;
+    el.setPointerCapture(e.pointerId);
+    el.classList.add('dragging');
+    el.style.position = 'fixed';
+    el.style.zIndex = 40;
+    el.style.width = rect.width + 'px';
+    el.style.left = rect.left + 'px';
+    el.style.top = rect.top + 'px';
+    document.body.appendChild(el);
+
+    function move(ev){
+      el.style.left = (ev.clientX - offsetX) + 'px';
+      el.style.top = (ev.clientY - offsetY) + 'px';
+      highlightZone(ev.clientX, ev.clientY);
+    }
+    function up(ev){
+      el.removeEventListener('pointermove', move);
+      el.removeEventListener('pointerup', up);
+      document.querySelectorAll('.dropzone.over').forEach(function(z){ z.classList.remove('over'); });
+      var zone = zoneAt(ev.clientX, ev.clientY);
+      el.style.position = ''; el.style.zIndex = ''; el.style.width = ''; el.style.left = ''; el.style.top = '';
+      el.classList.remove('dragging');
+      if (zone && zone.dataset.col !== dragData.col){
+        var prevCol = dragData.col;
+        dragData.col = zone.dataset.col;
+        if (dragData.col === 'closed') dragData._glow = true;
+        onDrop(dragData.col);
+      }
+      render();
+      dragEl = null; dragData = null;
+    }
+    el.addEventListener('pointermove', move);
+    el.addEventListener('pointerup', up);
+  }
+
+  function zoneAt(x, y){
+    var els = document.elementsFromPoint(x, y);
+    for (var i=0;i<els.length;i++){
+      if (els[i].classList && els[i].classList.contains('dropzone')) return els[i];
+    }
+    return null;
+  }
+  function highlightZone(x, y){
+    document.querySelectorAll('.dropzone.over').forEach(function(z){ z.classList.remove('over'); });
+    var z = zoneAt(x, y);
+    if (z) z.classList.add('over');
+  }
+
+  function onDrop(col){
+    if (col === 'transit') toast('Клиенту отправлен статус: машина вышла');
+    if (col === 'closed') toast('Акт и счёт сформированы');
+  }
+
+  function toast(text){
+    var t = document.createElement('div');
+    t.className = 'toast';
+    t.textContent = text;
+    toastsEl.appendChild(t);
+    setTimeout(function(){ t.remove(); }, 3600);
+  }
+
+  // ---- call popover ----
+  var openPopover = null;
+  document.addEventListener('click', function(e){
+    var chip = e.target.closest('.chip-call');
+    if (!chip){
+      if (openPopover && !e.target.closest('.popover')) closePopover();
+      return;
+    }
+    var d = state.find(function(x){ return String(x.id) === chip.dataset.id; });
+    if (!d) return;
+    if (openPopover) closePopover();
+    var rect = chip.getBoundingClientRect();
+    var pop = document.createElement('div');
+    pop.className = 'popover';
+    var bars = '';
+    for (var i=0;i<24;i++){ bars += '<span style="height:'+(6+Math.round(Math.random()*22))+'px"></span>'; }
+    pop.innerHTML =
+      '<div class="title"><span>Запись звонка</span><span>' + d.call + '</span></div>' +
+      '<div class="row"><button class="play">' + ICONS.play + '</button><div class="waveform">' + bars + '</div></div>';
+    document.body.appendChild(pop);
+    var top = rect.bottom + 8;
+    var left = Math.min(rect.left, window.innerWidth - 246);
+    if (top + 100 > window.innerHeight) top = rect.top - 100;
+    pop.style.top = top + 'px';
+    pop.style.left = left + 'px';
+    openPopover = pop;
+
+    var playing = false;
+    var btn = pop.querySelector('.play');
+    var wave = pop.querySelector('.waveform');
+    btn.addEventListener('click', function(ev){
+      ev.stopPropagation();
+      playing = !playing;
+      wave.classList.toggle('playing', playing);
+      btn.innerHTML = playing ? ICONS.pause : ICONS.play;
+    });
+    e.stopPropagation();
+  });
+  function closePopover(){ if (openPopover){ openPopover.remove(); openPopover = null; } }
+
+  document.getElementById('resetBtn').addEventListener('click', function(){
+    closePopover();
+    state = clone(INITIAL);
+    render();
+  });
+
+  state = clone(INITIAL);
+  render();
+})();
+</script>
+</body>
+</html>
