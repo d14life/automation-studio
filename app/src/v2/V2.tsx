@@ -123,6 +123,16 @@ const TIER =
    any screen that could resolve the difference. */
 const FPS = TIER === 'sm' || TIER === 'md' ? 50 : 25
 const HALF_FRAME = 0.5 / FPS
+/* THE SEEK CAP IS THE FILE'S OWN FRAME INTERVAL, not a hand-picked 30Hz. 33ms was chosen when
+   the phone was still on 1080p H.264 and stuttering, and it has been throttling the 50fps
+   files ever since - 30 updates a second out of 50 available, throwing away two frames in
+   five. Deriving it removes the guess: seeking faster than the clip has frames only decodes
+   the same picture twice, seeking slower discards frames that were paid for.
+   So the 50fps tiers now run at 50Hz and the 25fps tiers at 25Hz - which is actually LESS work
+   than before for laptops and 4K, where 33ms was over-seeking a 40ms grid. The extra cost
+   lands only on phone and tablet, and lands on 720p/1080p HEVC that Apple decodes in hardware,
+   which is the cheapest seek in the whole matrix. */
+const SEEK_MS = 1000 / FPS
 
 /* The two sources need not be the same resolution - the browser takes the first it can decode,
    and that is the whole point. HEVC is roughly half the bytes, so where it is available a
@@ -274,6 +284,8 @@ export default function V2() {
   const stageRef = useRef<HTMLElement | null>(null)
   const scrollP = useRef(0)      /* progress through the runway, 0..1 */
   const offscreen = useRef(false) /* header fully scrolled away - stop burning battery */
+  const rawY = useRef(0)          /* unclamped scroll position - what the SCRUB reads */
+  const travelPx = useRef(1)      /* runway length, so a full pass is still one pass */
 
   const nudge = useCallback((el: HTMLVideoElement | null) => {
     videoRef.current = el
@@ -303,6 +315,16 @@ export default function V2() {
       const travel = stage.offsetHeight - innerHeight
       scrollP.current = travel > 0 ? Math.min(1, Math.max(0, -rect.top / travel)) : 0
       offscreen.current = rect.bottom <= 0
+      /* THE SCRUB READS RAW SCROLL, NOT THIS CLAMPED PROGRESS - and that clamp was the real
+         "stuck at the end". scrollP is pinned to [0,1] because the overlay and the chapters
+         need a bounded 0..1 to fade along, which is right for them. But feeding it to the
+         scrub meant that the moment the runway was used up, the DELTA became exactly zero:
+         the strand was not jammed against a limit, it was receiving no input at all, and no
+         amount of folding can reverse a delta that is not there.
+         Raw scroll distance never runs out. Scaled by the same travel, so the feel of the
+         scrub is identical - a full runway is still one pass of the clip. */
+      rawY.current = scrollY
+      travelPx.current = Math.max(1, travel)
       /* the overlay hands the screen to the strand over the first fifth of the runway - one
          custom property, read by opacity and a small translate, both compositor-only. */
       const p = scrollP.current
@@ -341,7 +363,7 @@ export default function V2() {
        quietly starts building and unbuilding on its own. */
     let pos = 0    /* fraction of the clip on screen, the one true state */
     let dir = 1    /* idle playback direction; scrubbing re-aims it so release carries on */
-    let lastP = 0
+    let lastY = 0
     let quiet = 9  /* seconds since the last real INPUT - the only thing that arms the loop */
     let touching = false
     let last = performance.now()
@@ -355,9 +377,8 @@ export default function V2() {
       const dt = Math.min(0.05, (now - last) / 1000)
       last = now
 
-      const p = scrollP.current
-      const dp = p - lastP
-      lastP = p
+      const dp = (rawY.current - lastY) / travelPx.current
+      lastY = rawY.current
       if (offscreen.current) return
 
       /* THE SCROLL REFLECTS TOO - it does not run out of strand any more.
@@ -481,7 +502,7 @@ export default function V2() {
          Every seek also flushes the decode pipeline, and these frames are all-intra 2560x1440,
          which is the most expensive kind to decode cold. 30Hz is above the content rate, so
          nothing visible is lost and roughly half the decode work disappears. */
-      if (now - lastSeek < 33) return
+      if (now - lastSeek < SEEK_MS) return
       const t = Math.round(pos * (el.duration - 0.05) * FPS) / FPS
       if (Math.abs(el.currentTime - t) >= HALF_FRAME) { el.currentTime = t; lastSeek = now }
     }
