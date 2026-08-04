@@ -10,7 +10,14 @@ html,body{margin:0;background:#000}
 html{scroll-behavior:auto}
 
 /* The clip is pinned to the viewport; the runway scrolls past behind it. */
-.v2bg{position:fixed;inset:0;background:#000;display:grid;place-items:center;z-index:0}
+/* height:100lvh, not just inset:0. On iOS the toolbar grows and shrinks as you scroll, and
+   inset:0 on a fixed element resolves against the viewport as it is AT THAT MOMENT - so at the
+   top of the page, where the toolbar is at its tallest, the layer came up short and left a
+   black band under the chrome. It was smaller mid-scroll because the toolbar had collapsed.
+   lvh is the LARGEST viewport height, the one with the chrome retracted, so the layer is always
+   at least as tall as the screen can ever be and there is nothing left for a gap to appear in. */
+.v2bg{position:fixed;inset:0;height:100lvh;min-height:100lvh;
+  background:#000;display:grid;place-items:center;z-index:0}
 
 /* No padding on landscape. It was added to drop the strand clear of the browser chrome and it
    did - but a padded box means contain has less room, so the result was a visible black border
