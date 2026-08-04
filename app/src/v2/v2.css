@@ -451,59 +451,89 @@ html.v2light{--slogan:linear-gradient(100deg,#8A7261,#5C4536 46%,#33241A)}
 
 
 /* ---------- the glass panels on the runway ----------
-   The mechanism is the Motiq border-beam he sent: a conic gradient rotating behind the box,
-   cut to a ring by two stacked masks with mask-composite:exclude. That part is genuinely good
-   and is kept exactly.
+   Rebuilt against his reference, because the first attempt kept the ring and dropped the two
+   things that actually make the effect:
 
-   What is NOT kept is its engine. That component drives the angle from requestAnimationFrame
-   in React, and this page has just had a per-frame effect removed for making the whole site
-   lag - the melt - while a video is being seeked up to fifty times a second on the same
-   thread. An @property-registered custom property animated by CSS keyframes gives the same
-   travelling light with no JavaScript at all, no rAF, no spring, and nothing for React to
-   re-render. It also parks by itself: the animation only runs on the chapter that is actually
-   being read, so two of the three are always doing nothing.
+   1. THE GLOW. A second copy of the same conic gradient, blurred and sitting BEHIND the panel,
+      so the comets cast coloured light into the card rather than merely outlining it. That
+      bleed - azure in one corner, coral in the other - is most of what the reference is.
+   2. TWO COMETS, 180 degrees apart, in different colours. One faint comet in the page's own
+      pale accent had almost nothing to say against a bright video.
 
-   Tailwind is installed in this project but the v2 page deliberately does not load it - it has
-   its own stylesheet precisely so it is not fighting site.css - so the component's utility
-   classes would have been dead weight here anyway. */
+   The comet shape is the reference's and worth keeping exactly: a ~45deg tail easing into a
+   4deg bright head. Its toe is a 4% mix of the comet colour rather than `transparent`, because
+   `transparent` is rgba(0,0,0,0) and a conic ramp through it dips visibly grey.
+
+   Still no JavaScript. The reference drives its angle from requestAnimationFrame in React; an
+   @property custom property animated by CSS keyframes gives the same travelling light for no
+   script at all, which matters here because a video is being seeked beside it. */
 @property --beam{syntax:'<angle>';initial-value:0deg;inherits:false}
 @keyframes v2beam{to{--beam:360deg}}
 
-.v2glass{position:relative;isolation:isolate;border-radius:20px;
+.v2glass{
+  --bm-a:#4f7cff;            /* azure, the leading comet */
+  --bm-a2:#22c7d9;           /* its head reads cyan along the length */
+  --bm-b:#ff6b5e;            /* coral - the one warm moment, opposite the first */
+  --bm-ring:conic-gradient(from var(--beam),
+    transparent 0deg,
+    color-mix(in srgb, var(--bm-a) 4%, transparent) 18deg,
+    color-mix(in srgb, var(--bm-a) 58%, transparent) 46deg,
+    var(--bm-a2) 56deg,
+    color-mix(in srgb, var(--bm-a2) 25%, #fff) 60deg,
+    transparent 63deg,
+    transparent 198deg,
+    color-mix(in srgb, var(--bm-b) 4%, transparent) 216deg,
+    color-mix(in srgb, var(--bm-b) 52%, transparent) 244deg,
+    var(--bm-b) 254deg,
+    color-mix(in srgb, var(--bm-b) 26%, #fff) 258deg,
+    transparent 261deg,
+    transparent 360deg);
+  position:relative;isolation:isolate;border-radius:20px;
   padding:clamp(22px,3vw,34px);
-  background:color-mix(in srgb, var(--surface) 42%, transparent)}
+  border:1px solid color-mix(in srgb, var(--ink) 14%, transparent);
+  background:color-mix(in srgb, var(--surface) 62%, transparent)}
+
 /* Backdrop blur is the most expensive thing you can put over moving video, so it is desktop
-   only. A phone gets a denser tint instead, which reads as the same frosted panel and costs a
-   single paint rather than a per-frame readback of the frames underneath. */
+   only; a phone gets a denser tint that reads the same for a single paint. */
 @media (min-width:760px){
-  .v2glass{backdrop-filter:blur(16px) saturate(1.35);
-    -webkit-backdrop-filter:blur(16px) saturate(1.35);
-    background:color-mix(in srgb, var(--surface) 52%, transparent)}
+  .v2glass{backdrop-filter:blur(18px) saturate(1.4);
+    -webkit-backdrop-filter:blur(18px) saturate(1.4);
+    background:color-mix(in srgb, var(--surface) 44%, transparent)}
 }
 @media (max-width:759px){
-  .v2glass{background:color-mix(in srgb, var(--surface) 90%, transparent)}
+  .v2glass{background:color-mix(in srgb, var(--surface) 88%, transparent)}
+  /* MY CALL ON THE LAG, and it is a split rather than a yes or no.
+     The RING is cheap: a conic gradient and two mask layers, no filter, and it is what the eye
+     actually follows. The GLOW is a per-frame BLUR - the same class of cost as the melt that
+     had to be deleted, and a phone is where he feels it and where the video is already being
+     seeked fifty times a second beside it. So on phones the glow stops moving and stays as a
+     fixed halo: it still casts the azure and coral into the card, which is most of the look,
+     and it costs one paint instead of a blur per frame. Desktop keeps both moving - there is
+     headroom there and no report of trouble.
+     Frozen at 40deg rather than 0 so both comets sit on visible edges rather than one hiding
+     in a corner. */
+  .v2glass::before{animation:none;--beam:40deg;opacity:.6}
 }
 
-/* the ring: one comet round the border, paused unless this chapter is the one on screen */
-.v2glass::before{content:'';position:absolute;inset:0;border-radius:inherit;padding:2px;
-  pointer-events:none;
-  background:conic-gradient(from var(--beam),
-    transparent 0deg,
-    color-mix(in srgb, var(--accent) 8%, transparent) 24deg,
-    color-mix(in srgb, var(--accent) 60%, transparent) 50deg,
-    var(--accent) 58deg,
-    color-mix(in srgb, #fff 30%, var(--accent)) 61deg,
-    transparent 66deg,
-    transparent 360deg);
+/* THE GLOW - negative z-index inside an isolated stacking context paints above the panel's own
+   background but below its text, which is exactly where cast light belongs. */
+.v2glass::before{content:'';position:absolute;inset:-2px;border-radius:inherit;z-index:-1;
+  pointer-events:none;background:var(--bm-ring);
+  filter:blur(18px);opacity:.55;
+  animation:v2beam 8.5s linear infinite;animation-play-state:paused}
+
+/* THE RING - the same gradient cut to a border by two stacked masks. */
+.v2glass::after{content:'';position:absolute;inset:0;border-radius:inherit;padding:1.5px;
+  pointer-events:none;background:var(--bm-ring);
   -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
   -webkit-mask-composite:xor;
   mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
   mask-composite:exclude;
   animation:v2beam 8.5s linear infinite;animation-play-state:paused}
-.v2ch.is-live .v2glass::before{animation-play-state:running}
-/* a hairline so the panel still reads as an object while the beam is on the far side */
-.v2glass::after{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
-  box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--ink) 12%, transparent)}
+
+/* only the chapter being read animates - two of the three are always parked, which is why
+   this costs nothing next to the video */
+.v2ch.is-live .v2glass::before,.v2ch.is-live .v2glass::after{animation-play-state:running}
 @media (prefers-reduced-motion:reduce){
-  .v2glass::before{animation:none;--beam:40deg}
+  .v2glass::before,.v2glass::after{animation:none;--beam:40deg}
 }
