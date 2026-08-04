@@ -12,7 +12,13 @@
    median #0f212e. The page is that colour now, and the scroll out of the header is seamless
    in both themes for the same reason. */
 :root{--bg:#09161d;--ink:#F2F7F5}
-html.v2light{--bg:#F2E9E1;--ink:#141a1c}
+/* Light measured the same way, and it needs a different number than dark for one reason: the
+   clip is composited at opacity .5 in this theme, so what reaches the screen is the average of
+   the inverted clip and the page beneath it. The inverted clip's bottom row is #f6e9e2; against
+   a #f2e9e1 page that averaged to #f4e9e2 on screen while the page below stayed #f2e9e1 - a
+   small step, but a step. Setting the page to the clip's own value makes the blend
+   self-consistent: half of #f6e9e2 over #f6e9e2 is #f6e9e2, and the join disappears. */
+html.v2light{--bg:#f6e9e2;--ink:#141a1c}
 html,body{margin:0;background:var(--bg)}
 html{scroll-behavior:auto;scrollbar-width:none;-ms-overflow-style:none}
 /* The strand is the whole screen, so a scroll indicator down the side is a line across the
