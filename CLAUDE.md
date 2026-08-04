@@ -35,11 +35,29 @@ each sees the other's changes as they land. No feature branches — that is his 
 and it is the right one for two people who want immediate feedback on each other's
 work. It costs nothing as long as the loop below is followed exactly.
 
-**Every push, without exception:**
+**Stay inside the job you were given.** With two people in the same files, an agent
+that "improves" something it was not asked about is not being helpful — it is
+silently overwriting work the other person may be mid-way through. If you notice a
+real problem outside your scope, **write it down and keep going**; do not fix it.
+That includes reformatting, renaming, tidying imports, and deleting code that looks
+unused. Looks-unused is exactly what half-finished work looks like.
+
+**Every push, without exception — and never `git add -A` here:**
 
 ```bash
-git add -A && git commit -m "real sentence" && git pull --rebase origin react && git push origin react
+git status                        # anything dirty you did not mean to touch?
+git diff                          # read it. every line should be part of the job
+git add <the files you meant>     # named paths, not -A
+git commit -m "real sentence"
+git pull --rebase origin react && git push origin react
 ```
+
+`git add -A` is how a stray edit leaves the machine. Naming the paths means an
+accidental change stays local and harmless — you will see it in the next
+`git status` and can throw it away with `git checkout -- <file>`.
+
+(The deploy to `main` is the one exception: it legitimately sweeps built output, so
+it uses `-A` on that branch only.)
 
 `--rebase` is the whole trick: it replays your commits on top of theirs instead of
 creating a merge bubble, so the history stays a straight line and nobody's work
