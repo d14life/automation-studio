@@ -21,10 +21,9 @@ import './v2.css'
    3. The time eases toward its target instead of snapping to it. A trackpad emits scroll in
       coarse jumps; easing turns those into motion. */
 
-/* 5 screens, settled rather than guessed. At 4 the whole 23.4s clip crossed in a flick, so
-   the strand raced and every scroll step jumped several frames - which is also what made the
-   seeking look coarse. 5 gives finer control per pixel of scroll and fewer frames skipped. */
-const RUNWAY = 6.5
+/* Back to 5. The +30% was his idea and he has changed his mind having felt it - it made the
+   header too long to get through. */
+const RUNWAY = 5
 /* The clip is 25fps by construction (585 frames over 23.4s). Seeking finer than one frame
    just decodes the same picture again, so the scrubber works on this grid. */
 const FPS = 50
