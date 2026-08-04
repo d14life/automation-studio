@@ -687,3 +687,11 @@ html.v2light{--slogan:linear-gradient(100deg,#8A7261,#5C4536 46%,#33241A)}
 a.v2card{display:block;text-decoration:none;color:inherit;transition:border-color .15s}
 a.v2card:hover{border-color:var(--accent)}
 a.v2card:hover .v2card__win{color:var(--accent)}
+
+/* ?loop=diag - his idea, off unless asked for. The return leg is turned 180 so the strand's
+   diagonal keeps travelling instead of visibly rewinding, and the one jump this creates is
+   masked by a short blur at the turn - fired only there, where the strand is already in pieces.
+   Both are compositor properties, so the experiment costs nothing to leave in. */
+.v2bg video{transition:filter .26s ease}
+.v2bg video.is-rev{transform:rotate(180deg)}
+.v2bg video.is-turn{filter:blur(14px) brightness(1.15)}
