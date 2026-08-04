@@ -280,6 +280,28 @@ back to zero. The header had no side gutter at any width — invisible on deskto
 behind the 1180px max-width, and on a phone the logo sat at x=0. Use
 `padding-block` on anything that rides on `.wrap`.
 
+### 5.10b The clip can never loop perfectly - the trails are not periodic
+The PATH is: x=cos(t), y=sin(2t) comes home every 2*PI seconds, and a frame-by-frame scan of
+a take confirms the best match to frame 0 sits exactly at 4*PI. The RENDERED STATE does not:
+the tubes lag their target and their trails depend on history, so measured over a 13.7s take
+at 30fps:
+
+| comparison | mean abs diff (0-255 grey) |
+|---|---|
+| adjacent frames, 1/30s apart | **0.41**  <- what seamless looks like |
+| best loop found anywhere in the take | **3.17**  (cut 1.333s -> 13.733s) |
+| frames 0.5s apart | 4.86 |
+| two random frames | 10.84 |
+
+So no cut length is seamless, and picking one by theory (an integer number of path periods)
+does NOT beat searching the take frame by frame. Search it.
+
+The crossfade is what hides the residual, and it must be SHORT. An overlay crossfade blends
+content F seconds apart, so a long F is a long ghost of two different figures - which is
+exactly what "it teleports from one point to another" meant. 1.18s was very visible; 0.4s is
+not. If a seam is still visible the answer is a LONGER take, which gives the search more
+candidate loop points, not a longer fade.
+
 ### 5.11 A filmed clip cannot do two of the things the ribbons are for
 The ribbons walk the ICE palette one step behind the slogan (`setColors` every
 frame), and their sweep is measured off the slogan's own ink whenever it
