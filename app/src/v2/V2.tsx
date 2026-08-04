@@ -292,14 +292,21 @@ export default function V2() {
          while cruising - his "it tried at the same time to finish my scroll and continue the
          video". One mechanism, eased seeks, everywhere: at 30Hz against files that decode
          sequentially at 610fps here, the whole loop costs a few percent of one core. */
-      /* the last condition: while a glide is still pressing the strand against either end of
-         the runway, the pendulum waits - otherwise the clamp and the turnaround rewrite the
-         same frame in opposite directions and it flickers. */
+      /* EASED, WITH A FLOOR. The pure cosine wave dwelt too long at the ends: its speed goes
+         all the way to zero there, and at zero-ish speed the 25fps frame grid updates three
+         to eight times a second - sparse updates that his eye correctly read as LAG, both
+         when the loop arrived at an end by itself and when he scrolled it there. So the
+         bell curve stays (2*sqrt(pos*(1-pos)) is the same sine ease in closed form), but
+         speed never drops below 40% - which keeps frame updates above ~15 a second at the
+         very turnaround. The flip is explicit again, but at 0.4 of an eased approach it is
+         a soft catch, nothing like the full-speed slam he first complained about.
+         The end-press guard stays: while a glide holds the strand against a clamp, the loop
+         waits rather than flickering against it. */
       if (idle > 0 && !(pos >= 1 && dp > 0) && !(pos <= 0 && dp < 0)) {
-        const th = dir === 1 ? Math.acos(1 - 2 * pos) : 2 * Math.PI - Math.acos(1 - 2 * pos)
-        const th2 = (th + (Math.PI / el.duration) * dt * idle) % (2 * Math.PI)
-        pos = (1 - Math.cos(th2)) / 2
-        dir = th2 < Math.PI ? 1 : -1
+        const bell = Math.max(2 * Math.sqrt(pos * (1 - pos)), 0.4)
+        pos += dir * (Math.PI / (2 * el.duration)) * bell * dt * idle
+        if (pos >= 1) { pos = 1; dir = -1 }
+        if (pos <= 0) { pos = 0; dir = 1 }
       }
 
       /* NEVER SEEK FASTER THAN THE CLIP HAS FRAMES. rAF runs at 60Hz (120 on a ProMotion
