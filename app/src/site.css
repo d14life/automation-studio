@@ -66,8 +66,10 @@ header{position:absolute;top:0;left:0;right:0;z-index:20}
 /* between the phone panel and a wide desktop the header runs out of room: drop the two-word
    subtitles first, then the hover hint, before anything is allowed to wrap or overflow */
 @media (max-width:1180px){.navpill{padding:11px 18px;font-size:15.5px}}
+/* This hid the hover hints to buy width for an INLINE nav between 701 and 900. That nav is a
+   burger panel now at anything under 950, where there is room for the words, so the rule would
+   only be blanking the hints inside the open panel. */
 @media (max-width:900px) and (min-width:701px){
-  .np-hintwrap{display:none}
   .navpill{padding:10px 14px;font-size:14.5px}
   .navpills{gap:7px}
 }
@@ -806,8 +808,13 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
 .burger[aria-expanded="true"] i:nth-child(2){opacity:0}
 .burger[aria-expanded="true"] i:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
 
-/* ---------- phone ---------- */
-@media (max-width:700px){
+/* ---------- anything too narrow for the full nav: phones AND tablets ----------
+   Measured on an iPad Air at 820px: the nav wanted 707px beside a 124px logo, so it ran to
+   x=871 in an 820px viewport and the whole DOCUMENT scrolled sideways by 51px. The burger was
+   display:none because it only appeared at 700px, a phone-shaped number that had nothing to do
+   with when the nav actually stops fitting - which is about 950px. Everything else in the phone
+   block below stays at 700, because it is layout for a phone, not for a tablet. */
+@media (max-width:950px){
   .burger{display:block}
   /* the links live in a panel under the header, opened by the burger */
   .topnav{position:absolute;top:100%;right:16px;left:16px;flex-direction:column;align-items:stretch;
@@ -817,6 +824,16 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
   .topnav a{padding:14px 12px;border-radius:10px;font-size:16px}
   .topnav a:not(.cta):active{background:rgba(127,216,255,.08)}
   .cta{text-align:center;margin-top:4px;padding:15px 18px}
+  /* in the panel there is room for words, so every hint sits open - at any width */
+  .navpills{flex-direction:column;align-items:stretch;width:100%}
+  .navpill{justify-content:flex-start}
+  .np-hintwrap{display:grid;grid-template-columns:1fr}
+  .np-hint{opacity:1;padding-left:10px}
+  .topnav .gbtn,.topnav .gradient-button{min-height:44px;width:100%}
+}
+
+/* ---------- phone ---------- */
+@media (max-width:700px){
   .topbar{padding-block:16px;gap:10px}
   .mark{font-size:18px;padding:14px 0;display:inline-block}
   .cta{padding:11px 16px}

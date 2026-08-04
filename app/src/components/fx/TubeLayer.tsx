@@ -55,18 +55,29 @@ export function TubeLayer({ ready, heroVisible }: { ready: boolean; heroVisible:
      a watchdog: no frames after four seconds and the layer gives up. */
   const nudge = useCallback((el: HTMLVideoElement | null) => {
     if (!el) return
-    el.play().catch(() => { /* a browser that refuses: the watchdog below takes over */ })
+    const tryPlay = () => el.play().catch(() => { /* still refused; the watchdog decides */ })
+    tryPlay()
+    /* Seen on his own iPhone, 4 Aug: no ribbons at all, and a tap-to-play control where they
+       should be. iOS refuses to autoplay video in Low Power Mode however muted and inline it
+       is, and that is not an error state we can argue with - it is a setting. So: ask again on
+       the first touch, which IS a user gesture and is allowed. */
+    const onTouch = () => { tryPlay() }
+    addEventListener('touchstart', onTouch, { once: true, passive: true })
+    addEventListener('click', onTouch, { once: true })
     window.setTimeout(() => {
       const painted = el.readyState >= 2 && el.currentTime > 0
       if (!painted) setDead(true)
+      removeEventListener('touchstart', onTouch)
+      removeEventListener('click', onTouch)
     }, 4000)
   }, [])
 
-  /* the hook is called unconditionally - hooks must be - and builds nothing while filmed is on */
-  const layerRef = useTubeScene(ready && !filmed, heroVisible)
+  /* the hook is called unconditionally - hooks must be - and builds nothing while filmed is on.
+     `dead` means the clip never painted, so the live scene takes over rather than the page
+     losing its ribbons: this used to `return null` and show NOTHING, which is what he got. */
+  const layerRef = useTubeScene(ready && (!filmed || dead), heroVisible)
 
-  if (filmed) {
-    if (dead) return null
+  if (filmed && !dead) {
     return (
       <div id="tubelayer" ref={layerRef} className="tubefilm">
         <video ref={nudge} src="/tubes-loop.mp4" autoPlay muted loop playsInline preload="auto" />
