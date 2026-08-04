@@ -104,6 +104,35 @@ export default function V2() {
       if (Math.abs(el.currentTime - t) >= HALF_FRAME) el.currentTime = t
     }
 
+    /* NO MOMENTUM WHILE THE HEADER IS ON SCREEN. This is the thing he has asked about most and
+       the only honest fix for it: iOS keeps scrolling after the finger leaves, decelerating for
+       most of a second, and the strand following that reads as a crawl at about 1fps. Nothing
+       in the scrubber can help, because the scrubber is right - the page really is still moving.
+
+       So the page stops moving. While the stage is in view, touch drives scrollY directly,
+       one pixel of finger to one pixel of scroll, and the browser's own inertia never starts
+       because the gesture is preventDefault'd. Lift your finger and it stops on the frame you
+       left it on. Past the header this releases entirely and the rest of the page scrolls
+       normally with momentum, as a page should. */
+    let touchY = 0, touchTop = 0, driving = false
+    const inHeader = () => {
+      const st = stageRef.current
+      return !!st && st.getBoundingClientRect().bottom > innerHeight * 0.5
+    }
+    const onTouchStart = (e: TouchEvent) => {
+      driving = inHeader()
+      if (!driving) return
+      touchY = e.touches[0].clientY
+      touchTop = scrollY
+    }
+    const onTouchMove = (e: TouchEvent) => {
+      if (!driving) return
+      if (!inHeader()) { driving = false; return }
+      e.preventDefault()
+      scrollTo(0, Math.max(0, touchTop + (touchY - e.touches[0].clientY)))
+    }
+    addEventListener('touchstart', onTouchStart, { passive: true })
+    addEventListener('touchmove', onTouchMove, { passive: false })
     addEventListener('scroll', onScroll, { passive: true })
     addEventListener('resize', onScroll, { passive: true })
     onScroll()
@@ -111,6 +140,8 @@ export default function V2() {
     return () => {
       alive = false
       cancelAnimationFrame(raf)
+      removeEventListener('touchstart', onTouchStart)
+      removeEventListener('touchmove', onTouchMove)
       removeEventListener('scroll', onScroll)
       removeEventListener('resize', onScroll)
     }

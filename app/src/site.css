@@ -160,6 +160,14 @@ header{position:absolute;top:0;left:0;right:0;z-index:20}
      (195/402 and 86/402) precisely so that contain-fitting to the phone's width lands it at
      195x86. Scaling would multiply that back out of true. */
   transform:none}
+/* A TABLET is not a phone, and the clip is calibrated for one. Its sweep is filmed as a
+   fraction of the frame WIDTH (195/402), so contain-fitting it to an 820pt iPad gives a figure
+   ~796pt across against ~446pt of slogan - the ribbons swamp the words, the mirror image of the
+   problem the phone had. Scaling back is free: the compositor already holds the decoded frame.
+   HANDOFF item 3, which had never been looked at. */
+@media (min-width:701px) and (max-width:1180px){
+  .tubefilm video{transform:scale(.62)}
+}
 /* the bottom padding is what lifts the slogan: the block is centred, so padding at the foot
    pushes the centre - and the slogan with it - up the screen. */
 /* The whole first screen moves down as ONE block - slogan, number and buttons together - rather
