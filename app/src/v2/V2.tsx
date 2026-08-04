@@ -141,17 +141,17 @@ const SEEK_MS = 1000 / FPS
    up with real frames and a sane download, and Windows and Android are never asked for a codec
    they do not have. */
 const SRC_HEVC =
-  TIER === 'sm' ? '/dna-loop-sm.hevc.mp4?v=7'
-  : TIER === 'md' ? '/dna-loop.hevc.mp4?v=7'
+  TIER === 'sm' ? '/dna-loop-sm.hevc.mp4?v=8'
+  : TIER === 'md' ? '/dna-loop.hevc.mp4?v=8'
   /* 2800, not 3200, because HEVC is cheap enough that a retina laptop can have the 4K master
      and stop being upscaled at all - his Mac asks for 2880. A plain 1080p monitor asks for
      1920 and takes the 1440p file, because sending it 4K would be bytes it cannot paint. */
-  : NEED > 2800 ? '/dna-loop-4k.hevc.mp4?v=7'
-  : '/dna-loop-hq.hevc.mp4?v=7'
+  : NEED > 2800 ? '/dna-loop-4k.hevc.mp4?v=8'
+  : '/dna-loop-hq.hevc.mp4?v=8'
 const SRC_H264 =
-  TIER === 'sm' ? '/dna-loop-sm.mp4?v=7'
-  : TIER === 'md' ? '/dna-loop.mp4?v=7'
-  : '/dna-loop-hq.mp4?v=7'
+  TIER === 'sm' ? '/dna-loop-sm.mp4?v=8'
+  : TIER === 'md' ? '/dna-loop.mp4?v=8'
+  : '/dna-loop-hq.mp4?v=8'
 
 /* RELOAD MUST START THE STRAND OVER. The browser restores scrollY on reload, which for an
    ordinary page is a kindness and for this one is a bug: the scroll is restored but the video
