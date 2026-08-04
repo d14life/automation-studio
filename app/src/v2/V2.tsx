@@ -43,6 +43,18 @@ const SRC = matchMedia('(min-width:1100px) and (min-height:700px)').matches
   ? '/dna-loop-hq.mp4'
   : '/dna-loop.mp4'
 
+/* RELOAD MUST START THE STRAND OVER. The browser restores scrollY on reload, which for an
+   ordinary page is a kindness and for this one is a bug: the scroll is restored but the video
+   is not - it comes back at frame 0 - so the page is two thirds through the stage showing an
+   intact strand. Measured: after location.reload() at scrollY 1800, currentTime was 0.
+   On iOS it is worse than a mismatch. A video there cannot be SEEKED until it has been allowed
+   to play once, and a fresh load has had no gesture yet, so the picture sits frozen on a stale
+   frame and scrolling does nothing - then the first touch arms it and it snaps. That snap is
+   the "page reloads very quick and gets back to the starting frame".
+   Set at module scope, not in an effect: the browser restores scroll as soon as the document
+   is tall enough, which can be before React has mounted. */
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual'
+
 export default function V2() {
   /* Light and dark are the SAME clip. The donor's light hero is not a second video, it is the
      same footage with `invert` over a pale background - so the switch costs one CSS filter and
@@ -144,6 +156,9 @@ export default function V2() {
        removed. Native scrolling back, momentum and all. */
     addEventListener('scroll', onScroll, { passive: true })
     addEventListener('resize', onScroll, { passive: true })
+    /* belt and braces to the line above: manual restoration stops the browser putting the
+       scroll back, this puts it at the top even if something else already moved it. */
+    scrollTo(0, 0)
     onScroll()
     raf = requestAnimationFrame(tick)
     return () => {
