@@ -67,9 +67,16 @@ html.v2light .v2bg video{filter:invert(1);opacity:.5}
    certain of is the one I was drawing. So I am not drawing it. The bottom keeps its 64px soft
    edge, in pixels rather than percent, so it never becomes a band on a short screen. */
 .v2bg::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:1;
-  background:linear-gradient(0deg, var(--bg) 0px, rgba(0,0,0,0) 64px)}
+  /* 220px, and this is the finding that matters: matching --bg to the clip can never close
+     this seam, because the bottom of the clip is NOT flat background - there is helix in it.
+     Sampled a single pixel at the joint rather than an average and the difference showed up at
+     once: #162b38 above against #09161d below in dark. An average across the row hid it,
+     because most of the row IS background. So what meets the page is cut-off CONTENT, not a
+     mismatched colour, and no value of --bg fixes that. The fade has to be deep enough to
+     dissolve a strand, and 64px was only ever deep enough to soften a flat edge. */
+  background:linear-gradient(0deg, var(--bg) 0px, var(--bg) 40px, rgba(0,0,0,0) 220px)}
 html.v2light .v2bg::after{
-  background:linear-gradient(0deg, var(--bg) 0px, rgba(255,255,255,0) 64px)}
+  background:linear-gradient(0deg, var(--bg) 0px, var(--bg) 40px, rgba(255,255,255,0) 220px)}
 
 /* A PHONE HELD SIDEWAYS was falling into the desktop rule and letterboxed into a stamp,
    because contain shows the whole frame - right on a large display, wrong on one 350px tall.
