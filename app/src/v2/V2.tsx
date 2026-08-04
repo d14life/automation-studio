@@ -101,10 +101,47 @@ const TIER =
   : innerWidth < 1100 ? 'md'     /* tablets */
   : NEED > 3200 ? '4k'           /* an actual 4K display */
   : 'hq'                         /* laptops and ordinary monitors */
-const SRC = { sm: '/dna-loop-sm.mp4?v=6', md: '/dna-loop.mp4?v=6',
-              hq: '/dna-loop-hq.mp4?v=6', '4k': '/dna-loop-4k.mp4?v=6' }[TIER]
-const FPS = TIER === 'hq' ? 50 : 25
+/* TWO CODECS PER TIER, and the browser picks - which is also what keeps Windows and Android
+   working. HEVC is offered first and H.264 second, as two <source> children; any browser that
+   cannot decode HEVC skips that line and takes the H.264, which is the most universally
+   supported video codec there is. Nothing is sniffed, nothing is guessed - the failure mode is
+   a browser choosing the file it already told us it can play.
+   HEVC is worth the second encode because it is roughly half the bytes at the same quality and
+   is hardware-decoded on every Apple device, and half the bytes is exactly what paid for 50fps
+   everywhere: the phone's 25fps H.264 was 8.9MB, its 50fps HEVC is 8.6MB. Twice the frame rate
+   for slightly fewer bytes.
+   The 4K tier stays 25fps - interpolating 3840x2160 to 50 buys motion nobody sitting at a 4K
+   monitor is studying, at a download that no hero video can justify. */
+/* SMALL SCREENS GET SMOOTHNESS, BIG SCREENS GET SHARPNESS - and that split is forced by
+   arithmetic, not taste. There are only 293 REAL frames; 50fps means inventing every second
+   one, and an invented frame is the same mush this page spent the morning deleting. Measured
+   on identical crops: a real frame's PNG carries 13% more detail than the interpolated frame
+   at the same instant, and the scale texture on the strand visibly smears.
+   At 720p on a phone that softness is invisible and the motion is what the eye tracks, so
+   phones and tablets take the 50fps files. On a 1440p laptop it is plainly visible - he saw it
+   unprompted - so laptops and 4K displays take REAL frames only at 25fps. Nothing invented on
+   any screen that could resolve the difference. */
+const FPS = TIER === 'sm' || TIER === 'md' ? 50 : 25
 const HALF_FRAME = 0.5 / FPS
+
+/* The two sources need not be the same resolution - the browser takes the first it can decode,
+   and that is the whole point. HEVC is roughly half the bytes, so where it is available a
+   laptop can afford the 4K master with no upscaling at all; where it is not, the H.264 line
+   hands back a sharp 1440p instead of a 47MB 4K file nobody should download. Every device ends
+   up with real frames and a sane download, and Windows and Android are never asked for a codec
+   they do not have. */
+const SRC_HEVC =
+  TIER === 'sm' ? '/dna-loop-sm.hevc.mp4?v=7'
+  : TIER === 'md' ? '/dna-loop.hevc.mp4?v=7'
+  /* 2800, not 3200, because HEVC is cheap enough that a retina laptop can have the 4K master
+     and stop being upscaled at all - his Mac asks for 2880. A plain 1080p monitor asks for
+     1920 and takes the 1440p file, because sending it 4K would be bytes it cannot paint. */
+  : NEED > 2800 ? '/dna-loop-4k.hevc.mp4?v=7'
+  : '/dna-loop-hq.hevc.mp4?v=7'
+const SRC_H264 =
+  TIER === 'sm' ? '/dna-loop-sm.mp4?v=7'
+  : TIER === 'md' ? '/dna-loop.mp4?v=7'
+  : '/dna-loop-hq.mp4?v=7'
 
 /* RELOAD MUST START THE STRAND OVER. The browser restores scrollY on reload, which for an
    ordinary page is a kindness and for this one is a bug: the scroll is restored but the video
@@ -191,6 +228,9 @@ export default function V2() {
       const travel = stage.offsetHeight - innerHeight
       scrollP.current = travel > 0 ? Math.min(1, Math.max(0, -rect.top / travel)) : 0
       offscreen.current = rect.bottom <= 0
+      /* the overlay hands the screen to the strand over the first fifth of the runway - one
+         custom property, read by opacity and a small translate, both compositor-only. */
+      stage.style.setProperty('--over', String(Math.max(0, 1 - scrollP.current * 5)))
     }
 
     /* THE STRAND IS ALIVE NOW - his idea. The clip is no longer an absolute function of
@@ -267,7 +307,13 @@ export default function V2() {
            loop fades in and swallows the tail. Finger-down safety is untouched because calm
            only ever multiplies idle, never replaces it. */
       const calm = Math.min(1, Math.max(0, 1 - Math.abs(dp) / dt / 0.25))
-      const idle = Math.min(1, Math.max(0, (quiet - 0.05) / 0.2)) * calm
+      /* AT A PINNED END, THE RAMP BUYS NOTHING. The gates exist so the loop never fights the
+         scrub - but once pos is clamped hard against 0 or 1, scrolling further that way moves
+         nothing, so there is no fight left to lose. Waiting the full 0.25s there just parks
+         the strand on the destroyed frame: his "it holds there for a good half a second"
+         before it bounces. Pinned means the loop starts at once. */
+      const pinned = (pos >= 1 && dir === 1) || (pos <= 0 && dir === -1)
+      const idle = pinned ? 1 : Math.min(1, Math.max(0, (quiet - 0.05) / 0.2)) * calm
 
       /* THE LOOP IS A PENDULUM, NOT A METRONOME. Every complaint that survived the earlier
          fixes traced back to the loop being a second (and at one point third) controller
@@ -303,7 +349,7 @@ export default function V2() {
          The end-press guard stays: while a glide holds the strand against a clamp, the loop
          waits rather than flickering against it. */
       if (idle > 0 && !(pos >= 1 && dp > 0) && !(pos <= 0 && dp < 0)) {
-        const bell = Math.max(2 * Math.sqrt(pos * (1 - pos)), 0.4)
+        const bell = Math.max(2 * Math.sqrt(pos * (1 - pos)), 0.55)
         pos += dir * (Math.PI / (2 * el.duration)) * bell * dt * idle
         if (pos >= 1) { pos = 1; dir = -1 }
         if (pos <= 0) { pos = 0; dir = 1 }
@@ -399,7 +445,42 @@ export default function V2() {
       <section className="v2stage" ref={stageRef} style={{ height: `${RUNWAY * 100}svh` }}>
         <div className="v2pin">
           <div className="v2bg">
-            <video ref={nudge} src={SRC} muted playsInline preload="auto" />
+            <video ref={nudge} muted playsInline preload="auto">
+              <source src={SRC_HEVC} type='video/mp4; codecs="hvc1"' />
+              <source src={SRC_H264} type='video/mp4; codecs="avc1.640028"' />
+            </video>
+          </div>
+
+          <div className="v2scrim" aria-hidden="true" />
+
+          {/* THE STRAND IS THE STAGE, NOT THE SHOW. It was carrying the whole first screen
+              alone and he was right that it read as empty - a visitor who lands on beautiful
+              footage with no words does not learn who we are, which is the one job the brief
+              gives this screen. So the navigation and the promise sit ON the footage, the way
+              his reference does it, and both fade out as the strand takes over the scroll. */}
+          <header className="v2nav">
+            <a className="v2logo" href="#top">Solutions<b>101</b></a>
+            <nav className="v2links">
+              <a href="#about">О нас</a>
+              <a href="#services">Услуги</a>
+              <a href="#tools">Инструменты</a>
+              <a href="#works">Работы</a>
+              <a href="#contacts">Контакты</a>
+            </nav>
+            <a className="v2btn v2btn--go v2btn--sm" href="#request">Оставить заявку</a>
+          </header>
+
+          <div className="v2over">
+            <p className="v2eyebrow">Автоматизация бизнес-процессов</p>
+            <h1 className="v2h1">Быстро <em>не значит</em> плохо</h1>
+            <p className="v2lede">
+              Не консультируем и не учим теории — отдаём работающие инструменты
+              под вашу компанию. Прототип показываем до оплаты.
+            </p>
+            <div className="v2cta">
+              <a className="v2btn v2btn--go" href="#request">Оставить заявку</a>
+              <a className="v2btn v2btn--ghost" href="#tools">Посмотреть инструменты</a>
+            </div>
           </div>
         </div>
       </section>

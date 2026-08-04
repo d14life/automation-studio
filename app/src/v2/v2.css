@@ -145,6 +145,56 @@ html.v2light{
 }
 .v2main,.v2main button,.v2main input,.v2main textarea{font-family:Golos,system-ui,sans-serif}
 
+/* ---------- the overlay on the strand ----------
+   Everything here lives inside .v2pin, so it is pinned with the footage rather than scrolling
+   over it, and --over (written once per scroll event from V2.tsx) fades it out across the
+   first fifth of the runway. Only opacity and transform move, which the compositor handles
+   without a repaint - the same rule the whole page follows.
+   pointer-events go off with the fade, or invisible links keep swallowing clicks. */
+.v2nav,.v2over{position:absolute;z-index:3;opacity:var(--over,1);
+  transform:translateY(calc((1 - var(--over,1)) * -18px));
+  pointer-events:var(--over-pe,auto)}
+.v2stage[style*="--over: 0"] .v2nav,.v2stage[style*="--over: 0"] .v2over{pointer-events:none}
+
+/* THE STRAND GOES BRIGHT YELLOW HALFWAY THROUGH, and white text on it is unreadable - the
+   eyebrow vanished completely on his screen. A scrim is the standard cure and it costs one
+   element: darkness where the words are, nothing where they are not, so the footage is still
+   the footage. Both stops are transparent-to-bg so the tint follows the theme. */
+.v2scrim{position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--bg) 72%, transparent) 0, transparent 22%),
+    linear-gradient(0deg, color-mix(in srgb, var(--bg) 88%, transparent) 0, transparent 58%);
+  opacity:var(--over,1)}
+
+/* right padding clears the theme toggle, which is pinned to the same corner - without it the
+   call to action sat underneath the switch, which is what he photographed. */
+.v2nav{top:0;left:0;right:0;display:flex;align-items:center;gap:clamp(16px,3vw,44px);
+  padding:clamp(14px,2.2vh,26px) clamp(16px,3vw,54px);
+  padding-right:calc(clamp(16px,3vw,54px) + clamp(88px,9vw,116px))}
+.v2logo{color:var(--ink);text-decoration:none;font:800 19px/1 Golos,sans-serif;
+  letter-spacing:-.02em;white-space:nowrap}
+.v2logo b{font-weight:800;color:var(--accent)}
+.v2links{display:flex;gap:clamp(12px,1.8vw,28px);margin-left:auto}
+.v2links a{color:var(--ink-soft);text-decoration:none;white-space:nowrap;
+  font:600 14.5px/1 Golos,sans-serif;transition:color .18s ease-out}
+.v2links a:hover{color:var(--ink)}
+.v2btn--sm{padding:10px 18px;font-size:14px}
+
+/* The promise sits low-left, clear of the strand's bright core and clear of the theme toggle. */
+.v2over{left:0;right:0;bottom:clamp(48px,11vh,120px);
+  padding-inline:clamp(16px,3vw,54px);max-width:1280px;margin:0 auto}
+.v2over .v2h1{font-size:clamp(34px,5.4vw,86px)}
+.v2over .v2lede{max-width:46ch;margin-top:20px}
+.v2over .v2cta{margin-top:28px}
+@media (max-width:760px){
+  /* A phone gets the mark and nothing else up here. Five links do not fit, and the call to
+     action was wrapping onto two lines next to the theme switch - while an identical button
+     sits a thumb's length below it in the hero. Two of the same button on one screen is not
+     twice the invitation, it is clutter. */
+  .v2links,.v2nav .v2btn--sm{display:none}
+  .v2over{bottom:clamp(64px,14vh,140px)}
+}
+
 /* THE FIRST THING AFTER THE STRAND. The brief is unusually specific about this screen: the
    devise, then who we are, then proof - and no water anywhere. So the slogan IS the headline,
    because it is the sentence he wants a stranger to leave with. */
