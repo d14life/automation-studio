@@ -11,7 +11,7 @@
    the video ended on a visible line. Measured off the edges of a real frame: mean #0e1f2a,
    median #0f212e. The page is that colour now, and the scroll out of the header is seamless
    in both themes for the same reason. */
-:root{--bg:#09161d;--ink:#F2F7F5}
+:root{--bg:#0e202d;--ink:#F2F7F5}
 /* Light measured the same way, and it needs a different number than dark for one reason: the
    clip is composited at opacity .5 in this theme, so what reaches the screen is the average of
    the inverted clip and the page beneath it. The inverted clip's bottom row is #f6e9e2; against
