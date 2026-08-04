@@ -1,28 +1,30 @@
-/* Solutions101 v2 — a blank page and the DNA animation. Nothing else, on his word.
+/* Solutions101 v2 — the DNA strand, scrubbed by the scrollbar. Nothing written on it yet.
    Its own stylesheet: site.css is a thousand lines of decisions made for the current hero and
    inheriting them would mean fighting them. The live page is untouched. */
 
 *{box-sizing:border-box}
-html,body{margin:0;height:100%;background:#000;overflow:hidden}
+html,body{margin:0;background:#000}
+/* the strand is driven by scroll position, so the scroll must be the plain document one -
+   no smooth-scroll easing on top of the easing the scrubber already does. And no
+   overflow:hidden any more: the page now NEEDS to scroll, that is the whole interaction. */
+html{scroll-behavior:auto}
 
-/* The clip fills the screen. COVER, not contain: contain letterboxes a 16:9 clip into the
-   window and leaves it sitting in a box, which is what the last pass looked like. cover crops
-   to fill, so the animation IS the page.
+/* The clip is pinned to the viewport; the runway scrolls past behind it. */
+.v2bg{position:fixed;inset:0;background:#000;display:grid;place-items:center;z-index:0}
 
-   No blend mode. On the live page a mix-blend-mode on a fixed layer is exactly what punched a
-   black rectangle through the starfield, and there is nothing behind this one anyway. */
-.v2bg{position:fixed;inset:0;background:#000;display:grid;place-items:center}
-/* CONTAIN, so the whole filmed frame is on screen and you see as much of the helix as the
-   footage actually holds. cover crops to fill and throws away the ends of the chain, which is
-   the opposite of what he asked for. The bars contain leaves are black against a black page.
-
-   On the pixelation: the source is 1920x1080 and I had been re-encoding it down to 1280,
-   which a 1440-wide window then had to scale back UP. It ships at its native 1920 now. */
+/* CONTAIN and native size. cover crops to fill the window and what it crops is the ends of
+   the helix, which is the opposite of what he asked for; the bars contain leaves are black
+   against a black page. The file ships at its native 1920 - it had been re-encoded down to
+   1280, which a 1440-wide window then had to scale back up, and that was the softness. */
 .v2bg video{max-width:100%;max-height:100%;width:auto;height:auto;
   object-fit:contain;display:block}
 
-/* A visitor who has asked for less motion gets a still field rather than a moving one. */
+/* Nothing in here. It exists only so the page has something to scroll, which is what drives
+   the strand. Its height is set in the component, in screens. */
+.v2runway{position:relative;z-index:1;pointer-events:none}
+
+/* Someone who has asked for less motion should not have an animation tied to their scrollbar:
+   the runway collapses, so the page does not scroll and the strand simply holds still. */
 @media (prefers-reduced-motion:reduce){
-  .v2bg video{display:none}
-  .v2bg{background:radial-gradient(80% 60% at 55% 45%, #14314a 0%, #04070d 72%)}
+  .v2runway{height:0 !important}
 }
