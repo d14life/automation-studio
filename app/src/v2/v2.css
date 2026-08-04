@@ -54,7 +54,9 @@ html{scroll-behavior:auto}
        has objected to twice. Stretching that ratio is a 24% distortion on an organic shape
        nobody knows the true proportions of - it reads as a slightly longer helix, which is
        the direction he asked for anyway. */
-    object-fit:fill;transform:translate(-50%,-50%) rotate(90deg)}
+    /* -90, not +90: his call, so the strand runs the other way down the screen and the
+       sequence reads as starting from black and travelling down rather than climbing up. */
+    object-fit:fill;transform:translate(-50%,-50%) rotate(-90deg)}
 }
 
 /* His point, and it is the one that explains everything: on the live site the STARFIELD covers
@@ -66,10 +68,19 @@ html{scroll-behavior:auto}
    end, which does two things at once: Safari's bars blend into the page the way they do on the
    live site, and the video stops ending on a hard edge against them. Painted once, not a
    filter or a blend - trap 5.8 is about what per-frame passes cost. */
-.v2bg::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:1;
-  background:linear-gradient(180deg,
-    #000 0%, rgba(0,0,0,.72) 3%, rgba(0,0,0,0) 9%,
-    rgba(0,0,0,0) 89%, rgba(0,0,0,.75) 97%, #000 100%)}
+/* PORTRAIT ONLY, on his word: the desktop version is full bleed and wants no fade at all -
+   there the browser chrome sits outside the page rather than over it, so there is nothing to
+   blend into and a fade would just be two grey smudges.
+
+   Deeper than the first attempt, which still showed an edge. The black now holds solid for a
+   few percent before it starts to give, and takes about a fifth of the screen to reach clear -
+   a short fade reads as a band with a boundary of its own, which is the thing being fixed. */
+@media (max-aspect-ratio: 1/1){
+  .v2bg::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:1;
+    background:linear-gradient(180deg,
+      #000 0%, #000 4%, rgba(0,0,0,.82) 8%, rgba(0,0,0,.42) 14%, rgba(0,0,0,0) 22%,
+      rgba(0,0,0,0) 78%, rgba(0,0,0,.45) 86%, rgba(0,0,0,.85) 92%, #000 96%, #000 100%)}
+}
 
 /* Nothing in here. It exists only so the page has something to scroll, which is what drives
    the strand. Its height is set in the component, in screens. */
