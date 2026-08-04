@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import type { FormEvent, ReactNode, RefObject } from 'react'
 import './v2.css'
 
 /* v2: the DNA strand is driven by the scroll wheel, not by playback.
@@ -191,27 +192,6 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual'
    the fastest way to break it is to describe a feature instead of a relief.
    NO PRICES YET, deliberately. He asked for ranges and has not given the numbers, and this
    page's whole credibility argument is that nothing on it is invented. */
-const SERVICES = [
-  { t: 'Счета, акты, сверка',
-    d: 'Документы собираются из состояния сделки, долги и переплаты видны по каждому контрагенту, платёжный календарь сам показывает, что горит.',
-    w: 'Закрытие месяца за день вместо недели' },
-  { t: 'Заявки, клиенты, звонки',
-    d: 'CRM под ваши этапы, телефония с записью разговоров, автообзвон по базе, проверка компании по реквизитам перед сделкой.',
-    w: 'Ни одна заявка не теряется в мессенджерах' },
-  { t: 'Сбор данных',
-    d: 'Сайты конкурентов, прайсы поставщиков в двенадцати форматах, почта, выгрузки из 1С и маркетплейсов — всё стекается в одну таблицу само.',
-    w: 'Никто не переносит цифры руками' },
-  { t: 'Отчёты руководителю',
-    d: 'Один экран с деньгами, долгами, загрузкой и просрочками. Письмо в тот час, когда показатель вышел за границу, а не через месяц на планёрке.',
-    w: 'Цифры утром, а не в конце квартала' },
-  { t: 'Боты и ИИ',
-    d: 'Отвечают клиенту по вашему прайсу и остаткам, читают счета и договоры, заполняют формы, заносят контакт в базу и передают человеку сложное.',
-    w: 'Первая линия работает ночью и в выходные' },
-  { t: 'Склад и доставка',
-    d: 'Заказы, остатки, маршруты и статусы отгрузок на одной доске. Клиент видит, где его груз, без звонка менеджеру.',
-    w: 'Меньше звонков, меньше потерянных заказов' },
-]
-
 const TOOLS = [
   { t: 'CRM под компанию', d: 'ваши этапы и поля, а не чужой шаблон' },
   { t: 'Телефония', d: 'запись разговоров, статистика, привязка к карточке клиента' },
@@ -222,6 +202,201 @@ const TOOLS = [
   { t: 'Отчёты и дашборд', d: 'один экран с деньгами и долгами, письма при отклонениях' },
   { t: 'Сайт или экосистема', d: 'если нужен не инструмент, а всё сразу' },
 ]
+
+/* THE CONTENT BUILD, 5 August - PAGES.md and SPEC.md turned into markup. Sources are the
+   brief, the whiteboard, and two references: mabk (number tiles, clear menu) and GAIA
+   (numbered sections, services accordion, chip form). Every number shown is from the honesty
+   list in PAGES.md - nothing invented, because this site is shown in meetings as proof. */
+
+/* One tiny in-view hook gates EVERY effect below - count-ups, service animations, the
+   process line. Nothing animates offscreen; that rule is what killed v1's performance. */
+function useInView<T extends HTMLElement>(): [RefObject<T | null>, boolean] {
+  const ref = useRef<T>(null)
+  const [inView, set] = useState(false)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const io = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) { set(true); io.disconnect() }
+    }, { threshold: 0.25 })
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
+  return [ref, inView]
+}
+
+/* The tiles count up once when seen. A string target like '3–4' or '0 ₽' cannot be counted,
+   so each tile names the number to count and the text around it separately. */
+const FIGS = [
+  { n: 62, pre: '', post: '', b: 'готовых сценария', s: 'автоматизации — от бота до экосистемы' },
+  { n: 12, pre: '', post: '', b: 'типов инструментов', s: 'сборщики, сторожа, конвейеры документов' },
+  { n: 4, pre: '3–', post: '', b: 'человека в команде', s: 'лондонское техническое образование' },
+  { n: 0, pre: '', post: ' ₽', b: 'стоит прототип', s: 'платите 50%, когда увидите его в работе' },
+]
+function Fig({ f }: { f: (typeof FIGS)[number] }) {
+  const [ref, seen] = useInView<HTMLDivElement>()
+  const [v, setV] = useState(0)
+  useEffect(() => {
+    if (!seen) return
+    if (f.n === 0) { setV(0); return }
+    const t0 = performance.now()
+    let raf = 0
+    const step = (t: number) => {
+      const p = Math.min(1, (t - t0) / 900)
+      setV(Math.round(f.n * (1 - (1 - p) ** 3)))
+      if (p < 1) raf = requestAnimationFrame(step)
+    }
+    raf = requestAnimationFrame(step)
+    return () => cancelAnimationFrame(raf)
+  }, [seen, f.n])
+  return (
+    <div className="v2fig" ref={ref}>
+      <dt>{f.pre}<i>{v}</i>{f.post}</dt>
+      <dd><b>{f.b}</b><span>{f.s}</span></dd>
+    </div>
+  )
+}
+
+/* Each service draws its own picture - Rainur asked for that in its own voice message, and
+   it is the difference between claiming automation and showing it. All five are inline SVG
+   animated by CSS, started by the .is-in class and paused otherwise. */
+const SVC_ART: Record<string, ReactNode> = {
+  crm: (
+    <svg viewBox="0 0 120 72" aria-hidden="true">
+      <path className="a-lane" d="M8 14h104M8 36h104M8 58h104" />
+      {[0, 1, 2].map((r) => <circle key={r} className={`a-deal a-deal--${r}`} cy={14 + r * 22} r="4.5" />)}
+    </svg>
+  ),
+  tel: (
+    <svg viewBox="0 0 120 72" aria-hidden="true">
+      <path className="a-wave" d="M4 36 Q10 12 16 36 T28 36 T40 36 T52 36 T64 36 T76 36 T88 36 T100 36 T112 36" />
+      <circle className="a-rec" cx="108" cy="12" r="4" />
+    </svg>
+  ),
+  bot: (
+    <svg viewBox="0 0 120 72" aria-hidden="true">
+      <rect className="a-msg a-msg--in" x="8" y="10" width="56" height="14" rx="7" />
+      <rect className="a-msg a-msg--out" x="56" y="30" width="56" height="14" rx="7" />
+      <rect className="a-msg a-msg--in2" x="8" y="50" width="40" height="14" rx="7" />
+    </svg>
+  ),
+  data: (
+    <svg viewBox="0 0 120 72" aria-hidden="true">
+      {[0, 1, 2].map((r) => <rect key={r} className={`a-row a-row--${r}`} x="4" y={8 + r * 12} width="34" height="7" rx="2" />)}
+      <rect className="a-table" x="70" y="8" width="46" height="56" rx="4" />
+      {[0, 1, 2, 3].map((r) => <rect key={r} className={`a-cell a-cell--${r}`} x="76" y={14 + r * 13} width="34" height="7" rx="2" />)}
+    </svg>
+  ),
+  check: (
+    <svg viewBox="0 0 120 72" aria-hidden="true">
+      <rect className="a-card" x="30" y="8" width="60" height="56" rx="6" />
+      <path className="a-tick" d="M48 38l9 9 17-19" />
+    </svg>
+  ),
+}
+const SVC = [
+  { k: 'crm', t: 'CRM под ваши этапы', d: 'Не коробка, в которую вы подстраиваетесь, а ваша воронка как она есть. Импорт из таблиц, права по ролям, отчёты, которые вы просили.' },
+  { k: 'tel', t: 'Телефония с записью и автообзвоном', d: 'Каждый звонок в карточке сделки. Робот обзванивает базу и передаёт менеджеру только тех, кто ответил «да».' },
+  { k: 'bot', t: 'Боты, которые отвечают по вашему прайсу', d: 'Telegram и WhatsApp. Считают стоимость, принимают заявку, отдают её в CRM. Не «чат-бот» ради галочки.' },
+  { k: 'data', t: 'Сборщики прайсов', d: 'Прайсы поставщиков из почты, сайтов и таблиц — в одну таблицу, каждое утро, без ручной сверки.' },
+  { k: 'check', t: 'Пробив компаний', d: 'ИНН на входе, на выходе — реквизиты, суды, долги, учредители. Пакетно, по списку.' },
+]
+function SvcRow({ s, i }: { s: (typeof SVC)[number]; i: number }) {
+  const [ref, seen] = useInView<HTMLDetailsElement>()
+  return (
+    <details className={seen ? 'v2svc is-in' : 'v2svc'} ref={ref} open={i === 0}>
+      <summary><span className="v2num">{String(i + 1).padStart(2, '0')}</span><h3>{s.t}</h3></summary>
+      <div className="v2svc__body"><p>{s.d}</p><figure className="v2svc__art">{SVC_ART[s.k]}</figure></div>
+    </details>
+  )
+}
+
+/* The three steps, joined by a line that draws itself as the section arrives. */
+function Process() {
+  const [ref, seen] = useInView<HTMLDivElement>()
+  return (
+    <div className={seen ? 'v2proc is-in' : 'v2proc'} ref={ref}>
+      <svg className="v2proc__line" viewBox="0 0 2 100" preserveAspectRatio="none" aria-hidden="true"><path d="M1 0v100" /></svg>
+      {[
+        ['Разбираем процесс', 'Час разговора. Смотрим, что делается руками и сколько это стоит.'],
+        ['Показываем прототип', 'Работающую версию, не макет. Бесплатно. Не понравилось — расходимся.'],
+        ['Доводим и передаём', 'Исходный код, документация и обучение — ваши. Уходить от нас не больно.'],
+      ].map(([t, d], i) => (
+        <div className="v2proc__step" key={t}>
+          <span className="v2num">{i + 1}</span><b>{t}</b><p>{d}</p>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+/* SERVICES BY CLIENT, not by technology - the instruction from voice 3.3: a visitor должен
+   узнать себя, not choose between "интеграция" and "парсинг". Sticky headline per industry. */
+const INDUSTRIES = [
+  { t: 'Логистике', items: ['Заявки из почты и Telegram в одну CRM', 'Автообзвон перевозчиков', 'Сборщик ставок с бирж', 'Пробив контрагента до подписания'] },
+  { t: 'Оптовой торговле', items: ['Прайсы поставщиков в одну таблицу каждое утро', 'Бот, который считает стоимость по вашему прайсу', 'Остатки и резервы без Excel'] },
+  { t: 'Строительству', items: ['Сметы и акты из шаблонов', 'Контроль этапов и подрядчиков', 'Фотоотчёты с объектов в одну ленту'] },
+  { t: 'Юридическим фирмам', items: ['Документы из шаблонов за минуты', 'Мониторинг судов по вашим клиентам', 'Контроль сроков'] },
+]
+
+/* THE FORM - GAIA's chip pattern, which is what «ахуенная форма» turns out to mean: three
+   taps and one honest textarea. The budget chips also answer the price question without a
+   price list. No backend exists yet and the contacts are deliberately unset, so submit
+   composes the enquiry and hands it to the visitor to send - a form that silently swallows
+   a lead would cost more than the whole site. Validation stays full. */
+const CHIP = {
+  what: ['CRM', 'Бот', 'Телефония', 'Сборщик данных', 'Сайт', 'Экосистема', 'Не знаю пока'],
+  budget: ['до 150 тыс', '150–400 тыс', '400 тыс – 1 млн', '1 млн +', 'не знаю'],
+  when: ['как можно скорее', '1–3 месяца', 'позже в этом году', 'пока смотрю'],
+}
+function Enquiry() {
+  const [what, setWhat] = useState('')
+  const [budget, setBudget] = useState('')
+  const [when, setWhen] = useState('')
+  const [name, setName] = useState('')
+  const [contact, setContact] = useState('')
+  const [pain, setPain] = useState('')
+  const [err, setErr] = useState('')
+  const [sent, setSent] = useState(false)
+  const submit = (e: FormEvent) => {
+    e.preventDefault()
+    if (sent) return
+    if (!name.trim()) { setErr('Как к вам обращаться?'); return }
+    if (!/@|\+?\d{6,}|t\.me|^@?[a-zA-Z]\w{3,}$/.test(contact.trim())) { setErr('Оставьте телефон, почту или ник в Telegram — иначе мы не сможем ответить.'); return }
+    if (!pain.trim()) { setErr('Одной фразы достаточно — что отнимает время?'); return }
+    setErr('')
+    const text = `Заявка с solutions101.net\nИмя: ${name}\nСвязь: ${contact}\nЧто нужно: ${what || '—'}\nБюджет: ${budget || '—'}\nСроки: ${when || '—'}\nЗадача: ${pain}`
+    navigator.clipboard?.writeText(text).catch(() => {})
+    setSent(true)
+  }
+  const chips = (list: string[], cur: string, set: (v: string) => void) => (
+    <div className="v2chips">{list.map((c) => (
+      <button type="button" key={c} className={cur === c ? 'is-on' : ''} onClick={() => set(cur === c ? '' : c)}>{c}</button>
+    ))}</div>
+  )
+  if (sent) return (
+    <div className="v2form v2form--done">
+      <h3>Заявка собрана и скопирована в буфер.</h3>
+      <p>Пришлите её нам в Telegram или WhatsApp — контакты появятся в подвале в ближайшие
+         дни, а пока команда на связи лично. Ответим в течение рабочего дня.</p>
+    </div>
+  )
+  return (
+    <form className="v2form" onSubmit={submit} noValidate>
+      <label className="v2form__l">Что нужно{chips(CHIP.what, what, setWhat)}</label>
+      <label className="v2form__l">Бюджет{chips(CHIP.budget, budget, setBudget)}</label>
+      <label className="v2form__l">Сроки{chips(CHIP.when, when, setWhen)}</label>
+      <div className="v2form__row">
+        <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Имя" autoComplete="name" />
+        <input value={contact} onChange={(e) => setContact(e.target.value)} placeholder="Телефон, почта или @telegram" autoComplete="tel" />
+      </div>
+      <textarea value={pain} onChange={(e) => setPain(e.target.value)} rows={3}
+        placeholder="Что делается руками? Например: «менеджер каждое утро сводит прайсы четырёх поставщиков в Excel»" />
+      {err && <p className="v2form__err" role="alert">{err}</p>}
+      <button className="v2btn v2btn--go" type="submit">Собрать заявку</button>
+    </form>
+  )
+}
 
 /* REAL PAGES, ROUTED ON THE HASH - and the hash is not a shortcut, it is the only thing that
    works here. This deploys to GitHub Pages, which serves static files and cannot rewrite
@@ -382,10 +557,10 @@ export default function V2() {
       }
       /* CONTIGUOUS AND OVERLAPPING - his ask: the container is always there, cards do not
          appear out of nothing and vanish into nothing. The slices now tile the whole runway
-         after the overlay hands off, and each pair overlaps by ~4% so one card crossfades
-         into the next instead of the screen going empty between them. The only true fade-in
-         left is the first card's, off the hero. */
-      const c1 = band(0.16, 0.49), c2 = band(0.45, 0.76), c3 = band(0.72, 1.01)
+         after the overlay hands off. EXACTLY ADJACENT, not overlapping - the 4% overlap
+         tried first put two texts in the same glass at once, which read as a glitch on the
+         phone. Adjacent slices hand off with one quick fade instead. */
+      const c1 = band(0.16, 0.47), c2 = band(0.47, 0.74), c3 = band(0.74, 1.01)
       stage.style.setProperty('--c1', c1)
       stage.style.setProperty('--c2', c2)
       stage.style.setProperty('--c3', c3)
@@ -657,83 +832,131 @@ export default function V2() {
       </section>
       )}
 
-      {/* and the real page begins */}
+      {/* and the real page begins. Each page is its own composition now - PAGES.md built.
+          Sections carry GAIA-style numbering: real sequence, monospace eyebrow. */}
       <main className={home ? 'v2main' : 'v2main v2main--inner'}>
+
+        {home && <>
         <div className="v2wrap">
-          {/* The headline used to be repeated here, and once it moved onto the strand that
-              made the visitor read the same sentence twice in a row. The page below the
-              header opens on PROOF instead - which is also the order his reference uses and
-              the order the brief asks for: promise on the picture, numbers underneath. */}
-          <dl className="v2figs">
-            <div className="v2fig">
-              <dt><i>0</i> ₽</dt>
-              <dd><b>за прототип</b><span>платите 50% после того, как увидите его в работе</span></dd>
-            </div>
-            <div className="v2fig">
-              <dt><i>1</i> день</dt>
-              <dd><b>на учёт взаиморасчётов</b><span>строительная группа, три юрлица и мультивалюта</span></dd>
-            </div>
-            <div className="v2fig">
-              <dt><i>48</i></dt>
-              <dd><b>контрагентов в одном учёте</b><span>долги и переплаты видны по каждому</span></dd>
-            </div>
-            <div className="v2fig">
-              <dt><i>12</i></dt>
-              <dd><b>форматов прайсов</b><span>сборщик читает их и сводит в одну таблицу</span></dd>
-            </div>
-          </dl>
+          {/* proof before prose - the tiles count up once, from the honesty list only */}
+          <dl className="v2figs">{FIGS.map((f) => <Fig f={f} key={f.b} />)}</dl>
         </div>
 
-        {(home || page === 'about') && (
+        <section className="v2sec" id="do"><div className="v2wrap">
+          <p className="v2eyebrow">01 / Что мы делаем</p>
+          <h2 className="v2h2">Пять инструментов, которые закрывают почти всё</h2>
+          <div className="v2svcs">{SVC.map((s, i) => <SvcRow s={s} i={i} key={s.k} />)}</div>
+        </div></section>
+
+        <section className="v2sec" id="how"><div className="v2wrap">
+          <p className="v2eyebrow">02 / Как мы работаем</p>
+          <h2 className="v2h2">Сначала прототип, деньги потом</h2>
+          <Process />
+        </div></section>
+
+        <section className="v2sec" id="clients"><div className="v2wrap">
+          <p className="v2eyebrow">03 / С нами работают</p>
+          <div className="v2clients"><span>Негабарит-12</span><em>логистика — работают с нашими инструментами</em></div>
+          <p className="v2note">Список короткий, потому что честный. Он будет пополняться.</p>
+        </div></section>
+
+        <section className="v2sec v2sec--cta" id="request"><div className="v2wrap">
+          <p className="v2eyebrow">04 / Заявка</p>
+          <h2 className="v2h2">Расскажите, что делается руками</h2>
+          <p className="v2lede">Ответим в течение рабочего дня. Прототип покажем бесплатно —
+             платите, только если он вам подходит.</p>
+          <Enquiry />
+        </div></section>
+        </>}
+
+        {page === 'about' && <>
         <section className="v2sec" id="about"><div className="v2wrap">
-          <p className="v2eyebrow">О нас</p>
+          <p className="v2eyebrow">01 / Кто мы</p>
           <h2 className="v2h2">Не консультируем. Делаем.</h2>
           <div className="v2two">
-            <p>Мы небольшая команда разработчиков — четыре человека, лондонское техническое
-               образование, каждый день пишем то, что потом работает у клиента в проде.
-               Не курсы, не методички, не «стратегические сессии».</p>
-            <p>Работаем по всем отраслям и под каждого — отдельно. Логистика, строительство,
-               торговля, услуги: процессы у всех свои, поэтому коробочных решений мы не
-               продаём. Сначала смотрим, как у вас устроено, потом собираем инструмент.</p>
+            <p>У конкурентов 30% практики и 70% теории. У нас — 100% практики: мы не продаём
+               курсы и не пишем стратегии. Мы отдаём работающий инструмент, настроенный под
+               вашу компанию, с исходным кодом и обучением сотрудников.</p>
+            <p>Команда из 3–4 человек, образование — Лондон. Пишем сами, не перепродаём
+               подрядчиков: тот, кто говорит с вами о задаче, её и делает.</p>
           </div>
         </div></section>
-        )}
 
-        {(home || page === 'services') && (
-        <section className="v2sec" id="services"><div className="v2wrap">
-          <p className="v2eyebrow">Услуги</p>
-          <h2 className="v2h2">Что умеем и что это снимает с вас</h2>
-          <div className="v2grid">
-            {SERVICES.map((s) => (
-              <article className="v2card" key={s.t}>
-                <h3>{s.t}</h3>
-                <p>{s.d}</p>
-                <p className="v2card__win">{s.w}</p>
-              </article>
+        <section className="v2sec" id="why"><div className="v2wrap">
+          <p className="v2eyebrow">02 / Почему маленькая команда — это фича</p>
+          <ul className="v2why">
+            <li>Дизайн и разработка в одних руках: кто придумал интерфейс, тот его и построил.</li>
+            <li>Решения принимаются за день, а не циклами согласований.</li>
+            <li>Инструмент существует ради денег: выиграть клиентов, срезать ручной труд, открыть выручку.</li>
+            <li>Прототип бесплатно — потому что уверены, что он вам подойдёт.</li>
+          </ul>
+        </div></section>
+
+        <section className="v2sec" id="industries"><div className="v2wrap">
+          <p className="v2eyebrow">03 / Отрасли</p>
+          <h2 className="v2h2">Работаем со всеми</h2>
+          <p className="v2lede">Инструмент собирается под процесс, а не под отрасль — поэтому
+             заходим и туда, где до нас никто ничего не автоматизировал.</p>
+          <div className="v2inds">
+            {['Логистика', 'Оптовая торговля', 'Строительство', 'Юридические фирмы', 'Производство', 'Услуги'].map((t) => (
+              <div className="v2glass v2ind" key={t}>{t}</div>
             ))}
           </div>
         </div></section>
+        </>}
+
+        {page === 'services' && (
+        <section className="v2sec" id="services"><div className="v2wrap">
+          <p className="v2eyebrow">01 / Услуги</p>
+          <h2 className="v2h2">По типу клиента, а не по технологии</h2>
+          <p className="v2lede">Найдите свою отрасль — задачи в ней мы уже решали или решаем.</p>
+          {INDUSTRIES.map((ind) => (
+            <div className="v2branch" key={ind.t}>
+              <h3 className="v2branch__head">{ind.t}</h3>
+              <ul className="v2branch__list">
+                {ind.items.map((it) => <li key={it}>{it}</li>)}
+              </ul>
+            </div>
+          ))}
+          <p className="v2note">Вашей отрасли нет в списке? Это список сделанного, а не
+             границы. Опишите процесс в <a href="#contacts">заявке</a> — разбор бесплатный.</p>
+        </div></section>
         )}
 
-        {(home || page === 'tools') && (
+        {page === 'tools' && <>
         <section className="v2sec" id="tools"><div className="v2wrap">
-          <p className="v2eyebrow">Инструменты</p>
+          <p className="v2eyebrow">01 / Инструменты</p>
           <h2 className="v2h2">Что можно взять по отдельности</h2>
           <p className="v2lede">Каждый инструмент ставится сам по себе и работает без
-             остальных. Цена зависит от объёма — считаем на разборе, он бесплатный.</p>
+             остальных. Цена зависит от объёма, поэтому она — вилка, а не «от»: бот на три
+             сценария и бот, считающий по прайсу из 4000 позиций, — разные работы.</p>
           <ul className="v2tools">
             {TOOLS.map((t) => (
               <li key={t.t}><b>{t.t}</b><span>{t.d}</span></li>
             ))}
           </ul>
         </div></section>
-        )}
+        <section className="v2sec v2sec--cta"><div className="v2wrap">
+          <p className="v2eyebrow">02 / Цена</p>
+          <h2 className="v2h2">Прототип — бесплатно</h2>
+          <p className="v2lede">Точную вилку называем после бесплатного разбора — час
+             разговора о том, что у вас делается руками. Дальше 50% вперёд, остаток по
+             сдаче. Исходный код, документация и обучение входят в цену.</p>
+          <div className="v2cta"><a className="v2btn v2btn--go" href="#contacts">На разбор</a></div>
+        </div></section>
+        </>}
 
-        {(home || page === 'works') && (
+        {page === 'works' && <>
         <section className="v2sec" id="works"><div className="v2wrap">
-          <p className="v2eyebrow">Наши работы</p>
+          <p className="v2eyebrow">01 / Работы</p>
           <h2 className="v2h2">Что уже стоит и работает</h2>
           <div className="v2grid">
+            <article className="v2card">
+              <h3>Аукцион автозапчастей</h3>
+              <p>Торговая площадка: лоты, ставки в реальном времени, сделка уезжает в 1С
+                 без перепечатывания. Работает у продавца автозапчастей.</p>
+              <p className="v2card__win">Подключена к 1С</p>
+            </article>
             <article className="v2card">
               <h3>Учёт взаиморасчётов</h3>
               <p>Строительная группа: три юрлица, мультивалюта, 48 контрагентов.
@@ -753,27 +976,23 @@ export default function V2() {
               <p className="v2card__win">Заявка не теряется в мессенджерах</p>
             </article>
           </div>
+          <p className="v2note">Дальше здесь появятся кликабельные демо — по одному на каждый
+             из 12 типов инструментов, которые мы строим. Не картинки, а страницы, которые
+             можно потрогать.</p>
         </div></section>
-        )}
-
-        {(home || page === 'works') && (
         <section className="v2sec" id="clients"><div className="v2wrap">
-          <p className="v2eyebrow">С нами работают</p>
-          <h2 className="v2h2">Кому мы уже что-то починили</h2>
+          <p className="v2eyebrow">02 / С нами работают</p>
           <div className="v2clients"><span>Негабарит-12</span><em>логистика</em></div>
-          <p className="v2note">Список короткий, потому что честный. Он будет пополняться.</p>
         </div></section>
-        )}
+        </>}
 
-        {(home || page === 'contacts') && (
-        <section className="v2sec v2sec--cta" id="request"><div className="v2wrap">
-          <p className="v2eyebrow">Заявка</p>
-          <h2 className="v2h2">Расскажите, что болит</h2>
-          <p className="v2lede">Опишите процесс, который отнимает время. Ответим в течение
-             рабочего дня, разбор и прототип — бесплатно.</p>
-          <div className="v2cta">
-            <a className="v2btn v2btn--go" href="#contacts">Написать нам</a>
-          </div>
+        {page === 'contacts' && (
+        <section className="v2sec" id="request"><div className="v2wrap">
+          <p className="v2eyebrow">01 / Заявка</p>
+          <h2 className="v2h2">Расскажите, что делается руками</h2>
+          <p className="v2lede">Ответим в течение рабочего дня. Первый разговор — час,
+             бесплатно, без обязательств.</p>
+          <Enquiry />
         </div></section>
         )}
 

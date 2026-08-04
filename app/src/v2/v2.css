@@ -544,3 +544,136 @@ html.v2light{--slogan:linear-gradient(100deg,#8A7261,#5C4536 46%,#33241A)}
    feature. Kept because "does this lag" should be answered with two numbers, not an opinion. */
 .v2chapters--flat .v2glass{background:none;border:0;backdrop-filter:none;-webkit-backdrop-filter:none}
 .v2chapters--flat .v2glass::before,.v2chapters--flat .v2glass::after{display:none}
+
+/* ============ THE CONTENT BUILD, 5 Aug - everything below serves PAGES.md ============ */
+
+/* GAIA-style numbering: the eyebrow already carries the section name; the number rides in it */
+.v2num{font-family:JBMono,monospace;font-weight:700;color:var(--accent);font-size:13px}
+
+/* --- services accordion. Native <details>: the platform does open/close, we style it. --- */
+.v2svcs{margin-top:28px;border-top:1px solid var(--rule)}
+.v2svc{border-bottom:1px solid var(--rule)}
+.v2svc summary{display:flex;align-items:baseline;gap:18px;list-style:none;cursor:pointer;
+  padding:22px 0;-webkit-tap-highlight-color:transparent}
+.v2svc summary::-webkit-details-marker{display:none}
+.v2svc summary::after{content:'+';margin-left:auto;color:var(--ink-faint);
+  font:400 26px/1 JBMono,monospace;transition:transform .25s}
+.v2svc[open] summary::after{content:'−'}
+.v2svc summary h3{margin:0;color:var(--ink);font:700 clamp(18px,2vw,26px)/1.2 Golos,sans-serif;
+  letter-spacing:-.015em}
+.v2svc__body{display:grid;gap:24px;padding:0 0 26px;
+  grid-template-columns:minmax(0,1fr) clamp(150px,22vw,240px);align-items:center}
+@media (max-width:700px){.v2svc__body{grid-template-columns:1fr}}
+.v2svc__body p{margin:0;color:var(--ink-soft);font:400 clamp(15px,1.2vw,17px)/1.6 Golos,sans-serif;
+  max-width:58ch}
+.v2svc__art{margin:0}
+.v2svc__art svg{display:block;width:100%;height:auto;overflow:visible}
+
+/* every service draws its own picture - lines only, animated by class, PAUSED until .is-in.
+   None of these run offscreen: useInView adds is-in once, and a closed <details> hides the
+   body entirely, so at most one animation lives at a time. */
+.v2svc svg *{animation-play-state:paused}
+.v2svc.is-in[open] svg *{animation-play-state:running}
+/* crm: deals sliding along their lanes */
+.a-lane{stroke:var(--rule);stroke-width:1.5;fill:none}
+.a-deal{fill:var(--accent);cx:8px}
+.a-deal--0{animation:a-slide 3.2s ease-in-out infinite}
+.a-deal--1{animation:a-slide 3.2s .5s ease-in-out infinite}
+.a-deal--2{animation:a-slide 3.2s 1s ease-in-out infinite}
+@keyframes a-slide{0%{cx:8px;opacity:0}12%{opacity:1}88%{opacity:1}100%{cx:112px;opacity:0}}
+/* telephony: a call waveform sweeping, a record light breathing */
+.a-wave{stroke:var(--accent);stroke-width:2;fill:none;stroke-dasharray:160;
+  animation:a-sweep 2.6s linear infinite}
+@keyframes a-sweep{from{stroke-dashoffset:320}to{stroke-dashoffset:0}}
+.a-rec{fill:#ff6b5e;animation:a-blink 1.4s ease-in-out infinite}
+@keyframes a-blink{0%,100%{opacity:.25}50%{opacity:1}}
+/* bot: messages typing in turn */
+.a-msg{fill:color-mix(in srgb,var(--ink) 14%,transparent);transform-origin:left center}
+.a-msg--out{fill:color-mix(in srgb,var(--accent) 45%,transparent)}
+.a-msg--in{animation:a-pop 4.5s ease infinite}
+.a-msg--out{animation:a-pop 4.5s 1.5s ease infinite}
+.a-msg--in2{animation:a-pop 4.5s 3s ease infinite}
+@keyframes a-pop{0%{opacity:0;transform:scale(.6)}7%{opacity:1;transform:scale(1)}
+  85%{opacity:1}100%{opacity:0}}
+/* collector: rows fly from sources into the one table */
+.a-row{fill:color-mix(in srgb,var(--ink) 22%,transparent)}
+.a-table{fill:none;stroke:var(--rule);stroke-width:1.5}
+.a-cell{fill:color-mix(in srgb,var(--accent) 55%,transparent)}
+.a-row--0{animation:a-out 3.6s ease infinite}.a-row--1{animation:a-out 3.6s .4s ease infinite}
+.a-row--2{animation:a-out 3.6s .8s ease infinite}
+@keyframes a-out{0%,20%{opacity:1;transform:none}55%,100%{opacity:0;transform:translateX(30px)}}
+.a-cell--0{animation:a-in 3.6s .9s ease infinite}.a-cell--1{animation:a-in 3.6s 1.2s ease infinite}
+.a-cell--2{animation:a-in 3.6s 1.5s ease infinite}.a-cell--3{animation:a-in 3.6s 1.8s ease infinite}
+@keyframes a-in{0%{opacity:0}18%,80%{opacity:1}100%{opacity:0}}
+/* пробив: the check draws itself on the company card */
+.a-card{fill:none;stroke:var(--rule);stroke-width:1.5}
+.a-tick{fill:none;stroke:var(--accent);stroke-width:3;stroke-linecap:round;stroke-linejoin:round;
+  stroke-dasharray:40;animation:a-draw 2.8s ease infinite}
+@keyframes a-draw{0%{stroke-dashoffset:40}35%,75%{stroke-dashoffset:0;opacity:1}100%{stroke-dashoffset:0;opacity:0}}
+
+/* --- the three steps, and the line that draws down through them --- */
+.v2proc{position:relative;margin-top:36px;display:grid;gap:30px;padding-left:34px}
+@media (min-width:760px){.v2proc{grid-template-columns:repeat(3,1fr);gap:40px;padding-left:0;
+  padding-top:26px}}
+.v2proc__line{position:absolute;left:8px;top:0;width:2px;height:100%}
+@media (min-width:760px){.v2proc__line{left:0;top:8px;width:100%;height:2px;transform:none}
+  .v2proc__line path{d:path('M0 1h100')}}
+.v2proc__line path{stroke:var(--rule);stroke-width:2;fill:none;vector-effect:non-scaling-stroke;
+  stroke-dasharray:1;stroke-dashoffset:1;pathLength:1;transition:stroke-dashoffset 1.4s ease .2s}
+.v2proc.is-in .v2proc__line path{stroke-dashoffset:0}
+.v2proc__step b{display:block;color:var(--ink);margin-top:10px;
+  font:700 clamp(17px,1.6vw,21px)/1.25 Golos,sans-serif}
+.v2proc__step p{margin:8px 0 0;color:var(--ink-soft);font:400 15px/1.55 Golos,sans-serif}
+
+/* --- about: the small-by-design arrows and the industry tiles --- */
+.v2why{list-style:none;margin:28px 0 0;padding:0;display:grid;gap:18px}
+.v2why li{position:relative;padding-left:34px;color:var(--ink-soft);
+  font:400 clamp(15px,1.3vw,18px)/1.55 Golos,sans-serif;max-width:64ch}
+.v2why li::before{content:'→';position:absolute;left:0;color:var(--accent);
+  font-family:JBMono,monospace}
+.v2inds{display:grid;gap:14px;margin-top:30px;grid-template-columns:repeat(2,1fr)}
+@media (min-width:760px){.v2inds{grid-template-columns:repeat(3,1fr)}}
+.v2ind{padding:clamp(18px,2vw,26px);color:var(--ink);
+  font:600 clamp(15px,1.4vw,19px)/1.3 Golos,sans-serif}
+
+/* --- services by industry: the headline holds while its items pass (desktop) --- */
+.v2branch{display:grid;gap:10px 40px;padding:30px 0;border-top:1px solid var(--rule)}
+.v2branch:first-of-type{margin-top:26px}
+@media (min-width:760px){.v2branch{grid-template-columns:minmax(180px,.8fr) 2fr}}
+.v2branch__head{margin:0;color:var(--ink);font:800 clamp(20px,2.4vw,30px)/1.15 Golos,sans-serif;
+  letter-spacing:-.02em;align-self:start}
+@media (min-width:760px){.v2branch__head{position:sticky;top:96px}}
+.v2branch__list{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.v2branch__list li{position:relative;padding-left:26px;color:var(--ink-soft);
+  font:400 clamp(15px,1.25vw,17.5px)/1.55 Golos,sans-serif}
+.v2branch__list li::before{content:'';position:absolute;left:0;top:.62em;width:14px;height:2px;
+  background:var(--accent)}
+
+/* --- the enquiry form: chips, two fields, one honest textarea --- */
+.v2form{margin-top:34px;max-width:720px;display:grid;gap:22px}
+.v2form__l{display:grid;gap:10px;color:var(--ink-faint);
+  font:600 12px/1 JBMono,monospace;text-transform:uppercase;letter-spacing:.12em}
+.v2chips{display:flex;flex-wrap:wrap;gap:8px}
+.v2chips button{appearance:none;cursor:pointer;border:1px solid var(--rule);border-radius:999px;
+  background:transparent;color:var(--ink-soft);padding:9px 16px;
+  font:500 14px/1 Golos,sans-serif;transition:border-color .15s,background .15s,color .15s}
+.v2chips button.is-on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.v2form__row{display:grid;gap:12px}
+@media (min-width:600px){.v2form__row{grid-template-columns:1fr 1fr}}
+.v2form input,.v2form textarea{appearance:none;width:100%;box-sizing:border-box;
+  background:color-mix(in srgb,var(--surface) 70%,transparent);border:1px solid var(--rule);
+  border-radius:12px;color:var(--ink);padding:14px 16px;font:400 15px/1.4 Golos,sans-serif}
+.v2form input::placeholder,.v2form textarea::placeholder{color:var(--ink-faint)}
+.v2form input:focus-visible,.v2form textarea:focus-visible{outline:none;border-color:var(--accent)}
+.v2form textarea{resize:vertical;min-height:88px}
+.v2form__err{margin:0;color:#ff6b5e;font:500 14px/1.4 Golos,sans-serif}
+.v2form .v2btn{justify-self:start}
+.v2form--done{max-width:720px;margin-top:34px}
+.v2form--done h3{margin:0;color:var(--ink);font:700 clamp(18px,2vw,24px)/1.3 Golos,sans-serif}
+.v2form--done p{margin:12px 0 0;color:var(--ink-soft);font:400 15.5px/1.6 Golos,sans-serif;
+  max-width:56ch}
+
+@media (prefers-reduced-motion:reduce){
+  .v2svc svg *,.a-wave,.a-rec{animation:none!important}
+  .v2proc__line path{transition:none;stroke-dashoffset:0}
+}
