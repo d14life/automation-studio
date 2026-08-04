@@ -855,7 +855,7 @@ export default function V2() {
         </div></section>
 
         <section className="v2sec" id="clients"><div className="v2wrap">
-          <p className="v2eyebrow">03 / С нами работают</p>
+          <p className="v2eyebrow">02 / С нами работают</p>
           <div className="v2clients"><span>Негабарит-12</span><em>логистика — работают с нашими инструментами</em></div>
           <p className="v2note">Список короткий, потому что честный. Он будет пополняться.</p>
         </div></section>
@@ -977,29 +977,131 @@ export default function V2() {
             </article>
           </div>
         </div></section>
-        <section className="v2sec" id="demos"><div className="v2wrap">
-          <p className="v2eyebrow">02 / Демо</p>
-          <h2 className="v2h2">Потрогайте сами</h2>
-          <p className="v2lede">Не картинки, а работающие страницы на демо-данных. Каждая
-             показывает один тип инструмента за десять секунд.</p>
-          <div className="v2grid">
-            {[
-              ['sborschik', 'Сборщик прайсов', 'Три прайса поставщиков слетаются в одну таблицу с лучшей ценой по каждой позиции.'],
-              ['bot', 'Бот-калькулятор', 'Считает стоимость по прайсу компании и оформляет заявку — или зовёт человека.'],
-              ['crm', 'CRM логиста', 'Воронка перевозок: перетащите сделку — клиент получает статус, документы формируются.'],
-              ['otchet', 'Утренний отчёт владельцу', 'В 7:00 в Telegram приходит выручка, касса, долги и три проблемы — сам.'],
-              ['raspoznavatel', 'Распознаватель накладных', 'Фото мятой накладной превращается в строки таблицы и уезжает в 1С.'],
-            ].map(([slug, t, d]) => (
-              <a className="v2card v2card--demo" href={`/demo/${slug}/`} key={slug}>
-                <h3>{t}</h3>
-                <p>{d}</p>
-                <p className="v2card__win">Открыть демо →</p>
-              </a>
+        <section className="v2sec" id="clients"><div className="v2wrap">
+          <p className="v2eyebrow">02 / С нами работают</p>
+          <div className="v2clients"><span>Негабарит-12</span><em>логистика — работают с нашими инструментами</em></div>
+          <p className="v2note">Список короткий, потому что честный. Он будет пополняться.</p>
+        </div></section>
+
+        <section className="v2sec v2sec--cta" id="request"><div className="v2wrap">
+          <p className="v2eyebrow">04 / Заявка</p>
+          <h2 className="v2h2">Расскажите, что делается руками</h2>
+          <p className="v2lede">Ответим в течение рабочего дня. Прототип покажем бесплатно —
+             платите, только если он вам подходит.</p>
+          <Enquiry />
+        </div></section>
+        </>}
+
+        {page === 'about' && <>
+        <section className="v2sec" id="about"><div className="v2wrap">
+          <p className="v2eyebrow">01 / Кто мы</p>
+          <h2 className="v2h2">Не консультируем. Делаем.</h2>
+          <div className="v2two">
+            <p>У конкурентов 30% практики и 70% теории. У нас — 100% практики: мы не продаём
+               курсы и не пишем стратегии. Мы отдаём работающий инструмент, настроенный под
+               вашу компанию, с исходным кодом и обучением сотрудников.</p>
+            <p>Команда из 3–4 человек, образование — Лондон. Пишем сами, не перепродаём
+               подрядчиков: тот, кто говорит с вами о задаче, её и делает.</p>
+          </div>
+        </div></section>
+
+        <section className="v2sec" id="why"><div className="v2wrap">
+          <p className="v2eyebrow">02 / Почему маленькая команда — это фича</p>
+          <ul className="v2why">
+            <li>Дизайн и разработка в одних руках: кто придумал интерфейс, тот его и построил.</li>
+            <li>Решения принимаются за день, а не циклами согласований.</li>
+            <li>Инструмент существует ради денег: выиграть клиентов, срезать ручной труд, открыть выручку.</li>
+            <li>Прототип бесплатно — потому что уверены, что он вам подойдёт.</li>
+          </ul>
+        </div></section>
+
+        <section className="v2sec" id="industries"><div className="v2wrap">
+          <p className="v2eyebrow">03 / Отрасли</p>
+          <h2 className="v2h2">Работаем со всеми</h2>
+          <p className="v2lede">Инструмент собирается под процесс, а не под отрасль — поэтому
+             заходим и туда, где до нас никто ничего не автоматизировал.</p>
+          <div className="v2inds">
+            {['Логистика', 'Оптовая торговля', 'Строительство', 'Юридические фирмы', 'Производство', 'Услуги'].map((t) => (
+              <div className="v2glass v2ind" key={t}>{t}</div>
             ))}
           </div>
         </div></section>
+        </>}
+
+        {page === 'services' && (
+        <section className="v2sec" id="services"><div className="v2wrap">
+          <p className="v2eyebrow">01 / Услуги</p>
+          <h2 className="v2h2">По типу клиента, а не по технологии</h2>
+          <p className="v2lede">Найдите свою отрасль — задачи в ней мы уже решали или решаем.</p>
+          {INDUSTRIES.map((ind) => (
+            <div className="v2branch" key={ind.t}>
+              <h3 className="v2branch__head">{ind.t}</h3>
+              <ul className="v2branch__list">
+                {ind.items.map((it) => <li key={it}>{it}</li>)}
+              </ul>
+            </div>
+          ))}
+          <p className="v2note">Вашей отрасли нет в списке? Это список сделанного, а не
+             границы. Опишите процесс в <a href="#contacts">заявке</a> — разбор бесплатный.</p>
+        </div></section>
+        )}
+
+        {page === 'tools' && <>
+        <section className="v2sec" id="tools"><div className="v2wrap">
+          <p className="v2eyebrow">01 / Инструменты</p>
+          <h2 className="v2h2">Что можно взять по отдельности</h2>
+          <p className="v2lede">Каждый инструмент ставится сам по себе и работает без
+             остальных. Цена зависит от объёма, поэтому она — вилка, а не «от»: бот на три
+             сценария и бот, считающий по прайсу из 4000 позиций, — разные работы.</p>
+          <ul className="v2tools">
+            {TOOLS.map((t) => (
+              <li key={t.t}><b>{t.t}</b><span>{t.d}</span></li>
+            ))}
+          </ul>
+        </div></section>
+        <section className="v2sec v2sec--cta"><div className="v2wrap">
+          <p className="v2eyebrow">02 / Цена</p>
+          <h2 className="v2h2">Прототип — бесплатно</h2>
+          <p className="v2lede">Точную вилку называем после бесплатного разбора — час
+             разговора о том, что у вас делается руками. Дальше 50% вперёд, остаток по
+             сдаче. Исходный код, документация и обучение входят в цену.</p>
+          <div className="v2cta"><a className="v2btn v2btn--go" href="#contacts">На разбор</a></div>
+        </div></section>
+        </>}
+
+        {page === 'works' && <>
+        <section className="v2sec" id="works"><div className="v2wrap">
+          <p className="v2eyebrow">01 / Работы</p>
+          <h2 className="v2h2">Что уже стоит и работает</h2>
+          <div className="v2grid">
+            <article className="v2card">
+              <h3>Аукцион автозапчастей</h3>
+              <p>Торговая площадка: лоты, ставки в реальном времени, сделка уезжает в 1С
+                 без перепечатывания. Работает у продавца автозапчастей.</p>
+              <p className="v2card__win">Подключена к 1С</p>
+            </article>
+            <article className="v2card">
+              <h3>Учёт взаиморасчётов</h3>
+              <p>Строительная группа: три юрлица, мультивалюта, 48 контрагентов.
+                 Долги и переплаты видны по каждому, платёжный календарь показывает, что горит.</p>
+              <p className="v2card__win">Собрано за один день</p>
+            </article>
+            <article className="v2card">
+              <h3>Сборщик прайсов</h3>
+              <p>Двенадцать форматов прайс-листов от поставщиков — xls, pdf, письма, выгрузки —
+                 читаются и сводятся в одну таблицу без участия человека.</p>
+              <p className="v2card__win">Никто не переносит цифры руками</p>
+            </article>
+            <article className="v2card">
+              <h3>Телефония и автообзвон</h3>
+              <p>Звонки с записью, автоматический обзвон базы, проверка контрагента по
+                 реквизитам до сделки. Всё привязано к карточке клиента.</p>
+              <p className="v2card__win">Заявка не теряется в мессенджерах</p>
+            </article>
+          </div>
+        </div></section>
         <section className="v2sec" id="clients"><div className="v2wrap">
-          <p className="v2eyebrow">03 / С нами работают</p>
+          <p className="v2eyebrow">02 / С нами работают</p>
           <div className="v2clients"><span>Негабарит-12</span><em>логистика</em></div>
         </div></section>
         </>}
