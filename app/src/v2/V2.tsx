@@ -193,7 +193,44 @@ const TOOLS = [
   { t: 'Сайт или экосистема', d: 'если нужен не инструмент, а всё сразу' },
 ]
 
+/* REAL PAGES, ROUTED ON THE HASH - and the hash is not a shortcut, it is the only thing that
+   works here. This deploys to GitHub Pages, which serves static files and cannot rewrite
+   /uslugi back to index.html, so a pushState route would 404 the moment anyone reloaded or
+   opened a link directly. A hash route is handled entirely in the browser and survives both.
+   Client-side rather than separate HTML entries because the strand is a 14-25MB download: a
+   second entry point would re-fetch and re-decode it on every page change. This way the
+   header stays live and switching is instant. */
+const PAGES = [
+  { id: '', nav: 'Главная' },
+  { id: 'about', nav: 'О нас' },
+  { id: 'services', nav: 'Услуги' },
+  { id: 'tools', nav: 'Инструменты' },
+  { id: 'works', nav: 'Работы' },
+  { id: 'contacts', nav: 'Контакты' },
+] as const
+type PageId = (typeof PAGES)[number]['id']
+
+function usePage(): PageId {
+  const read = () => {
+    const h = location.hash.replace(/^#\/?/, '')
+    return (PAGES.some((p) => p.id === h) ? h : '') as PageId
+  }
+  const [page, setPage] = useState<PageId>(read)
+  useEffect(() => {
+    const on = () => {
+      setPage(read())
+      /* a new page starts at its top, or you land halfway down someone else's scroll */
+      scrollTo(0, 0)
+    }
+    addEventListener('hashchange', on)
+    return () => removeEventListener('hashchange', on)
+  }, [])
+  return page
+}
+
 export default function V2() {
+  const page = usePage()
+  const home = page === ''
   /* Light and dark are the SAME clip. The donor's light hero is not a second video, it is the
      same footage with `invert` over a pale background - so the switch costs one CSS filter and
      no extra download. The strand is white on cream in light, dark on near-black in dark. */
@@ -357,11 +394,16 @@ export default function V2() {
            alone, exactly like the pre-loop days; as the glide decays toward the crawl the
            loop fades in and swallows the tail. Finger-down safety is untouched because calm
            only ever multiplies idle, never replaces it. */
-      /* 0.55, up from 0.25: the loop now regards the page as "calm enough to take over" at
-         twice the glide speed, which is how it catches the momentum roughly half a second
-         earlier - his ask. It is still a multiplier, so a genuinely fast flick still belongs
-         to the scrub alone; what changed is where the handover sits along the decay. */
-      const calm = Math.min(1, Math.max(0, 1 - Math.abs(dp) / dt / 0.55))
+      /* THE HANDOVER SITS AT THE TOP OF THE DECAY NOW. Twice was not enough - he still read the
+         tail as lag - so the loop takes the page as calm at four times the old speed, and the
+         window is squared so it reaches full strength almost as soon as the flick starts
+         bleeding off rather than creeping up over the whole glide. In practice the strand is
+         moving under its own power about a second earlier than it was.
+         It is still a MULTIPLIER on the input gate, which is what keeps it safe: a finger on
+         the glass pins idle to zero regardless, so none of this can overpower a real scroll.
+         Only a page that is coasting untouched can be taken over. */
+      const c = Math.min(1, Math.max(0, 1 - Math.abs(dp) / dt / 1.1))
+      const calm = c * c
       /* AT A PINNED END, THE RAMP BUYS NOTHING. The gates exist so the loop never fights the
          scrub - but once pos is clamped hard against 0 or 1, scrolling further that way moves
          nothing, so there is no fight left to lose. Waiting the full 0.25s there just parks
@@ -503,17 +545,20 @@ export default function V2() {
           that is always true. It earns a tinted, blurred backdrop only once you have scrolled
           off the top, so the very first screen stays pure footage. */}
       <header className="v2nav">
-        <a className="v2logo" href="#top">Solutions<b>101</b></a>
+        <a className="v2logo" href="#/">Solutions<b>101</b></a>
         <nav className="v2links">
-          <a href="#about">О нас</a>
-          <a href="#services">Услуги</a>
-          <a href="#tools">Инструменты</a>
-          <a href="#works">Работы</a>
-          <a href="#contacts">Контакты</a>
+          {PAGES.filter((p) => p.id !== '').map((p) => (
+            <a key={p.id} href={`#/${p.id}`}
+               className={page === p.id ? 'is-on' : undefined}
+               aria-current={page === p.id ? 'page' : undefined}>{p.nav}</a>
+          ))}
         </nav>
-        <a className="v2btn v2btn--go v2btn--sm" href="#request">Оставить заявку</a>
+        <a className="v2btn v2btn--go v2btn--sm" href="#/contacts">Оставить заявку</a>
       </header>
 
+      {/* The strand belongs to the front page. On the inner pages it would be three and a
+          half screens of scrolling between the reader and the thing they clicked for. */}
+      {home && (
       <section className="v2stage" ref={stageRef} style={{ height: `${RUNWAY * 100}svh` }}>
         <div className="v2pin">
           <div className="v2bg">
@@ -572,9 +617,10 @@ export default function V2() {
           </div>
         </div>
       </section>
+      )}
 
       {/* and the real page begins */}
-      <main className="v2main">
+      <main className={home ? 'v2main' : 'v2main v2main--inner'}>
         <div className="v2wrap">
           {/* The headline used to be repeated here, and once it moved onto the strand that
               made the visitor read the same sentence twice in a row. The page below the
@@ -600,6 +646,7 @@ export default function V2() {
           </dl>
         </div>
 
+        {(home || page === 'about') && (
         <section className="v2sec" id="about"><div className="v2wrap">
           <p className="v2eyebrow">О нас</p>
           <h2 className="v2h2">Не консультируем. Делаем.</h2>
@@ -612,7 +659,9 @@ export default function V2() {
                продаём. Сначала смотрим, как у вас устроено, потом собираем инструмент.</p>
           </div>
         </div></section>
+        )}
 
+        {(home || page === 'services') && (
         <section className="v2sec" id="services"><div className="v2wrap">
           <p className="v2eyebrow">Услуги</p>
           <h2 className="v2h2">Что умеем и что это снимает с вас</h2>
@@ -626,7 +675,9 @@ export default function V2() {
             ))}
           </div>
         </div></section>
+        )}
 
+        {(home || page === 'tools') && (
         <section className="v2sec" id="tools"><div className="v2wrap">
           <p className="v2eyebrow">Инструменты</p>
           <h2 className="v2h2">Что можно взять по отдельности</h2>
@@ -638,7 +689,9 @@ export default function V2() {
             ))}
           </ul>
         </div></section>
+        )}
 
+        {(home || page === 'works') && (
         <section className="v2sec" id="works"><div className="v2wrap">
           <p className="v2eyebrow">Наши работы</p>
           <h2 className="v2h2">Что уже стоит и работает</h2>
@@ -663,14 +716,18 @@ export default function V2() {
             </article>
           </div>
         </div></section>
+        )}
 
+        {(home || page === 'works') && (
         <section className="v2sec" id="clients"><div className="v2wrap">
           <p className="v2eyebrow">С нами работают</p>
           <h2 className="v2h2">Кому мы уже что-то починили</h2>
           <div className="v2clients"><span>Негабарит-12</span><em>логистика</em></div>
           <p className="v2note">Список короткий, потому что честный. Он будет пополняться.</p>
         </div></section>
+        )}
 
+        {(home || page === 'contacts') && (
         <section className="v2sec v2sec--cta" id="request"><div className="v2wrap">
           <p className="v2eyebrow">Заявка</p>
           <h2 className="v2h2">Расскажите, что болит</h2>
@@ -680,6 +737,7 @@ export default function V2() {
             <a className="v2btn v2btn--go" href="#contacts">Написать нам</a>
           </div>
         </div></section>
+        )}
 
         <footer className="v2sec v2foot" id="contacts"><div className="v2wrap">
           <div className="v2two">
