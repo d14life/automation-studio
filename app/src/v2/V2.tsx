@@ -255,7 +255,19 @@ export default function V2() {
          deliberate scrolling can ever be overpowered again. */
       if (dp !== 0) dir = dp > 0 ? 1 : -1
       if (touching) quiet = 0; else quiet += dt
-      const idle = Math.min(1, Math.max(0, (quiet - 0.05) / 0.2))
+
+      /* TWO GATES ON THE LOOP, for the two ways a human is still in charge:
+         - quiet: seconds since real INPUT (finger, wheel). A finger on the glass pins the
+           loop off entirely, so slow deliberate scrolling can never be overpowered.
+         - calm: how fast the page is actually MOVING. This one is for the glide. The loop
+           exists to cover the slow crawl at the END of a flick - but ramping it to full while
+           the page was still flying meant two motions writing frames at once, which is the
+           fast-scroll lag he reported on the phone. Fast glide -> the scrub owns the frames
+           alone, exactly like the pre-loop days; as the glide decays toward the crawl the
+           loop fades in and swallows the tail. Finger-down safety is untouched because calm
+           only ever multiplies idle, never replaces it. */
+      const calm = Math.min(1, Math.max(0, 1 - Math.abs(dp) / dt / 0.25))
+      const idle = Math.min(1, Math.max(0, (quiet - 0.05) / 0.2)) * calm
 
       /* THE LOOP IS A PENDULUM, NOT A METRONOME. Every complaint that survived the earlier
          fixes traced back to the loop being a second (and at one point third) controller
@@ -280,7 +292,10 @@ export default function V2() {
          while cruising - his "it tried at the same time to finish my scroll and continue the
          video". One mechanism, eased seeks, everywhere: at 30Hz against files that decode
          sequentially at 610fps here, the whole loop costs a few percent of one core. */
-      if (idle > 0) {
+      /* the last condition: while a glide is still pressing the strand against either end of
+         the runway, the pendulum waits - otherwise the clamp and the turnaround rewrite the
+         same frame in opposite directions and it flickers. */
+      if (idle > 0 && !(pos >= 1 && dp > 0) && !(pos <= 0 && dp < 0)) {
         const th = dir === 1 ? Math.acos(1 - 2 * pos) : 2 * Math.PI - Math.acos(1 - 2 * pos)
         const th2 = (th + (Math.PI / el.duration) * dt * idle) % (2 * Math.PI)
         pos = (1 - Math.cos(th2)) / 2
