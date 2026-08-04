@@ -44,7 +44,7 @@ const RUNWAY = 3.85
    no speed anywhere. */
 const SCROLL_GAIN = 1
 const LOOP_SPEED = 1
-const HOLD_FADE = 0.16
+const HOLD_FADE = 0.08
 /* Frame rate is per tier, so it is declared with the tier below - seeking finer than one frame
    just decodes the same picture again, and the grid has to be the grid the file actually has. */
 
@@ -380,7 +380,12 @@ export default function V2() {
         const f = (b - a) * HOLD_FADE
         return String(Math.max(0, Math.min(1, Math.min((p - a) / f, (b - p) / f))))
       }
-      const c1 = band(0.20, 0.44), c2 = band(0.46, 0.70), c3 = band(0.72, 0.97)
+      /* CONTIGUOUS AND OVERLAPPING - his ask: the container is always there, cards do not
+         appear out of nothing and vanish into nothing. The slices now tile the whole runway
+         after the overlay hands off, and each pair overlaps by ~4% so one card crossfades
+         into the next instead of the screen going empty between them. The only true fade-in
+         left is the first card's, off the hero. */
+      const c1 = band(0.16, 0.49), c2 = band(0.45, 0.76), c3 = band(0.72, 1.01)
       stage.style.setProperty('--c1', c1)
       stage.style.setProperty('--c2', c2)
       stage.style.setProperty('--c3', c3)
