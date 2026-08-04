@@ -337,17 +337,58 @@ DELTA scrubs from whatever frame is on screen, and when the measured scroll
 speed dies an idle loop plays the clip itself — forward, then backward,
 ping-ponging over the full range at 1x, while the page stays put.
 
-The handoff is a **velocity blend, not a timer** — and that is deliberately the
-fix for the iOS momentum tail: the last crawl of a flick is slower than `V0`,
-so by then the loop already owns the motion and the crawl disappears into it.
-Do not reintroduce a "start playing after N ms idle" timer; the blend IS the
-feature.
+**Corrected 2026-08-04, later the same evening.** The velocity blend and the
+anchors described in earlier drafts of this section are **deleted, and must not
+come back** — each was a second controller writing to the same `pos`, and each
+produced a bug he reported within minutes. The blend overpowered slow scrolling
+("it goes down even though I go up"); the anchors dragged the strand to the
+destroyed end and would not let go, because `dp === 0` passes `dp >= 0`.
 
-Anchors: the last `EDGE` (12%) of runway at each end pulls the frame toward its
-meaning (top = intact, bottom = destroyed) — weighted by `(1 - idle)`, so they
-only grip while actually scrolling. At rest they let go so the loop can play on
-the untouched hero. Consequence he accepted: frame and scroll position are not
-strictly tied any more; mid-runway the strand can be in any state.
+What survives is one unbounded `phase` and a triangle wave, ~24 lines:
+`pos = triangle(phase)`, no boundaries, no clamps, no reflection branch. Speed
+rides a bell so turnarounds are naturally soft. Input gating (`quiet`) holds the
+loop off while a finger or wheel is active, with a 0.22 floor so scroll start
+does not hitch.
+
+Two clamps, and confusing them cost several rounds: `scrollP` is pinned to [0,1]
+because the overlay and chapters fade along it. **The scrub must not read it** —
+when the runway runs out the delta becomes exactly zero, so the strand receives
+no input at all and freezes ("stuck at the end"). The scrub reads raw `scrollY`
+scaled by travel. Raw scroll distance never runs out.
+
+### 5.14 A `var()` inside a custom property is substituted where that property is DECLARED
+This froze the glass panels' beam for its entire life and read as "the animation
+doesn't work". `--bm-ring` (the conic-gradient) is declared on `.v2glass`, so it
+is resolved **there**, with `--beam` at its `0deg` initial value — and what the
+pseudo-elements inherit is a finished string with the angle already baked in.
+Animating `--beam` on `::before` moved a variable that nothing was reading.
+
+Measured, old wiring: pseudo `--beam` ticking 0/90/180 while the gradient's own
+`from` angle stayed `0deg` at every sample. Fixed wiring: 0/90/180/270 on both
+the glow and the ring. **The animation must live on the element that owns the
+property containing the `var()`** — here `.v2glass`, not its pseudos.
+
+Note this refines trap 5.1 rather than contradicting it. 5.1's cost came from an
+`inherits:true` registered property forcing a whole-document re-resolve every
+frame. `--beam` is `inherits:false` and scoped to the panel being read
+(`.v2ch.is-live`), so only that subtree recomputes. A/B on the phone, video
+motion over 3s as the proxy for a starved frame budget: **28.85 with the panels,
+27.82 with them stripped** (`?nopanel=1`, still in the CSS as a measuring
+switch). That is noise. Verified on device: two untouched screenshots seconds
+apart show the comets ~90° further round AND the strand at a different frame, so
+the beam and the idle loop run together.
+
+### 5.15 Every deploy makes every visitor refetch the 30MB video
+GitHub Pages builds its `ETag` from the **deploy timestamp, not the file
+contents** — `ETag: "6a721503-1cfbcfa"`, where the prefix is the deploy time in
+hex. So pushing a two-line CSS change invalidates `dna-loop-hq.mp4` as well, and
+the browser pulls all 30.4MB again.
+
+The symptom is a flat `#0e202d` screen where the strand should be. That is
+`.v2bg`'s fallback colour showing through while the clip downloads, and it looks
+exactly like a broken video element. **It is not a bug.** Before diagnosing it as
+one, check `video.readyState` and `video.buffered` — a healthy live page reports
+`4` and the full 11.72s.
 
 ---
 
