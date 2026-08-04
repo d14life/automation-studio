@@ -122,6 +122,13 @@ export function useLiquidSlogan(ready: boolean, heroVisible: boolean): void {
          same words are 34px, so the blur was twice the letter height and ate them. Half the
          measured font size keeps the melt and keeps the words readable. */
       maxBlur: TOUCH ? Math.round(parseFloat(getComputedStyle(L1).fontSize || '34') * 0.5) : 100,
+      /* Redraw the melt at ~33fps on touch instead of every frame. Measured: the melt running
+         at full rate held the page at ~37fps and let it jump to 51-56 during each 0.45s
+         cooldown, a ~40% swing on a 5s cycle - and the starfield's motion tracks the frame
+         rate, so that swing IS the stutter he kept reporting. The morph is a 4.5s blur
+         crossfade and its progression is measured against the clock, so it still takes exactly
+         as long; there are simply fewer redraws for the SVG filter to chew through. */
+      stepMs: TOUCH ? 30 : 0,
       activeWhen: () => activeRef.current && !scrollingRef.current,
     }
     const stop1 = window.LiquidText(L1, SLOGAN_LINE_1, MORPH)

@@ -245,6 +245,18 @@ function LiquidText(host, texts, o) {
   /* how far the melt may blur, in px. Default 100 keeps the desktop look exactly as approved;
      a caller on a small screen passes something near half its own font size. */
   var maxBlur      = o.maxBlur != null ? o.maxBlur : 100;
+  /* How often the melt is allowed to REDRAW, in ms. 0 means every animation frame, which is
+     what it always did - and on a phone that turned out to set the rhythm of the whole page.
+     Measured in half-second buckets on an iPhone 16 Pro simulator: a steady ~37fps while the
+     words are melting, jumping to 51-56 for one bucket every ~5s. 5s is morphTime 4.5 plus
+     cooldownTime 0.45: during the cooldown nothing changes, so the browser reuses the cached
+     filtered raster and the page speeds up ~40%. The starfield's motion tracks the frame rate,
+     so that burst is exactly the "quick for a split second, then slower, again and again".
+
+     Redrawing the melt less often flattens it. The morph is a 4.5s blur crossfade - it does not
+     need 60 steps a second - and the progression below is measured against the clock, so the
+     morph still takes exactly as long and lands in the same place. */
+  var stepMs       = o.stepMs   != null ? o.stepMs   : 0;
   /* The melt's blur curve below was written as 8/fraction - 8, and that 8 is in ABSOLUTE px:
      it was tuned against the 77px desktop slogan. The same 8px laid on a phone's 34px type is
      2.3x heavier relative to the letters, which is why the phone melted into blue blobs while
@@ -379,10 +391,16 @@ function LiquidText(host, texts, o) {
     t1.style.filter='none'; t1.style.opacity='0%';
   }
   var raf=0, running=true;
+  var meltLast=0;
   function animate(){
     if(!running) return;
     raf=requestAnimationFrame(animate);
     if (document.hidden || (activeWhen && !activeWhen())){ time=Date.now(); return; }
+    if (stepMs){
+      var t=Date.now();
+      if (t-meltLast < stepMs) return;   /* time still accumulates below, only the redraw waits */
+      meltLast=t;
+    }
     var now=Date.now(), dt=(now-time)/1000; time=now;
     cooldown-=dt; morph+=dt>0?dt:0;
     if (cooldown<=0) doMorph(); else doCooldown();
