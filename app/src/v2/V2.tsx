@@ -647,6 +647,9 @@ export default function V2() {
        actually scrolling there ((1 - idle) weight). At rest the anchors let go, so the loop
        plays even on the untouched hero: land at the top, the strand settles intact, then
        quietly starts building and unbuilding on its own. */
+    const DIAG = location.search.includes('loop=diag')
+    let reversed = false
+    let turnTimer = 0 as unknown as ReturnType<typeof setTimeout>
     let pos = 0      /* the frame on screen, 0..1 - DERIVED from phase, never set directly */
     let phase = 0    /* unbounded; pos is a triangle wave of it, so there is no boundary */
     let dir = 1    /* idle playback direction; scrubbing re-aims it so release carries on */
@@ -719,6 +722,30 @@ export default function V2() {
       phase += dir * (Math.PI / (2 * el.duration)) * LOOP_SPEED * bell * dt * idle
       const t2 = ((phase % 2) + 2) % 2
       pos = t2 <= 1 ? t2 : 2 - t2
+
+      /* ?loop=diag - HIS IDEA, BUILT SO HE CAN JUDGE IT RATHER THAN TAKE MY WORD.
+         The complaint is that the strand visibly BOUNCES at the destroyed end instead of
+         carrying on. His fix: turn the return leg diagonally so the motion reads as continuing.
+
+         Measured on the master, the jump at the turn against a normal 8.6 frame-to-frame step:
+         rotate 180 = 59.7, mirror = 67.9, hard cut to the start = 46.7. His diagonal is the
+         best of them and none is seamless - so the honest move is to MASK that one jump rather
+         than pretend it is not there. The rotation itself is free: a compositor transform on a
+         layer that is already composited, no new file and no download.
+
+         The mask is a 260ms blur-and-lift that fires only at the turn, when the strand is
+         fully in pieces and the screen is chaos anyway - the one moment in the clip where a
+         cut can hide. Off by default; ?loop=diag turns it on. */
+      if (DIAG) {
+        const back = t2 > 1                       /* the return leg */
+        if (back !== reversed) {
+          reversed = back
+          el.classList.toggle('is-rev', back)
+          el.classList.add('is-turn')
+          clearTimeout(turnTimer)
+          turnTimer = setTimeout(() => el.classList.remove('is-turn'), 260)
+        }
+      }
 
       if (dbg) dbg.textContent =
         `pos ${pos.toFixed(3)}  phase ${phase.toFixed(2)}  dir ${dir}  dp ${dp.toFixed(4)}` +
@@ -818,7 +845,11 @@ export default function V2() {
       <header className="v2nav">
         <a className="v2logo" href="#/">Solutions<b>101</b></a>
         <nav className="v2links">
-          {PAGES.filter((p) => p.id !== '').map((p) => (
+          {/* ГЛАВНАЯ IS IN THE LIST. It used to be filtered out because the logo links home -
+              but a logo is not a navigation item, and he proved it: he opened an inner page and
+              could not find the way back. The one page everybody needs to return to cannot be
+              the only one without a link. */}
+          {PAGES.map((p) => (
             <a key={p.id} href={`#/${p.id}`}
                className={page === p.id ? 'is-on' : undefined}
                aria-current={page === p.id ? 'page' : undefined}>{p.nav}</a>
