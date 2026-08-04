@@ -155,6 +155,44 @@ const SRC_H264 =
    is tall enough, which can be before React has mounted. */
 if ('scrollRestoration' in history) history.scrollRestoration = 'manual'
 
+/* Copy lives beside the markup rather than inside it: these are the six things we actually do
+   and the tools that can be bought singly, and both lists will change more often than the
+   layout will. Every line names a job and what it removes - Rainur's rule is ноль воды, and
+   the fastest way to break it is to describe a feature instead of a relief.
+   NO PRICES YET, deliberately. He asked for ranges and has not given the numbers, and this
+   page's whole credibility argument is that nothing on it is invented. */
+const SERVICES = [
+  { t: 'Счета, акты, сверка',
+    d: 'Документы собираются из состояния сделки, долги и переплаты видны по каждому контрагенту, платёжный календарь сам показывает, что горит.',
+    w: 'Закрытие месяца за день вместо недели' },
+  { t: 'Заявки, клиенты, звонки',
+    d: 'CRM под ваши этапы, телефония с записью разговоров, автообзвон по базе, проверка компании по реквизитам перед сделкой.',
+    w: 'Ни одна заявка не теряется в мессенджерах' },
+  { t: 'Сбор данных',
+    d: 'Сайты конкурентов, прайсы поставщиков в двенадцати форматах, почта, выгрузки из 1С и маркетплейсов — всё стекается в одну таблицу само.',
+    w: 'Никто не переносит цифры руками' },
+  { t: 'Отчёты руководителю',
+    d: 'Один экран с деньгами, долгами, загрузкой и просрочками. Письмо в тот час, когда показатель вышел за границу, а не через месяц на планёрке.',
+    w: 'Цифры утром, а не в конце квартала' },
+  { t: 'Боты и ИИ',
+    d: 'Отвечают клиенту по вашему прайсу и остаткам, читают счета и договоры, заполняют формы, заносят контакт в базу и передают человеку сложное.',
+    w: 'Первая линия работает ночью и в выходные' },
+  { t: 'Склад и доставка',
+    d: 'Заказы, остатки, маршруты и статусы отгрузок на одной доске. Клиент видит, где его груз, без звонка менеджеру.',
+    w: 'Меньше звонков, меньше потерянных заказов' },
+]
+
+const TOOLS = [
+  { t: 'CRM под компанию', d: 'ваши этапы и поля, а не чужой шаблон' },
+  { t: 'Телефония', d: 'запись разговоров, статистика, привязка к карточке клиента' },
+  { t: 'Автообзвон', d: 'обзвон базы роботом, живому менеджеру уходит только заинтересованный' },
+  { t: 'Пробив по компаниям', d: 'проверка контрагента по реквизитам до сделки' },
+  { t: 'Телеграм-бот', d: 'приём заявок, ответы по прайсу и остаткам, передача человеку' },
+  { t: 'Сборщик данных', d: 'прайсы, сайты, почта и выгрузки — в одну таблицу' },
+  { t: 'Отчёты и дашборд', d: 'один экран с деньгами и долгами, письма при отклонениях' },
+  { t: 'Сайт или экосистема', d: 'если нужен не инструмент, а всё сразу' },
+]
+
 export default function V2() {
   /* Light and dark are the SAME clip. The donor's light hero is not a second video, it is the
      same footage with `invert` over a pale background - so the switch costs one CSS filter and
@@ -230,7 +268,20 @@ export default function V2() {
       offscreen.current = rect.bottom <= 0
       /* the overlay hands the screen to the strand over the first fifth of the runway - one
          custom property, read by opacity and a small translate, both compositor-only. */
-      stage.style.setProperty('--over', String(Math.max(0, 1 - scrollP.current * 5)))
+      const p = scrollP.current
+      stage.style.setProperty('--over', String(Math.max(0, 1 - p * 5)))
+      /* Each chapter owns a slice of the runway and fades in and out across it. A trapezoid,
+         not a triangle: it reaches full opacity and HOLDS there for the middle of its slice,
+         so there is time to actually read it instead of one legible instant. */
+      const band = (a: number, b: number) => {
+        const f = (b - a) * 0.28
+        return String(Math.max(0, Math.min(1, Math.min((p - a) / f, (b - p) / f))))
+      }
+      stage.style.setProperty('--c1', band(0.20, 0.44))
+      stage.style.setProperty('--c2', band(0.46, 0.70))
+      stage.style.setProperty('--c3', band(0.72, 0.97))
+      /* the bar earns its backdrop once you are off the very top */
+      document.documentElement.style.setProperty('--nav', scrollY > 40 ? '1' : '0')
     }
 
     /* THE STRAND IS ALIVE NOW - his idea. The clip is no longer an absolute function of
@@ -306,7 +357,11 @@ export default function V2() {
            alone, exactly like the pre-loop days; as the glide decays toward the crawl the
            loop fades in and swallows the tail. Finger-down safety is untouched because calm
            only ever multiplies idle, never replaces it. */
-      const calm = Math.min(1, Math.max(0, 1 - Math.abs(dp) / dt / 0.25))
+      /* 0.55, up from 0.25: the loop now regards the page as "calm enough to take over" at
+         twice the glide speed, which is how it catches the momentum roughly half a second
+         earlier - his ask. It is still a multiplier, so a genuinely fast flick still belongs
+         to the scrub alone; what changed is where the handover sits along the decay. */
+      const calm = Math.min(1, Math.max(0, 1 - Math.abs(dp) / dt / 0.55))
       /* AT A PINNED END, THE RAMP BUYS NOTHING. The gates exist so the loop never fights the
          scrub - but once pos is clamped hard against 0 or 1, scrolling further that way moves
          nothing, so there is no fight left to lose. Waiting the full 0.25s there just parks
@@ -442,6 +497,23 @@ export default function V2() {
         </div>
       </label>
 
+      {/* THE BAR NEVER LEAVES. It used to live inside the pinned stage and fade with the
+          overlay, so it vanished a fifth of the way down and the page lost its navigation for
+          the rest of the scroll. Fixed and outside the stage, it is the one thing on screen
+          that is always true. It earns a tinted, blurred backdrop only once you have scrolled
+          off the top, so the very first screen stays pure footage. */}
+      <header className="v2nav">
+        <a className="v2logo" href="#top">Solutions<b>101</b></a>
+        <nav className="v2links">
+          <a href="#about">О нас</a>
+          <a href="#services">Услуги</a>
+          <a href="#tools">Инструменты</a>
+          <a href="#works">Работы</a>
+          <a href="#contacts">Контакты</a>
+        </nav>
+        <a className="v2btn v2btn--go v2btn--sm" href="#request">Оставить заявку</a>
+      </header>
+
       <section className="v2stage" ref={stageRef} style={{ height: `${RUNWAY * 100}svh` }}>
         <div className="v2pin">
           <div className="v2bg">
@@ -452,23 +524,39 @@ export default function V2() {
           </div>
 
           <div className="v2scrim" aria-hidden="true" />
+          <div className="v2scrim v2scrim--mid" aria-hidden="true" />
 
           {/* THE STRAND IS THE STAGE, NOT THE SHOW. It was carrying the whole first screen
               alone and he was right that it read as empty - a visitor who lands on beautiful
               footage with no words does not learn who we are, which is the one job the brief
               gives this screen. So the navigation and the promise sit ON the footage, the way
               his reference does it, and both fade out as the strand takes over the scroll. */}
-          <header className="v2nav">
-            <a className="v2logo" href="#top">Solutions<b>101</b></a>
-            <nav className="v2links">
-              <a href="#about">О нас</a>
-              <a href="#services">Услуги</a>
-              <a href="#tools">Инструменты</a>
-              <a href="#works">Работы</a>
-              <a href="#contacts">Контакты</a>
-            </nav>
-            <a className="v2btn v2btn--go v2btn--sm" href="#request">Оставить заявку</a>
-          </header>
+          {/* THE CHAPTERS. His ask: give the runway something to read from start to end. The
+              strand takes 385svh to come apart and until now that was three and a half screens
+              of footage with nothing to do, which is a lot to ask of anyone's patience.
+              Each panel owns a slice of the scroll and fades through it, so the scroll earns
+              its length: the strand is what you watch, these are what you learn. Short by
+              instruction - ноль воды is the one rule Rainur repeated six times. */}
+          <div className="v2chapters" aria-hidden="false">
+            <article className="v2ch v2ch--1">
+              <p className="v2eyebrow">Что мы делаем</p>
+              <h2>Собираем инструмент под вашу компанию</h2>
+              <p>CRM под ваши этапы. Телефония с записью и автообзвоном. Боты, которые отвечают
+                 по вашему прайсу. Сборщики, которые сводят прайсы поставщиков в одну таблицу.</p>
+            </article>
+            <article className="v2ch v2ch--2">
+              <p className="v2eyebrow">Как это устроено</p>
+              <h2>Сначала прототип, деньги потом</h2>
+              <p>Показываем работающую версию бесплатно. Нравится — 50% и мы доводим до сдачи.
+                 Исходный код, документация и обучение сотрудников остаются у вас.</p>
+            </article>
+            <article className="v2ch v2ch--3">
+              <p className="v2eyebrow">Почему это работает</p>
+              <h2>100% практики, ноль теории</h2>
+              <p>Мы не продаём курсы и не консультируем. Отдаём готовое и настроенное.
+                 С нашими инструментами уже работает логистическая компания «Негабарит-12».</p>
+            </article>
+          </div>
 
           <div className="v2over">
             <p className="v2eyebrow">Автоматизация бизнес-процессов</p>
@@ -488,19 +576,10 @@ export default function V2() {
       {/* and the real page begins */}
       <main className="v2main">
         <div className="v2wrap">
-          <p className="v2eyebrow">Solutions101 — автоматизация бизнес-процессов</p>
-          <h1 className="v2h1">Быстро <em>не значит</em> плохо</h1>
-          <p className="v2lede">
-            Мы не консультируем и не учим теории — мы отдаём работающие инструменты.
-            CRM под ваши этапы, телефония с автообзвоном, боты, сборщики данных и отчёты,
-            собранные под вашу компанию. Прототип показываем до оплаты.
-          </p>
-          <div className="v2cta">
-            <a className="v2btn v2btn--go" href="#request">Оставить заявку</a>
-            <a className="v2btn v2btn--ghost" href="#tools">Посмотреть инструменты</a>
-          </div>
-
-          {/* Four, because the research is unanimous that a fifth reads as filler. */}
+          {/* The headline used to be repeated here, and once it moved onto the strand that
+              made the visitor read the same sentence twice in a row. The page below the
+              header opens on PROOF instead - which is also the order his reference uses and
+              the order the brief asks for: promise on the picture, numbers underneath. */}
           <dl className="v2figs">
             <div className="v2fig">
               <dt><i>0</i> ₽</dt>
@@ -520,6 +599,103 @@ export default function V2() {
             </div>
           </dl>
         </div>
+
+        <section className="v2sec" id="about"><div className="v2wrap">
+          <p className="v2eyebrow">О нас</p>
+          <h2 className="v2h2">Не консультируем. Делаем.</h2>
+          <div className="v2two">
+            <p>Мы небольшая команда разработчиков — четыре человека, лондонское техническое
+               образование, каждый день пишем то, что потом работает у клиента в проде.
+               Не курсы, не методички, не «стратегические сессии».</p>
+            <p>Работаем по всем отраслям и под каждого — отдельно. Логистика, строительство,
+               торговля, услуги: процессы у всех свои, поэтому коробочных решений мы не
+               продаём. Сначала смотрим, как у вас устроено, потом собираем инструмент.</p>
+          </div>
+        </div></section>
+
+        <section className="v2sec" id="services"><div className="v2wrap">
+          <p className="v2eyebrow">Услуги</p>
+          <h2 className="v2h2">Что умеем и что это снимает с вас</h2>
+          <div className="v2grid">
+            {SERVICES.map((s) => (
+              <article className="v2card" key={s.t}>
+                <h3>{s.t}</h3>
+                <p>{s.d}</p>
+                <p className="v2card__win">{s.w}</p>
+              </article>
+            ))}
+          </div>
+        </div></section>
+
+        <section className="v2sec" id="tools"><div className="v2wrap">
+          <p className="v2eyebrow">Инструменты</p>
+          <h2 className="v2h2">Что можно взять по отдельности</h2>
+          <p className="v2lede">Каждый инструмент ставится сам по себе и работает без
+             остальных. Цена зависит от объёма — считаем на разборе, он бесплатный.</p>
+          <ul className="v2tools">
+            {TOOLS.map((t) => (
+              <li key={t.t}><b>{t.t}</b><span>{t.d}</span></li>
+            ))}
+          </ul>
+        </div></section>
+
+        <section className="v2sec" id="works"><div className="v2wrap">
+          <p className="v2eyebrow">Наши работы</p>
+          <h2 className="v2h2">Что уже стоит и работает</h2>
+          <div className="v2grid">
+            <article className="v2card">
+              <h3>Учёт взаиморасчётов</h3>
+              <p>Строительная группа: три юрлица, мультивалюта, 48 контрагентов.
+                 Долги и переплаты видны по каждому, платёжный календарь показывает, что горит.</p>
+              <p className="v2card__win">Собрано за один день</p>
+            </article>
+            <article className="v2card">
+              <h3>Сборщик прайсов</h3>
+              <p>Двенадцать форматов прайс-листов от поставщиков — xls, pdf, письма, выгрузки —
+                 читаются и сводятся в одну таблицу без участия человека.</p>
+              <p className="v2card__win">Никто не переносит цифры руками</p>
+            </article>
+            <article className="v2card">
+              <h3>Телефония и автообзвон</h3>
+              <p>Звонки с записью, автоматический обзвон базы, проверка контрагента по
+                 реквизитам до сделки. Всё привязано к карточке клиента.</p>
+              <p className="v2card__win">Заявка не теряется в мессенджерах</p>
+            </article>
+          </div>
+        </div></section>
+
+        <section className="v2sec" id="clients"><div className="v2wrap">
+          <p className="v2eyebrow">С нами работают</p>
+          <h2 className="v2h2">Кому мы уже что-то починили</h2>
+          <div className="v2clients"><span>Негабарит-12</span><em>логистика</em></div>
+          <p className="v2note">Список короткий, потому что честный. Он будет пополняться.</p>
+        </div></section>
+
+        <section className="v2sec v2sec--cta" id="request"><div className="v2wrap">
+          <p className="v2eyebrow">Заявка</p>
+          <h2 className="v2h2">Расскажите, что болит</h2>
+          <p className="v2lede">Опишите процесс, который отнимает время. Ответим в течение
+             рабочего дня, разбор и прототип — бесплатно.</p>
+          <div className="v2cta">
+            <a className="v2btn v2btn--go" href="#contacts">Написать нам</a>
+          </div>
+        </div></section>
+
+        <footer className="v2sec v2foot" id="contacts"><div className="v2wrap">
+          <div className="v2two">
+            <div>
+              <p className="v2eyebrow">Контакты</p>
+              <p className="v2foot__big">Solutions<b>101</b></p>
+              <p className="v2note">Автоматизация бизнес-процессов</p>
+            </div>
+            <ul className="v2contacts">
+              <li><span>Telegram</span><a href="https://t.me/">указать</a></li>
+              <li><span>WhatsApp</span><a href="https://wa.me/">указать</a></li>
+              <li><span>Почта</span><a href="mailto:">указать</a></li>
+              <li><span>Телефон</span><a href="tel:">указать</a></li>
+            </ul>
+          </div>
+        </div></footer>
       </main>
     </>
   )

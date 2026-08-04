@@ -165,12 +165,43 @@ html.v2light{
     linear-gradient(180deg, color-mix(in srgb, var(--bg) 72%, transparent) 0, transparent 22%),
     linear-gradient(0deg, color-mix(in srgb, var(--bg) 88%, transparent) 0, transparent 58%);
   opacity:var(--over,1)}
+/* A second scrim for the CHAPTERS, because they sit in the middle of the screen where the
+   first one is deliberately clear - and the third chapter lands exactly on the phase where
+   the strand has gone bright yellow. It is only as strong as the strongest visible chapter,
+   so when nothing is being read the footage is untouched. */
+.v2scrim--mid{opacity:calc(max(var(--c1,0), var(--c2,0), var(--c3,0)) * .92);
+  background:radial-gradient(120% 62% at 50% 50%,
+    color-mix(in srgb, var(--bg) 82%, transparent) 0, transparent 72%)}
 
-/* right padding clears the theme toggle, which is pinned to the same corner - without it the
-   call to action sat underneath the switch, which is what he photographed. */
-.v2nav{top:0;left:0;right:0;display:flex;align-items:center;gap:clamp(16px,3vw,44px);
+/* FIXED, ALWAYS, AND NOT PART OF THE FADE. It lives outside the pinned stage now, so it
+   survives the whole page rather than disappearing a fifth of the way down the runway.
+   The backdrop arrives with --nav (0 at the very top, 1 once scrolled) so the opening frame
+   is pure footage and every screen after it has a legible bar.
+   Right padding clears the theme toggle, which is pinned to the same corner. */
+.v2nav{position:fixed;top:0;left:0;right:0;z-index:20;opacity:1;transform:none;
+  display:flex;align-items:center;gap:clamp(16px,3vw,44px);
   padding:clamp(14px,2.2vh,26px) clamp(16px,3vw,54px);
-  padding-right:calc(clamp(16px,3vw,54px) + clamp(88px,9vw,116px))}
+  padding-right:calc(clamp(16px,3vw,54px) + clamp(88px,9vw,116px));
+  background:color-mix(in srgb, var(--bg) calc(var(--nav,0) * 78%), transparent);
+  backdrop-filter:blur(calc(var(--nav,0) * 14px));
+  -webkit-backdrop-filter:blur(calc(var(--nav,0) * 14px));
+  border-bottom:1px solid color-mix(in srgb, var(--rule) calc(var(--nav,0) * 100%), transparent);
+  transition:background-color .25s ease-out,border-color .25s ease-out}
+
+/* ---------- the chapters on the runway ---------- */
+/* All three panels share ONE grid cell rather than being absolutely positioned, so they stack
+   on top of each other, stay inside the container's padding, and centre without arithmetic.
+   Absolute positioning escaped the padding and pinned the words to the screen edge. */
+.v2chapters{position:absolute;inset:0;z-index:3;pointer-events:none;
+  display:grid;place-items:center;padding-inline:clamp(16px,3vw,54px)}
+.v2ch{grid-area:1/1;width:min(680px,100%);text-align:left}
+.v2ch--1{opacity:var(--c1,0)}
+.v2ch--2{opacity:var(--c2,0)}
+.v2ch--3{opacity:var(--c3,0)}
+.v2ch h2{margin:10px 0 0;color:var(--ink);text-wrap:balance;
+  font:800 clamp(26px,3.6vw,48px)/1.1 Golos,sans-serif;letter-spacing:-.025em}
+.v2ch p:last-child{margin:16px 0 0;color:var(--ink-soft);max-width:52ch;
+  font:400 clamp(15px,1.25vw,18px)/1.55 Golos,sans-serif}
 .v2logo{color:var(--ink);text-decoration:none;font:800 19px/1 Golos,sans-serif;
   letter-spacing:-.02em;white-space:nowrap}
 .v2logo b{font-weight:800;color:var(--accent)}
@@ -337,3 +368,56 @@ html.v2light{
 .theme-switch__checkbox:not(:checked) + .theme-switch__container .theme-switch__clouds{bottom:-4.062em}
 .theme-switch__checkbox:not(:checked) + .theme-switch__container .theme-switch__stars-container{
   top:50%;transform:translateY(-50%)}
+
+/* ---------- the sections below the strand ----------
+   One spacing rhythm, one card shape, no borders where a lift in surface will do. Depth on a
+   dark page comes from a lighter surface, not from a shadow - shadows read as smudge here. */
+.v2sec{padding-block:clamp(56px,9vh,112px)}
+.v2sec + .v2sec{border-top:1px solid var(--rule)}
+.v2h2{margin:10px 0 0;color:var(--ink);text-wrap:balance;
+  font:800 clamp(28px,3.8vw,52px)/1.08 Golos,sans-serif;letter-spacing:-.03em}
+.v2sec .v2lede{margin-top:18px}
+.v2two{display:grid;gap:clamp(20px,3vw,48px);margin-top:28px;
+  grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.v2two p{margin:0;color:var(--ink-soft);font:400 clamp(15px,1.25vw,17.5px)/1.6 Golos,sans-serif}
+
+.v2grid{display:grid;gap:14px;margin-top:32px;
+  grid-template-columns:repeat(auto-fit,minmax(290px,1fr))}
+.v2card{background:var(--surface);border-radius:14px;padding:clamp(20px,2.2vw,28px);
+  transition:transform .2s ease-out,background-color .2s ease-out}
+.v2card:hover{transform:translateY(-3px)}
+.v2card h3{margin:0;color:var(--ink);font:700 19px/1.25 Golos,sans-serif;letter-spacing:-.015em}
+.v2card p{margin:12px 0 0;color:var(--ink-soft);font:400 15px/1.55 Golos,sans-serif}
+.v2card__win{color:var(--accent) !important;font-weight:600 !important}
+
+.v2tools{list-style:none;margin:32px 0 0;padding:0;display:grid;gap:0}
+.v2tools li{display:grid;grid-template-columns:minmax(180px,var(--tw,280px)) 1fr;
+  gap:clamp(12px,2vw,32px);padding:18px 0;border-top:1px solid var(--rule);align-items:baseline}
+.v2tools li:last-child{border-bottom:1px solid var(--rule)}
+.v2tools b{color:var(--ink);font:700 17px/1.3 Golos,sans-serif}
+.v2tools span{color:var(--ink-faint);font:400 15px/1.5 Golos,sans-serif}
+@media (max-width:640px){ .v2tools li{grid-template-columns:1fr;gap:4px} }
+
+.v2clients{display:flex;align-items:baseline;gap:14px;margin-top:30px;flex-wrap:wrap}
+.v2clients span{color:var(--ink);font:800 clamp(24px,3vw,38px)/1 Golos,sans-serif;
+  letter-spacing:-.02em}
+.v2clients em{color:var(--ink-faint);font-style:normal;
+  font:500 12px/1 JBMono,monospace;letter-spacing:.14em;text-transform:uppercase}
+.v2note{margin:16px 0 0;color:var(--ink-faint);font:400 14.5px/1.5 Golos,sans-serif}
+
+.v2sec--cta{background:var(--surface)}
+.v2foot__big{margin:12px 0 0;color:var(--ink);font:800 26px/1 Golos,sans-serif;
+  letter-spacing:-.02em}
+.v2foot__big b{color:var(--accent)}
+.v2contacts{list-style:none;margin:0;padding:0;display:grid;gap:0;align-content:start}
+.v2contacts li{display:flex;justify-content:space-between;gap:18px;padding:13px 0;
+  border-top:1px solid var(--rule)}
+.v2contacts li:last-child{border-bottom:1px solid var(--rule)}
+.v2contacts span{color:var(--ink-faint);font:500 12px/1.4 JBMono,monospace;
+  letter-spacing:.12em;text-transform:uppercase}
+.v2contacts a{color:var(--ink);text-decoration:none;font:600 15px/1.4 Golos,sans-serif;
+  border-bottom:1px solid var(--rule)}
+.v2contacts a:hover{border-color:var(--accent);color:var(--accent)}
+
+/* the fixed bar would otherwise sit on top of whatever an anchor scrolls to */
+.v2sec{scroll-margin-top:88px}
