@@ -68,7 +68,7 @@ export function TubeLayer({ ready, heroVisible }: { ready: boolean; heroVisible:
   if (filmed) {
     if (dead) return null
     return (
-      <div id="tubelayer" className="tubefilm">
+      <div id="tubelayer" ref={layerRef} className="tubefilm">
         <video ref={nudge} src="/tubes-loop.mp4" autoPlay muted loop playsInline preload="auto" />
       </div>
     )

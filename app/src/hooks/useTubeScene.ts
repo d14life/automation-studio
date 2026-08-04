@@ -49,9 +49,13 @@ export function useTubeScene(ready: boolean, heroVisible: boolean): RefObject<HT
      screen. The layer is nudged so the path's centre lands on the morph lines: that is what
      puts the ribbons behind the text instead of over the number below it. */
   useEffect(() => {
-    const layer = layerRef.current
-    if (!layer) return
     const aimTubesAtText = () => {
+      /* read the ref here, not once above. This layer is swapped when the page falls back to
+         the clip: TubeLayer unmounts the live div and mounts the filmed one, so an element
+         captured at mount time is the removed one by the time it matters. That is why the clip
+         sat centred in the viewport while the live scene tracked the words. */
+      const layer = layerRef.current
+      if (!layer) return
       /* THE fix for "it lags everywhere else": this reads two boxes, which forces a fresh
          layout, and it was doing it on every scroll frame for the entire length of the page -
          long after the ribbons had left the screen and there was nothing left to aim. Below the
@@ -77,7 +81,12 @@ export function useTubeScene(ready: boolean, heroVisible: boolean): RefObject<HT
     addEventListener('scroll', onScroll, { passive: true }) /* the words move, the band follows */
     addEventListener('load', aimTubesAtText)
     aimTubesAtText()
+    /* The filmed layer mounts AFTER this effect has run, and the slogan's own box only settles
+       once the font gate lifts and LiquidText has painted. Re-aim on the same schedule the
+       sweep uses rather than hoping a scroll happens. */
+    const again = [120, 700, 1800, 4600].map((ms) => window.setTimeout(aimTubesAtText, ms))
     return () => {
+      again.forEach(clearTimeout)
       removeEventListener('resize', onScroll)
       removeEventListener('scroll', onScroll)
       removeEventListener('load', aimTubesAtText)
