@@ -27,15 +27,8 @@ import './v2.css'
    shorter runway rather than a faster clip - the clip is scrubbed, it has no speed of its own.
    5 / 1.3 = 3.85. */
 const RUNWAY = 3.85
-/* 25, back down from 50. The 583-frame clip was not 583 rendered frames: it was the master's
-   293 real frames MOTION-INTERPOLATED to 50fps, so every second frame was a synthetic blend.
-   Proven by PSNR - consecutive frames measured 29.3dB apart while every SECOND frame measured
-   25.0dB, which is what the master's true consecutive frames measure. Half the frames you
-   scrubbed onto were invented, and invented frames are mush.
-   The clip is now the master's 293 real frames and nothing else. Seeking finer than one frame
-   just decodes the same picture again, so the scrubber works on this grid. */
-const FPS = 25
-const HALF_FRAME = 0.5 / FPS
+/* Frame rate is per tier, so it is declared with the tier below - seeking finer than one frame
+   just decodes the same picture again, and the grid has to be the grid the file actually has. */
 
 /* ?v=3: REBUILT FROM THE MASTER. He said the clip looked better the day it arrived than it
    does now, and he was right - it had been re-encoded from its own output twice and
@@ -90,14 +83,28 @@ const HALF_FRAME = 0.5 / FPS
    file stuttered on his iPhone when scrolling; this is that fix.
 
    Chosen once at module load rather than per render - the file cannot be swapped mid-scroll
-   without losing the seek position, so a resize does not re-pick. */
+   without losing the seek position, so a resize does not re-pick.
+
+   SMOOTHNESS IS BOUGHT WITH BYTES, NOT WITH LAG - which is what lets both of his asks be true
+   at once. The seek rate is capped at 30Hz regardless of the file, so doubling a file's frame
+   rate costs nothing in scrubbing cost; and when the loop cruises it uses native playback,
+   where 50 sequential decodes a second is still trivial against the 610fps this machine
+   benchmarks. So a 50fps file is smoother for free in CPU and expensive only in download.
+   That is why the laptop tier - the one screen where the bytes are cheap and he watches most -
+   is the one that gets 50fps, regenerated from the AI-upscaled 4K frames rather than from the
+   degraded originals that made interpolation a dirty word on this page. The 4K tier stays 25fps
+   because 50fps at 3840x2160 is a ~95MB download, which no hero video can justify. */
 const DPR = Math.min(devicePixelRatio || 1, 3)
 const NEED = Math.max(innerWidth * DPR, (innerHeight * DPR * 16) / 9)
-const SRC =
-  innerWidth < 700 ? '/dna-loop-sm.mp4?v=5'   /* phones - decode cost rules here, see above */
-  : innerWidth < 1100 ? '/dna-loop.mp4?v=5'   /* tablets */
-  : NEED > 3200 ? '/dna-loop-4k.mp4?v=5'      /* an actual 4K display */
-  : '/dna-loop-hq.mp4?v=5'                    /* laptops and ordinary monitors */
+const TIER =
+  innerWidth < 700 ? 'sm'        /* phones - decode cost rules here, see above */
+  : innerWidth < 1100 ? 'md'     /* tablets */
+  : NEED > 3200 ? '4k'           /* an actual 4K display */
+  : 'hq'                         /* laptops and ordinary monitors */
+const SRC = { sm: '/dna-loop-sm.mp4?v=6', md: '/dna-loop.mp4?v=6',
+              hq: '/dna-loop-hq.mp4?v=6', '4k': '/dna-loop-4k.mp4?v=6' }[TIER]
+const FPS = TIER === 'hq' ? 50 : 25
+const HALF_FRAME = 0.5 / FPS
 
 /* RELOAD MUST START THE STRAND OVER. The browser restores scrollY on reload, which for an
    ordinary page is a kindness and for this one is a bug: the scroll is restored but the video
