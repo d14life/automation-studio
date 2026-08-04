@@ -368,6 +368,11 @@ export default function V2() {
     let touching = false
     let last = performance.now()
     let lastSeek = 0
+    const dbg = location.search.includes('dbg=1')
+      ? Object.assign(document.body.appendChild(document.createElement('div')), {
+          style: 'position:fixed;left:0;right:0;bottom:0;z-index:99;background:#000c;color:#0f0;'
+               + 'font:11px/1.5 ui-monospace,monospace;padding:6px 8px;white-space:pre-wrap' })
+      : null
 
     const tick = (now: number) => {
       if (!alive) return
@@ -446,14 +451,23 @@ export default function V2() {
          SHAPE of the ramp, not just where it starts.
          Safety is unchanged and does not depend on this number: a finger on the glass pins
          idle to zero through the other gate, so only a page coasting untouched is ever taken. */
-      const calm = Math.min(1, Math.max(0, 1 - Math.abs(dp) / dt / 2.5))
+      /* THE GLIDE GATE IS GONE. Every round I raised its threshold he still felt торможение,
+         and the reason is that the gate itself was the brake: it measured how fast the PAGE
+         was moving and held the loop back in proportion, so the whole momentum tail - exactly
+         the stretch he wanted covered - was the stretch it suppressed hardest.
+         The input gate alone is enough, and it is the one that actually protects him: a finger
+         on the glass pins idle to zero, so a real scroll can never be overpowered. The instant
+         the finger leaves, the page is coasting rather than being driven, and there is nothing
+         left to protect - the loop should own it immediately. It now reaches full strength
+         0.14s after release instead of waiting out the decay. */
+      const calm = 1
       /* AT A PINNED END, THE RAMP BUYS NOTHING. The gates exist so the loop never fights the
          scrub - but once pos is clamped hard against 0 or 1, scrolling further that way moves
          nothing, so there is no fight left to lose. Waiting the full 0.25s there just parks
          the strand on the destroyed frame: his "it holds there for a good half a second"
          before it bounces. Pinned means the loop starts at once. */
       const pinned = (pos >= 1 && dir === 1) || (pos <= 0 && dir === -1)
-      const idle = pinned ? 1 : Math.min(1, Math.max(0, (quiet - 0.05) / 0.2)) * calm
+      const idle = pinned ? 1 : Math.min(1, Math.max(0, (quiet - 0.02) / 0.12)) * calm
 
       /* THE LOOP IS A PENDULUM, NOT A METRONOME. Every complaint that survived the earlier
          fixes traced back to the loop being a second (and at one point third) controller
@@ -502,6 +516,14 @@ export default function V2() {
          Every seek also flushes the decode pipeline, and these frames are all-intra 2560x1440,
          which is the most expensive kind to decode cold. 30Hz is above the content rate, so
          nothing visible is lost and roughly half the decode work disappears. */
+      /* ?dbg=1 prints the scrub's own state on screen. Behind a query flag so it can never
+         reach a visitor, and cheap enough to leave in - diagnosing this by reading the source
+         has cost more rounds than measuring it would have. */
+      if (dbg) dbg.textContent =
+        `pos ${pos.toFixed(3)}  dir ${dir}  dp ${dp.toFixed(4)}  idle ${idle.toFixed(2)}` +
+        `  quiet ${quiet.toFixed(2)}  touch ${touching ? 1 : 0}  off ${offscreen.current ? 1 : 0}` +
+        `  y ${Math.round(rawY.current)}`
+
       if (now - lastSeek < SEEK_MS) return
       const t = Math.round(pos * (el.duration - 0.05) * FPS) / FPS
       if (Math.abs(el.currentTime - t) >= HALF_FRAME) { el.currentTime = t; lastSeek = now }
@@ -515,7 +537,12 @@ export default function V2() {
        quiet - the moment the finger leaves, the loop is allowed to start covering the glide. */
     const down = () => { touching = true; quiet = 0 }
     const up = () => { touching = false }
-    const wheeled = () => { quiet = 0 }
+    const wheeled = (e: Event) => {
+      /* macOS keeps sending wheel events through its own momentum, with deltas that decay
+         toward nothing. Treating those as input would hold the loop off for the whole
+         glide on a trackpad, which is the same braking he feels on the phone. */
+      if (Math.abs((e as WheelEvent).deltaY) > 4) quiet = 0
+    }
     addEventListener('touchstart', down, { passive: true })
     addEventListener('touchmove', down, { passive: true })
     addEventListener('touchend', up, { passive: true })
