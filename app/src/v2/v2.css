@@ -123,14 +123,69 @@ html.v2light .v2bg::after{
 /* ---------- the page proper, below the header ----------
    Deliberately bare - he asked for the background first and the writing afterwards - but it
    exists so the header has something to release INTO, which is the point of the change. */
-.v2main{position:relative;z-index:2;background:var(--bg);min-height:100svh;
-  display:flex;align-items:center;padding-block:12vh}
+.v2main{position:relative;z-index:2;background:var(--bg);
+  padding-block:clamp(64px,12vh,140px)}
 .v2wrap{width:100%;max-width:1280px;margin:0 auto;padding-inline:clamp(16px,3vw,54px)}
-.v2h1{margin:0;max-width:15ch;color:var(--ink);
-  font:900 clamp(38px,6.4vw,104px)/1.0 Nunito,sans-serif;letter-spacing:-.03em}
+
+/* TOKENS. Two ramps off the sampled background, not invented greys: --bg is the clip's own
+   navy, so every surface above it is that same navy lifted, and every rule is that same navy
+   with the ink bled through. Tinting the neutrals toward the ground is what stops a dark page
+   reading as a light page with the lights off.
+   --ink is reserved for the loudest thing on screen. Body copy runs at --ink-soft, because
+   pure white on near-black vibrates and is the most common dark-mode mistake. */
+:root{
+  --surface:#132937; --rule:rgba(242,247,245,.13);
+  --ink-soft:rgba(242,247,245,.72); --ink-faint:rgba(242,247,245,.46);
+  --accent:#7FD8FF;
+}
+html.v2light{
+  --surface:#efe0d7; --rule:rgba(20,26,28,.14);
+  --ink-soft:rgba(20,26,28,.74); --ink-faint:rgba(20,26,28,.5);
+  --accent:#1f6f93;
+}
+.v2main,.v2main button,.v2main input,.v2main textarea{font-family:Golos,system-ui,sans-serif}
+
+/* THE FIRST THING AFTER THE STRAND. The brief is unusually specific about this screen: the
+   devise, then who we are, then proof - and no water anywhere. So the slogan IS the headline,
+   because it is the sentence he wants a stranger to leave with. */
+.v2eyebrow{margin:0 0 22px;font:500 12px/1 JBMono,monospace;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink-faint)}
+.v2h1{margin:0;max-width:16ch;color:var(--ink);text-wrap:balance;
+  font:900 clamp(38px,6.4vw,104px)/1.02 Golos,sans-serif;letter-spacing:-.035em}
 .v2h1 em{font-style:normal;
   background:linear-gradient(100deg,#DFF6FF,#7FD8FF 45%,#5C82C9);
   -webkit-background-clip:text;background-clip:text;color:transparent}
+.v2lede{margin:26px 0 0;max-width:54ch;color:var(--ink-soft);
+  font:400 clamp(16px,1.35vw,19px)/1.55 Golos,sans-serif}
+
+.v2cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:36px}
+.v2btn{appearance:none;border:0;cursor:pointer;text-decoration:none;display:inline-flex;
+  align-items:center;border-radius:999px;padding:14px 26px;
+  font:700 15px/1 Golos,sans-serif;letter-spacing:-.01em;
+  transition:transform .18s ease-out,background-color .18s ease-out,border-color .18s ease-out}
+.v2btn--go{background:var(--ink);color:var(--bg)}
+.v2btn--ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1px var(--rule)}
+.v2btn:hover{transform:translateY(-2px)}
+.v2btn--ghost:hover{box-shadow:inset 0 0 0 1px var(--accent)}
+.v2btn:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+/* THE FIGURES. Four, in a row, with no boxes around them - the research says every dark site
+   that does this well separates them with space rather than card chrome, and mabk.pro (his
+   reference) does exactly that. The number is set in mono so it reads as measured rather than
+   marketed, and every one of them is a figure this page can stand behind: nothing invented. */
+.v2figs{display:grid;gap:clamp(24px,3.4vw,56px);margin-top:clamp(56px,8vh,96px);
+  grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+/* The DIGITS are monospaced, the words next to them are not. Setting «день» in JetBrains Mono
+   put every Cyrillic letter in a fixed cell, which looks like a spreadsheet rather than a
+   sentence - and the reason for mono was never the unit, it was the figure. */
+.v2fig dt{margin:0;color:var(--ink);font:800 clamp(30px,3.6vw,50px)/1 Golos,sans-serif;
+  letter-spacing:-.03em}
+.v2fig dt i{font-style:normal;font-family:JBMono,monospace;font-weight:700;
+  font-variant-numeric:tabular-nums;letter-spacing:-.04em}
+.v2fig dd{margin:12px 0 0}
+.v2fig b{display:block;color:var(--ink);font:600 15px/1.3 Golos,sans-serif}
+.v2fig span{display:block;margin-top:5px;color:var(--ink-faint);
+  font:400 14px/1.45 Golos,sans-serif}
 
 @media (prefers-reduced-motion:reduce){
   .v2stage{height:100svh !important}
@@ -172,7 +227,10 @@ html.v2light .v2bg::after{
   --back-clouds-color:#AACADF;
   --transition:.5s cubic-bezier(0,-0.02,0.4,1.25);
   --circle-transition:.3s cubic-bezier(0,-0.02,0.35,1.17);
-  position:fixed;top:clamp(12px,2vh,26px);right:clamp(12px,2.4vw,40px);z-index:10;
+  /* ABSOLUTE, not fixed. Fixed kept it floating over the page for its whole length, and it
+     landed on top of the opening paragraph - his screen. It belongs to the strand, so it
+     scrolls away with the strand. */
+  position:absolute;top:clamp(12px,2vh,26px);right:clamp(12px,2.4vw,40px);z-index:10;
   display:block}
 .theme-switch,.theme-switch *,.theme-switch *::before,.theme-switch *::after{
   box-sizing:border-box;margin:0;padding:0;font-size:var(--toggle-size)}
