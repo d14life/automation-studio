@@ -1,6 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useVendorScripts } from '@/hooks/useVendorScripts'
-import { FLOW } from '@/hooks/heroTuning'
 import './v2.css'
 
 /* v2: the DNA strand is driven by the scroll wheel, not by playback.
@@ -245,25 +243,6 @@ function usePage(): PageId {
    pairs are the argument in order: the devise, then what we are not, then what we are.
    All three obey the width the phone can take - the longest line is 16 characters, against the
    live page's БИЗНЕС-ПРОЦЕССЫ at 15, so the sizing that page arrived at still holds. */
-/* His new slogan, and it is the best line on the site because it finally explains the strand:
-   the footage is not decoration, it is the argument. A business has a DNA - the processes it
-   is built out of - and we go in and change it. So the strand comes apart and rebuilds while
-   the words say exactly that.
-   It leads, then the devise, then the positioning. Longest line is 14 characters. */
-const MORPH_1 = ['МЕНЯЕМ ДНК', 'БЫСТРО', 'НЕ КОНСУЛЬТИРУЕМ']
-const MORPH_2 = ['ВАШЕГО БИЗНЕСА', 'НЕ ЗНАЧИТ ПЛОХО', 'А ДЕЛАЕМ']
-
-/* THE LETTERS ARE PAINTED IN THE CLIP'S OWN COLOURS - he asked for the exact ones, so they were
-   SAMPLED off the master frames rather than picked by eye. Averaging the most saturated pixels
-   of a real frame: intact #2B6397 (steel blue), midway #C2AE5A, destroyed #E8B22D with its
-   brightest at #F0E782. So the strand's whole arc is blue into gold into amber.
-   Dark takes the warm end - pale gold to the clip's own amber to a burnt ember. It flows to
-   orange as he asked, and the darkest stop stops where legibility does: true black on the navy
-   scrim would simply disappear, and a slogan nobody can read is not a slogan.
-   Light is the violet he wanted, and it has to be the DARK half of violet: this theme's page is
-   cream, so white letters would vanish exactly as black ones do on the dark theme. */
-const INK_DARK = ['#F0E782', '#E8B22D', '#B4600F']
-const INK_LIGHT = ['#9B7BE8', '#6D28D9', '#3B1D6E']
 
 export default function V2() {
   const page = usePage()
@@ -274,68 +253,6 @@ export default function V2() {
     document.documentElement.classList.toggle('v2light', light)
   }, [light])
 
-  /* win.js + anim3.js publish window.LiquidText. Loaded here rather than in the HTML so the
-     inner pages, which have no slogan, never pay for it. */
-  const vendorReady = useVendorScripts()
-  const liq1 = useRef<HTMLDivElement | null>(null)
-  const liq2 = useRef<HTMLDivElement | null>(null)
-  /* the melt may only run when it is both VISIBLE and the page is still - see the effect */
-  const meltOk = useRef(true)
-
-  useEffect(() => {
-    if (!vendorReady || !home) return
-    const a = liq1.current, b = liq2.current
-    if (!a || !b) return
-
-    /* THE MELT IS EXPENSIVE AND MUST BE FENCED. The live page measured it at 42fps of cost
-       WHILE SCROLLING - url(#threshold) is an SVG filter re-run over the text every frame, and
-       this page cannot afford that on top of a video being seeked 50 times a second.
-       Two fences, and together they mean it only ever runs on a still page at the very top:
-         - the overlay fades out over the first fifth of the runway, so past that the slogan is
-           invisible and there is nothing to compute;
-         - during any scroll it freezes, resuming 180ms after the page settles. Nobody reads a
-           morphing slogan mid-scroll, and this is the same trick the live page landed on. */
-    let t = 0
-    const onScroll = () => {
-      meltOk.current = false
-      clearTimeout(t)
-      t = window.setTimeout(() => { meltOk.current = true }, 180)
-    }
-    addEventListener('scroll', onScroll, { passive: true })
-
-    const SMALL = innerWidth < 700
-    const opts: LiquidTextOptions = {
-      /* TIME TO ACTUALLY READ IT. The live page ran 4.5s melting against 0.45s still, so the
-         words were in transition 91% of the time - which looks like liquid and reads like
-         nothing. His ask, and he is right: a slogan that is never legible is decoration.
-         Now 2.8s melting against 3.2s holding, so each phrase sits still for longer than it
-         spends arriving. Six seconds a phrase, eighteen for the full argument. */
-      morphTime: 2.8,
-      cooldownTime: 3.2,
-      colors: light ? INK_LIGHT : INK_DARK,
-      flow: FLOW,
-      drift: FLOW * 3,
-      spread: 0.24,
-      /* the threshold IS the liquid - without it the melt degrades to two phrases ghosting
-         through each other. It stays on everywhere; the live page proved that the hard way. */
-      threshold: true,
-      /* iOS drops background-clip:text on a blurred layer and paints the span's box instead,
-         so touch paints the palette as a plain colour. */
-      flat: SMALL,
-      /* the library's flat 100px cap was written for a 77px desktop slogan; on phone type it is
-         twice the letter height and eats the words. */
-      maxBlur: SMALL ? Math.round(parseFloat(getComputedStyle(a).fontSize || '30') * 0.5) : 100,
-      stepMs: SMALL ? 30 : 0,
-      activeWhen: () => meltOk.current,
-    }
-    const stop1 = window.LiquidText(a, MORPH_1, opts)
-    const stop2 = window.LiquidText(b, MORPH_2, opts)
-    return () => {
-      clearTimeout(t)
-      removeEventListener('scroll', onScroll)
-      stop1(); stop2()
-    }
-  }, [vendorReady, home, light])
   /* Light and dark are the SAME clip. The donor's light hero is not a second video, it is the
      same footage with `invert` over a pale background - so the switch costs one CSS filter and
      no extra download. The strand is white on cream in light, dark on near-black in dark. */
@@ -683,11 +600,7 @@ export default function V2() {
             <p className="v2eyebrow">Автоматизация бизнес-процессов</p>
             {/* the h1 stays for search engines and screen readers - the melt is two divs the
                 library paints into, and neither carries the sentence in a readable form */}
-            <h1 className="v2h1 v2h1--sr">Меняем ДНК вашего бизнеса. Быстро не значит плохо.</h1>
-            <div className="v2morphs" aria-hidden="true">
-              <div className="v2morph" ref={liq1} />
-              <div className="v2morph" ref={liq2} />
-            </div>
+            <h1 className="v2h1">Меняем <em>ДНК</em> вашего бизнеса</h1>
             <p className="v2lede">
               Процессы компании — это её ДНК. Мы переписываем их под вас: CRM, телефония,
               боты, сборщики данных. Прототип показываем до оплаты.
