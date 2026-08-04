@@ -24,10 +24,10 @@ import './v2.css'
 /* 5 screens, settled rather than guessed. At 4 the whole 23.4s clip crossed in a flick, so
    the strand raced and every scroll step jumped several frames - which is also what made the
    seeking look coarse. 5 gives finer control per pixel of scroll and fewer frames skipped. */
-const RUNWAY = 5
+const RUNWAY = 6.5
 /* The clip is 25fps by construction (585 frames over 23.4s). Seeking finer than one frame
    just decodes the same picture again, so the scrubber works on this grid. */
-const FPS = 25
+const FPS = 50
 const HALF_FRAME = 0.5 / FPS
 
 /* 1920x1080 is the source, so it is also the ceiling - there is no higher master to unlock,
@@ -83,41 +83,17 @@ export default function V2() {
       const el = videoRef.current
       if (!el || !el.duration || Number.isNaN(el.duration)) return
 
-      /* Ease toward the scroll position, but barely, and SNAP as soon as the gap is small.
+      /* NO EASING. It was here to smooth a trackpad's coarse jumps, but the frame grid below
+         already does that - and everything else it did was tail: motion continuing after the
+         scroll stopped, which is what he kept reporting. The clip now tracks the scroll 1:1,
+         so whatever movement is left after his finger lifts is the page genuinely still
+         scrolling under iOS momentum, not us lagging behind it.
 
-         The easing was there to smooth the coarse jumps a trackpad emits - but the seek is
-         quantised to the 25fps frame grid now, which already does that job, so most of what
-         the easing still contributed was TAIL: motion continuing after the scroll had stopped.
-         That is what he is seeing. 0.18 -> 0.38 and the snap threshold nearly tripled, so the
-         scrubber is within a frame of the scroll almost immediately.
-
-         What is left after this is iOS momentum: the page really is still scrolling for a
-         moment after the finger lifts, and the strand tracking that is correct rather than
-         laggy. The fix for THAT would be to stop honouring momentum at all, which would feel
-         worse. */
-      shown.current += (target.current - shown.current) * 0.38
-      if (Math.abs(target.current - shown.current) < 0.004) shown.current = target.current
-
-      /* The turnaround was rigid, and here is why: the clip is the take followed by its own
-         reverse, so the strand changes direction at exactly the halfway frame. Mapped straight
-         from scroll, time crosses that frame at full speed and the motion flips in one frame -
-         a bounce, not a turn.
-
-         So bend the mapping instead of the footage. p is re-centred to -1..1 and raised to a
-         power, which leaves the ends alone but flattens the curve around the middle: the
-         same scroll distance buys less and less time as the strand approaches the turn, so it
-         slows into it and picks up again coming out. 1.7 is gentle; higher dwells longer. */
-      const u = shown.current * 2 - 1
-      /* 1.9, settled. He called the turnaround rigid, and this exponent is what softens it -
-         higher means the strand dwells longer as it reaches the halfway frame where the
-         footage reverses. 1.7 was a first guess; 1.9 holds the turn noticeably without
-         slowing the ends, which stay near linear. */
-      const bent = (Math.sign(u) * Math.abs(u) ** 1.9 + 1) / 2
-      /* Quantise to real frame boundaries. The clip is 25fps, so a frame is 0.04s and any
-         seek finer than that decodes a picture you are already looking at - pure cost, and on
-         iOS a queue of pending seeks that arrives late and looks like stutter. Rounding to the
-         frame grid means a seek happens only when the visible frame actually changes. */
-      const t = Math.round(bent * (el.duration - 0.05) * FPS) / FPS
+         No turnaround bend either. That existed because the clip was the take plus its own
+         reverse and flipped direction at the halfway frame. The clip is forward-only now -
+         scrolling UP is what rebuilds the strand, because scrubbing backwards IS reverse
+         playback - so there is no midpoint to ease through. */
+      const t = Math.round(target.current * (el.duration - 0.05) * FPS) / FPS
       if (Math.abs(el.currentTime - t) >= HALF_FRAME) el.currentTime = t
     }
 
