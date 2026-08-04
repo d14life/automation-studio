@@ -163,7 +163,11 @@ html.v2light{
 .v2scrim{position:absolute;inset:0;z-index:2;pointer-events:none;
   background:
     linear-gradient(180deg, color-mix(in srgb, var(--bg) 72%, transparent) 0, transparent 22%),
-    linear-gradient(0deg, color-mix(in srgb, var(--bg) 88%, transparent) 0, transparent 58%);
+    /* deeper and taller than it was, because the slogan is amber now and the strand it crosses
+       goes bright yellow: two warm things at similar lightness, which is the one pairing that
+       cannot be read. The scrim buys the letters their contrast back. */
+    linear-gradient(0deg, color-mix(in srgb, var(--bg) 94%, transparent) 0,
+                          color-mix(in srgb, var(--bg) 62%, transparent) 34%, transparent 72%);
   opacity:var(--over,1)}
 /* A second scrim for the CHAPTERS, because they sit in the middle of the screen where the
    first one is deliberately clear - and the third chapter lands exactly on the phase where
@@ -178,6 +182,12 @@ html.v2light{
    The backdrop arrives with --nav (0 at the very top, 1 once scrolled) so the opening frame
    is pure footage and every screen after it has a legible bar.
    Right padding clears the theme toggle, which is pinned to the same corner. */
+/* pointer-events:none on the BAR, auto on its children. The bar is fixed and full width at
+   z-index 20, so its empty middle was lying on top of the theme switch and swallowing every
+   tap aimed at it - the switch simply could not be pressed on the front page. A bar should
+   catch clicks where it has something to click, and nowhere else. */
+.v2nav{pointer-events:none}
+.v2logo,.v2links,.v2nav .v2btn{pointer-events:auto}
 .v2nav{position:fixed;top:0;left:0;right:0;z-index:20;opacity:1;transform:none;
   display:flex;align-items:center;gap:clamp(16px,3vw,44px);
   padding:clamp(14px,2.2vh,26px) clamp(16px,3vw,54px);
@@ -442,10 +452,17 @@ html.v2light{
    size, so at 28px on a 402px screen it needs ~308px against ~370px of room. Fixed type broke
    at the hyphen on a phone and showed the slogan as its own first thirteen letters. */
 .v2morphs{margin:0}
-.v2morph{position:relative;width:100%;height:1.24em;
-  font:900 clamp(28px,5.4vw,84px)/1 Golos,system-ui,sans-serif;
-  letter-spacing:-.03em;color:var(--ink)}
-.v2morph + .v2morph{margin-top:.02em}
+/* LETTER-SPACING IS POSITIVE HERE, and that is deliberate rather than a default. Display type
+   normally wants negative tracking - the rest of this page runs -.03em - but these words are
+   BLURRED and then fused by an alpha threshold, so neighbouring letters bleed into each other
+   before the filter decides what is solid. Tight tracking turns МЕНЯЕМ into one shape. Opening
+   it to +.02em gives the melt somewhere to happen between the glyphs instead of on top of them,
+   which is what he saw as squashed. Weight 800 rather than 900 for the same reason: thinner
+   stems leave more gap at the same size. */
+.v2morph{position:relative;width:100%;height:1.3em;
+  font:800 clamp(28px,5.2vw,80px)/1 Golos,system-ui,sans-serif;
+  letter-spacing:.02em;color:var(--ink)}
+.v2morph + .v2morph{margin-top:.06em}
 
 /* the sentence still has to exist for search engines and screen readers - the melt is painted
    into two divs that carry no readable phrase at any single moment */
