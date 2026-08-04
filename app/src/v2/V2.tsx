@@ -30,8 +30,20 @@ const RUNWAY = 5
 const FPS = 25
 const HALF_FRAME = 0.5 / FPS
 
+/* 1920x1080 is the source, so it is also the ceiling - there is no higher master to unlock,
+   and the only thing left to spend on quality is bitrate. Two encodes of the same frames:
+   CRF 21 at 15.7MB for a screen big enough to see the difference, CRF 30 at 6.3MB for
+   everything else. A phone cannot resolve the extra detail and would just pay for it in data
+   and decode, and decode is what the whole scrub depends on staying cheap.
+   Chosen once at module load rather than per render - the file cannot be swapped mid-scroll
+   without losing the seek position, so a resize does not re-pick. */
+const SRC = matchMedia('(min-width:1100px) and (min-height:700px)').matches
+  ? '/dna-loop-hq.mp4'
+  : '/dna-loop.mp4'
+
 export default function V2() {
   const videoRef = useRef<HTMLVideoElement | null>(null)
+  const stageRef = useRef<HTMLElement | null>(null)
   const target = useRef(0)
   const shown = useRef(0)
 
@@ -53,9 +65,16 @@ export default function V2() {
     let raf = 0
     let alive = true
 
+    /* Progress through the STAGE, not through the whole document. That is what turns this
+       from a page-length effect into a header: the clip is finished by the time the stage has
+       been scrolled past, and everything below it is an ordinary page. */
     const onScroll = () => {
-      const max = document.documentElement.scrollHeight - innerHeight
-      target.current = max > 0 ? Math.min(1, Math.max(0, scrollY / max)) : 0
+      const stage = stageRef.current
+      if (!stage) return
+      const travel = stage.offsetHeight - innerHeight
+      target.current = travel > 0
+        ? Math.min(1, Math.max(0, -stage.getBoundingClientRect().top / travel))
+        : 0
     }
 
     const tick = () => {
@@ -116,11 +135,23 @@ export default function V2() {
 
   return (
     <>
-      <div className="v2bg">
-        <video ref={nudge} src="/dna-loop.mp4" muted playsInline preload="auto" />
-      </div>
-      {/* the runway: nothing in it, it exists so there is something to scroll */}
-      <div className="v2runway" style={{ height: `${RUNWAY * 100}svh` }} />
+      {/* THE HEADER. The clip used to be position:fixed, which pins it to the screen forever -
+          there was no "after". Sticky inside a tall section holds it for exactly the length of
+          that section and then lets it scroll away like anything else. */}
+      <section className="v2stage" ref={stageRef} style={{ height: `${RUNWAY * 100}svh` }}>
+        <div className="v2pin">
+          <div className="v2bg">
+            <video ref={nudge} src={SRC} muted playsInline preload="auto" />
+          </div>
+        </div>
+      </section>
+
+      {/* and the real page begins */}
+      <main className="v2main">
+        <div className="v2wrap">
+          <h1 className="v2h1">Автоматизируем<br /><em>бизнес-процессы</em></h1>
+        </div>
+      </main>
     </>
   )
 }

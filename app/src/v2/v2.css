@@ -16,8 +16,18 @@ html{scroll-behavior:auto}
    black band under the chrome. It was smaller mid-scroll because the toolbar had collapsed.
    lvh is the LARGEST viewport height, the one with the chrome retracted, so the layer is always
    at least as tall as the screen can ever be and there is nothing left for a gap to appear in. */
-.v2bg{position:fixed;inset:0;height:100lvh;min-height:100lvh;
-  background:#000;display:grid;place-items:center;z-index:0}
+/* THE HEADER. .v2stage is tall - that height is the scroll runway - and .v2pin sticks to the
+   top of the screen for exactly as long as the stage is passing, then releases. That release
+   is the difference from position:fixed, which pinned the clip forever and left no room for a
+   page underneath.
+
+   height:100lvh on the pin, not 100%: on iOS the toolbar grows at the top of a page and
+   collapses once you move, and a height that follows it leaves a black band under the chrome -
+   bigger at the very top, which is exactly what he photographed. lvh is the LARGEST viewport
+   height, so the pin is always at least as tall as the screen can ever be. */
+.v2stage{position:relative}
+.v2pin{position:sticky;top:0;height:100lvh;min-height:100lvh;overflow:hidden}
+.v2bg{position:absolute;inset:0;background:#000;display:grid;place-items:center;z-index:0}
 
 /* No padding on landscape. It was added to drop the strand clear of the browser chrome and it
    did - but a padded box means contain has less room, so the result was a visible black border
@@ -138,12 +148,20 @@ html{scroll-behavior:auto}
       rgba(0,0,0,1.0) 100.0%)}
 }
 
-/* Nothing in here. It exists only so the page has something to scroll, which is what drives
-   the strand. Its height is set in the component, in screens. */
-.v2runway{position:relative;z-index:1;pointer-events:none}
+/* The page proper, below the header. Deliberately bare for now - he asked for the background
+   first and the writing afterwards - but it exists so the header has something to release
+   INTO, which is the whole point of the change. */
+.v2main{position:relative;z-index:2;background:#000;min-height:100svh;
+  display:flex;align-items:center;padding-block:12vh}
+.v2wrap{width:100%;max-width:1280px;margin:0 auto;padding-inline:clamp(16px,3vw,54px)}
+.v2h1{margin:0;max-width:15ch;color:#F2F7F5;
+  font:900 clamp(38px,6.4vw,104px)/1.0 Nunito,sans-serif;letter-spacing:-.03em}
+.v2h1 em{font-style:normal;
+  background:linear-gradient(100deg,#DFF6FF,#7FD8FF 45%,#5C82C9);
+  -webkit-background-clip:text;background-clip:text;color:transparent}
 
 /* Someone who has asked for less motion should not have an animation tied to their scrollbar:
    the runway collapses, so the page does not scroll and the strand simply holds still. */
 @media (prefers-reduced-motion:reduce){
-  .v2runway{height:0 !important}
+  .v2stage{height:100svh !important}
 }
