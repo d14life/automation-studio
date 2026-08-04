@@ -360,7 +360,37 @@ export default function V2() {
       {/* and the real page begins */}
       <main className="v2main">
         <div className="v2wrap">
-          <h1 className="v2h1">Автоматизируем<br /><em>бизнес-процессы</em></h1>
+          <p className="v2eyebrow">Solutions101 — автоматизация бизнес-процессов</p>
+          <h1 className="v2h1">Быстро <em>не значит</em> плохо</h1>
+          <p className="v2lede">
+            Мы не консультируем и не учим теории — мы отдаём работающие инструменты.
+            CRM под ваши этапы, телефония с автообзвоном, боты, сборщики данных и отчёты,
+            собранные под вашу компанию. Прототип показываем до оплаты.
+          </p>
+          <div className="v2cta">
+            <a className="v2btn v2btn--go" href="#request">Оставить заявку</a>
+            <a className="v2btn v2btn--ghost" href="#tools">Посмотреть инструменты</a>
+          </div>
+
+          {/* Four, because the research is unanimous that a fifth reads as filler. */}
+          <dl className="v2figs">
+            <div className="v2fig">
+              <dt><i>0</i> ₽</dt>
+              <dd><b>за прототип</b><span>платите 50% после того, как увидите его в работе</span></dd>
+            </div>
+            <div className="v2fig">
+              <dt><i>1</i> день</dt>
+              <dd><b>на учёт взаиморасчётов</b><span>строительная группа, три юрлица и мультивалюта</span></dd>
+            </div>
+            <div className="v2fig">
+              <dt><i>48</i></dt>
+              <dd><b>контрагентов в одном учёте</b><span>долги и переплаты видны по каждому</span></dd>
+            </div>
+            <div className="v2fig">
+              <dt><i>12</i></dt>
+              <dd><b>форматов прайсов</b><span>сборщик читает их и сводит в одну таблицу</span></dd>
+            </div>
+          </dl>
         </div>
       </main>
     </>
