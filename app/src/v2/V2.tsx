@@ -605,7 +605,15 @@ export default function V2() {
          amount of folding can reverse a delta that is not there.
          Raw scroll distance never runs out. Scaled by the same travel, so the feel of the
          scrub is identical - a full runway is still one pass of the clip. */
-      rawY.current = scrollY
+      /* CLAMPED AT ZERO, and that is the rubber-band bug he hit: at the very top, grabbing the
+         page and pulling drags scrollY NEGATIVE on iOS and macOS. The scrub reads raw scroll
+         precisely so it never runs out of input - which also means it happily follows scrollY
+         into negative numbers, and a rubber-band oscillates, so the strand was being seeked
+         forwards and backwards several times a second with the finger barely moving. That is
+         decoder thrash, and it reads exactly as he described it: the whole video lagging hard
+         the moment you grab the top. There is no content above zero, so there is nothing to
+         scrub to - clamp it. */
+      rawY.current = Math.max(0, scrollY)
       travelPx.current = Math.max(1, travel)
       /* the overlay hands the screen to the strand over the first fifth of the runway - one
          custom property, read by opacity and a small translate, both compositor-only. */
