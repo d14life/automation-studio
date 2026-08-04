@@ -61,12 +61,20 @@ export default function V2() {
       const el = videoRef.current
       if (!el || !el.duration || Number.isNaN(el.duration)) return
 
-      /* Ease toward the scroll position rather than jumping to it - but SNAP once the gap is
-         negligible. An exponential ease never actually arrives, so after the finger lifts it
-         kept creeping for dozens of frames, and every one of those frames was a seek. That
-         crawl is what he saw as lag when scrolling stopped, on both the phone and the Mac. */
-      shown.current += (target.current - shown.current) * 0.18
-      if (Math.abs(target.current - shown.current) < 0.0015) shown.current = target.current
+      /* Ease toward the scroll position, but barely, and SNAP as soon as the gap is small.
+
+         The easing was there to smooth the coarse jumps a trackpad emits - but the seek is
+         quantised to the 25fps frame grid now, which already does that job, so most of what
+         the easing still contributed was TAIL: motion continuing after the scroll had stopped.
+         That is what he is seeing. 0.18 -> 0.38 and the snap threshold nearly tripled, so the
+         scrubber is within a frame of the scroll almost immediately.
+
+         What is left after this is iOS momentum: the page really is still scrolling for a
+         moment after the finger lifts, and the strand tracking that is correct rather than
+         laggy. The fix for THAT would be to stop honouring momentum at all, which would feel
+         worse. */
+      shown.current += (target.current - shown.current) * 0.38
+      if (Math.abs(target.current - shown.current) < 0.004) shown.current = target.current
 
       /* The turnaround was rigid, and here is why: the clip is the take followed by its own
          reverse, so the strand changes direction at exactly the halfway frame. Mapped straight
