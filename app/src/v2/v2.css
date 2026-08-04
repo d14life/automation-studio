@@ -5,7 +5,13 @@
 *{box-sizing:border-box}
 /* One variable carries the theme. Everything that has to change - the page, the pin, the
    fade at both ends - reads from it, so the switch is one class on <html>. */
-:root{--bg:#000;--ink:#F2F7F5}
+/* --bg is SAMPLED from the clip, not chosen. Light already looked seamless because the
+   inverted footage's background is cream and the page was cream - the join is invisible.
+   Dark did not, because the clip's background is a deep navy and the page was pure black, so
+   the video ended on a visible line. Measured off the edges of a real frame: mean #0e1f2a,
+   median #0f212e. The page is that colour now, and the scroll out of the header is seamless
+   in both themes for the same reason. */
+:root{--bg:#0f212e;--ink:#F2F7F5}
 html.v2light{--bg:#F2E9E1;--ink:#141a1c}
 html,body{margin:0;background:var(--bg)}
 html{scroll-behavior:auto}
