@@ -11,7 +11,7 @@
    the video ended on a visible line. Measured off the edges of a real frame: mean #0e1f2a,
    median #0f212e. The page is that colour now, and the scroll out of the header is seamless
    in both themes for the same reason. */
-:root{--bg:#0f212e;--ink:#F2F7F5}
+:root{--bg:#0f1e25;--ink:#F2F7F5}
 html.v2light{--bg:#F2E9E1;--ink:#141a1c}
 html,body{margin:0;background:var(--bg)}
 html{scroll-behavior:auto;scrollbar-width:none;-ms-overflow-style:none}
