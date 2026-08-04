@@ -57,14 +57,40 @@ const HALF_FRAME = 0.5 / FPS
    measured on identical crops). Desktop is 2560x1440 now instead of 1920x1080.
 
    His call, and it overrides the old economy: the upscaled picture goes to EVERY device, so
-   the small file is 1080p now rather than 720p. Both are cut from the same 4K frames: 1440p
-   CRF 19 at 29MB for a screen big enough to see it, 1080p CRF 20 at 16.6MB for phones and
-   tablets. Two files rather than one because a phone decoding 2560x1440 twenty-five times a
-   second is how the lag comes back, and cheap decode is what the whole scrub rests on.
+   the smallest file is 1080p now rather than 720p. All three are cut from the same 4K frames.
+
+   THREE TIERS - 3840x2160 at 47.6MB, 2560x1440 at 29MB, 1920x1080 at 16.6MB - and the file is
+   picked by DEVICE pixels, not CSS pixels. CSS pixels lie on every retina screen: measured in
+   the browser, a 1440-CSS-px window on a 2x display renders this video at 2880x2060 real
+   pixels, so the 2560-wide file was being stretched, not "exactly 1:1" as the old comment
+   claimed. His rule, and it is the right one: give each screen the most it can actually show
+   and not one byte more.
+
+   NEED is the width a 16:9 source must have to cover BOTH axes, because the CSS deliberately
+   overstretches the clip past the viewport (see v2.css) - height is what binds on a phone, not
+   width. Measured at 375x812: the element renders 375x1072 CSS px, which is 1125x3216 device
+   pixels at dpr 3. Even the 4K file is only 2160 rows against 3216 wanted, so on a portrait
+   phone this clip is ALWAYS being magnified vertically - that is a framing problem, not a file
+   problem, and the real cure is a portrait-cropped encode rather than a bigger landscape one.
+
+   The 4K gate is 3200, not 2560, and that number is chosen against real hardware rather than
+   roundness: his MacBook Air asks for 2960, a true 4K display asks for 3840. So the 4K tier
+   means an ACTUAL 4K monitor, and a retina laptop takes 1440p with mild stretching - which is
+   the right trade, because he reported the page felt laggier and 4K decodes at 299fps here
+   against 1440p's 610fps. Sharpness nobody can see is not worth a scrub that stutters.
+
+   PORTABLE is capped at 1440p on purpose. By need alone a phone would ask for 4K, but 47.6MB
+   over cellular is indefensible and decoding 3840x2160 twenty-five times a second is exactly
+   how the lag comes back. Cheap decode is what the whole scrub rests on.
+
    Chosen once at module load rather than per render - the file cannot be swapped mid-scroll
    without losing the seek position, so a resize does not re-pick. */
-const SRC = matchMedia('(min-width:1100px) and (min-height:700px)').matches
-  ? '/dna-loop-hq.mp4?v=4'
+const DPR = Math.min(devicePixelRatio || 1, 3)
+const NEED = Math.max(innerWidth * DPR, (innerHeight * DPR * 16) / 9)
+const PORTABLE = innerWidth < 1100
+const SRC =
+  NEED > 3200 && !PORTABLE ? '/dna-loop-4k.mp4?v=4'
+  : NEED > 1920 ? '/dna-loop-hq.mp4?v=4'
   : '/dna-loop.mp4?v=4'
 
 /* RELOAD MUST START THE STRAND OVER. The browser restores scrollY on reload, which for an
@@ -175,9 +201,9 @@ export default function V2() {
     let pos = 0    /* fraction of the clip on screen, the one true state */
     let dir = 1    /* idle playback direction; scrubbing re-aims it so release carries on */
     let lastP = 0
-    let vel = 0    /* smoothed |scroll speed|, clip-fractions per second */
+    let quiet = 9  /* seconds since the last scroll event - the ONLY thing that arms the loop */
     let last = performance.now()
-    const V0 = 0.15   /* speed at which the loop is fully handed the wheel */
+    let lastSeek = 0
     const EDGE = 0.12 /* anchor zone at each end of the runway */
 
     const tick = (now: number) => {
@@ -195,22 +221,62 @@ export default function V2() {
 
       /* scroll delta scrubs from the current frame; down = toward destroyed, clamped */
       pos = Math.min(1, Math.max(0, pos + dp))
-      if (Math.abs(dp) > 0.0005) dir = dp > 0 ? 1 : -1
-      /* fast attack, ~150ms release - the loop fades in a beat BEFORE the page fully stops */
-      vel = Math.max(Math.abs(dp) / dt, vel * Math.exp(-dt / 0.15))
-      const idle = Math.max(0, 1 - vel / V0)
+
+      /* HANDS OFF, NOT SLOW HANDS. This was a velocity blend and it had a bug he found in one
+         sentence: "it definitely goes down even though I go up with my movements". Scrolling
+         slowly produces a small delta, a velocity blend reads small as stopped, and the loop -
+         which advances a full 1/duration per second - simply overpowered his finger and kept
+         destroying the strand while he scrolled up. Velocity cannot tell slow scrolling from a
+         stopped page. Time can: a scroll event either happened this frame or it did not.
+         So the loop is armed only by SILENCE. Any scroll at all, at any speed, resets it and
+         the delta has the wheel alone. The 0.15s dead time then covers iOS momentum, which
+         keeps firing events as it decays, so the loop still fades in the moment the page has
+         truly come to rest rather than fighting the tail. */
+      if (dp !== 0) { dir = dp > 0 ? 1 : -1; quiet = 0 } else quiet += dt
+      const idle = Math.min(1, Math.max(0, (quiet - 0.15) / 0.3))
 
       /* the loop: real speed, full range, reflecting at both ends */
       pos += dir * (dt / el.duration) * idle
       if (pos > 1) { pos = 2 - pos; dir = -1 }
       if (pos < 0) { pos = -pos; dir = 1 }
 
-      /* the anchors */
-      if (p < EDGE) pos += (0 - pos) * Math.min(1, (1 - p / EDGE) * (1 - idle) * 8 * dt)
-      else if (p > 1 - EDGE) pos += (1 - pos) * Math.min(1, ((p - 1 + EDGE) / EDGE) * (1 - idle) * 8 * dt)
+      /* THE ANCHORS ONLY PULL THE WAY YOU ARE TRAVELLING. They used to pull whenever you were
+         inside the zone, whichever way you were going, and that produced the bug he hit:
+         coming back UP from the page into the header means passing through the bottom zone, so
+         the "end = destroyed" anchor grabbed the strand and dragged it to the destroyed frame
+         before he had scrolled anywhere near it. An anchor is meant to finish a journey, not to
+         ambush one - so the bottom one only bites while you are heading down into the end, and
+         the top one only while you are heading up into the start. */
+      if (p < EDGE && dp <= 0) pos += (0 - pos) * Math.min(1, (1 - p / EDGE) * (1 - idle) * 8 * dt)
+      else if (p > 1 - EDGE && dp >= 0) pos += (1 - pos) * Math.min(1, ((p - 1 + EDGE) / EDGE) * (1 - idle) * 8 * dt)
 
+      /* LET THE DECODER DO IT WHEN IT CAN. He reported the page got laggier the moment the
+         idle loop arrived, and he was right: a seek is not a decode. Sequential decode of this
+         clip benchmarks at 610fps for the 1440p file on this Mac, but the loop was asking for
+         25 SEEKS a second, forever, and every seek flushes the decode pipeline. That cost is
+         new - before the loop, an idle page decoded nothing at all.
+         So when the loop owns the motion AND is running forwards, hand it to native playback,
+         which is the path the hardware decoder is built for, and just READ where it got to.
+         Backwards still has to be seeks - no browser plays a video in reverse - but that is
+         half the cycle instead of all of it. */
+      const cruising = idle > 0.9 && dir === 1 && pos < 0.98
+      if (cruising) {
+        if (el.paused) { pos = el.currentTime / el.duration; el.play().catch(() => {}) }
+        else pos = el.currentTime / el.duration
+        return
+      }
+      if (!el.paused) el.pause()
+
+      /* NEVER SEEK FASTER THAN THE CLIP HAS FRAMES. rAF runs at 60Hz (120 on a ProMotion
+         screen) and a fast scroll changes the target frame every single time, so this was
+         firing up to 60 seeks a second at a clip that only holds 25 distinct frames a second -
+         more than half of them decoding a picture identical to the one already on screen.
+         Every seek also flushes the decode pipeline, and these frames are all-intra 2560x1440,
+         which is the most expensive kind to decode cold. 30Hz is above the content rate, so
+         nothing visible is lost and roughly half the decode work disappears. */
+      if (now - lastSeek < 33) return
       const t = Math.round(pos * (el.duration - 0.05) * FPS) / FPS
-      if (Math.abs(el.currentTime - t) >= HALF_FRAME) el.currentTime = t
+      if (Math.abs(el.currentTime - t) >= HALF_FRAME) { el.currentTime = t; lastSeek = now }
     }
 
     /* The touch scroll lock is gone. It did what it promised - driving scrollY from the
