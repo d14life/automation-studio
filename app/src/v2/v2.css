@@ -11,8 +11,15 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden}
 
    No blend mode. On the live page a mix-blend-mode on a fixed layer is exactly what punched a
    black rectangle through the starfield, and there is nothing behind this one anyway. */
-.v2bg{position:fixed;inset:0;background:#000}
-.v2bg video{width:100%;height:100%;object-fit:cover;display:block}
+.v2bg{position:fixed;inset:0;background:#000;display:grid;place-items:center}
+/* CONTAIN, so the whole filmed frame is on screen and you see as much of the helix as the
+   footage actually holds. cover crops to fill and throws away the ends of the chain, which is
+   the opposite of what he asked for. The bars contain leaves are black against a black page.
+
+   On the pixelation: the source is 1920x1080 and I had been re-encoding it down to 1280,
+   which a 1440-wide window then had to scale back UP. It ships at its native 1920 now. */
+.v2bg video{max-width:100%;max-height:100%;width:auto;height:auto;
+  object-fit:contain;display:block}
 
 /* A visitor who has asked for less motion gets a still field rather than a moving one. */
 @media (prefers-reduced-motion:reduce){
