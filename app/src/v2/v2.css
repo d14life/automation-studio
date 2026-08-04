@@ -44,20 +44,14 @@ html.v2light .v2bg video{filter:invert(1)}
    Smoothstep stops, not two. Two interpolate linearly, so there is a point where the fade
    abruptly begins and the eye finds it at once; these leave and arrive at zero slope, so there
    is no moment where the gradient starts. One painted gradient, no per-frame cost. */
+/* BOTTOM ONLY. The top gradient is gone: he says the bottom reads as a fade and the top does
+   not, and rather than theorise about it again the one bit of darkening at the top I can be
+   certain of is the one I was drawing. So I am not drawing it. The bottom keeps its 64px soft
+   edge, in pixels rather than percent, so it never becomes a band on a short screen. */
 .v2bg::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:1;
-  /* PIXELS, not percentages, and this is why: the span was 15% of the pin, which is fine on a
-     900px desktop and is ~52px of solid darkening at the top of a 350px landscape phone - a
-     visible black band, which is exactly what he kept photographing. A fixed 64px is a soft
-     edge on every screen instead of a band on short ones.
-     Smoothstep stops, not two: two interpolate linearly and the eye finds the point where the
-     fade begins. These leave and arrive at zero slope. */
-  background:
-    linear-gradient(180deg, var(--bg) 0px, rgba(0,0,0,0) 64px),
-    linear-gradient(0deg, var(--bg) 0px, rgba(0,0,0,0) 64px)}
+  background:linear-gradient(0deg, var(--bg) 0px, rgba(0,0,0,0) 64px)}
 html.v2light .v2bg::after{
-  background:
-    linear-gradient(180deg, var(--bg) 0px, rgba(255,255,255,0) 64px),
-    linear-gradient(0deg, var(--bg) 0px, rgba(255,255,255,0) 64px)}
+  background:linear-gradient(0deg, var(--bg) 0px, rgba(255,255,255,0) 64px)}
 
 /* A PHONE HELD SIDEWAYS was falling into the desktop rule and letterboxed into a stamp,
    because contain shows the whole frame - right on a large display, wrong on one 350px tall.
