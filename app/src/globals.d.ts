@@ -38,6 +38,8 @@ declare global {
     /** how far the melt may blur, in px. The library's flat 100 was written for a 77px desktop
         slogan and destroys a 34px one on a phone. Pass about half the font size there. */
     maxBlur?: number
+    /* how often the melt may REDRAW, in ms; 0 or absent means every animation frame */
+    stepMs?: number
     morphTime?: number
     cooldownTime?: number
     colors?: string[]
