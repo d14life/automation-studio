@@ -27,8 +27,11 @@ Rules I care about most:
 - Anything that MOVES cannot be verified in the preview pane — it reports
   document.hidden, which freezes both requestAnimationFrame and the CSS
   animation timeline. Use the iOS Simulator or a real foregrounded window.
-- Commit on `react`, never straight to `main`. Read the branch section of
-  CLAUDE.md before your first push — the wrong checkout has wiped work five times.
+- Two of us work on `react` at the same time, both pushing to it. So: pull before
+  you start, commit small, and push with `git pull --rebase origin react` first,
+  every time. Never `git push --force` — on a shared branch that deletes whatever
+  the other person pushed. Never commit straight to `main`; that is the deploy
+  branch and only one of us touches it at a time.
 - English and short with me. The site copy stays Russian.
 ```
 

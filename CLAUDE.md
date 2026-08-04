@@ -28,15 +28,37 @@ git checkout main && git checkout react -- app docs && cd app && npm run build &
 `git checkout react -- app` on `main` has wiped uncommitted edits five times.
 **Never switch branches with unstaged work.** Commit or stash first, every time.
 
-## Two people work on this repo
+## Two people work on this repo, on the SAME branch
 
-Damir and his brother both run Claude sessions against it, sometimes at once.
+Damir and his brother both work locally on `react` and push their parts to it, so
+each sees the other's changes as they land. No feature branches — that is his call
+and it is the right one for two people who want immediate feedback on each other's
+work. It costs nothing as long as the loop below is followed exactly.
 
-- Branch off `react`: `git checkout react && git pull && git checkout -b feat/<name>-<thing>`
-- Merge back into `react` when the slice is done and verified.
-- **Pull before you start and before you push.** Two agents rebasing the same branch
-  is how a day disappears.
-- **Only one person deploys to `main` at a time.** Say so before you do it.
+**Every push, without exception:**
+
+```bash
+git add -A && git commit -m "real sentence" && git pull --rebase origin react && git push origin react
+```
+
+`--rebase` is the whole trick: it replays your commits on top of theirs instead of
+creating a merge bubble, so the history stays a straight line and nobody's work
+gets buried. Run `git config pull.rebase true` once per machine and plain
+`git pull` does the right thing.
+
+- **Pull before you start working, not just before you push.** Starting from stale
+  code is what turns a two-line conflict into an evening.
+- **Commit small and push often.** Two people editing `V2.tsx` — 761 lines and
+  effectively the whole site — will touch the same file constantly. Frequent small
+  pushes conflict on a few lines; a four-hour push conflicts on everything.
+- **Say which area you are in** before starting: the header scrub, the chapters,
+  the CSS, or one of the five content pages. Same file is fine; same function at
+  the same time is not.
+- **If a rebase stops with a conflict, do not force-push.** `git status` names the
+  files, fix them, `git add` them, `git rebase --continue`. `git push --force` on a
+  shared branch deletes whatever the other person pushed while you were working —
+  it is the one command that can actually lose work here.
+- **Only one person deploys to `main` at a time.** Say so out loud before you do.
 - Running two sessions on one machine? Use a worktree, not a second clone:
   `git worktree add ~/solutions101-lane-b -b lane-b react`
 
