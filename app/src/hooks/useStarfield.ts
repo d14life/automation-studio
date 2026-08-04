@@ -43,8 +43,9 @@ export function useStarfield(ready: boolean): RefObject<HTMLDivElement | null> {
          drift is now measured against the clock rather than counted in frames, the field moves
          at exactly the same visible speed as before. */
       minFrameMs: SMALL ? 32 : 22,
-      /* 30% slower on both versions - his word */
-      speed: SMALL ? 2.18 : 2.69,
+      /* 30% slower on both versions - his word. Then, 4 Aug, seen on the real phone: still
+         "moving too fast through the stars", half speed. The phone only - the Mac is approved. */
+      speed: SMALL ? 1.09 : 2.69,
       easing: 1,
       warpFactor: 10,
       opacity: 0.1,
