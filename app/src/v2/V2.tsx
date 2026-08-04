@@ -218,7 +218,6 @@ export default function V2() {
     let touching = false
     let last = performance.now()
     let lastSeek = 0
-    const EDGE = 0.12 /* anchor zone at each end of the runway */
 
     const tick = (now: number) => {
       if (!alive) return
@@ -258,37 +257,35 @@ export default function V2() {
       if (touching) quiet = 0; else quiet += dt
       const idle = Math.min(1, Math.max(0, (quiet - 0.05) / 0.2))
 
-      /* the loop: real speed, full range, reflecting at both ends */
-      pos += dir * (dt / el.duration) * idle
-      if (pos > 1) { pos = 2 - pos; dir = -1 }
-      if (pos < 0) { pos = -pos; dir = 1 }
+      /* THE LOOP IS A PENDULUM, NOT A METRONOME. Every complaint that survived the earlier
+         fixes traced back to the loop being a second (and at one point third) controller
+         fighting the scroll for one variable - anchors ambushing the strand on the way back
+         up, native playback discarding momentum deltas so the flick's end stuttered, and a
+         constant-speed loop slamming into the ends and reversing "too fast, not smooth".
 
-      /* THE ANCHORS ONLY PULL THE WAY YOU ARE TRAVELLING. They used to pull whenever you were
-         inside the zone, whichever way you were going, and that produced the bug he hit:
-         coming back UP from the page into the header means passing through the bottom zone, so
-         the "end = destroyed" anchor grabbed the strand and dragged it to the destroyed frame
-         before he had scrolled anywhere near it. An anchor is meant to finish a journey, not to
-         ambush one - so the bottom one only bites while you are heading down into the end, and
-         the top one only while you are heading up into the start. */
-      if (p < EDGE && dp <= 0) pos += (0 - pos) * Math.min(1, (1 - p / EDGE) * (1 - idle) * 8 * dt)
-      else if (p > 1 - EDGE && dp >= 0) pos += (1 - pos) * Math.min(1, ((p - 1 + EDGE) / EDGE) * (1 - idle) * 8 * dt)
+         All of it is gone by construction now. The loop's position is a point on a cosine
+         wave: pos = (1 - cos θ) / 2. Advancing θ at a constant rate makes the strand's speed
+         a sine - naturally ZERO at both ends, full in the middle. The turnaround cannot be
+         abrupt, because arriving at an end and slowing to a stop are the same thing. No
+         reflection branch, no direction flip to mistime - the wave carries it through.
 
-      /* LET THE DECODER DO IT WHEN IT CAN. He reported the page got laggier the moment the
-         idle loop arrived, and he was right: a seek is not a decode. Sequential decode of this
-         clip benchmarks at 610fps for the 1440p file on this Mac, but the loop was asking for
-         25 SEEKS a second, forever, and every seek flushes the decode pipeline. That cost is
-         new - before the loop, an idle page decoded nothing at all.
-         So when the loop owns the motion AND is running forwards, hand it to native playback,
-         which is the path the hardware decoder is built for, and just READ where it got to.
-         Backwards still has to be seeks - no browser plays a video in reverse - but that is
-         half the cycle instead of all of it. */
-      const cruising = idle > 0.6 && dir === 1 && pos < 0.98
-      if (cruising) {
-        if (el.paused) { pos = el.currentTime / el.duration; el.play().catch(() => {}) }
-        else pos = el.currentTime / el.duration
-        return
+         The scrub stays a plain delta on pos, and each frame θ is re-derived from wherever
+         pos actually is, so the two hands can never disagree: scrub moves the point along the
+         wave, the loop continues the wave from that exact point. dp keeps adding during iOS
+         momentum while idle ramps in, so the glide's crawl is covered by loop motion instead
+         of being the only motion - and while a finger is down, idle is pinned to zero, so slow
+         deliberate scrolling can never be overpowered.
+
+         Native playback is gone on purpose. It saved decode work but discarded scroll deltas
+         while cruising - his "it tried at the same time to finish my scroll and continue the
+         video". One mechanism, eased seeks, everywhere: at 30Hz against files that decode
+         sequentially at 610fps here, the whole loop costs a few percent of one core. */
+      if (idle > 0) {
+        const th = dir === 1 ? Math.acos(1 - 2 * pos) : 2 * Math.PI - Math.acos(1 - 2 * pos)
+        const th2 = (th + (Math.PI / el.duration) * dt * idle) % (2 * Math.PI)
+        pos = (1 - Math.cos(th2)) / 2
+        dir = th2 < Math.PI ? 1 : -1
       }
-      if (!el.paused) el.pause()
 
       /* NEVER SEEK FASTER THAN THE CLIP HAS FRAMES. rAF runs at 60Hz (120 on a ProMotion
          screen) and a fast scroll changes the target frame every single time, so this was
