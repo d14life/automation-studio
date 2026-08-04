@@ -36,8 +36,17 @@ html{scroll-behavior:auto}
      to the start rather than centring it, which left a black band down one side. Positioning
      from the centre and translating back by half is immune to that. */
   .v2bg video{position:absolute;top:50%;left:50%;
-    width:100svh;height:100svw;max-width:none;max-height:none;
-    object-fit:cover;transform:translate(-50%,-50%) rotate(90deg)}
+    /* lvh/lvw, not svh/svw. The parent is position:fixed, and a fixed element sizes to the
+       LARGE viewport - the one with the browser chrome retracted - while svh is the SMALL
+       one. So the video was always a toolbar's height shorter than the box it sits in, and
+       that gap is the black band at the top and bottom of his phone. */
+    width:100lvh;height:100lvw;max-width:none;max-height:none;
+    /* FILL, not cover: his call, stretch rather than zoom. cover would have to crop about a
+       quarter of the frame to fill a 1.44:1 box with 1.78:1 footage, and cropping is what he
+       has objected to twice. Stretching that ratio is a 24% distortion on an organic shape
+       nobody knows the true proportions of - it reads as a slightly longer helix, which is
+       the direction he asked for anyway. */
+    object-fit:fill;transform:translate(-50%,-50%) rotate(90deg)}
 }
 
 /* Nothing in here. It exists only so the page has something to scroll, which is what drives
