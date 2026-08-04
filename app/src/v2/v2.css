@@ -57,7 +57,7 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none}
    frame, and doing it badly - it flipped the strand's speculars to black, which is what turned
    the metal into blue-violet mush. Light now loads its own graded 50fps file (see SRC_LIGHT in
    V2.tsx), so this rule only has to set the opacity the composition wants. */
-html.v2light .v2bg video{opacity:.62}
+html.v2light .v2bg video{filter:invert(1);opacity:.5}
 
 /* Stretched DOWN, not zoomed - his word, and the 220px fade that used to sit here was the
    'gap' he was pointing at: it painted 40px of solid page colour and ramped over 220 more,

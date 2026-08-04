@@ -176,10 +176,12 @@ const SRC_H264 =
 
 /* The light theme's own file, same tier, same 50fps, cut from the same 4K masters and graded
    for cream rather than inverted at runtime. Only ever downloaded if the visitor switches. */
-const SRC_LIGHT =
-  TIER === 'sm' ? '/dna-light-sm.mp4?v=1'
-  : TIER === 'md' ? '/dna-light-md.mp4?v=1'
-  : '/dna-light-hq.mp4?v=1'
+/* REVERTED to the dark file + CSS invert while the grade is redone. The graded files exist
+   and are deployed, but the grade was validated on ONE frame - the intact end - and the clip
+   ends GOLD. Gold inverted and then desaturated is brown mud, which is what he saw across the
+   whole back half of the runway. A grade for this clip has to be checked at the intact end,
+   the middle AND the destroyed end before it ships. */
+const SRC_LIGHT = SRC_H264
 
 /* RELOAD MUST START THE STRAND OVER. The browser restores scrollY on reload, which for an
    ordinary page is a kindness and for this one is a bug: the scroll is restored but the video
