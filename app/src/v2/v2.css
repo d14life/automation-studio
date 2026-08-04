@@ -58,7 +58,15 @@ html.v2light .v2bg::after{
    What separates those cases is SIZE, not orientation. It fills as desktop does; only the low
    framing is dropped, there being no chrome to clear. */
 @media (min-aspect-ratio: 1/1) and (max-height: 600px){
-  .v2bg video{object-position:center center}
+  /* Overshoot the box rather than fit it. Whatever is leaving that dark strip at the top on a
+     phone held sideways - and I have guessed wrong about it several times - the fix that does
+     not depend on knowing is to make the video BIGGER than the space it has to fill: 80px
+     taller and pulled 40px up, so it covers past the top and the bottom by 40 each and there
+     is no edge left for a gap to appear at. Stretching it, in his words, and it costs nothing
+     because it is still one video element being composited. */
+  .v2bg video{position:absolute;left:0;top:-40px;
+    width:100%;height:calc(100% + 80px);
+    object-fit:cover;object-position:center center}
 }
 
 /* PORTRAIT: turn the strand on its side rather than cropping it. A 16:9 clip in a 0.69:1
