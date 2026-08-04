@@ -26,23 +26,24 @@ import './v2.css'
 /* 3.85, not 5. His ask: the same scroll should move the strand 30% further, which is a
    shorter runway rather than a faster clip - the clip is scrubbed, it has no speed of its own.
    5 / 1.3 = 3.85. */
-const RUNWAY = 4.6
+const RUNWAY = 3.85
 
 /* THE THREE FEEL KNOBS. Everything about how the strand responds is one of these, so a
    "faster" or "slower" note changes a number here and nothing else.
 
-   SCROLL_GAIN  how much clip one screen of scrolling covers. 1 = the old behaviour, where a
-                full runway was exactly one pass of the video.
+   SCROLL_GAIN  how much clip one screen of scrolling covers. 1 = a full runway is one pass.
    LOOP_SPEED   how fast the strand plays itself while nobody is scrolling. 1 = real time.
    HOLD_FADE    the fraction of a chapter's slice spent fading in and out. SMALLER MEANS THE
                 CARD STAYS LONGER: at 0.28 it held still for 44% of its slice, at 0.16 it holds
-                for 68% - a 55% longer read, before the longer runway above is even counted.
+                for 68%.
 
-   Note the two work in opposite directions on purpose. A longer runway gives the cards more
-   distance to live in, which is what "let me finish reading" needs; the gain then buys the
-   strand's speed back so scrolling does MORE, not less. Net motion per pixel is 1.5x the old. */
-const SCROLL_GAIN = 1.8
-const LOOP_SPEED = 1.7
+   ALL THREE SPEED CHANGES ARE REVERTED - his call, the evening of 4 August, after feeling
+   1.8/1.7/4.6 on the phone: "scroll is too strong". The 50fps file made the motion smooth on
+   its own, and speed on top of smooth was too much. GAIN and LOOP back to 1, RUNWAY back to
+   3.85. HOLD_FADE keeps its new value: cards staying readable was a separate ask and costs
+   no speed anywhere. */
+const SCROLL_GAIN = 1
+const LOOP_SPEED = 1
 const HOLD_FADE = 0.16
 /* Frame rate is per tier, so it is declared with the tier below - seeking finer than one frame
    just decodes the same picture again, and the grid has to be the grid the file actually has. */
