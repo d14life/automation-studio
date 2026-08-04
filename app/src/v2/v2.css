@@ -34,6 +34,18 @@ html{scroll-behavior:auto}
    suits the interaction, since the strand now unwinds in the direction you are scrolling.
    The element is sized in swapped units so that after the rotation its footprint is exactly
    the viewport, and cover then crops 1.78 against 1.44 - about a quarter - instead of 60%. */
+/* A PHONE HELD SIDEWAYS was falling into the desktop path and being letterboxed into a stamp
+   in the middle of the screen. contain is right on a large display - it shows the whole frame -
+   and wrong on one about 350px tall, where the whole frame is tiny.
+
+   What separates those cases is not orientation, it is SIZE, so that is what this asks. A short
+   landscape viewport is a phone on its side: fill it and accept the crop, the same trade
+   portrait already makes. Desktop, being landscape AND tall, keeps contain and its full
+   uncropped frame. */
+@media (min-aspect-ratio: 1/1) and (max-height: 600px){
+  .v2bg video{width:100%;height:100%;max-width:none;max-height:none;object-fit:cover}
+}
+
 @media (max-aspect-ratio: 1/1){
   /* Centred by absolute position, not by the grid. Before the rotation this element's box is
      100svh WIDE - wider than the container it sits in - and a grid aligns an overflowing item
@@ -76,10 +88,37 @@ html{scroll-behavior:auto}
    few percent before it starts to give, and takes about a fifth of the screen to reach clear -
    a short fade reads as a band with a boundary of its own, which is the thing being fixed. */
 @media (max-aspect-ratio: 1/1){
+  /* SMOOTH, not bigger. The last attempt made the black area deeper, which is not what he
+     asked for - the visible edge was never the amount of black, it was the fade CURVE. Two
+     stops interpolate linearly, so there is a point where the fade abruptly starts and the eye
+     finds it immediately.
+     These stops follow a smoothstep, which leaves and arrives at zero slope, so there is no
+     moment where the gradient begins - and the span is SHORTER than before, 15% rather than
+     22%, so there is less black than the version he objected to. */
   .v2bg::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:1;
     background:linear-gradient(180deg,
-      #000 0%, #000 4%, rgba(0,0,0,.82) 8%, rgba(0,0,0,.42) 14%, rgba(0,0,0,0) 22%,
-      rgba(0,0,0,0) 78%, rgba(0,0,0,.45) 86%, rgba(0,0,0,.85) 92%, #000 96%, #000 100%)}
+      rgba(0,0,0,1.0) 0.0%,
+      rgba(0,0,0,0.972) 1.5%,
+      rgba(0,0,0,0.896) 3.0%,
+      rgba(0,0,0,0.784) 4.5%,
+      rgba(0,0,0,0.648) 6.0%,
+      rgba(0,0,0,0.5) 7.5%,
+      rgba(0,0,0,0.352) 9.0%,
+      rgba(0,0,0,0.216) 10.5%,
+      rgba(0,0,0,0.104) 12.0%,
+      rgba(0,0,0,0.028) 13.5%,
+      rgba(0,0,0,0.0) 15.0%,
+      rgba(0,0,0,0.0) 85.0%,
+      rgba(0,0,0,0.028) 86.5%,
+      rgba(0,0,0,0.104) 88.0%,
+      rgba(0,0,0,0.216) 89.5%,
+      rgba(0,0,0,0.352) 91.0%,
+      rgba(0,0,0,0.5) 92.5%,
+      rgba(0,0,0,0.648) 94.0%,
+      rgba(0,0,0,0.784) 95.5%,
+      rgba(0,0,0,0.896) 97.0%,
+      rgba(0,0,0,0.972) 98.5%,
+      rgba(0,0,0,1.0) 100.0%)}
 }
 
 /* Nothing in here. It exists only so the page has something to scroll, which is what drives
