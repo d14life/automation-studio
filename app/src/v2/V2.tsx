@@ -22,6 +22,10 @@ import './v2.css'
       coarse jumps; easing turns those into motion. */
 
 const RUNWAY = 4 /* screens of scrolling to cross the clip once */
+/* The clip is 25fps by construction (585 frames over 23.4s). Seeking finer than one frame
+   just decodes the same picture again, so the scrubber works on this grid. */
+const FPS = 25
+const HALF_FRAME = 0.5 / FPS
 
 export default function V2() {
   const videoRef = useRef<HTMLVideoElement | null>(null)
@@ -57,8 +61,12 @@ export default function V2() {
       const el = videoRef.current
       if (!el || !el.duration || Number.isNaN(el.duration)) return
 
-      /* ease toward the scroll position rather than jumping to it */
-      shown.current += (target.current - shown.current) * 0.12
+      /* Ease toward the scroll position rather than jumping to it - but SNAP once the gap is
+         negligible. An exponential ease never actually arrives, so after the finger lifts it
+         kept creeping for dozens of frames, and every one of those frames was a seek. That
+         crawl is what he saw as lag when scrolling stopped, on both the phone and the Mac. */
+      shown.current += (target.current - shown.current) * 0.18
+      if (Math.abs(target.current - shown.current) < 0.0015) shown.current = target.current
 
       /* The turnaround was rigid, and here is why: the clip is the take followed by its own
          reverse, so the strand changes direction at exactly the halfway frame. Mapped straight
@@ -71,10 +79,12 @@ export default function V2() {
          slows into it and picks up again coming out. 1.7 is gentle; higher dwells longer. */
       const u = shown.current * 2 - 1
       const bent = (Math.sign(u) * Math.abs(u) ** 1.7 + 1) / 2
-      const t = bent * (el.duration - 0.05)
-
-      /* one seek per frame at most, and only when it is worth a seek */
-      if (Math.abs(el.currentTime - t) > 0.02) el.currentTime = t
+      /* Quantise to real frame boundaries. The clip is 25fps, so a frame is 0.04s and any
+         seek finer than that decodes a picture you are already looking at - pure cost, and on
+         iOS a queue of pending seeks that arrives late and looks like stutter. Rounding to the
+         frame grid means a seek happens only when the visible frame actually changes. */
+      const t = Math.round(bent * (el.duration - 0.05) * FPS) / FPS
+      if (Math.abs(el.currentTime - t) >= HALF_FRAME) el.currentTime = t
     }
 
     addEventListener('scroll', onScroll, { passive: true })
