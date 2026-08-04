@@ -3,7 +3,11 @@
    inheriting them would mean fighting them. The live page is untouched. */
 
 *{box-sizing:border-box}
-html,body{margin:0;background:#000}
+/* One variable carries the theme. Everything that has to change - the page, the pin, the
+   fade at both ends - reads from it, so the switch is one class on <html>. */
+:root{--bg:#000;--ink:#F2F7F5}
+html.v2light{--bg:#F2E9E1;--ink:#141a1c}
+html,body{margin:0;background:var(--bg)}
 html{scroll-behavior:auto}
 
 /* ---------- the header ----------
@@ -16,7 +20,7 @@ html{scroll-behavior:auto}
    at the very top - which is what he photographed. lvh is the LARGEST viewport height. */
 .v2stage{position:relative}
 .v2pin{position:sticky;top:0;height:100lvh;min-height:100lvh;overflow:hidden}
-.v2bg{position:absolute;inset:0;background:#000;display:grid;place-items:center;z-index:0}
+.v2bg{position:absolute;inset:0;background:var(--bg);display:grid;place-items:center;z-index:0}
 
 /* DESKTOP: cover, framed low. contain sized the frame to the viewport height exactly, so the
    top of the strand landed at y=0, hard against the browser toolbar. Padding was worse - it
@@ -24,7 +28,13 @@ html{scroll-behavior:auto}
    ~10% of the frame width at 1440x900, and object-position pulls the visible window DOWN the
    source so the composition sits lower. */
 .v2bg video{width:100%;height:100%;max-width:none;max-height:none;
-  object-fit:cover;object-position:center 62%;display:block}
+  object-fit:cover;object-position:center 62%;display:block;
+  transition:filter .45s ease}
+/* THE LIGHT VERSION IS THE SAME CLIP. The donor's pale hero is not a second video, it is this
+   footage inverted over a warm background - white strand on cream instead of dark on black.
+   One filter, no extra download, and it stays clear of trap 5.5 because a filter is computed
+   on this element's own pixels: no group, nothing underneath it to depend on. */
+html.v2light .v2bg video{filter:invert(1)}
 
 /* THE FADE, on every orientation - his word. It began as a way to blend Safari's chrome into
    the page, but it earns its place for a simpler reason: without it the clip ends on a hard
@@ -35,15 +45,19 @@ html{scroll-behavior:auto}
    abruptly begins and the eye finds it at once; these leave and arrive at zero slope, so there
    is no moment where the gradient starts. One painted gradient, no per-frame cost. */
 .v2bg::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:1;
-  background:linear-gradient(180deg,
-    rgba(0,0,0,1) 0%, rgba(0,0,0,.972) 1.5%, rgba(0,0,0,.896) 3%,
-    rgba(0,0,0,.784) 4.5%, rgba(0,0,0,.648) 6%, rgba(0,0,0,.5) 7.5%,
-    rgba(0,0,0,.352) 9%, rgba(0,0,0,.216) 10.5%, rgba(0,0,0,.104) 12%,
-    rgba(0,0,0,.028) 13.5%, rgba(0,0,0,0) 15%,
-    rgba(0,0,0,0) 85%, rgba(0,0,0,.028) 86.5%, rgba(0,0,0,.104) 88%,
-    rgba(0,0,0,.216) 89.5%, rgba(0,0,0,.352) 91%, rgba(0,0,0,.5) 92.5%,
-    rgba(0,0,0,.648) 94%, rgba(0,0,0,.784) 95.5%, rgba(0,0,0,.896) 97%,
-    rgba(0,0,0,.972) 98.5%, rgba(0,0,0,1) 100%)}
+  /* PIXELS, not percentages, and this is why: the span was 15% of the pin, which is fine on a
+     900px desktop and is ~52px of solid darkening at the top of a 350px landscape phone - a
+     visible black band, which is exactly what he kept photographing. A fixed 64px is a soft
+     edge on every screen instead of a band on short ones.
+     Smoothstep stops, not two: two interpolate linearly and the eye finds the point where the
+     fade begins. These leave and arrive at zero slope. */
+  background:
+    linear-gradient(180deg, var(--bg) 0px, rgba(0,0,0,0) 64px),
+    linear-gradient(0deg, var(--bg) 0px, rgba(0,0,0,0) 64px)}
+html.v2light .v2bg::after{
+  background:
+    linear-gradient(180deg, var(--bg) 0px, rgba(255,255,255,0) 64px),
+    linear-gradient(0deg, var(--bg) 0px, rgba(255,255,255,0) 64px)}
 
 /* A PHONE HELD SIDEWAYS was falling into the desktop rule and letterboxed into a stamp,
    because contain shows the whole frame - right on a large display, wrong on one 350px tall.
@@ -74,10 +88,10 @@ html{scroll-behavior:auto}
 /* ---------- the page proper, below the header ----------
    Deliberately bare - he asked for the background first and the writing afterwards - but it
    exists so the header has something to release INTO, which is the point of the change. */
-.v2main{position:relative;z-index:2;background:#000;min-height:100svh;
+.v2main{position:relative;z-index:2;background:var(--bg);min-height:100svh;
   display:flex;align-items:center;padding-block:12vh}
 .v2wrap{width:100%;max-width:1280px;margin:0 auto;padding-inline:clamp(16px,3vw,54px)}
-.v2h1{margin:0;max-width:15ch;color:#F2F7F5;
+.v2h1{margin:0;max-width:15ch;color:var(--ink);
   font:900 clamp(38px,6.4vw,104px)/1.0 Nunito,sans-serif;letter-spacing:-.03em}
 .v2h1 em{font-style:normal;
   background:linear-gradient(100deg,#DFF6FF,#7FD8FF 45%,#5C82C9);
@@ -86,3 +100,34 @@ html{scroll-behavior:auto}
 @media (prefers-reduced-motion:reduce){
   .v2stage{height:100svh !important}
 }
+
+/* ---------- the day / night switch ----------
+   A pill with a sun that slides across a sky, the shape from the reference he sent. Built from
+   spans rather than an image so it recolours with the theme and costs nothing to load.
+   Everything that moves is transform and opacity, which the compositor handles - the project's
+   rule, and the reason the live page's effects were survivable at all. */
+.v2sw{position:fixed;top:clamp(14px,2.2vh,26px);right:clamp(14px,2.4vw,40px);z-index:10;
+  width:74px;height:38px;padding:0;border:0;border-radius:999px;cursor:pointer;
+  background:linear-gradient(180deg,#2b4a72,#12233c);overflow:hidden;
+  box-shadow:inset 0 2px 6px rgba(0,0,0,.5), 0 6px 18px rgba(0,0,0,.45);
+  transition:background .45s ease}
+html.v2light .v2sw{background:linear-gradient(180deg,#7fb2e8,#c9e2f7);
+  box-shadow:inset 0 2px 6px rgba(0,0,0,.18), 0 6px 18px rgba(0,0,0,.18)}
+
+.v2sw-knob{position:absolute;top:4px;left:4px;width:30px;height:30px;border-radius:50%;
+  background:radial-gradient(circle at 34% 32%, #fff6c2, #e9d34e 62%, #d9bf35);
+  box-shadow:0 2px 8px rgba(0,0,0,.45);
+  transform:translateX(0);transition:transform .45s cubic-bezier(.4,1.4,.5,1), background .45s ease}
+html.v2light .v2sw-knob{transform:translateX(36px);
+  background:radial-gradient(circle at 34% 32%, #ffffff, #eef4f8 62%, #d8e6f0)}
+
+/* the clouds sit on the far side and drift in as the sun leaves */
+.v2sw-cloud{position:absolute;border-radius:999px;background:#fff;opacity:.9;
+  transition:transform .5s ease, opacity .4s ease}
+.v2sw-c1{width:26px;height:12px;bottom:5px;right:6px;transform:translateX(4px)}
+.v2sw-c2{width:18px;height:10px;bottom:11px;right:16px;transform:translateX(6px)}
+.v2sw-c3{width:14px;height:8px;bottom:4px;right:26px;transform:translateX(8px);opacity:.75}
+html.v2light .v2sw-c1,html.v2light .v2sw-c2{transform:translateX(-30px)}
+html.v2light .v2sw-c3{transform:translateX(-26px);opacity:.9}
+.v2sw:active .v2sw-knob{transform:scale(.94) translateX(0)}
+html.v2light .v2sw:active .v2sw-knob{transform:scale(.94) translateX(36px)}

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import './v2.css'
 
 /* v2: the DNA strand is driven by the scroll wheel, not by playback.
@@ -42,6 +42,14 @@ const SRC = matchMedia('(min-width:1100px) and (min-height:700px)').matches
   : '/dna-loop.mp4'
 
 export default function V2() {
+  /* Light and dark are the SAME clip. The donor's light hero is not a second video, it is the
+     same footage with `invert` over a pale background - so the switch costs one CSS filter and
+     no extra download. The strand is white on cream in light, dark on near-black in dark. */
+  const [light, setLight] = useState(false)
+  useEffect(() => {
+    document.documentElement.classList.toggle('v2light', light)
+  }, [light])
+
   const videoRef = useRef<HTMLVideoElement | null>(null)
   const stageRef = useRef<HTMLElement | null>(null)
   const target = useRef(0)
@@ -114,6 +122,17 @@ export default function V2() {
       {/* THE HEADER. The clip used to be position:fixed, which pins it to the screen forever -
           there was no "after". Sticky inside a tall section holds it for exactly the length of
           that section and then lets it scroll away like anything else. */}
+      {/* the switch, over the header where a nav bar would sit */}
+      <button className="v2sw" type="button" aria-pressed={light}
+              aria-label={light ? 'Тёмная тема' : 'Светлая тема'}
+              onClick={() => setLight((v) => !v)}>
+        <span className="v2sw-sky" />
+        <span className="v2sw-cloud v2sw-c1" />
+        <span className="v2sw-cloud v2sw-c2" />
+        <span className="v2sw-cloud v2sw-c3" />
+        <span className="v2sw-knob" />
+      </button>
+
       <section className="v2stage" ref={stageRef} style={{ height: `${RUNWAY * 100}svh` }}>
         <div className="v2pin">
           <div className="v2bg">
