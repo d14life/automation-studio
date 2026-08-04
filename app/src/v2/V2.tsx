@@ -26,7 +26,24 @@ import './v2.css'
 /* 3.85, not 5. His ask: the same scroll should move the strand 30% further, which is a
    shorter runway rather than a faster clip - the clip is scrubbed, it has no speed of its own.
    5 / 1.3 = 3.85. */
-const RUNWAY = 3.85
+const RUNWAY = 4.6
+
+/* THE THREE FEEL KNOBS. Everything about how the strand responds is one of these, so a
+   "faster" or "slower" note changes a number here and nothing else.
+
+   SCROLL_GAIN  how much clip one screen of scrolling covers. 1 = the old behaviour, where a
+                full runway was exactly one pass of the video.
+   LOOP_SPEED   how fast the strand plays itself while nobody is scrolling. 1 = real time.
+   HOLD_FADE    the fraction of a chapter's slice spent fading in and out. SMALLER MEANS THE
+                CARD STAYS LONGER: at 0.28 it held still for 44% of its slice, at 0.16 it holds
+                for 68% - a 55% longer read, before the longer runway above is even counted.
+
+   Note the two work in opposite directions on purpose. A longer runway gives the cards more
+   distance to live in, which is what "let me finish reading" needs; the gain then buys the
+   strand's speed back so scrolling does MORE, not less. Net motion per pixel is 1.5x the old. */
+const SCROLL_GAIN = 1.8
+const LOOP_SPEED = 1.7
+const HOLD_FADE = 0.16
 /* Frame rate is per tier, so it is declared with the tier below - seeking finer than one frame
    just decodes the same picture again, and the grid has to be the grid the file actually has. */
 
@@ -345,7 +362,7 @@ export default function V2() {
          not a triangle: it reaches full opacity and HOLDS there for the middle of its slice,
          so there is time to actually read it instead of one legible instant. */
       const band = (a: number, b: number) => {
-        const f = (b - a) * 0.28
+        const f = (b - a) * HOLD_FADE
         return String(Math.max(0, Math.min(1, Math.min((p - a) / f, (b - p) / f))))
       }
       const c1 = band(0.20, 0.44), c2 = band(0.46, 0.70), c3 = band(0.72, 0.97)
@@ -400,7 +417,7 @@ export default function V2() {
       const dt = Math.min(0.05, (now - last) / 1000)
       last = now
 
-      const dp = (rawY.current - lastY) / travelPx.current
+      const dp = ((rawY.current - lastY) / travelPx.current) * SCROLL_GAIN
       lastY = rawY.current
       if (offscreen.current) return
 
@@ -447,7 +464,7 @@ export default function V2() {
 
       const tri = ((phase % 2) + 2) % 2          /* 0..2, one full there-and-back */
       const bell = Math.max(Math.abs(Math.sin(tri * Math.PI)), 0.55)
-      phase += dir * (Math.PI / (2 * el.duration)) * bell * dt * idle
+      phase += dir * (Math.PI / (2 * el.duration)) * LOOP_SPEED * bell * dt * idle
       const t2 = ((phase % 2) + 2) % 2
       pos = t2 <= 1 ? t2 : 2 - t2
 
