@@ -181,9 +181,9 @@ const SEEK_MS = 1000 / FPS
    up with real frames and a sane download, and Windows and Android are never asked for a codec
    they do not have. */
 const SRC_H264 =
-  TIER === 'sm' ? '/dna-loop-sm.mp4?v=11'
-  : TIER === 'md' ? '/dna-loop.mp4?v=11'
-  : '/dna-loop-hq.mp4?v=11'
+  TIER === 'sm' ? '/dna-loop-sm.mp4?v=9'
+  : TIER === 'md' ? '/dna-loop.mp4?v=9'
+  : '/dna-loop-hq.mp4?v=10'
 
 /* The light theme's own file, same tier, same 50fps, cut from the same 4K masters and graded
    for cream rather than inverted at runtime. Only ever downloaded if the visitor switches. */
@@ -661,6 +661,9 @@ export default function V2() {
        actually scrolling there ((1 - idle) weight). At rest the anchors let go, so the loop
        plays even on the untouched hero: land at the top, the strand settles intact, then
        quietly starts building and unbuilding on its own. */
+    const DIAG = location.search.includes('loop=diag')
+    let reversed = false
+    let turnTimer = 0 as unknown as ReturnType<typeof setTimeout>
     let pos = 0      /* the frame on screen, 0..1 - DERIVED from phase, never set directly */
     let phase = 0    /* unbounded; pos is a triangle wave of it, so there is no boundary */
     let dir = 1    /* idle playback direction; scrubbing re-aims it so release carries on */
@@ -728,32 +731,35 @@ export default function V2() {
          up" failure is structurally impossible in the phase model. */
       const idle = Math.max(0.22, Math.min(1, Math.max(0, (quiet - 0.02) / 0.12)))
 
-      /* Constant speed now. The bell existed only to take the corner off a turnaround, and a
-         closed loop has no turnaround to soften. One phase unit is one pass of the clip, so
-         1/duration per second is real-time playback. */
-      phase += dir * (1 / el.duration) * LOOP_SPEED * dt * idle
-      /* ENDLESS, AND IT IS THE FILE THAT MADE IT POSSIBLE - not a smarter tick.
-         Every playback trick was measured and every one jumped at the turn: rotate 180 = 59.7,
-         mirror = 67.9, cut back to the start = 46.7, against a normal frame step of 8.6. You
-         cannot hide that in code.
-         So the loop was built into the FOOTAGE. The 293 masters now carry 22 extra frames that
-         dissolve the destroyed end back into the intact start on a smoothstep, which makes the
-         sequence close on itself: measured on the finished frames, the wrap is 0.56 against a
-         normal step of 6.19, and measured again after encoding - because compression could
-         have broken what the frames promised - the wrap is 1.22 against 1.85. The join is
-         SMALLER than an ordinary step. There is no seam to hide.
-         With a self-closing file the triangle wave is not needed and would in fact be wrong:
-         pos is simply the fractional part of phase, so the strand assembles, comes apart, and
-         flows back into itself forever without ever reversing. dir still follows the finger, so
-         scrolling up runs the cycle backwards - equally seamless, since a closed loop has no
-         preferred direction. */
-      pos = ((phase % 1) + 1) % 1
+      const tri = ((phase % 2) + 2) % 2          /* 0..2, one full there-and-back */
+      const bell = Math.max(Math.abs(Math.sin(tri * Math.PI)), 0.55)
+      phase += dir * (Math.PI / (2 * el.duration)) * LOOP_SPEED * bell * dt * idle
+      const t2 = ((phase % 2) + 2) % 2
+      pos = t2 <= 1 ? t2 : 2 - t2
 
-      /* ?loop=diag IS GONE, and it should be: it was the best AVAILABLE answer while the
-         footage still bounced - rotate the return leg, blur the seam, hope it reads as motion.
-         The file closes on itself now, so there is no return leg to rotate and no seam to
-         blur. Keeping a masking trick for a problem that no longer exists is how dead code
-         starts. The measurements that killed each alternative are recorded above pos. */
+      /* ?loop=diag - HIS IDEA, BUILT SO HE CAN JUDGE IT RATHER THAN TAKE MY WORD.
+         The complaint is that the strand visibly BOUNCES at the destroyed end instead of
+         carrying on. His fix: turn the return leg diagonally so the motion reads as continuing.
+
+         Measured on the master, the jump at the turn against a normal 8.6 frame-to-frame step:
+         rotate 180 = 59.7, mirror = 67.9, hard cut to the start = 46.7. His diagonal is the
+         best of them and none is seamless - so the honest move is to MASK that one jump rather
+         than pretend it is not there. The rotation itself is free: a compositor transform on a
+         layer that is already composited, no new file and no download.
+
+         The mask is a 260ms blur-and-lift that fires only at the turn, when the strand is
+         fully in pieces and the screen is chaos anyway - the one moment in the clip where a
+         cut can hide. Off by default; ?loop=diag turns it on. */
+      if (DIAG) {
+        const back = t2 > 1                       /* the return leg */
+        if (back !== reversed) {
+          reversed = back
+          el.classList.toggle('is-rev', back)
+          el.classList.add('is-turn')
+          clearTimeout(turnTimer)
+          turnTimer = setTimeout(() => el.classList.remove('is-turn'), 260)
+        }
+      }
 
       if (dbg) dbg.textContent =
         `pos ${pos.toFixed(3)}  phase ${phase.toFixed(2)}  dir ${dir}  dp ${dp.toFixed(4)}` +
