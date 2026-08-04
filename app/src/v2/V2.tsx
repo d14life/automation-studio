@@ -214,7 +214,8 @@ export default function V2() {
     let pos = 0    /* fraction of the clip on screen, the one true state */
     let dir = 1    /* idle playback direction; scrubbing re-aims it so release carries on */
     let lastP = 0
-    let quiet = 9  /* seconds since the last scroll event - the ONLY thing that arms the loop */
+    let quiet = 9  /* seconds since the last real INPUT - the only thing that arms the loop */
+    let touching = false
     let last = performance.now()
     let lastSeek = 0
     const EDGE = 0.12 /* anchor zone at each end of the runway */
@@ -235,18 +236,27 @@ export default function V2() {
       /* scroll delta scrubs from the current frame; down = toward destroyed, clamped */
       pos = Math.min(1, Math.max(0, pos + dp))
 
-      /* HANDS OFF, NOT SLOW HANDS. This was a velocity blend and it had a bug he found in one
-         sentence: "it definitely goes down even though I go up with my movements". Scrolling
-         slowly produces a small delta, a velocity blend reads small as stopped, and the loop -
-         which advances a full 1/duration per second - simply overpowered his finger and kept
-         destroying the strand while he scrolled up. Velocity cannot tell slow scrolling from a
-         stopped page. Time can: a scroll event either happened this frame or it did not.
-         So the loop is armed only by SILENCE. Any scroll at all, at any speed, resets it and
-         the delta has the wheel alone. The 0.15s dead time then covers iOS momentum, which
-         keeps firing events as it decays, so the loop still fades in the moment the page has
-         truly come to rest rather than fighting the tail. */
-      if (dp !== 0) { dir = dp > 0 ? 1 : -1; quiet = 0 } else quiet += dt
-      const idle = Math.min(1, Math.max(0, (quiet - 0.15) / 0.3))
+      /* A SCROLL EVENT IS NOT AN INPUT. This is the third attempt at the handoff and the first
+         one that satisfies both things he asked for, because the two earlier ones each solved
+         one and broke the other:
+
+           - a VELOCITY blend read slow scrolling as stopped, so the loop overpowered his finger
+             and kept destroying the strand while he scrolled up;
+           - gating on scroll SILENCE fixed that, but silence only arrives once iOS momentum has
+             finished, which is precisely the crawling tail he wanted hidden - "there is like a
+             slight wait" and "the video should continue a bit before".
+
+         Both fall out of the same mistake: treating scroll events as evidence the user is
+         scrolling. During momentum the finger is already off the glass. The page is gliding,
+         not being driven. So the loop is armed by INPUT - touch and wheel - and momentum, which
+         fires scroll but neither of those, no longer holds it off. The strand starts moving
+         while the page is still gliding, which is exactly the ask: the loop's motion covers the
+         crawl instead of the crawl being the motion.
+         And while a finger is actually down, idle is pinned to zero, so no amount of slow,
+         deliberate scrolling can ever be overpowered again. */
+      if (dp !== 0) dir = dp > 0 ? 1 : -1
+      if (touching) quiet = 0; else quiet += dt
+      const idle = Math.min(1, Math.max(0, (quiet - 0.05) / 0.2))
 
       /* the loop: real speed, full range, reflecting at both ends */
       pos += dir * (dt / el.duration) * idle
@@ -272,7 +282,7 @@ export default function V2() {
          which is the path the hardware decoder is built for, and just READ where it got to.
          Backwards still has to be seeks - no browser plays a video in reverse - but that is
          half the cycle instead of all of it. */
-      const cruising = idle > 0.9 && dir === 1 && pos < 0.98
+      const cruising = idle > 0.6 && dir === 1 && pos < 0.98
       if (cruising) {
         if (el.paused) { pos = el.currentTime / el.duration; el.play().catch(() => {}) }
         else pos = el.currentTime / el.duration
@@ -296,6 +306,18 @@ export default function V2() {
        finger directly so iOS inertia never started, and the strand stopped dead when you let
        go - but he tried it and it made the page feel rigid, which is worse than the crawl it
        removed. Native scrolling back, momentum and all. */
+    /* the input listeners the handoff above depends on. touchend deliberately does NOT reset
+       quiet - the moment the finger leaves, the loop is allowed to start covering the glide. */
+    const down = () => { touching = true; quiet = 0 }
+    const up = () => { touching = false }
+    const wheeled = () => { quiet = 0 }
+    addEventListener('touchstart', down, { passive: true })
+    addEventListener('touchmove', down, { passive: true })
+    addEventListener('touchend', up, { passive: true })
+    addEventListener('touchcancel', up, { passive: true })
+    addEventListener('wheel', wheeled, { passive: true })
+    addEventListener('keydown', wheeled)
+
     addEventListener('scroll', onScroll, { passive: true })
     addEventListener('resize', onScroll, { passive: true })
     /* belt and braces to the line above: manual restoration stops the browser putting the
@@ -308,6 +330,12 @@ export default function V2() {
       cancelAnimationFrame(raf)
       removeEventListener('scroll', onScroll)
       removeEventListener('resize', onScroll)
+      removeEventListener('touchstart', down)
+      removeEventListener('touchmove', down)
+      removeEventListener('touchend', up)
+      removeEventListener('touchcancel', up)
+      removeEventListener('wheel', wheeled)
+      removeEventListener('keydown', wheeled)
     }
   }, [])
 
