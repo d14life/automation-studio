@@ -132,7 +132,18 @@ header{position:absolute;top:0;left:0;right:0;z-index:20}
    What is left is one blend on the video itself - screen, which drops the filmed black into the
    page and keeps the starfield visible behind the ribbons. Blending the video element directly
    is much better supported than blending a wrapper around it. */
-#tubelayer.tubefilm{overflow:hidden;mix-blend-mode:normal}
+/* NO mix-blend-mode:normal here. That override is what punched a black rectangle through the
+   starfield wherever the clip was: it moved the screen blend onto the <video>, and #tubelayer
+   is position:fixed with overflow:hidden, so it is its own stacking context - the video's blend
+   could only reach the layer's own transparent interior, never the stars painted behind the
+   layer. The layer then composited normally and its black frame covered them.
+
+   The live canvas has always done it the other way round, and the rule above says why: the
+   blend belongs on the WRAPPER, where it blends against the page. Inheriting screen from
+   #tubelayer drops the filmed black into the starfield exactly as it does for the canvas.
+   This is not the trap-5.5 tint - that was a MULTIPLY overlay in an isolated group with
+   nothing painting beneath it. This is one screen blend against the page, same as live. */
+#tubelayer.tubefilm{overflow:hidden}
 /* CONTAIN, not cover, and the difference is the whole size problem. The clip is landscape
    (1280x695); a phone is portrait. `cover` scaled it up until it covered 812px of height, which
    blew the ribbons up to several times their proper size. `contain` lays it across the width
@@ -140,7 +151,8 @@ header{position:absolute;top:0;left:0;right:0;z-index:20}
    width, the ratio measured off the live desktop page), fitting the frame to the viewport width
    reproduces exactly the sweep the live scene would have computed from this screen's own
    slogan. The black that `contain` leaves above and below is screened away and never seen. */
-.tubefilm video{display:block;width:100%;height:100%;object-fit:contain;mix-blend-mode:screen;
+.tubefilm video{display:block;width:100%;height:100%;object-fit:contain;mix-blend-mode:normal;  /* the screen lives on the wrapper, see above */
+ 
   /* NO scale. The 1.2 here was correcting a clip filmed with the desktop's figure; the clip is
      now filmed with the phone's own, its sweep written as a fraction of the frame WIDTH
      (195/402 and 86/402) precisely so that contain-fitting to the phone's width lands it at

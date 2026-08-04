@@ -82,7 +82,14 @@ export function useLiquidSlogan(ready: boolean, heroVisible: boolean): void {
          there is no background box to hide, so the filter is guarding against a bug that cannot
          happen here. The library keeps the motion either way: threshold:false leaves the blur
          and opacity curves, which are the melt. */
-      threshold: !TOUCH,
+      /* Back ON for touch. Taking it off bought 22.9fps and cost the effect: without the alpha
+         threshold there is no fusing, so the melt degrades to a blurred crossfade with both
+         phrases ghosting through each other - his words, "the morph text is not the one on the
+         web version", and he was right. The threshold IS the liquid.
+         The cost was never the threshold itself, it was the filter running in linearRGB. See
+         anim3.js: the matrix only touches alpha, so sRGB is the same picture without the
+         per-pixel colour-space conversion every frame. */
+      threshold: true,
       flat: TOUCH,
       /* Photographed on a real iPhone: the slogan turned into blue blobs. The library caps the
          melt blur at a flat 100px, which was written for a 77px desktop slogan - on a phone the
