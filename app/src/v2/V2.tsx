@@ -49,14 +49,23 @@ const HALF_FRAME = 0.5 / FPS
    second, half of them in reverse where a GOP is pure cost. Every frame is its own keyframe,
    so a seek costs exactly one decode in either direction.
 
-   Two encodes of the same frames: CRF 18 at 24MB for a screen big enough to see it, CRF 21 at
-   9MB scaled to 720p for everything else - a phone cannot resolve the extra detail and would
-   pay for it in data and decode, and cheap decode is what the whole scrub rests on.
+   ?v=4: AI UPSCALED. 1920x1080 was the ceiling of the master, so the only way past it was to
+   invent detail: Real-ESRGAN (realesr-animevideov3) took all 293 frames to 3840x2160 on the
+   M4 GPU, and both files are cut from those. Smooth 3D-rendered CG is the ideal case for it -
+   nothing to confuse with grain - and it DENOISED the source compression on the way, so the
+   AI 1440p came out both sharper AND smaller than a plain lanczos 1440p (29.0MB vs 35.2MB,
+   measured on identical crops). Desktop is 2560x1440 now instead of 1920x1080.
+
+   His call, and it overrides the old economy: the upscaled picture goes to EVERY device, so
+   the small file is 1080p now rather than 720p. Both are cut from the same 4K frames: 1440p
+   CRF 19 at 29MB for a screen big enough to see it, 1080p CRF 20 at 16.6MB for phones and
+   tablets. Two files rather than one because a phone decoding 2560x1440 twenty-five times a
+   second is how the lag comes back, and cheap decode is what the whole scrub rests on.
    Chosen once at module load rather than per render - the file cannot be swapped mid-scroll
    without losing the seek position, so a resize does not re-pick. */
 const SRC = matchMedia('(min-width:1100px) and (min-height:700px)').matches
-  ? '/dna-loop-hq.mp4?v=3'
-  : '/dna-loop.mp4?v=3'
+  ? '/dna-loop-hq.mp4?v=4'
+  : '/dna-loop.mp4?v=4'
 
 /* RELOAD MUST START THE STRAND OVER. The browser restores scrollY on reload, which for an
    ordinary page is a kindness and for this one is a bug: the scroll is restored but the video
