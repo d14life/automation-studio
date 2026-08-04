@@ -237,11 +237,23 @@ html.v2light{
    because it is the sentence he wants a stranger to leave with. */
 .v2eyebrow{margin:0 0 22px;font:500 12px/1 JBMono,monospace;letter-spacing:.16em;
   text-transform:uppercase;color:var(--ink-faint)}
-.v2h1{margin:0;max-width:16ch;color:var(--ink);text-wrap:balance;
-  font:900 clamp(38px,6.4vw,104px)/1.02 Golos,sans-serif;letter-spacing:-.035em}
-.v2h1 em{font-style:normal;
-  background:linear-gradient(100deg,#DFF6FF,#7FD8FF 45%,#5C82C9);
-  -webkit-background-clip:text;background-clip:text;color:transparent}
+/* THE SLOGAN IS PAINTED IN THE CLIP'S OWN COLOURS, and they were SAMPLED off the master
+   frames rather than picked: averaging the most saturated pixels of a real frame gives
+   #2B6397 steel blue while the strand is intact, #C2AE5A midway, and #E8B22D at the
+   destroyed peak with its brightest at #F0E782. That warm arc is what the eye actually sees
+   behind these words, so the words are made of it - the same reasoning that set --bg from a
+   sampled pixel instead of a chosen one.
+   Light is his violet, and necessarily the DARK half of violet: that theme's page is cream, so
+   a pale gradient would vanish there exactly as a black one does on the dark theme.
+   One variable carries it, so the switch is the same one class on <html> as everything else. */
+:root{--slogan:linear-gradient(100deg,#F0E782,#E8B22D 46%,#B4600F)}
+html.v2light{--slogan:linear-gradient(100deg,#9B7BE8,#6D28D9 46%,#3B1D6E)}
+.v2h1{margin:0;max-width:16ch;text-wrap:balance;
+  font:900 clamp(38px,6.4vw,104px)/1.02 Golos,sans-serif;letter-spacing:-.035em;
+  background:var(--slogan);-webkit-background-clip:text;background-clip:text;color:transparent}
+/* the emphasised word keeps the page's ink so it reads as the accent against the gradient,
+   rather than two gradients competing inside one sentence */
+.v2h1 em{font-style:normal;color:var(--ink);-webkit-text-fill-color:var(--ink)}
 .v2lede{margin:26px 0 0;max-width:54ch;color:var(--ink-soft);
   font:400 clamp(16px,1.35vw,19px)/1.55 Golos,sans-serif}
 
