@@ -360,8 +360,20 @@ export default function V2() {
       lastP = p
       if (offscreen.current) return
 
-      /* scroll delta scrubs from the current frame; down = toward destroyed, clamped */
-      pos = Math.min(1, Math.max(0, pos + dp))
+      /* THE SCROLL REFLECTS TOO - it does not run out of strand any more.
+         His report: the loop walks the strand to the destroyed end while he is only halfway
+         down the runway, and from there scrolling further does nothing at all - "it is just
+         stuck at the end while we scroll". That was the clamp. Once the loop is free to move
+         pos on its own, pos and the scroll position are no longer the same number, so pinning
+         pos to [0,1] guarantees dead scroll whenever the loop has arrived first.
+         Folding instead of clamping means the strand simply turns around and rebuilds, and
+         keeps turning for as long as you keep scrolling. Every scroll produces motion, always,
+         which is the property he actually wants. The while loop handles a flick big enough to
+         cross the whole clip more than once. */
+      let raw = pos + dp
+      let bounces = 0
+      while (raw > 1 || raw < 0) { raw = raw > 1 ? 2 - raw : -raw; bounces++ }
+      pos = raw
 
       /* A SCROLL EVENT IS NOT AN INPUT. This is the third attempt at the handoff and the first
          one that satisfies both things he asked for, because the two earlier ones each solved
@@ -381,7 +393,9 @@ export default function V2() {
          crawl instead of the crawl being the motion.
          And while a finger is actually down, idle is pinned to zero, so no amount of slow,
          deliberate scrolling can ever be overpowered again. */
-      if (dp !== 0) dir = dp > 0 ? 1 : -1
+      /* an odd number of bounces means the strand is now travelling the OTHER way, so the loop
+         must carry on rebuilding rather than snapping back to destroying when you let go */
+      if (dp !== 0) dir = (dp > 0 ? 1 : -1) * (bounces % 2 ? -1 : 1)
       if (touching) quiet = 0; else quiet += dt
 
       /* TWO GATES ON THE LOOP, for the two ways a human is still in charge:
@@ -402,8 +416,16 @@ export default function V2() {
          It is still a MULTIPLIER on the input gate, which is what keeps it safe: a finger on
          the glass pins idle to zero regardless, so none of this can overpower a real scroll.
          Only a page that is coasting untouched can be taken over. */
-      const c = Math.min(1, Math.max(0, 1 - Math.abs(dp) / dt / 1.1))
-      const calm = c * c
+      /* He says he still cannot see a difference, and the reason is that SQUARING the window
+         was undoing the threshold I kept raising: at half the cut-off speed a squared window is
+         only a quarter open, so the loop stayed suppressed through most of the glide however
+         high the number went. Dropped the square and raised the cut-off to 2.5, so the loop is
+         already at 60% strength while the page is still travelling at a fair clip and reaches
+         full long before the crawl. That is the "two seconds earlier" - the change is in the
+         SHAPE of the ramp, not just where it starts.
+         Safety is unchanged and does not depend on this number: a finger on the glass pins
+         idle to zero through the other gate, so only a page coasting untouched is ever taken. */
+      const calm = Math.min(1, Math.max(0, 1 - Math.abs(dp) / dt / 2.5))
       /* AT A PINNED END, THE RAMP BUYS NOTHING. The gates exist so the loop never fights the
          scrub - but once pos is clamped hard against 0 or 1, scrolling further that way moves
          nothing, so there is no fight left to lose. Waiting the full 0.25s there just parks
