@@ -14,7 +14,10 @@
 :root{--bg:#0f212e;--ink:#F2F7F5}
 html.v2light{--bg:#F2E9E1;--ink:#141a1c}
 html,body{margin:0;background:var(--bg)}
-html{scroll-behavior:auto}
+html{scroll-behavior:auto;scrollbar-width:none;-ms-overflow-style:none}
+/* The strand is the whole screen, so a scroll indicator down the side is a line across the
+   artwork - his screenshot. The page still scrolls, it just stops advertising it. */
+html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none}
 
 /* ---------- the header ----------
    .v2stage is tall - that height IS the scroll runway - and .v2pin sticks to the top for as
