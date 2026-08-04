@@ -101,26 +101,22 @@ const TIER =
   : innerWidth < 1100 ? 'md'     /* tablets */
   : NEED > 3200 ? '4k'           /* an actual 4K display */
   : 'hq'                         /* laptops and ordinary monitors */
-/* TWO CODECS PER TIER, and the browser picks - which is also what keeps Windows and Android
-   working. HEVC is offered first and H.264 second, as two <source> children; any browser that
-   cannot decode HEVC skips that line and takes the H.264, which is the most universally
-   supported video codec there is. Nothing is sniffed, nothing is guessed - the failure mode is
-   a browser choosing the file it already told us it can play.
-   HEVC is worth the second encode because it is roughly half the bytes at the same quality and
-   is hardware-decoded on every Apple device, and half the bytes is exactly what paid for 50fps
-   everywhere: the phone's 25fps H.264 was 8.9MB, its 50fps HEVC is 8.6MB. Twice the frame rate
-   for slightly fewer bytes.
-   The 4K tier stays 25fps - interpolating 3840x2160 to 50 buys motion nobody sitting at a 4K
-   monitor is studying, at a download that no hero video can justify. */
-/* SMALL SCREENS GET SMOOTHNESS, BIG SCREENS GET SHARPNESS - and that split is forced by
-   arithmetic, not taste. There are only 293 REAL frames; 50fps means inventing every second
-   one, and an invented frame is the same mush this page spent the morning deleting. Measured
-   on identical crops: a real frame's PNG carries 13% more detail than the interpolated frame
-   at the same instant, and the scale texture on the strand visibly smears.
-   At 720p on a phone that softness is invisible and the motion is what the eye tracks, so
-   phones and tablets take the 50fps files. On a 1440p laptop it is plainly visible - he saw it
-   unprompted - so laptops and 4K displays take REAL frames only at 25fps. Nothing invented on
-   any screen that could resolve the difference. */
+/* H.264 ONLY, and the HEVC experiment is reverted rather than patched.
+   The saving was real on paper - roughly half the bytes - but it cost the one thing that has
+   to be true: he could not play the video on his own iPhone. First it was libx265 emitting an
+   Rext profile, which Apple hardware refuses; Apple's own encoder fixed the profile and the
+   file STILL would not scrub on a real device, only decode a single frame. On his phone the
+   H.264 files scrubbed for the whole evening before HEVC was introduced, and on the phone
+   tier HEVC was saving 6% - 12.5MB against 13.3. That is not a trade, it is a regression with
+   a rounding error attached.
+   H.264 High profile, all-intra, yuv420p, faststart: the most universally decodable video
+   there is, and the configuration this page was already proven on. Windows, Android, old
+   Safari, everything.
+
+   A note for whoever is tempted to try HEVC again: a <source> fallback CANNOT save you. A
+   browser that accepts the type up front and then fails to DECODE does not fall back to the
+   next line - it shows nothing at all. Test on real hardware, not the simulator, which
+   borrows the Mac's decoder and plays files a phone will refuse. */
 const FPS = TIER === 'sm' || TIER === 'md' ? 50 : 25
 const HALF_FRAME = 0.5 / FPS
 /* THE SEEK CAP IS THE FILE'S OWN FRAME INTERVAL, not a hand-picked 30Hz. 33ms was chosen when
@@ -140,18 +136,10 @@ const SEEK_MS = 1000 / FPS
    hands back a sharp 1440p instead of a 47MB 4K file nobody should download. Every device ends
    up with real frames and a sane download, and Windows and Android are never asked for a codec
    they do not have. */
-const SRC_HEVC =
-  TIER === 'sm' ? '/dna-loop-sm.hevc.mp4?v=8'
-  : TIER === 'md' ? '/dna-loop.hevc.mp4?v=8'
-  /* 2800, not 3200, because HEVC is cheap enough that a retina laptop can have the 4K master
-     and stop being upscaled at all - his Mac asks for 2880. A plain 1080p monitor asks for
-     1920 and takes the 1440p file, because sending it 4K would be bytes it cannot paint. */
-  : NEED > 2800 ? '/dna-loop-4k.hevc.mp4?v=8'
-  : '/dna-loop-hq.hevc.mp4?v=8'
 const SRC_H264 =
-  TIER === 'sm' ? '/dna-loop-sm.mp4?v=8'
-  : TIER === 'md' ? '/dna-loop.mp4?v=8'
-  : '/dna-loop-hq.mp4?v=8'
+  TIER === 'sm' ? '/dna-loop-sm.mp4?v=9'
+  : TIER === 'md' ? '/dna-loop.mp4?v=9'
+  : '/dna-loop-hq.mp4?v=9'
 
 /* RELOAD MUST START THE STRAND OVER. The browser restores scrollY on reload, which for an
    ordinary page is a kindness and for this one is a bug: the scroll is restored but the video
@@ -298,15 +286,31 @@ export default function V2() {
   const nudge = useCallback((el: HTMLVideoElement | null) => {
     videoRef.current = el
     if (!el) return
-    /* iOS will not let a video be SEEKED until it has been allowed to play at least once, and
-       in Low Power Mode it will not autoplay at all - so play, immediately pause, and ask
-       again on the first real gesture if it was refused. Same lesson as the live page. */
+    /* iOS WILL NOT SEEK A VIDEO IT HAS NEVER BEEN ALLOWED TO PLAY, and the old arming here
+       gave up too easily - which is exactly what he described: a blue screen with no strand,
+       then one frame after the first scroll and nothing after that. One frame decoding while
+       currentTime does nothing IS the un-armed signature.
+       Three things were wrong. The first play() fired from the ref callback, before the element
+       had metadata, so it could reject for a reason that had nothing to do with permission.
+       The gesture retries were {once:true}, so a single early failure spent them both. And
+       nothing ever checked whether arming had actually worked.
+       Now: arm on canplay AND loadedmetadata as well as immediately, retry on every gesture
+       until it takes, and confirm by watching for a real 'seeked' event before standing down.
+       autoplay is on the element too - muted and playsInline, which iOS permits - so in the
+       common case the browser arms it for us and none of this is needed. */
+    let armed = false
     const arm = () => {
-      el.play().then(() => el.pause()).catch(() => { /* wait for a gesture */ })
+      if (armed) return
+      el.play().then(() => { el.pause() }).catch(() => { /* wait for a real gesture */ })
     }
+    const done = () => { armed = true }
+    el.addEventListener('seeked', done, { once: true })
+    el.addEventListener('loadedmetadata', arm)
+    el.addEventListener('canplay', arm)
     arm()
-    addEventListener('touchstart', arm, { once: true, passive: true })
-    addEventListener('click', arm, { once: true })
+    addEventListener('touchstart', arm, { passive: true })
+    addEventListener('pointerdown', arm, { passive: true })
+    addEventListener('click', arm)
   }, [])
 
   useEffect(() => {
@@ -560,10 +564,7 @@ export default function V2() {
       <section className="v2stage" ref={stageRef} style={{ height: `${RUNWAY * 100}svh` }}>
         <div className="v2pin">
           <div className="v2bg">
-            <video ref={nudge} muted playsInline preload="auto">
-              <source src={SRC_HEVC} type='video/mp4; codecs="hvc1"' />
-              <source src={SRC_H264} type='video/mp4; codecs="avc1.640028"' />
-            </video>
+            <video ref={nudge} src={SRC_H264} muted autoPlay playsInline preload="auto" />
           </div>
 
           <div className="v2scrim" aria-hidden="true" />
