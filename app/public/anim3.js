@@ -42,6 +42,9 @@ function Starfield1(host, o) {
     measure();
     cv.width = w; cv.height = h;
   }
+  var onWinResize = function(){ needResize = true; };
+  addEventListener('resize', onWinResize, {passive:true});
+  addEventListener('orientationchange', onWinResize, {passive:true});
   function bigBang(){
     if (arr.length !== quantity){
       arr = new Array(quantity);
@@ -51,7 +54,18 @@ function Starfield1(host, o) {
       }
     }
   }
+  /* Polled from the animation loop, this called measure() - which reads host.clientWidth and
+     host.clientHeight - on EVERY FRAME: a forced layout read sixty times a second, forever, to
+     learn something that only changes when the window resizes. There was no resize listener at
+     all; the loop polled layout instead. With the parallax and the melt writing styles in the
+     same frame that is a read-write-read thrash, and it does not show up as a lower average -
+     it shows up as IRREGULAR FRAME TIMES. Movement is scaled by elapsed time, so the field is
+     always in the right PLACE, but the frames arrive unevenly and each jumps a different
+     distance. That is the "quick for a split second then slower, again and again". */
+  var needResize = false;
   function resizeIfNeeded(){
+    if (!needResize) return;
+    needResize = false;
     var pw=w, ph=h;
     measure();
     if (cv.width!==w || cv.height!==h){
@@ -143,6 +157,8 @@ function Starfield1(host, o) {
   };
   function stop(){
     running=false; cancelAnimationFrame(raf);
+    removeEventListener('resize', onWinResize);
+    removeEventListener('orientationchange', onWinResize);
     if (mouseAdjust) host.removeEventListener('mousemove', onMove);
     if (clickToWarp){ host.removeEventListener('mousedown', onDown); removeEventListener('mouseup', onUp); }
     cv.remove();
