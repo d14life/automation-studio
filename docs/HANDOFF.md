@@ -312,6 +312,24 @@ deleted, so the clip has been stuck white ever since. If the clip ever has to
 carry the colour again, the tint must be a `filter` on the `<video>` element
 itself, never an overlay in an isolated group.
 
+### 5.12 A scrubbed video must turn OFF the browser's scroll restoration
+On reload the browser puts `scrollY` back where it was. For an ordinary page
+that is a kindness; for v2's DNA header it is a bug, because the scroll is
+restored and the video is not — it comes back at `currentTime` 0. Measured in
+the browser: reload at `scrollY 1800` gave `currentTime 0`, i.e. the page sat
+two thirds through the stage showing an intact strand.
+
+On iOS it is worse than a mismatch. A `<video>` there cannot be **seeked** until
+it has been allowed to play once, and a fresh load has had no gesture yet — so
+the picture freezes on whatever frame is painted and scrolling does nothing,
+then the first touch arms it and it snaps. That snap reads as "the page reloaded
+by itself and jumped back to the start".
+
+`history.scrollRestoration = 'manual'` in `V2.tsx`, at **module scope** — not in
+an effect. The browser restores scroll as soon as the document is tall enough,
+which can be before React has mounted. Any future scroll-driven media on this
+site needs the same line.
+
 ---
 
 ## 6. The method that finally worked
