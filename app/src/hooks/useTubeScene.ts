@@ -18,11 +18,18 @@ function textWidth(el: HTMLElement): number {
   return w || el.getBoundingClientRect().width
 }
 
-function tubeSet(p: number): string[] {
+/* dim() multiplies each channel by k and clamps at 255, so k IS the brightness: the ribbons
+   have been running at 0.672 of the palette. His word, 4 Aug: too shallow on the phone. A
+   phone has no bloom (it is the largest piece of GPU work on the page and stays off) and far
+   fewer, thinner tubes than the Mac, so the same k lands much darker there. BOOST takes the
+   phone to 0.97 - effectively the full palette, still clamped, with the desktop untouched. */
+const BOOST = 1.45
+
+function tubeSet(p: number, boost = 1): string[] {
   return [
-    window.dim(window.paletteAt(ICE, p), k),
-    window.dim(window.paletteAt(ICE, p + sp), k),
-    window.dim(window.paletteAt(ICE, p + sp * 2), k),
+    window.dim(window.paletteAt(ICE, p), k * boost),
+    window.dim(window.paletteAt(ICE, p + sp), k * boost),
+    window.dim(window.paletteAt(ICE, p + sp * 2), k * boost),
   ]
 }
 
@@ -42,9 +49,13 @@ export function useTubeScene(ready: boolean, heroVisible: boolean): RefObject<HT
      screen. The layer is nudged so the path's centre lands on the morph lines: that is what
      puts the ribbons behind the text instead of over the number below it. */
   useEffect(() => {
-    const layer = layerRef.current
-    if (!layer) return
     const aimTubesAtText = () => {
+      /* read the ref here, not once above. This layer is swapped when the page falls back to
+         the clip: TubeLayer unmounts the live div and mounts the filmed one, so an element
+         captured at mount time is the removed one by the time it matters. That is why the clip
+         sat centred in the viewport while the live scene tracked the words. */
+      const layer = layerRef.current
+      if (!layer) return
       /* THE fix for "it lags everywhere else": this reads two boxes, which forces a fresh
          layout, and it was doing it on every scroll frame for the entire length of the page -
          long after the ribbons had left the screen and there was nothing left to aim. Below the
@@ -70,7 +81,12 @@ export function useTubeScene(ready: boolean, heroVisible: boolean): RefObject<HT
     addEventListener('scroll', onScroll, { passive: true }) /* the words move, the band follows */
     addEventListener('load', aimTubesAtText)
     aimTubesAtText()
+    /* The filmed layer mounts AFTER this effect has run, and the slogan's own box only settles
+       once the font gate lifts and LiquidText has painted. Re-aim on the same schedule the
+       sweep uses rather than hoping a scroll happens. */
+    const again = [120, 700, 1800, 4600].map((ms) => window.setTimeout(aimTubesAtText, ms))
     return () => {
+      again.forEach(clearTimeout)
       removeEventListener('resize', onScroll)
       removeEventListener('scroll', onScroll)
       removeEventListener('load', aimTubesAtText)
@@ -131,13 +147,21 @@ export function useTubeScene(ready: boolean, heroVisible: boolean): RefObject<HT
          what they lose is the halo bleeding out past their edges. One word to put it back. */
       bloom: false,
       tubes: {
-        colors: tubeSet(p0),
+        colors: tubeSet(p0, SMALL ? BOOST : 1),
         /* The ribbon's own length, which is its tubular segment count - not the reach of the
            path, which is sleepRadiusX/Y below. +30% on the library's 32-128. */
-        /* Length stays close to the Mac; the saving is taken around the tube instead of along
-           it, below. He complained the mobile ribbons were short - so they are not short. */
-        minTubularSegments: SMALL ? 40 : 42,
-        maxTubularSegments: SMALL ? 150 : 166,
+        /* This is the ribbon's OWN length - how far the trail streams behind the head - not the
+           reach of the path, which is sleepRadiusX/Y. It used to be held close to the Mac's
+           because he had said the mobile ribbons were too short. With the figure now wrapping
+           the slogan properly the opposite is true: at 150 the trail is long enough to lap its
+           own path and read as a tangle rather than a stroke. His word, 4 Aug: shorter.
+
+           Cut to about 62%. This is also the cheapest frame time on the page - the surface is
+           rebuilt every frame by a loop over tubularSegments x radialSegments, so a third off
+           the length is a third off that product, on top of the radialSegments 8 -> 5 already
+           taken below. It should help the 33fps the perf guard measured. */
+        minTubularSegments: SMALL ? 25 : 42,
+        maxTubularSegments: SMALL ? 95 : 166,
         /* THE mobile lever, and it costs nothing anyone can see. Each ribbon's surface is
            rebuilt every frame by a loop over tubularSegments x radialSegments, so the cost is
            the product - and radialSegments is how many facets go AROUND a tube whose radius is
@@ -152,12 +176,14 @@ export function useTubeScene(ready: boolean, heroVisible: boolean): RefObject<HT
            reads the same and there is a third less geometry to rebuild sixty times a second. */
         count: SMALL ? 8 : 11,
         lights: {
-          intensity: GLOW.i,
+          /* the four lights are what actually lights the tube surface, so brightness is half
+             here and half in the colours above */
+          intensity: SMALL ? Math.round(GLOW.i * 1.6) : GLOW.i,
           colors: [
-            window.dim(window.paletteAt(ICE, p0), k),
-            window.dim(window.paletteAt(ICE, p0 + sp * 0.9), k),
-            window.dim(window.paletteAt(ICE, p0 + sp * 1.5), k),
-            window.dim(window.paletteAt(ICE, p0 + sp * 2.1), k),
+            window.dim(window.paletteAt(ICE, p0), k * (SMALL ? BOOST : 1)),
+            window.dim(window.paletteAt(ICE, p0 + sp * 0.9), k * (SMALL ? BOOST : 1)),
+            window.dim(window.paletteAt(ICE, p0 + sp * 1.5), k * (SMALL ? BOOST : 1)),
+            window.dim(window.paletteAt(ICE, p0 + sp * 2.1), k * (SMALL ? BOOST : 1)),
           ],
         },
       },
@@ -238,8 +264,33 @@ export function useTubeScene(ready: boolean, heroVisible: boolean): RefObject<HT
         /* These two are how FAR the ribbons travel, not how long the ribbon itself is.
            Narrower on his word: the path used to reach past the ends of the words, now it stays
            well inside them. Height is three quarters of the block, up 50% from a half. */
-        a.options.sleepRadiusX = Math.round(textW * 0.38)
-        a.options.sleepRadiusY = Math.round(blockH * 1.125)
+        /* The path is x=cos(t), y=sin(2t) - a lemniscate, the infinity figure. These two radii
+           are its half-width and half-height, so they are what wraps it around the words.
+           "Around the edges of the morph text": framed on the TEXT, which is what desktop
+           already does, not on the viewport. RY is the one being tuned by eye tonight. */
+        /* RX is the half-width of the figure, so at 0.38 of the text width the loop turned back
+           well INSIDE the words - that was a deliberate narrowing once, and it is what made the
+           infinity read as a small knot rather than something wrapping the slogan. At 0.55 the
+           full span is 1.1x the text, so the two lobes cross behind the middle of the line and
+           the ends reach just past the last letter on each side without leaving the screen. */
+        /* MEASURED off the live site at 1280x720, not guessed: sweep 462 x 202 against a
+           1217px slogan and a 179.2px block. That is RX 0.380, RY 1.127 - the values below -
+           and a figure whose own aspect is 2.29:1.
+
+           The phone cannot have the same composition, and it is worth writing down why: on the
+           Mac the slogan is 77px filling 95% of a 1280px window, so the two lines are 24.9% of
+           the viewport height. A 402px phone only fits 33px type, so its block is 11.8% - less
+           than half. Framing the figure on the VIEWPORT therefore blows it up (that was the 2.4x
+           he called too wide); framing it on the TEXT at the desktop's own multipliers makes it
+           small and flat. Nothing can satisfy both while the type has to shrink to fit.
+
+           So: keep the web's SHAPE and let it wrap the phone's slogan. RX 0.55 puts the span at
+           1.1x the text, and RY is then set to hold the measured 2.29:1 - 0.55/2.29*2 = 0.48 of
+           the block per side, x2 lines = 1.07. Same figure as the Mac, sized to these words. */
+        const RX = SMALL ? 0.55 : 0.380
+        const RY = SMALL ? 1.07 : 1.127
+        a.options.sleepRadiusX = Math.round(textW * RX)
+        a.options.sleepRadiusY = Math.round(blockH * RY)
         window.__tubeSweep = [a.options.sleepRadiusX, a.options.sleepRadiusY] /* readable proof */
       }
       sweep()
@@ -281,6 +332,7 @@ export function useTubeScene(ready: boolean, heroVisible: boolean): RefObject<HT
   useEffect(() => {
     if (!heroVisible) return
     let hue = 0, last = 0, raf = 0, warned = false
+    const boost = isSmallDevice() ? BOOST : 1
     const cycle = (now: number) => {
       raf = requestAnimationFrame(cycle)
       const app = appRef.current
@@ -292,12 +344,14 @@ export function useTubeScene(ready: boolean, heroVisible: boolean): RefObject<HT
       hue = (hue + 360 * (now - last) / 1000 / (FLOW * 3)) % 360; last = now
       const p = hue / 360 * ICE.length + p0
       try {
-        app.tubes.setColors(tubeSet(p))
+        /* the cycle rewrites every colour ~16 times a second, so without the same boost the
+           ribbons would brighten for one frame at build and then sink back on the next tick */
+        app.tubes.setColors(tubeSet(p, boost))
         app.tubes.setLightsColors([
-          window.dim(window.paletteAt(ICE, p + sp * 0.3), k),
-          window.dim(window.paletteAt(ICE, p + sp * 0.9), k),
-          window.dim(window.paletteAt(ICE, p + sp * 1.5), k),
-          window.dim(window.paletteAt(ICE, p + sp * 2.1), k),
+          window.dim(window.paletteAt(ICE, p + sp * 0.3), k * boost),
+          window.dim(window.paletteAt(ICE, p + sp * 0.9), k * boost),
+          window.dim(window.paletteAt(ICE, p + sp * 1.5), k * boost),
+          window.dim(window.paletteAt(ICE, p + sp * 2.1), k * boost),
         ])
         window.__tubeHue = Math.round(hue) /* readable proof that the cycle is alive */
       } catch (e) { if (!warned) { warned = true; console.warn('tube colours:', e) } }

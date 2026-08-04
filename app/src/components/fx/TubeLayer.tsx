@@ -34,6 +34,13 @@ export function TubeLayer({ ready, heroVisible }: { ready: boolean; heroVisible:
   const [dead, setDead] = useState(false)
 
   useEffect(() => {
+    /* Back to the clip for every phone, and this time the clip is the phone's own scene:
+       re-filmed 4 Aug through record-tubes.html?mobile=1 with the phone build (8 tubes, trails
+       25/95, 5 radial segments), the phone's figure, and the brightness he approved. The live
+       scene proved the look on the simulator and then measured 33fps there; a clip is video
+       decode on dedicated silicon instead. The one thing this used to cost - the colour cycle -
+       is not lost: the take is 10.5s + a 1.2s crossfade, so the palette completes a full lap
+       over the output length and the loop closes on a matching colour. */
     if (isSmallDevice() || document.documentElement.dataset.perf === 'low') {
       setFilmed(true)
       return
@@ -61,7 +68,7 @@ export function TubeLayer({ ready, heroVisible }: { ready: boolean; heroVisible:
   if (filmed) {
     if (dead) return null
     return (
-      <div id="tubelayer" className="tubefilm">
+      <div id="tubelayer" ref={layerRef} className="tubefilm">
         <video ref={nudge} src="/tubes-loop.mp4" autoPlay muted loop playsInline preload="auto" />
       </div>
     )

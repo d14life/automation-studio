@@ -11,7 +11,12 @@ a{color:inherit}
 /* ---------- header ---------- */
 header{position:absolute;top:0;left:0;right:0;z-index:20}
 .wrap{max-width:1180px;margin:0 auto;padding:0 24px}
-.topbar{display:flex;align-items:center;gap:16px;padding:22px 0}
+/* padding-block, not the `22px 0` shorthand. .topbar always rides on .wrap, and a shorthand
+   here resets .wrap's `padding:0 24px` to zero - so the header had no side gutter at any width.
+   On a phone that put the logo at x=0 and the burger hard against the right edge (measured
+   0..111 and 358..402 at 402 wide). The sections below all keep .wrap's gutter; now the header
+   lines up with them. */
+.topbar{display:flex;align-items:center;gap:16px;padding-block:22px}
 .mark{font:900 20px/1 Nunito,sans-serif;letter-spacing:-.02em;text-decoration:none}
 .mark span{color:var(--ice2)}
 .topnav{margin-left:auto;display:flex;align-items:center;gap:22px;font-size:14.5px;color:var(--dim)}
@@ -127,7 +132,18 @@ header{position:absolute;top:0;left:0;right:0;z-index:20}
    What is left is one blend on the video itself - screen, which drops the filmed black into the
    page and keeps the starfield visible behind the ribbons. Blending the video element directly
    is much better supported than blending a wrapper around it. */
-#tubelayer.tubefilm{overflow:hidden;mix-blend-mode:normal}
+/* NO mix-blend-mode:normal here. That override is what punched a black rectangle through the
+   starfield wherever the clip was: it moved the screen blend onto the <video>, and #tubelayer
+   is position:fixed with overflow:hidden, so it is its own stacking context - the video's blend
+   could only reach the layer's own transparent interior, never the stars painted behind the
+   layer. The layer then composited normally and its black frame covered them.
+
+   The live canvas has always done it the other way round, and the rule above says why: the
+   blend belongs on the WRAPPER, where it blends against the page. Inheriting screen from
+   #tubelayer drops the filmed black into the starfield exactly as it does for the canvas.
+   This is not the trap-5.5 tint - that was a MULTIPLY overlay in an isolated group with
+   nothing painting beneath it. This is one screen blend against the page, same as live. */
+#tubelayer.tubefilm{overflow:hidden}
 /* CONTAIN, not cover, and the difference is the whole size problem. The clip is landscape
    (1280x695); a phone is portrait. `cover` scaled it up until it covered 812px of height, which
    blew the ribbons up to several times their proper size. `contain` lays it across the width
@@ -135,11 +151,13 @@ header{position:absolute;top:0;left:0;right:0;z-index:20}
    width, the ratio measured off the live desktop page), fitting the frame to the viewport width
    reproduces exactly the sweep the live scene would have computed from this screen's own
    slogan. The black that `contain` leaves above and below is screened away and never seen. */
-.tubefilm video{display:block;width:100%;height:100%;object-fit:contain;mix-blend-mode:screen;
-  /* his word: a bit wider. contain fits the frame to the viewport width, which lands the sweep
-     within 10% of what the live scene computes here; a fifth on top is the "bit". Scaling the
-     element is free - the compositor already has the decoded frame as a texture. */
-  transform:scale(1.2);transform-origin:center}
+.tubefilm video{display:block;width:100%;height:100%;object-fit:contain;mix-blend-mode:normal;  /* the screen lives on the wrapper, see above */
+ 
+  /* NO scale. The 1.2 here was correcting a clip filmed with the desktop's figure; the clip is
+     now filmed with the phone's own, its sweep written as a fraction of the frame WIDTH
+     (195/402 and 86/402) precisely so that contain-fitting to the phone's width lands it at
+     195x86. Scaling would multiply that back out of true. */
+  transform:none}
 /* the bottom padding is what lifts the slogan: the block is centred, so padding at the foot
    pushes the centre - and the slogan with it - up the screen. */
 /* The whole first screen moves down as ONE block - slogan, number and buttons together - rather
@@ -151,14 +169,43 @@ header{position:absolute;top:0;left:0;right:0;z-index:20}
   transform:translateY(var(--herodrop,108px))}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 /* half again as big as it was: 21pt -> 31.5pt, 3.2rem -> 4.8rem, heights to match */
-.morph{position:relative;height:3.5rem;width:100%;max-width:1400px;margin:0 auto;
+/* flex:none is load-bearing, not tidiness. .morph is a flex item of .stageui, and every child
+   it has is position:absolute - so its min-content height is 0 and min-height:auto cannot stop
+   it shrinking. On a phone .numblock joins the flow (it is absolute on desktop) and the column
+   overflows, so flex crushed BOTH hosts to height 0 and they landed on the same y: the two
+   slogan lines painted on top of each other. Measured on iPhone 16 Pro: cssH=0px, liq1 and liq2
+   both top=199.7. That, not the melt, was the overlap six fixes chased. */
+.morph{position:relative;flex:none;height:3.5rem;width:100%;max-width:1400px;margin:0 auto;
   font:900 31.5pt/1 Nunito,system-ui,sans-serif}
 /* height only a little over the 4.8rem text, so the two lines sit close together */
 @media (min-width:1024px){.morph{font-size:4.8rem;height:5.6rem}}
 /* A phone is narrower than the word. At the fixed 42px the longest line was 423px against a
    327px screen and the slogan showed as its own first thirteen letters. Sized off the screen
    it always fits; 8.4vw lands on 31.5px at 375 wide, and the height follows the font. */
-@media (max-width:700px){.morph{font-size:clamp(19px,8.4vw,42px);height:clamp(24px,10vw,56px)}}
+/* Measured, not guessed: the widest phrase is БИЗНЕС-ПРОЦЕССЫ at 10.63x the font size. At
+   8.4vw on a 402px screen that is 359px against 354px of room, so it broke at the hyphen and
+   took two lines inside a 40px host - the desktop never wraps, so nor should this. 16px of side
+   padding instead of 24 and 8.2vw clears it on every phone width down to 320 (279 needed
+   against 288). nowrap is the guarantee: if a longer phrase is ever added it overhangs by a few
+   pixels rather than silently stacking two lines on top of each other again. */
+@media (max-width:700px){
+  /* ONE gutter for the whole first screen. It was four different numbers: the header on
+     .wrap's 24, the hero on 16 (the slogan needs it - at 24 the longest phrase does not fit a
+     320px screen), the action pills on 41 because a 320px max-width centred them, and the nav
+     panel on its own 16. Nothing lined up with anything. 16 everywhere, and the pills simply
+     fill the column like every other block. */
+  .wrap{padding-inline:16px}
+  .stageui{padding-inline:16px}
+  /* Smaller so the ribbon reads as going AROUND the words rather than through them. On the
+     phone the clip is filmed at a fixed fraction of the frame (195x86 of 402), so it does NOT
+     shrink with the type the way the live scene's measured sweep would - dropping the slogan
+     from 8.2vw to 7.2vw leaves the figure the same size and the words smaller inside it, which
+     is exactly the effect he asked for. 7.2vw is 29px at 402 wide and the longest phrase needs
+     10.63x that = 308px against 370px of column, so it still cannot wrap.
+     Height tracks the type instead of staying at 10vw, or the two lines drift apart. */
+  .morph{font-size:clamp(17px,7.2vw,38px);height:clamp(21px,8.6vw,46px)}
+  .morph span{white-space:nowrap}
+}
 h1{font:900 clamp(28px,4.6vw,54px)/1.12 Nunito,sans-serif;letter-spacing:-.02em;
   margin:14px 0 0;max-width:20ch}
 h1 em{font-style:normal;color:var(--ice2)}
@@ -770,15 +817,18 @@ h2{font:900 clamp(26px,3.6vw,42px)/1.15 Nunito,sans-serif;letter-spacing:-.02em;
   .topnav a{padding:14px 12px;border-radius:10px;font-size:16px}
   .topnav a:not(.cta):active{background:rgba(127,216,255,.08)}
   .cta{text-align:center;margin-top:4px;padding:15px 18px}
-  .topbar{padding:16px 0;gap:10px}
+  .topbar{padding-block:16px;gap:10px}
   .mark{font-size:18px;padding:14px 0;display:inline-block}
   .cta{padding:11px 16px}
   /* on a narrow screen the buttons covered the whole number, so they sit under it */
   .numblock{margin-top:clamp(30px,6vh,60px);flex-direction:column;align-items:center;gap:14px}
   .actswrap{position:static;inset:auto}
-  .acts{flex-direction:column;width:100%;max-width:320px}
+  /* was max-width:320px, which centred the pills at x=41 while the slogan and the header sat
+     at 16 - measured L=41 against L=16 for everything else. The pills fill the column now. */
+  .acts{flex-direction:column;width:100%}
   .acts .btn{width:100%;text-align:center}
-  .hero101{font-size:clamp(180px,51vw,285px)}  /* +50% on the phone too */
+  /* was 51vw - 205px on a 402 screen, which crowded the ribbon and the pills both */
+  .hero101{font-size:clamp(150px,42vw,240px)}
   /* finger-sized targets everywhere */
   footer .cols a{padding:15px 0}
   .proj .go{padding:13px 0;display:inline-block}

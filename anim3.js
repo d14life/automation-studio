@@ -229,13 +229,28 @@ function LiquidText(host, texts, o) {
   /* how far the melt may blur, in px. Default 100 keeps the desktop look exactly as approved;
      a caller on a small screen passes something near half its own font size. */
   var maxBlur      = o.maxBlur != null ? o.maxBlur : 100;
+  /* The melt's blur curve below was written as 8/fraction - 8, and that 8 is in ABSOLUTE px:
+     it was tuned against the 77px desktop slogan. The same 8px laid on a phone's 34px type is
+     2.3x heavier relative to the letters, which is why the phone melted into blue blobs while
+     the Mac read as liquid - the cap was never the problem, the unit was. Derived from the
+     host's own type size it is self-correcting at any scale, and 77 * 0.104 is 8.0, so the
+     desktop curve is unchanged to the pixel. */
+  var blurUnit     = o.blurUnit != null ? o.blurUnit
+                     : parseFloat(getComputedStyle(host).fontSize || '77') * 0.104;
   if (!texts || texts.length < 2) throw new Error('LiquidText: need 2+ texts');
 
   if (!simple && threshold && !document.getElementById('lt-threshold-svg')){
     var svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
     svg.id='lt-threshold-svg';
     svg.setAttribute('style','position:absolute;width:0;height:0');
-    svg.innerHTML='<defs><filter id="threshold"><feColorMatrix in="SourceGraphic" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 255 -140"/></filter></defs>';
+    /* color-interpolation-filters="sRGB" is not cosmetic, it is most of the cost of this filter.
+       SVG filters default to linearRGB, so the browser converts every pixel of the filter region
+       out of sRGB and back again, twice, on every frame. This matrix only touches ALPHA - its
+       three colour rows are the identity - so the conversion changes nothing that can be seen
+       and the sRGB result is mathematically the same picture.
+       Measured on an iPhone 16 Pro simulator: the melt cost 22.9fps of 60 with the default. */
+    svg.innerHTML='<defs><filter id="threshold" color-interpolation-filters="sRGB">'+
+      '<feColorMatrix in="SourceGraphic" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 255 -140"/></filter></defs>';
     document.body.appendChild(svg);
   }
   host.style.position = host.style.position || 'relative';
@@ -326,10 +341,10 @@ function LiquidText(host, texts, o) {
          same words are 34px, so at the start of a morph the library was putting 70-100px of blur
          on 34px letters and the line dissolved into blobs - photographed on a real iPhone. The
          cap is now proportional to the type size, so the melt looks the same at any scale. */
-      t2.style.filter='blur('+Math.min(8/fraction-8,maxBlur)+'px)';
+      t2.style.filter='blur('+Math.min(blurUnit/fraction-blurUnit,maxBlur)+'px)';
       t2.style.opacity=(Math.pow(fraction,0.4)*100)+'%';
       var inv=1-fraction;
-      t1.style.filter='blur('+Math.min(8/inv-8,maxBlur)+'px)';
+      t1.style.filter='blur('+Math.min(blurUnit/inv-blurUnit,maxBlur)+'px)';
       t1.style.opacity=(Math.pow(inv,0.4)*100)+'%';
     }
     setWord(t1,texts[textIndex%texts.length]);

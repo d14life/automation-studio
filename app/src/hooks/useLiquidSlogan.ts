@@ -45,8 +45,13 @@ export function useLiquidSlogan(ready: boolean, heroVisible: boolean): void {
          iPhone it reads as a collision - two phrases sharing one line with nothing legible.
          Touch gets the same melt, just weighted the other way: a quick 1.6s morph and a 2.6s
          hold, so most of the time there is a readable sentence on screen. */
-      morphTime: WEAK ? 0.9 : TOUCH ? 1.6 : 4.5,
-      cooldownTime: WEAK ? 1.7 : TOUCH ? 2.6 : 0.45,
+      /* His call, 4 Aug, looking at the Mac next to the phone: the phone must be the web
+         version. Same 4.5s melt against 0.45s still, in transition 91% of the time. The reason
+         the phone was given a quick morph and a long hold was that the two lines were colliding
+         - and that turned out to be flex crushing both hosts to height 0, not the melt. With the
+         hosts holding their 40px there is room to melt. */
+      morphTime: WEAK ? 0.9 : 4.5,
+      cooldownTime: WEAK ? 1.7 : 0.45,
       colors: ICE,
       flow: FLOW,
       drift: FLOW * 3,
@@ -58,7 +63,33 @@ export function useLiquidSlogan(ready: boolean, heroVisible: boolean): void {
          capped, two crisp phrases sitting on top of each other. Neither is the effect.
          Touch gets a clean crossfade instead: one phrase out, the next in, never both legible
          at once. Same palette, same tempo, and it costs no per-frame blur at all. */
-      simple: WEAK || TOUCH,
+      /* `simple` is the sequential fade, and it is NOT the effect - it was a workaround for the
+         collision. The melt is what the site sells, so the phone gets the melt and only a
+         genuinely weak device keeps the fade. flat:true below still protects it from trap 5.4
+         (iOS drops background-clip:text on a blurred layer), and maxBlur keeps the blur
+         proportional to the 34px type instead of the desktop's 100px. */
+      simple: WEAK,
+      /* MEASURED on the iPhone 16 Pro simulator, 4 Aug: with the melt on the page ran 37.1fps,
+         and hiding the two slogan hosts took it to 60.0. Everything else on the first screen
+         together cost under 4fps - the starfield 1.2, the filmed ribbons 2.5, the glass and the
+         101's glow nothing at all. The melt WAS the mobile performance problem, and it is this
+         line: url(#threshold) is an SVG feColorMatrix re-run over the text every single frame.
+
+         It can go on touch without losing anything, and that is the part worth understanding.
+         The threshold earns its cost on desktop by clamping everything under 55% alpha to
+         nothing, which is what hides the background-clip:text rectangle the blur exposes (trap
+         5.4). Touch already passes flat:true, which paints the palette as a plain text colour -
+         there is no background box to hide, so the filter is guarding against a bug that cannot
+         happen here. The library keeps the motion either way: threshold:false leaves the blur
+         and opacity curves, which are the melt. */
+      /* Back ON for touch. Taking it off bought 22.9fps and cost the effect: without the alpha
+         threshold there is no fusing, so the melt degrades to a blurred crossfade with both
+         phrases ghosting through each other - his words, "the morph text is not the one on the
+         web version", and he was right. The threshold IS the liquid.
+         The cost was never the threshold itself, it was the filter running in linearRGB. See
+         anim3.js: the matrix only touches alpha, so sRGB is the same picture without the
+         per-pixel colour-space conversion every frame. */
+      threshold: true,
       flat: TOUCH,
       /* Photographed on a real iPhone: the slogan turned into blue blobs. The library caps the
          melt blur at a flat 100px, which was written for a 77px desktop slogan - on a phone the
