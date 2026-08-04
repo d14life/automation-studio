@@ -109,8 +109,11 @@ const HOLD_FADE = 0.16
    benchmarks. So a 50fps file is smoother for free in CPU and expensive only in download.
    That is why the laptop tier - the one screen where the bytes are cheap and he watches most -
    is the one that gets 50fps, regenerated from the AI-upscaled 4K frames rather than from the
-   degraded originals that made interpolation a dirty word on this page. The 4K tier stays 25fps
-   because 50fps at 3840x2160 is a ~95MB download, which no hero video can justify. */
+   degraded originals that made interpolation a dirty word on this page.
+   Written as a plan on 4 August and only actually built late that night - until then the file
+   was still the 293-frame 25fps encode and this paragraph described an intention. It is true
+   now. The 4K tier shares it: with HEVC reverted there is no separate 4K H.264 file, and a
+   50fps 3840x2160 all-intra encode is a ~95MB download that no hero video can justify. */
 const DPR = Math.min(devicePixelRatio || 1, 3)
 const NEED = Math.max(innerWidth * DPR, (innerHeight * DPR * 16) / 9)
 const TIER =
@@ -134,7 +137,18 @@ const TIER =
    browser that accepts the type up front and then fails to DECODE does not fall back to the
    next line - it shows nothing at all. Test on real hardware, not the simulator, which
    borrows the Mac's decoder and plays files a phone will refuse. */
-const FPS = TIER === 'sm' || TIER === 'md' ? 50 : 25
+/* 50 EVERYWHERE NOW, and the reason the desktop was held at 25 no longer applies.
+   The rule used to be "phones get interpolated frames, laptops get real ones only" -
+   because the 583-frame clip that arrived was the master's 293 real frames badly
+   interpolated, and its invented frames measured 13% less detail with visible smearing
+   on the strand's scale texture. He spotted that on a 1440p laptop unprompted.
+   Re-interpolated properly from the 293 (motion-compensated, aobmc + vsbmc, not a blend)
+   the invented frames measure 2.4% off - and hold up magnified: a real/invented/real
+   triptych puts the strand exactly halfway with the scale texture intact and no ghosting.
+   The clip was never a bad candidate for interpolation. It had just been interpolated badly.
+   Cost: 29MB -> 38MB for double the frames, and 50 seeks a second against a file that
+   benchmarks at 610fps sequential decode. */
+const FPS = 50
 const HALF_FRAME = 0.5 / FPS
 /* THE SEEK CAP IS THE FILE'S OWN FRAME INTERVAL, not a hand-picked 30Hz. 33ms was chosen when
    the phone was still on 1080p H.264 and stuttering, and it has been throttling the 50fps
@@ -156,7 +170,7 @@ const SEEK_MS = 1000 / FPS
 const SRC_H264 =
   TIER === 'sm' ? '/dna-loop-sm.mp4?v=9'
   : TIER === 'md' ? '/dna-loop.mp4?v=9'
-  : '/dna-loop-hq.mp4?v=9'
+  : '/dna-loop-hq.mp4?v=10'
 
 /* RELOAD MUST START THE STRAND OVER. The browser restores scrollY on reload, which for an
    ordinary page is a kindness and for this one is a bug: the scroll is restored but the video
