@@ -42,7 +42,18 @@ export function useStarfield(ready: boolean): RefObject<HTMLDivElement | null> {
          second on this Mac. Capped to ~45 that is well under half the work, and because the
          drift is now measured against the clock rather than counted in frames, the field moves
          at exactly the same visible speed as before. */
-      minFrameMs: SMALL ? 32 : 22,
+      /* His report, 4 Aug: the stars "keep moving quick for a split second then slower, again
+         and again". That is this cap, not lag. The gate is `now - lastFrame >= minFrameMs` with
+         lastFrame reset to now, so on a page running at a VARIABLE rate it lets a frame through
+         at 33ms, then 50, then 40, and the cadence drifts a little further out every cycle.
+         Movement is scaled by real elapsed time, so the field is in the right place on every
+         drawn frame - but the frames arrive unevenly, and each one jumps a different distance.
+         Uneven distance per frame IS the stutter he is describing.
+
+         The cap was bought to save work. Measured tonight, the entire starfield costs 1.2fps of
+         60 - it was saving almost nothing and paying for it in smoothness. Phones now draw on
+         every animation frame, which is by definition an even cadence. */
+      minFrameMs: SMALL ? 0 : 22,
       /* 30% slower on both versions - his word. Then, 4 Aug, seen on the real phone: still
          "moving too fast through the stars", half speed. The phone only - the Mac is approved. */
       speed: SMALL ? 1.09 : 2.69,
