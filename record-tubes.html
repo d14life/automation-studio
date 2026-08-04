@@ -73,7 +73,20 @@ const GLOW = { l: 0.43, i: 135 }
    length, not the take: then the last output frame and the first are on the same colour, and
    the crossfade blends matching colours rather than fighting ones.
    The lap is the slogan's own: FLOW*3 = 10.5s. Recording 10.5 + 1.2 gives exactly that. */
-const CYCLE = 10.5
+/* THE LOOP MUST BE AN INTEGER NUMBER OF PATH PERIODS, and that is what the 10.5 broke.
+   The figure is x=cos(t), y=sin(2t): it comes home every 2*PI seconds and at no other time.
+   10.5s was chosen so the COLOUR could complete a lap, but 10.5/6.283 is 1.67 periods, so the
+   last frame caught the ribbons mid-stroke and the loop visibly teleported. The very first
+   clip was 6.23s for exactly this reason.
+
+   Both clocks have to close on the same frame, so the colour lap is set TO the path instead of
+   against it: two periods, 12.566s, with the colour making exactly one lap over that. The
+   1.2s crossfade still hides the residual, because the tubes lag their target and one period
+   does not quite bring them home even when the path itself has closed. */
+/* declared here, not further down: CYCLE below reads it and const has a TDZ */
+const MOBILE = location.search.indexOf('mobile=1') >= 0
+const PATH = 2 * Math.PI
+const CYCLE = MOBILE ? PATH * 2 : 10.5
 const FADE = 1.2
 const PERIOD = CYCLE + FADE
 const SETTLE_MS = 2600        /* the tubes lerp into the figure; let them arrive first */
@@ -123,7 +136,6 @@ const SWEEP_Y = 202 / 797
    The numbers are the phone figure measured on the simulator at 402x678: sleepRadius 195 x 86
    (RX 0.55 of a 355px slogan, RY 1.07 of an 80px block), so 195/402 and 86/402 of the width.
    Record with the video's transform:scale() at 1, or this is multiplied by it. */
-const MOBILE = location.search.indexOf('mobile=1') >= 0
 const M_SWEEP_X = 195 / 402
 const M_SWEEP_Y = 86 / 402
 function sweep() {
@@ -136,9 +148,14 @@ function sweep() {
    60% - all of it approved on the simulator tonight. Filming the Mac's build and playing it on
    a phone would put back exactly the mismatch this clip exists to remove. */
 const BOOST = MOBILE ? 1.45 : 1
-const TUBE_BUILD = MOBILE
-  ? { count: 8, minTubularSegments: 25, maxTubularSegments: 95, radialSegments: 5, capSegments: 2 }
-  : { count: 11, minTubularSegments: 42, maxTubularSegments: 166, radialSegments: 8, capSegments: 4 }
+/* The FULL build, on a phone take, deliberately. The reduced phone build - 8 tubes, trails cut
+   to 25/95, 5 radial segments - exists to save a phone's GPU sixty times a second. A clip is
+   decoded, not computed: it costs a phone exactly the same whether 8 tubes or 11 were filmed
+   into it, and whether the trails were 95 segments or 166. Filming the cheap build was paying
+   the discount twice and it is why he said it looked cheaper than the web. There is no reason
+   for a pre-rendered frame to carry the compromise the live scene needed. */
+const TUBE_BUILD = { count: 11, minTubularSegments: 42, maxTubularSegments: 166,
+                     radialSegments: 8, capSegments: 4 }
 
 const big = document.getElementById('big')
 const say = (t, sub) => { big.innerHTML = t + '<small>' + (sub || 'не уходи с этой вкладки') + '</small>' }
