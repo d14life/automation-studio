@@ -42,8 +42,9 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none}
    gives contain less room and buys a visible black border. cover fills instead, at the cost of
    ~10% of the frame width at 1440x900, and object-position pulls the visible window DOWN the
    source so the composition sits lower. */
-.v2bg video{width:100%;height:100%;max-width:none;max-height:none;
-  object-fit:cover;object-position:center 62%;display:block;
+.v2bg video{position:absolute;top:0;left:0;
+  width:100%;height:calc(100% + 130px);max-width:none;max-height:none;
+  object-fit:fill;object-position:center 62%;display:block;
   transition:filter .45s ease}
 /* THE LIGHT VERSION IS THE SAME CLIP. The donor's pale hero is not a second video, it is this
    footage inverted over a warm background - white strand on cream instead of dark on black.
@@ -54,7 +55,14 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none}
    reference. The half opacity is what mutes it into the background. */
 html.v2light .v2bg video{filter:invert(1);opacity:.5}
 
-/* THE FADE, on every orientation - his word. It began as a way to blend Safari's chrome into
+/* Stretched DOWN, not zoomed - his word, and the 220px fade that used to sit here was the
+   'gap' he was pointing at: it painted 40px of solid page colour and ramped over 220 more,
+   which is a flat band across the bottom of the picture. Back to a 90px soft edge, and the
+   video is grown 130px taller from a top anchor so its content reaches past the bottom instead
+   of the page showing through. object-fit:fill so the extra height stretches the image rather
+   than cropping into it - the same trade portrait already makes.
+
+   THE FADE, on every orientation - his word. It began as a way to blend Safari's chrome into
    the page, but it earns its place for a simpler reason: without it the clip ends on a hard
    straight line against the black below, and pulling away from the video reads as rigid. That
    is true on a desktop and on a phone held sideways, where there is no chrome at all.
@@ -74,9 +82,9 @@ html.v2light .v2bg video{filter:invert(1);opacity:.5}
      because most of the row IS background. So what meets the page is cut-off CONTENT, not a
      mismatched colour, and no value of --bg fixes that. The fade has to be deep enough to
      dissolve a strand, and 64px was only ever deep enough to soften a flat edge. */
-  background:linear-gradient(0deg, var(--bg) 0px, var(--bg) 40px, rgba(0,0,0,0) 220px)}
+  background:linear-gradient(0deg, var(--bg) 0px, rgba(0,0,0,0) 90px)}
 html.v2light .v2bg::after{
-  background:linear-gradient(0deg, var(--bg) 0px, var(--bg) 40px, rgba(255,255,255,0) 220px)}
+  background:linear-gradient(0deg, var(--bg) 0px, rgba(255,255,255,0) 90px)}
 
 /* A PHONE HELD SIDEWAYS was falling into the desktop rule and letterboxed into a stamp,
    because contain shows the whole frame - right on a large display, wrong on one 350px tall.
@@ -90,8 +98,8 @@ html.v2light .v2bg::after{
      is no edge left for a gap to appear at. Stretching it, in his words, and it costs nothing
      because it is still one video element being composited. */
   .v2bg video{position:absolute;left:0;top:-40px;
-    width:100%;height:calc(100% + 80px);
-    object-fit:cover;object-position:center center}
+    width:100%;height:calc(100% + 200px);
+    object-fit:fill;object-position:center center}
 }
 
 /* PORTRAIT: turn the strand on its side rather than cropping it. A 16:9 clip in a 0.69:1
@@ -107,7 +115,7 @@ html.v2light .v2bg::after{
    -90 runs the strand the way he asked. */
 @media (max-aspect-ratio: 1/1){
   .v2bg video{position:absolute;top:50%;left:50%;
-    width:112lvh;height:100lvw;max-width:none;max-height:none;
+    width:132lvh;height:100lvw;max-width:none;max-height:none;
     object-fit:fill;object-position:center center;
     transform:translate(-50%,-50%) rotate(-90deg)}
 }
