@@ -39,9 +39,14 @@ const HALF_FRAME = 0.5 / FPS
    and decode, and decode is what the whole scrub depends on staying cheap.
    Chosen once at module load rather than per render - the file cannot be swapped mid-scroll
    without losing the seek position, so a resize does not re-pick. */
+/* ?v=2: ALL-INTRA encodes. The keyframe-every-10 files made each seek decode up to nine
+   extra frames, and the idle loop seeks ~50 times a second - in REVERSE half the time, where
+   a GOP is pure cost. Every frame is its own keyframe now (-g 1 -bf 0), so a seek decodes
+   exactly one frame in either direction. Price: 9.1MB -> 28MB desktop, 2.3MB -> 8.9MB phone.
+   The query string busts the cache; the filenames stay. */
 const SRC = matchMedia('(min-width:1100px) and (min-height:700px)').matches
-  ? '/dna-loop-hq.mp4'
-  : '/dna-loop.mp4'
+  ? '/dna-loop-hq.mp4?v=2'
+  : '/dna-loop.mp4?v=2'
 
 /* RELOAD MUST START THE STRAND OVER. The browser restores scrollY on reload, which for an
    ordinary page is a kindness and for this one is a bug: the scroll is restored but the video
