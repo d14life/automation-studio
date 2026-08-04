@@ -1,88 +1,21 @@
-/* Solutions101 v2 — a fresh first screen: the DNA clip and the slogan, nothing else yet.
-   Its own stylesheet on purpose. site.css is a thousand lines of decisions made for the
-   current hero; inheriting them would mean fighting them. Nothing here touches the live page.
-
-   Palette is the project's and is not reinvented: ICE, from hooks/heroTuning.ts. */
-:root{
-  --ice1:#DFF6FF;
-  --ice2:#7FD8FF;
-  --ice3:#5C82C9;
-  --ink:#EDF2EC;
-  --dim:#9BB0AE;
-  --line:rgba(255,255,255,.14);
-}
+/* Solutions101 v2 — a blank page and the DNA animation. Nothing else, on his word.
+   Its own stylesheet: site.css is a thousand lines of decisions made for the current hero and
+   inheriting them would mean fighting them. The live page is untouched. */
 
 *{box-sizing:border-box}
-html,body{margin:0;background:#000;color:var(--ink);
-  font:400 16px/1.5 Nunito,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
-body{overflow-x:hidden}
+html,body{margin:0;height:100%;background:#000;overflow:hidden}
 
-.v2hero{position:relative;min-height:100svh;display:flex;flex-direction:column;
-  isolation:isolate;overflow:hidden}
+/* The clip fills the screen. COVER, not contain: contain letterboxes a 16:9 clip into the
+   window and leaves it sitting in a box, which is what the last pass looked like. cover crops
+   to fill, so the animation IS the page.
 
-/* The clip fills the screen, behind everything by z-index rather than by a blend. No
-   mix-blend-mode: on the live page that is exactly what punched a black rectangle through the
-   starfield, and there is nothing behind this one that needs to show through. */
-.v2bg{position:absolute;inset:0;z-index:-2;overflow:hidden;background:#04070d}
-/* CONTAIN, not cover, and then pulled back further. cover scales the 1280x720 clip UP until
-   it fills the viewport - at 1440x900 that is 1600px wide, cropped - which is why the strands
-   read as enormous. contain fits the whole frame, and 0.78 gives it room to breathe inside
-   the screen instead of pressing against it. The clip's own background is near-black, so what
-   contain leaves around the edges is invisible against the page. */
-.v2bg video{width:100%;height:100%;object-fit:contain;display:block;
-  transform:scale(.78);transform-origin:center;
-  /* "Can't see anything" - the first pass ran brightness(.42) under a heavy veil and buried
-     the DNA entirely. The clip is the point of this design, so it is lit now and only tinted:
-     full brightness, a little lift in contrast to keep the strands separated, and the hue
-     pulled to the site's cold blue. A filter is computed on this element's own pixels - no
-     group, nothing underneath it to depend on - which is what keeps it clear of trap 5.5. */
-  filter:brightness(1.05) contrast(1.12) saturate(.6) hue-rotate(178deg)}
+   No blend mode. On the live page a mix-blend-mode on a fixed layer is exactly what punched a
+   black rectangle through the starfield, and there is nothing behind this one anyway. */
+.v2bg{position:fixed;inset:0;background:#000}
+.v2bg video{width:100%;height:100%;object-fit:cover;display:block}
 
-/* One painted gradient does the legibility work. A backdrop-filter here would be a full pass
-   over the whole first screen every frame - the exact cost that took the live page apart
-   (trap 5.8). Much lighter than the first pass: it only has to hold the type, not hide the
-   clip. Darkest at the very top and bottom edges, barely there across the middle. */
-.v2veil{position:absolute;inset:0;z-index:-1;pointer-events:none;
-  background:
-    linear-gradient(180deg, rgba(0,0,0,.62) 0%, rgba(0,0,0,.18) 22%,
-                            rgba(0,0,0,.18) 62%, rgba(0,0,0,.72) 100%),
-    linear-gradient(90deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,.06) 55%, rgba(0,0,0,0) 100%)}
-
-/* ---------- header ---------- */
-.v2wrap{width:100%;max-width:1280px;margin:0 auto;padding-inline:24px}
-@media (max-width:950px){.v2wrap{padding-inline:16px}}
-
-.v2bar{display:flex;align-items:center;gap:16px;padding-block:26px;position:relative;z-index:3}
-.v2mark{font:900 22px/1 Nunito,sans-serif;letter-spacing:-.02em;color:var(--ink);
-  text-decoration:none}
-.v2mark span{color:var(--ice2)}
-.v2nav{margin-left:auto;display:flex;align-items:center;gap:30px}
-.v2nav a{color:var(--dim);text-decoration:none;font-size:15.5px;transition:color .2s}
-@media (hover:hover){.v2nav a:hover{color:var(--ink)}}
-
-.v2burger{display:none;margin-left:auto;background:none;border:0;padding:12px 11px;cursor:pointer}
-.v2burger i{display:block;width:22px;height:2px;margin:4px 0;border-radius:2px;background:var(--ink)}
-
-/* ---------- the slogan, and for now nothing else ---------- */
-.v2mid{flex:1;display:flex;align-items:center;position:relative;z-index:2}
-
-.v2h1{margin:0;max-width:16ch;
-  font:900 clamp(44px,8.2vw,124px)/0.98 Nunito,sans-serif;letter-spacing:-.03em;
-  /* the type sits ON the clip, so it carries its own shadow rather than leaning on the veil */
-  text-shadow:0 2px 40px rgba(0,0,0,.75), 0 1px 4px rgba(0,0,0,.5)}
-.v2h1 em{font-style:normal;
-  background:linear-gradient(100deg,var(--ice1),var(--ice2) 45%,var(--ice3));
-  -webkit-background-clip:text;background-clip:text;color:transparent;
-  /* a gradient clipped to the glyphs cannot take a text-shadow, so the glow goes underneath */
-  filter:drop-shadow(0 2px 26px rgba(0,0,0,.6))}
-
-@media (max-width:950px){
-  .v2nav{display:none}
-  .v2burger{display:block}
-}
-
-/* A visitor who has asked for less motion gets a still field, not a moving one. */
+/* A visitor who has asked for less motion gets a still field rather than a moving one. */
 @media (prefers-reduced-motion:reduce){
   .v2bg video{display:none}
-  .v2bg{background:radial-gradient(80% 60% at 50% 40%, #0c2536 0%, #04070d 70%)}
+  .v2bg{background:radial-gradient(80% 60% at 55% 45%, #14314a 0%, #04070d 72%)}
 }
