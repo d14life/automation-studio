@@ -1,4 +1,4 @@
-import{d as e,l as t,t as n,u as r}from"./index-DCRUImLj.js";var i=n(`sparkles`,[[`path`,{d:`M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z`,key:`1s2grr`}],[`path`,{d:`M20 2v4`,key:`1rf3ol`}],[`path`,{d:`M22 4h-4`,key:`gwowj6`}],[`circle`,{cx:`4`,cy:`20`,r:`2`,key:`6kqj1y`}]]),a=`#version 300 es
+import{r as e,s as t,t as n}from"./jsx-runtime-BofAvxmo.js";import{t as r}from"./main-CG3ERSO0.js";var i=r(`sparkles`,[[`path`,{d:`M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z`,key:`1s2grr`}],[`path`,{d:`M20 2v4`,key:`1rf3ol`}],[`path`,{d:`M22 4h-4`,key:`gwowj6`}],[`circle`,{cx:`4`,cy:`20`,r:`2`,key:`6kqj1y`}]]),a=`#version 300 es
 precision mediump float;
 
 layout(location = 0) in vec4 a_position;
@@ -523,7 +523,7 @@ void main() {
 
   fragColor = vec4(color, opacity);
 }
-`,m=e(r(),1),h=t();function g({label:e=`Get Started`,onClick:t,viewMode:n=`text`,width:r}){let[a,o]=(0,m.useState)(!1),[c,l]=(0,m.useState)(!1),[u,d]=(0,m.useState)([]),f=(0,m.useRef)(null),g=(0,m.useRef)(null),_=(0,m.useRef)(null),v=(0,m.useRef)(0),y=(0,m.useMemo)(()=>{if(n===`icon`)return{width:46,height:46,innerWidth:42,innerHeight:42,shaderWidth:46,shaderHeight:46};{let e=r??142;return{width:e,height:46,innerWidth:e-4,innerHeight:42,shaderWidth:e,shaderHeight:46}}},[n,r]);return(0,m.useEffect)(()=>{let e=`shader-canvas-style-exploded`;if(!document.getElementById(e)){let t=document.createElement(`style`);t.id=e,t.textContent=`
+`,m=t(e(),1),h=n();function g({label:e=`Get Started`,onClick:t,viewMode:n=`text`,width:r}){let[a,o]=(0,m.useState)(!1),[c,l]=(0,m.useState)(!1),[u,d]=(0,m.useState)([]),f=(0,m.useRef)(null),g=(0,m.useRef)(null),_=(0,m.useRef)(null),v=(0,m.useRef)(0),y=(0,m.useMemo)(()=>{if(n===`icon`)return{width:46,height:46,innerWidth:42,innerHeight:42,shaderWidth:46,shaderHeight:46};{let e=r??142;return{width:e,height:46,innerWidth:e-4,innerHeight:42,shaderWidth:e,shaderHeight:46}}},[n,r]);return(0,m.useEffect)(()=>{let e=`shader-canvas-style-exploded`;if(!document.getElementById(e)){let t=document.createElement(`style`);t.id=e,t.textContent=`
         .shader-container-exploded canvas {
           width: 100% !important;
           height: 100% !important;
