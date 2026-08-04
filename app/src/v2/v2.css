@@ -421,3 +421,10 @@ html.v2light{
 
 /* the fixed bar would otherwise sit on top of whatever an anchor scrolls to */
 .v2sec{scroll-margin-top:88px}
+
+/* the page you are on, marked in the bar - aria-current carries it to screen readers too */
+.v2links a.is-on{color:var(--ink)}
+.v2links a.is-on::after{content:'';display:block;height:2px;margin-top:5px;border-radius:2px;
+  background:var(--accent)}
+/* inner pages have no strand above them, so they need to clear the fixed bar themselves */
+.v2main--inner{padding-top:clamp(96px,13vh,150px)}
