@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useTubeScene } from '@/hooks/useTubeScene'
+import { isSmallDevice } from '@/hooks/heroTuning'
 
 /* The tubes live in their own fixed layer at the root, beside the starfield: the library sizes
    its canvas from the PARENT box, so the wrapper is what keeps the surface viewport-sized.
@@ -33,23 +34,14 @@ export function TubeLayer({ ready, heroVisible }: { ready: boolean; heroVisible:
   const [dead, setDead] = useState(false)
 
   useEffect(() => {
-    /* This used to be `isSmallDevice()`, which handed EVERY phone the clip - and that made the
-       light phone build inside useTubeScene dead code it could never reach. The two files
-       disagreed and the clip won.
-
-       His call, 4 Aug, Mac beside phone: the phone must be the web version. Two of the three
-       things he asked for are impossible with a clip, not merely wrong in it. The ribbons walk
-       the ICE palette one step behind the slogan, recoloured every frame by setColors; a filmed
-       frame has one fixed colour and can never do that. And the sweep is measured off the
-       slogan's own ink each time it changes - a clip is stuck with the geometry of the screen it
-       was filmed on. Only the live scene has either.
-
-       So the test is now the same one useTubeScene already uses to opt out: a genuinely weak
-       device, not merely a small one. Everything else runs the light build - 8 tubes, 5 radial
-       segments, pixel ratio 1. usePerfGuard is still the safety net underneath: measure under
-       46fps and `perf-low` swaps this layer to the clip mid-flight. */
-    const WEAK = !!(navigator.deviceMemory && navigator.deviceMemory <= 3)
-    if (WEAK || document.documentElement.dataset.perf === 'low') {
+    /* Back to the clip for every phone, and this time the clip is the phone's own scene:
+       re-filmed 4 Aug through record-tubes.html?mobile=1 with the phone build (8 tubes, trails
+       25/95, 5 radial segments), the phone's figure, and the brightness he approved. The live
+       scene proved the look on the simulator and then measured 33fps there; a clip is video
+       decode on dedicated silicon instead. The one thing this used to cost - the colour cycle -
+       is not lost: the take is 10.5s + a 1.2s crossfade, so the palette completes a full lap
+       over the output length and the loop closes on a matching colour. */
+    if (isSmallDevice() || document.documentElement.dataset.perf === 'low') {
       setFilmed(true)
       return
     }
