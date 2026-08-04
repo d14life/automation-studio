@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useVendorScripts } from '@/hooks/useVendorScripts'
-import { ICE, FLOW } from '@/hooks/heroTuning'
+import { FLOW } from '@/hooks/heroTuning'
 import './v2.css'
 
 /* v2: the DNA strand is driven by the scroll wheel, not by playback.
@@ -253,9 +253,26 @@ function usePage(): PageId {
 const MORPH_1 = ['МЕНЯЕМ ДНК', 'БЫСТРО', 'НЕ КОНСУЛЬТИРУЕМ']
 const MORPH_2 = ['ВАШЕГО БИЗНЕСА', 'НЕ ЗНАЧИТ ПЛОХО', 'А ДЕЛАЕМ']
 
+/* THE LETTERS ARE PAINTED IN THE CLIP'S OWN COLOURS - he asked for the exact ones, so they were
+   SAMPLED off the master frames rather than picked by eye. Averaging the most saturated pixels
+   of a real frame: intact #2B6397 (steel blue), midway #C2AE5A, destroyed #E8B22D with its
+   brightest at #F0E782. So the strand's whole arc is blue into gold into amber.
+   Dark takes the warm end - pale gold to the clip's own amber to a burnt ember. It flows to
+   orange as he asked, and the darkest stop stops where legibility does: true black on the navy
+   scrim would simply disappear, and a slogan nobody can read is not a slogan.
+   Light is the violet he wanted, and it has to be the DARK half of violet: this theme's page is
+   cream, so white letters would vanish exactly as black ones do on the dark theme. */
+const INK_DARK = ['#F0E782', '#E8B22D', '#B4600F']
+const INK_LIGHT = ['#9B7BE8', '#6D28D9', '#3B1D6E']
+
 export default function V2() {
   const page = usePage()
   const home = page === ''
+
+  const [light, setLight] = useState(false)
+  useEffect(() => {
+    document.documentElement.classList.toggle('v2light', light)
+  }, [light])
 
   /* win.js + anim3.js publish window.LiquidText. Loaded here rather than in the HTML so the
      inner pages, which have no slogan, never pay for it. */
@@ -288,12 +305,17 @@ export default function V2() {
 
     const SMALL = innerWidth < 700
     const opts: LiquidTextOptions = {
-      morphTime: 4.5,
-      cooldownTime: 0.45,
-      colors: ICE,
+      /* TIME TO ACTUALLY READ IT. The live page ran 4.5s melting against 0.45s still, so the
+         words were in transition 91% of the time - which looks like liquid and reads like
+         nothing. His ask, and he is right: a slogan that is never legible is decoration.
+         Now 2.8s melting against 3.2s holding, so each phrase sits still for longer than it
+         spends arriving. Six seconds a phrase, eighteen for the full argument. */
+      morphTime: 2.8,
+      cooldownTime: 3.2,
+      colors: light ? INK_LIGHT : INK_DARK,
       flow: FLOW,
       drift: FLOW * 3,
-      spread: ICE.length * 0.08,
+      spread: 0.24,
       /* the threshold IS the liquid - without it the melt degrades to two phrases ghosting
          through each other. It stays on everywhere; the live page proved that the hard way. */
       threshold: true,
@@ -313,14 +335,10 @@ export default function V2() {
       removeEventListener('scroll', onScroll)
       stop1(); stop2()
     }
-  }, [vendorReady, home])
+  }, [vendorReady, home, light])
   /* Light and dark are the SAME clip. The donor's light hero is not a second video, it is the
      same footage with `invert` over a pale background - so the switch costs one CSS filter and
      no extra download. The strand is white on cream in light, dark on near-black in dark. */
-  const [light, setLight] = useState(false)
-  useEffect(() => {
-    document.documentElement.classList.toggle('v2light', light)
-  }, [light])
 
   /* THE CURTAIN. His reference component drops a full-screen panel in the colour of the theme
      you are switching TO, swaps the theme while the screen is covered, then lifts it - so you
