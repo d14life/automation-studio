@@ -10,6 +10,32 @@ export function useLiquidSlogan(ready: boolean, heroVisible: boolean): void {
   const activeRef = useRef(heroVisible)
   useEffect(() => { activeRef.current = heroVisible }, [heroVisible])
 
+  /* MEASURED on the simulator, 4 Aug: at rest the melt costs 10fps, but WHILE SCROLLING it
+     costs 42 - the page ran 18.4fps scrolling with the slogan against 60.3 with it hidden.
+     Neither effect is guilty on its own; it is the pair. The parallax writes a transform on
+     these two hosts on every scroll frame, and the same hosts carry filter:url(#threshold), so
+     the SVG filter was re-rasterised at a new position sixty times a second.
+
+     Promoting the host with will-change:transform was the obvious answer and it measured worse:
+     scrolling improved but at rest dropped 41.5 -> 30.8, because the filtered layer then has to
+     be kept as its own raster.
+
+     So: freeze the melt while the page is moving. The library already checks activeWhen every
+     frame, so a false there means no new blur, no new opacity, nothing for the filter to redo -
+     the parallax is then just translating a layer that is not changing. Nobody can read a
+     morphing slogan mid-scroll anyway, and it resumes 180ms after the page stops. */
+  const scrollingRef = useRef(false)
+  useEffect(() => {
+    let t = 0
+    const onScroll = () => {
+      scrollingRef.current = true
+      clearTimeout(t)
+      t = window.setTimeout(() => { scrollingRef.current = false }, 180)
+    }
+    addEventListener('scroll', onScroll, { passive: true })
+    return () => { clearTimeout(t); removeEventListener('scroll', onScroll) }
+  }, [])
+
   useEffect(() => {
     if (!ready) return
     const L1 = document.getElementById('liq1') as LiquidTextHost | null
@@ -96,7 +122,7 @@ export function useLiquidSlogan(ready: boolean, heroVisible: boolean): void {
          same words are 34px, so the blur was twice the letter height and ate them. Half the
          measured font size keeps the melt and keeps the words readable. */
       maxBlur: TOUCH ? Math.round(parseFloat(getComputedStyle(L1).fontSize || '34') * 0.5) : 100,
-      activeWhen: () => activeRef.current,
+      activeWhen: () => activeRef.current && !scrollingRef.current,
     }
     const stop1 = window.LiquidText(L1, SLOGAN_LINE_1, MORPH)
     const stop2 = window.LiquidText(L2, SLOGAN_LINE_2, MORPH)
