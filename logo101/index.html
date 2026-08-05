@@ -152,14 +152,13 @@ const skinMat = new THREE.MeshPhysicalMaterial({
      base colour was near-black, so an albedo map multiplied into it had nothing to
      show. Mid grey, roughness fully driven by the map. */
   color: 0x6d757a, metalness: 0.0, roughness: 1.0, envMapIntensity: 0.55,
-  transparent: true,
 })
 
 function patch(mat, isCore) {
   mat.onBeforeCompile = (sh) => {
     Object.assign(sh.uniforms, uniforms)
     sh.vertexShader = `
-      attribute vec3 aCenter; attribute vec3 aSeed; attribute float aTone; attribute float aWord;
+      attribute vec3 aCenter; attribute vec3 aSeed; attribute vec3 aPartner; attribute float aTone; attribute float aWord;
       uniform float uDamage, uMorph, uSpin, uMinY, uMaxY;
       varying float vT; varying float vTone; varying float vFade; varying vec3 vLocalN; varying vec3 vWorld;
       mat3 axisRot(vec3 a, float ang){
@@ -219,8 +218,19 @@ function patch(mat, isCore) {
          the 101 is still in the air while the first of Solutions arrives. */
       float own = min(mix(uMorph, 1.0 - uMorph, aWord) * 1.61, 1.0);
       float t = breakT(aCenter, own, uMinY, uMaxY);
-      vT = t; vTone = aTone; vFade = 1.0 - smoothstep(0.55, 1.0, own);
-      vec3 home = aCenter;
+      vT = t; vTone = aTone;
+      /* NO ALPHA. Fading one word out while the other faded in is what made the middle
+         read as a transition between two unrelated objects sitting in different places.
+         A fragment now SHRINKS to nothing on the spot where the other word needs it,
+         and grows from nothing on the spot the first word left - so the rubble is one
+         continuous stream, not two piles. It also drops the material back to opaque,
+         which is what was letting far fragments blend over near ones and look like
+         slabs floating in front of the letters. */
+      vFade = 1.0;
+      float shrink = 1.0 - smoothstep(0.45, 1.0, t);
+      /* where the piece lives right now: its own word's slot, travelling to the slot
+         the other word needs filled */
+      vec3 home = mix(aCenter, aPartner, smoothstep(0.12, 1.0, t));
       /* PHYSICS, NOT A BLENDER. The spin was t*6.2 plus a term driven by the global
          clock, so every fragment tumbled forever at speed - which reads as a special
          effect, not as something breaking. Real debris does three things: it bursts
@@ -230,7 +240,7 @@ function patch(mat, isCore) {
       float fly = pow(t, 0.55);
       float ang = fly * (0.35 + aTone * 0.8);
       mat3 R = axisRot(normalize(aSeed + vec3(0.001)), ang);
-      vec3 transformed = home + R * (position - aCenter)
+      vec3 transformed = home + R * (position - aCenter) * shrink
                        + aSeed * fly * 0.20
                        + vec3(0.0, t * t * -0.32, 0.0);   /* gravity accelerates */
       /* vWorld was DECLARED in both shaders and NEVER ASSIGNED. Every triplanar
@@ -282,7 +292,7 @@ function mergeBucket(list) {
   let n = 0
   for (const e of list) n += e.g.attributes.position.count
   const pos = new Float32Array(n * 3), nor = new Float32Array(n * 3)
-  const cen = new Float32Array(n * 3), sed = new Float32Array(n * 3)
+  const cen = new Float32Array(n * 3), sed = new Float32Array(n * 3), par = new Float32Array(n * 3)
   const ton = new Float32Array(n), wrd = new Float32Array(n)
   let o = 0
   for (const e of list) {
@@ -292,6 +302,7 @@ function mergeBucket(list) {
       nor[(o + i) * 3] = nm[i * 3]; nor[(o + i) * 3 + 1] = nm[i * 3 + 1]; nor[(o + i) * 3 + 2] = nm[i * 3 + 2]
       cen[(o + i) * 3] = e.c.x; cen[(o + i) * 3 + 1] = e.c.y; cen[(o + i) * 3 + 2] = e.c.z
       sed[(o + i) * 3] = e.s.x; sed[(o + i) * 3 + 1] = e.s.y; sed[(o + i) * 3 + 2] = e.s.z
+      par[(o + i) * 3] = e.p.x; par[(o + i) * 3 + 1] = e.p.y; par[(o + i) * 3 + 2] = e.p.z
       ton[o + i] = e.t; wrd[o + i] = e.w
     }
     o += e.g.attributes.position.count
@@ -301,6 +312,7 @@ function mergeBucket(list) {
   g.setAttribute('normal', new THREE.BufferAttribute(nor, 3))
   g.setAttribute('aCenter', new THREE.BufferAttribute(cen, 3))
   g.setAttribute('aSeed', new THREE.BufferAttribute(sed, 3))
+  g.setAttribute('aPartner', new THREE.BufferAttribute(par, 3))
   g.setAttribute('aTone', new THREE.BufferAttribute(ton, 1))
   g.setAttribute('aWord', new THREE.BufferAttribute(wrd, 1))
   return g
@@ -336,12 +348,26 @@ const build = (gltf) => { try {
   const skin = [], core = []
   let count = 0
   const box = new THREE.Box3()
+  /* TWO PASSES, because a piece cannot know where it is going until every piece on
+     the other side has been placed. Pass one measures each piece; pass two pairs
+     each 101 fragment with a Solutions fragment and vice versa. That pairing is what
+     makes the handoff continuous: the rubble does not fade out here and fade in over
+     there, it flies from where it was to where the other word needs it. */
+  const meta = []
   for (const [pid, meshes] of byPiece) {
+    const pb = new THREE.Box3()
+    for (const m of meshes) pb.expandByObject(m)
+    meta.push({ pid, meshes, pb, c: pb.getCenter(new THREE.Vector3()).applyMatrix4(STAND),
+                w: /^b/.test(String(pid)) ? 1 : 0 })
+  }
+  const cenA = meta.filter(m => m.w === 0).map(m => m.c)
+  const cenB = meta.filter(m => m.w === 1).map(m => m.c)
+  let ia = 0, ib = 0
+  for (const m of meta) m.p = m.w === 0 ? cenB[(ia++) % cenB.length] : cenA[(ib++) % cenA.length]
+
+  for (const { pid, meshes, pb, c, w, p } of meta) {
     /* one centre and one throw direction per PIECE, shared by its skin and its
        interior - otherwise a fragment's outside and inside fly apart separately */
-    const pb = new THREE.Box3()
-    for (const m of meshes) pb.expandByObject(m)   /* still in import space; STAND applied below */
-    const c = pb.getCenter(new THREE.Vector3()).applyMatrix4(STAND)
     const tone = Math.random()
     const s = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1)
     if (s.lengthSq() < 1e-6) s.set(0, 1, 0)
@@ -349,18 +375,14 @@ const build = (gltf) => { try {
     /* bias the throw outward from the mark's own centre, so it opens rather than
        stirs - pure randomness reads as a blender, not a break */
     s.lerp(c.clone().normalize(), 0.28).normalize()
-    /* the landing point inside "Solutions". No STAND here: the exporter's Y-up
-       conversion and STAND compose to the identity, so targets sampled straight from
-       Blender are already in the right space - applying STAND alone tips the word. */
-    const w = /^b/.test(String(pid)) ? 1 : 0
-    box.union(pb.applyMatrix4(STAND))
+    box.union(pb.clone().applyMatrix4(STAND))
     for (const m of meshes) {
       const g = (m.geometry.index ? m.geometry.toNonIndexed() : m.geometry.clone())
       g.applyMatrix4(m.matrixWorld)
       g.applyMatrix4(STAND)
       if (!g.attributes.normal) g.computeVertexNormals()
       const name = (m.material?.name || '').toLowerCase()
-      ;(name.includes('core') ? core : skin).push({ g, c, s, t: tone, w })
+      ;(name.includes('core') ? core : skin).push({ g, c, s, t: tone, w, p })
       count++
     }
   }
