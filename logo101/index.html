@@ -216,8 +216,26 @@ function patch(mat, isCore) {
          faded out, and the middle of the scroll is a blank screen. 1.61 stretches each
          word over ~62% of the travel so they OVERLAP in the middle third - the last of
          the 101 is still in the air while the first of Solutions arrives. */
-      float own = min(mix(uMorph, 1.0 - uMorph, aWord) * 1.61, 1.0);
-      float t = breakT(aCenter, own, uMinY, uMaxY);
+      /* SLOWER, AND EASED AT BOTH ENDS. Two things were rushing it. Each word packed
+         its entire break into 62% of the scroll (the 1.61), so a short drag already
+         had it in pieces; and the ramp was linear, so the very first pixel of scroll
+         produced the same amount of damage as one in the middle - which is what makes
+         a scrubbed animation feel like it goes off the instant you touch it.
+
+         Each word now spans the WHOLE scroll, and smoothstep eases the ends: the first
+         part of the drag barely cracks it, the middle does the work, and the last part
+         settles Solutions into place slowly instead of snapping shut. Density no longer
+         depends on the two words overlapping - the mate's complement conserves the rock
+         on its own - so there is nothing left to pay for the extra length. */
+      float g = smoothstep(0.0, 1.0, uMorph);
+      float own = mix(g, 1.0 - g, aWord);
+      /* THE RUBBLE IS THE SHORTEST PART, NOT THE LONGEST. Feeding own straight into
+         breakT spread the break across the entire scroll, so most of the travel was
+         spent as a formless pile with no word in it. Squeezing it into the middle band
+         gives the shape the effect should have: a long stretch where the 101 is whole
+         and only cracking, a brief shatter, and a long stretch where Solutions is
+         readable and settling. */
+      float t = breakT(aCenter, smoothstep(0.26, 0.84, own), uMinY, uMaxY);
       vT = t; vTone = aTone;
       /* NO ALPHA. Fading one word out while the other faded in is what made the middle
          read as a transition between two unrelated objects sitting in different places.
@@ -244,12 +262,12 @@ function patch(mat, isCore) {
          partner's aTone the pair shares one lo - so one shrinks exactly as the other
          grows, in the same place, in the same instant. */
       float lo = 0.30 + aTone * 0.40;
-      float kA = smoothstep(lo, lo + 0.14, uMorph);
+      float kA = smoothstep(lo, lo + 0.14, g);
       float k = mix(kA, 1.0 - kA, aWord);
       float shrink = pow(1.0 - k, 0.3333);
       /* where the piece lives right now: its own word's slot, travelling to the slot
          the other word needs filled */
-      vec3 home = mix(aCenter, aPartner, smoothstep(0.12, 1.0, t));
+      vec3 home = mix(aCenter, aPartner, smoothstep(0.42, 1.0, t));
       /* PHYSICS, NOT A BLENDER. The spin was t*6.2 plus a term driven by the global
          clock, so every fragment tumbled forever at speed - which reads as a special
          effect, not as something breaking. Real debris does three things: it bursts
@@ -274,7 +292,8 @@ function patch(mat, isCore) {
       vWorld = position;
     `)
     sh.vertexShader = sh.vertexShader.replace('#include <beginnormal_vertex>', `
-      float tn = breakT(aCenter, min(mix(uMorph,1.0-uMorph,aWord)*1.61,1.0), uMinY, uMaxY);
+      float gn = smoothstep(0.0, 1.0, uMorph);
+      float tn = breakT(aCenter, smoothstep(0.26, 0.84, mix(gn, 1.0 - gn, aWord)), uMinY, uMaxY);
       float angn = pow(tn, 0.55) * (0.35 + aTone * 0.8);
       vec3 objectNormal = axisRot(normalize(aSeed + vec3(0.001)), angn) * normal;
       vLocalN = objectNormal;
@@ -474,7 +493,7 @@ new GLTFLoader().load('./words.glb', build, undefined, (e) => fail('GLB не з�
 let damage = 0, target = 0, spin = 0, last = performance.now()
 slider.addEventListener('input', () => { target = parseFloat(slider.value) })
 addEventListener('wheel', (e) => {
-  target = Math.min(1, Math.max(0, target + e.deltaY * 0.0012))
+  target = Math.min(1, Math.max(0, target + e.deltaY * 0.0006))
   slider.value = String(target)
 }, { passive: true })
 let ty = null
@@ -482,7 +501,7 @@ addEventListener('touchstart', (e) => { ty = e.touches[0].clientY }, { passive: 
 addEventListener('touchmove', (e) => {
   if (ty === null) return
   const y = e.touches[0].clientY
-  target = Math.min(1, Math.max(0, target + (ty - y) * 0.004))
+  target = Math.min(1, Math.max(0, target + (ty - y) * 0.002))
   slider.value = String(target); ty = y
 }, { passive: true })
 
