@@ -298,8 +298,20 @@ function patch(mat, isCore) {
          every rock is surrounded by hundreds of others and a change of size is just
          more debris. lo staggers each pair inside that band, and because a mate
          inherits its partner's aTone the pair still trades in the same instant. */
-      float lo = 0.40 + aTone * 0.12;
-      float kA = smoothstep(lo, lo + 0.10, g);
+      /* SPREAD THE TRADE OUT. Every pair changed hands inside a 0.22 band, so the whole
+         pile turned into different rock at the same moment - which is why it reads as
+         the shapes morphing rather than as rubble in motion. Widening lo to 0.26-0.66
+         means only a fraction of the rocks are ever mid-trade, and the rest are just
+         stone flying past them. It stays entirely inside the rubble phase - the 101 is
+         gone by 0.34 and Solutions is not solid until past 0.80 - so nothing changes
+         hands next to an intact word.
+
+         The shape change itself cannot be removed. A cell cut out of the 101 is not a
+         cell of Solutions; two solid words mean two sets of solids, and each rock has
+         to become its counterpart once, somewhere. This is about making that moment
+         land on a few rocks at a time instead of all 327 at once. */
+      float lo = 0.26 + aTone * 0.40;
+      float kA = smoothstep(lo, lo + 0.14, g);
       float k = mix(kA, 1.0 - kA, aWord);
       float shrink = pow(1.0 - k, 0.3333);
       /* where the piece lives right now: its own word's slot, travelling to the slot
