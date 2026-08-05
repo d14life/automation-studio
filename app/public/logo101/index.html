@@ -363,7 +363,14 @@ function patch(mat, isCore) {
       vLocalN = objectNormal;
     `)
 
-    sh.fragmentShader = 'uniform sampler2D uRock; uniform sampler2D uRough; uniform sampler2D uNormal;\nvarying float vT; varying float vTone; varying float vFade; varying vec3 vLocalN; varying vec3 vWorld;\nvec3 tri(sampler2D s, vec3 p, vec3 n){ vec3 b=pow(abs(n),vec3(2.0)); b/=(b.x+b.y+b.z+0.0001); return texture2D(s,p.zy*2.6).rgb*b.x + texture2D(s,p.xz*2.6).rgb*b.y + texture2D(s,p.xy*2.6).rgb*b.z; }\n' + sh.fragmentShader
+    /* THE THIN AXIS HAD TO BE SCALED UP. Triplanar assumes the three projections see
+       roughly the same amount of surface, but an extruded word is ~7x thinner through
+       the depth than it is wide or tall. A side wall samples p.zy, and z only spans
+       0.085 - so the whole wall reads a single sliver of the texture, smeared into
+       rays. That is the pale untextured edge on the 1 and the radial streaks around
+       the 0, both of which look like triangles rather than stone. Multiplying z by 6.5
+       inside the projection gives the walls the same texel density as the faces. */
+    sh.fragmentShader = 'uniform sampler2D uRock; uniform sampler2D uRough; uniform sampler2D uNormal;\nvarying float vT; varying float vTone; varying float vFade; varying vec3 vLocalN; varying vec3 vWorld;\nvec3 tri(sampler2D s, vec3 p, vec3 n){ p.z *= 6.5; vec3 b=pow(abs(n),vec3(2.0)); b/=(b.x+b.y+b.z+0.0001); return texture2D(s,p.zy*2.6).rgb*b.x + texture2D(s,p.xz*2.6).rgb*b.y + texture2D(s,p.xy*2.6).rgb*b.z; }\n' + sh.fragmentShader
     /* NO SECOND MATERIAL. The interior used to be its own emissive blue with a
        three-stop colour ramp, so a stone that split showed coloured light inside -
        which is a video-game crystal, not a rock. Rock that breaks reveals more rock.
@@ -378,10 +385,13 @@ function patch(mat, isCore) {
                  'vec3 nrm = tri(uNormal, vWorld, normalize(vLocalN)) * 2.0 - 1.0; normal = normalize(normal + vec3(nrm.xy, 0.0) * 0.75);')
       sh.fragmentShader = sh.fragmentShader.replace('#include <dithering_fragment>', `
         #include <dithering_fragment>
-        /* a soft rim so near-black stone keeps its silhouette against a near-black
-           background - colourless now, it was tinting the edges teal and amber */
-        float fres = pow(1.0 - abs(dot(normalize(vLocalN), vec3(0.0, 0.0, 1.0))), 3.2);
-        gl_FragColor.rgb += fres * vec3(0.10, 0.13, 0.15);
+        /* THE RIM IS GONE, AND IT WAS THE PALE SIDES. It measured the angle against a
+           FIXED object-space direction (0,0,1) rather than against the viewer - so every
+           face perpendicular to the depth axis, which is every extrusion wall, got the
+           full wash at all times no matter where the camera was. Not a rim light: a coat
+           of grey paint on all the sides. It was added when the stone was near-black
+           metal that lost its silhouette; the rock albedo carries the shape on its own
+           now, so this just goes. */
         gl_FragColor.a *= vFade;
       `)
   }
