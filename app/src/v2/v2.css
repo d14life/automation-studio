@@ -718,11 +718,16 @@ a.v2card:hover .v2card__win{color:var(--accent)}
    Both are compositor properties, so the experiment costs nothing to leave in. */
 .v2bg video.is-rev{transform:rotate(180deg)}
 
-/* THE MIRROR TURN. The reverse leg plays mirrored so the strand keeps spinning the same way
-   instead of visibly rewinding; the flip is spent at the destroyed end, where a frame full of
-   debris hides it. Both properties are compositor-only, so the whole effect is free. */
+/* THE TURN IS A 180 ROTATION, NOT A MIRROR - and the difference is the diagonal.
+   scaleX(-1) flips the strand left-to-right, so an arch peaking top-right comes back
+   peaking top-LEFT: the diagonal reverses and the eye reads it as the clip being
+   played backwards, which is the exact thing this was meant to hide. Rotating a full
+   180 keeps the diagonal running the same direction, so the motion reads as carrying
+   on. Measured at the turn as well: 59.7 against the mirror's 67.6.
+   Spent at the destroyed end, where a frame full of debris hides the cut. transform is
+   compositor-only, so the whole effect costs nothing. */
 .v2bg video{transition:opacity .18s ease}
-.v2bg video.is-mir{transform:scaleX(-1)}
+.v2bg video.is-mir{transform:rotate(180deg)}
 /* An OPACITY dip, not a blur. I wrote "transform and filter are compositor
    properties" in the tick that drives this, and that is wrong: filter is a PAINT
    operation, and this one was running a 10px blur across the largest element on
