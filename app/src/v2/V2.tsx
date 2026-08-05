@@ -72,7 +72,12 @@ const HOLD_FADE = 0.08
 
    There is no middle: the symmetric frames are all clustered at 17-22% of the clip,
    because that is where the helix is still whole enough to look the same upside down. */
-const TURN_AT = 1
+/* Overridable from the URL so all versions can be compared on the real site without a
+   deploy each time: ?turn=1 · ?turn=0.63 · ?turn=0.2 */
+const TURN_AT = (() => {
+  const q = parseFloat(new URLSearchParams(location.search).get('turn') || '')
+  return Number.isFinite(q) && q > 0.05 && q <= 1 ? q : 1
+})()
 /* Frame rate is per tier, so it is declared with the tier below - seeking finer than one frame
    just decodes the same picture again, and the grid has to be the grid the file actually has. */
 
