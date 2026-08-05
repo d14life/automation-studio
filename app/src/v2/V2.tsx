@@ -70,13 +70,21 @@ const HOLD_FADE = 0.08
      turn at 0.20 (frame  57)                  =  3.9x   nearly invisible, but the
                                                           strand hardly comes apart
 
+   HIS CHOICE IS 0.9, and it is not the one the numbers point at. He looked at 0.63 and
+   said it turns too early - "I see what you can't see". He is right that the metric is
+   blind here: it measures how much the PIXELS differ between a frame and its rotation,
+   and says nothing about whether the strand's MOTION reads as carrying on. That is the
+   same blindness that made the crossfade score 0.56 and still look like a restart.
+   0.9 keeps almost all of the destruction and turns just before the frame where the
+   debris is at its most chaotic.
+
    There is no middle: the symmetric frames are all clustered at 17-22% of the clip,
    because that is where the helix is still whole enough to look the same upside down. */
 /* Overridable from the URL so all versions can be compared on the real site without a
    deploy each time: ?turn=1 · ?turn=0.63 · ?turn=0.2 */
 const TURN_AT = (() => {
   const q = parseFloat(new URLSearchParams(location.search).get('turn') || '')
-  return Number.isFinite(q) && q > 0.05 && q <= 1 ? q : 1
+  return Number.isFinite(q) && q > 0.05 && q <= 1 ? q : 0.9
 })()
 /* Frame rate is per tier, so it is declared with the tier below - seeking finer than one frame
    just decodes the same picture again, and the grid has to be the grid the file actually has. */
