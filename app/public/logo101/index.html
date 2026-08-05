@@ -227,7 +227,7 @@ function patch(mat, isCore) {
          which is what was letting far fragments blend over near ones and look like
          slabs floating in front of the letters. */
       vFade = 1.0;
-      float shrink = 1.0 - smoothstep(0.45, 1.0, t);
+      float shrink = 1.0 - smoothstep(0.68, 1.0, t);
       /* where the piece lives right now: its own word's slot, travelling to the slot
          the other word needs filled */
       vec3 home = mix(aCenter, aPartner, smoothstep(0.12, 1.0, t));
@@ -240,9 +240,13 @@ function patch(mat, isCore) {
       float fly = pow(t, 0.55);
       float ang = fly * (0.35 + aTone * 0.8);
       mat3 R = axisRot(normalize(aSeed + vec3(0.001)), ang);
+      /* NO GRAVITY. A falling fragment is correct physics for rubble that is going
+         to land, and wrong for rubble that is being handed to the other word: it made
+         every piece sink out of frame as it shrank, so the effect read as "these fall
+         away and different ones appear" instead of as a transfer. The pieces drift on
+         their own axis and trade in place. */
       vec3 transformed = home + R * (position - aCenter) * shrink
-                       + aSeed * fly * 0.20
-                       + vec3(0.0, t * t * -0.32, 0.0);   /* gravity accelerates */
+                       + aSeed * fly * 0.20;
       /* vWorld was DECLARED in both shaders and NEVER ASSIGNED. Every triplanar
          lookup therefore sampled the same single texel, and the whole rock pack
          resolved to one flat colour multiply - which is why the surface still had
@@ -360,21 +364,28 @@ const build = (gltf) => { try {
     meta.push({ pid, meshes, pb, c: pb.getCenter(new THREE.Vector3()).applyMatrix4(STAND),
                 w: /^b/.test(String(pid)) ? 1 : 0 })
   }
-  const cenA = meta.filter(m => m.w === 0).map(m => m.c)
-  const cenB = meta.filter(m => m.w === 1).map(m => m.c)
-  let ia = 0, ib = 0
-  for (const m of meta) m.p = m.w === 0 ? cenB[(ia++) % cenB.length] : cenA[(ib++) % cenA.length]
+  /* THE SWAP HAS TO BE MUTUAL. The pairing used to be two independent walks, so a
+     101 fragment shrank away at one place while some unrelated Solutions fragment
+     grew somewhere else - which is why it read as things vanishing and other things
+     appearing rather than as rock being re-used.
 
-  for (const { pid, meshes, pb, c, w, p } of meta) {
-    /* one centre and one throw direction per PIECE, shared by its skin and its
-       interior - otherwise a fragment's outside and inside fly apart separately */
-    const tone = Math.random()
-    const s = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1)
-    if (s.lengthSq() < 1e-6) s.set(0, 1, 0)
-    s.normalize()
-    /* bias the throw outward from the mark's own centre, so it opens rather than
-       stirs - pure randomness reads as a blender, not a break */
-    s.lerp(c.clone().normalize(), 0.28).normalize()
+     Now the mapping is symmetric: A[i] and B[i] are each other's mate. One shrinks to
+     nothing exactly where the other grows from nothing, at the same moment, spinning
+     on the same axis at the same rate - because the mate inherits its partner's seed
+     and tone rather than rolling its own. Two draw calls' worth of geometry, but on
+     screen it is one rock that keeps going. 228 against 328 means the last hundred
+     Solutions cells share a mate; at the instant they trade, both are microscopic. */
+  const A = meta.filter(m => m.w === 0), B = meta.filter(m => m.w === 1)
+  const dir = () => {
+    const v = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1)
+    return v.lengthSq() < 1e-6 ? new THREE.Vector3(0, 1, 0) : v.normalize()
+  }
+  A.forEach((m, i) => { m.mate = B[i % B.length]; m.s = dir(); m.t = Math.random() })
+  B.forEach((m, i) => { const a = A[i % A.length]; m.mate = a; m.s = a.s.clone(); m.t = a.t })
+  for (const m of meta) m.p = m.mate.c
+
+  for (const { pid, meshes, pb, c, w, p, s, t: tone } of meta) {
+
     box.union(pb.clone().applyMatrix4(STAND))
     for (const m of meshes) {
       const g = (m.geometry.index ? m.geometry.toNonIndexed() : m.geometry.clone())
