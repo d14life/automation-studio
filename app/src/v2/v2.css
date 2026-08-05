@@ -343,7 +343,12 @@ html.v2light{--slogan:linear-gradient(100deg,#8A7261,#5C4536 46%,#33241A)}
    them. What IS shared is the behaviour - useCardFan and useCardTilt are imported unchanged and
    write --fx/--fy/--fr/--fs/--fz and --tx/--ty/--tz into the transform below. */
 .v2 .projects,.projects{position:relative;height:min(760px,46vw);margin:44px 0 8px;perspective:1500px}
-.projects .proj{position:absolute;left:50%;top:50%;width:var(--cardw,300px);aspect-ratio:1;
+/* content-visibility lets the browser skip layout and paint for a card that is not on
+   screen. With a full document inside each one, that is the difference between three
+   desktop pages being rendered and one. contain-intrinsic-size keeps the scroll height
+   stable so nothing jumps when a card is skipped. */
+.projects .proj{content-visibility:auto;contain-intrinsic-size:var(--cardw,300px) var(--cardw,300px);
+  position:absolute;left:50%;top:50%;width:var(--cardw,300px);aspect-ratio:1;
   margin:calc(var(--cardw,300px)/-2) 0 0 calc(var(--cardw,300px)/-2);
   border:1px solid var(--rule);border-radius:22px;overflow:hidden;
   background:color-mix(in srgb, var(--surface) 88%, #000);
@@ -369,7 +374,7 @@ html.v2light{--slogan:linear-gradient(100deg,#8A7261,#5C4536 46%,#33241A)}
 .proj__shot{position:relative;display:block;flex:1 1 auto;overflow:hidden;
   background:var(--bg);pointer-events:none}
 .proj__shot iframe{position:absolute;top:0;left:0;border:0;
-  width:1440px;height:1000px;
+  width:1120px;height:780px;
   transform:scale(var(--shot-s,.21));transform-origin:0 0;
   pointer-events:none}
 /* a hairline of the page colour over the shot, so the demo's own edge never reads as a seam
@@ -937,3 +942,14 @@ a.v2card:hover .v2card__win{color:var(--accent)}
 .v2docs{margin-top:14px;font:500 13px/1.5 Golos,sans-serif;color:var(--ink-faint)}
 .v2docs a{color:var(--accent);text-decoration:none}
 .v2docs a:hover{text-decoration:underline}
+
+/* «Проверьте себя» - eight questions, and the list has to breathe or it reads as a form.
+   Two columns on a wide screen so the block does not become a wall. */
+.v2qs{list-style:none;margin:30px 0 0;padding:0;display:grid;gap:16px}
+@media (min-width:860px){.v2qs{grid-template-columns:1fr 1fr;gap:18px 40px}}
+.v2qs li{position:relative;padding-left:38px;color:var(--ink-soft);
+  font:400 clamp(15px,1.3vw,17.5px)/1.55 Golos,sans-serif;max-width:52ch}
+.v2qs b{position:absolute;left:0;top:-.06em;display:flex;align-items:center;
+  justify-content:center;width:26px;height:26px;border-radius:50%;
+  border:1px solid var(--rule);color:var(--accent);
+  font:700 14px/1 JBMono,monospace}

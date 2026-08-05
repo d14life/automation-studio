@@ -300,11 +300,17 @@ function useInView<T extends HTMLElement>(): [RefObject<T | null>, boolean] {
 
 /* The tiles count up once when seen. A string target like '3–4' or '0 ₽' cannot be counted,
    so each tile names the number to count and the text around it separately. */
+/* FIVE, not four - the old page's band, restored. Rainur's line was «бизнес любит цифры,
+   цифр нужно больше», and the version that answered it best had five figures with a
+   sub-line under each; this page had quietly shrunk to four bare tiles. Every number is
+   one the page already stands behind: the prepayment, the receivables build, the price
+   formats the collector reads, the reply window. Nothing invented. */
 const FIGS = [
-  { n: 62, pre: '', post: '', b: 'готовых сценария', s: 'автоматизации — от бота до экосистемы' },
-  { n: 12, pre: '', post: '', b: 'типов инструментов', s: 'сборщики, сторожа, конвейеры документов' },
-  { n: 4, pre: '3–', post: '', b: 'человека в команде', s: 'лондонское техническое образование' },
-  { n: 0, pre: '', post: ' ₽', b: 'стоит прототип', s: 'платите 50%, когда увидите его в работе' },
+  { n: 0, pre: '', post: ' ₽', b: 'предоплата', s: 'платите, только если инструмент помог' },
+  { n: 1, pre: '', post: ' день', b: 'на учёт взаиморасчётов', s: 'строительная группа, три юрлица и мультивалюта — готово за день' },
+  { n: 48, pre: '', post: '', b: 'контрагентов', s: 'в том же учёте, долги и переплаты видны по каждому' },
+  { n: 12, pre: '', post: '', b: 'форматов прайсов', s: 'сборщик читает их все и сводит в одну таблицу' },
+  { n: 1, pre: '', post: '', b: 'рабочий день', s: 'столько ждать письменного ответа на заявку' },
 ]
 function Fig({ f }: { f: (typeof FIGS)[number] }) {
   const [ref, seen] = useInView<HTMLDivElement>()
@@ -391,9 +397,10 @@ function Process() {
     <div className={seen ? 'v2proc is-in' : 'v2proc'} ref={ref}>
       <svg className="v2proc__line" viewBox="0 0 2 100" preserveAspectRatio="none" aria-hidden="true"><path d="M1 0v100" /></svg>
       {[
-        ['Разбираем процесс', 'Час разговора. Смотрим, что делается руками и сколько это стоит.'],
-        ['Показываем прототип', 'Работающую версию, не макет. Бесплатно. Не понравилось — расходимся.'],
-        ['Доводим и передаём', 'Исходный код, документация и обучение — ваши. Уходить от нас не больно.'],
+        ['Разбор задачи', 'Разговор и взгляд на то, как работа устроена сейчас. На выходе письменное описание: что именно будет собрано и в какой срок. Бесплатно и ни к чему не обязывает.'],
+        ['Сначала пробуете', 'Первая рабочая версия приходит за дни, а не в конце проекта. Вы гоняете её на реальной работе. Не помогло — расходимся, вы ничего не должны.'],
+        ['Передача', 'Исходный код, документация, обучение сотрудников и доступы. Ничего не заперто: захотите отдать другому подрядчику — сможете.'],
+        ['Поддержка', 'Фиксированная месячная сумма или по часам, на ваш выбор. Или вообще без поддержки. Это ваша система.'],
       ].map(([t, d], i) => (
         <div className="v2proc__step" key={t}>
           <span className="v2num">{i + 1}</span><b>{t}</b><p>{d}</p>
@@ -554,7 +561,7 @@ const DEMOS = [
    pointer-events:none on the frame is not laziness - without it the iframe swallows the cursor,
    the fan never sees mouseenter, the tilt dies, and a click lands inside the demo instead of
    opening it. The card is a link; the frame is a picture that happens to be alive. */
-const DESIGN_W = 1440
+const DESIGN_W = 1120
 
 function DemoDeck() {
   useCardFan()
@@ -581,6 +588,30 @@ function DemoDeck() {
     return () => ro.disconnect()
   }, [])
 
+  /* ONE LIVE DOCUMENT AT A TIME, NOT THREE.
+     loading="lazy" only defers the FETCH. Once a frame has loaded it stays a full, live
+     document forever - and each of these is laid out at DESIGN_W x 900 and then scaled down
+     into the card, so three of them meant the browser laying out and painting three
+     desktop-sized pages, inside rotated layers that force a re-raster. Measured on the live
+     site: park 207KB, zapchasti 138KB, vzaimoraschety 107KB of HTML, all resident at once.
+     That is the lag he feels beside the projects section.
+     Now a card's src is attached when it comes near the viewport and set back to about:blank
+     when it leaves, so the work scales with what is actually on screen. */
+  useEffect(() => {
+    const frames = [...document.querySelectorAll<HTMLIFrameElement>('.proj__shot iframe')]
+    if (!frames.length) return
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        const f = e.target as HTMLIFrameElement
+        const want = f.dataset.src || ''
+        if (e.isIntersecting) { if (f.getAttribute('src') !== want) f.setAttribute('src', want) }
+        else if (f.getAttribute('src') !== 'about:blank') f.setAttribute('src', 'about:blank')
+      }
+    }, { rootMargin: '120px' })
+    frames.forEach((f) => io.observe(f))
+    return () => io.disconnect()
+  }, [])
+
   return (
     <div className="projects">
       {DEMOS.map(([slug, t, d]) => (
@@ -589,8 +620,8 @@ function DemoDeck() {
             {/* loading=lazy so three full applications are not fetched before the visitor has
                 scrolled anywhere near them. tabIndex -1 and aria-hidden keep the frame out of the
                 tab order and off the screen reader - the link around it carries the meaning. */}
-            <iframe src={`/demo/${slug}/`} title="" aria-hidden="true" tabIndex={-1}
-                    loading="lazy" scrolling="no" />
+            <iframe data-src={`/demo/${slug}/`} src="about:blank" title="" aria-hidden="true"
+                    tabIndex={-1} loading="lazy" scrolling="no" />
           </span>
           <span className="proj__body">
             <b>{t}</b>
@@ -1230,6 +1261,30 @@ export default function V2() {
              здесь, на демо-данных. Наведите, чтобы рассмотреть, откройте, чтобы поработать
              внутри. Вводите своё, ломайте, перезагружайте — состояние сохраняется.</p>
           <DemoDeck />
+        </div></section>
+
+        {/* «ПРОВЕРЬТЕ СЕБЯ» - the old page's strongest section and the one v2 never got.
+            Nothing else on this site does its job: it does not describe what we sell, it
+            hands the visitor eight questions about their own company, and any one of them
+            landing IS the project. Rainur's «ноль воды» in its purest form - not a claim
+            about us, a diagnostic about them. */}
+        <section className="v2sec" id="check"><div className="v2wrap">
+          <p className="v2eyebrow">Проверьте себя</p>
+          <h2 className="v2h2">Не знаете, что просить? Это нормально</h2>
+          <p className="v2lede">Клиенты редко знают, что заказывать. Зато точно знают, что
+             бесит. Если хоть один вопрос колет — это и есть проект.</p>
+          <ul className="v2qs">
+            {[
+              'Какой отчёт дольше всего собирается каждый месяц и кто его собирает?',
+              'Какие решения принимаются с опозданием, потому что цифры приходят поздно?',
+              'Где одни и те же данные вбиваются в две разные системы?',
+              'От чего вы отказались в прошлом году, потому что не хватало трёх человек?',
+              'Что клиенты спрашивают по телефону, хотя могли бы посмотреть сами?',
+              'Где вы теряете заказы: на запросе, на счёте или после отгрузки?',
+              'Что ломается, когда один конкретный сотрудник уходит в отпуск?',
+              'На что команда жалуется так давно, что вы перестали это слышать?',
+            ].map((q) => (<li key={q}><b aria-hidden="true">?</b>{q}</li>))}
+          </ul>
         </div></section>
 
         <section className="v2sec" id="clients"><div className="v2wrap">
