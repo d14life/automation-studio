@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Starting prompts — Solutions101</title>
+<style>
+  :root{--bg:#0e202d;--panel:#132937;--ink:#F2F7F5;--soft:rgba(242,247,245,.86);
+    --faint:rgba(242,247,245,.58);--acc:#7FD8FF;--rule:rgba(242,247,245,.13)}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:var(--acc);text-decoration:none} a:hover{text-decoration:underline}
+  a:focus-visible,button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+  header{position:sticky;top:0;z-index:9;background:var(--bg);border-bottom:1px solid var(--rule);
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:0 clamp(14px,3vw,28px);min-height:52px}
+  .eyebrow{font:600 12px/1 ui-monospace,monospace;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--faint)}
+  .back{display:inline-flex;align-items:center;min-height:44px;padding:0 8px;font-size:14px}
+  main{max-width:860px;margin:0 auto;padding:clamp(24px,4vw,52px) clamp(14px,3vw,28px) 96px}
+  h1{font:700 clamp(28px,4.4vw,44px)/1.08 system-ui;letter-spacing:-.02em;margin:0 0 24px}
+  h2{font:700 clamp(21px,2.6vw,29px)/1.15 system-ui;letter-spacing:-.015em;
+    margin:44px 0 14px;padding-top:22px;border-top:1px solid var(--rule)}
+  h3{font:700 clamp(17px,1.9vw,21px)/1.25 system-ui;margin:30px 0 10px}
+  h4{font:700 16px/1.3 system-ui;margin:22px 0 8px;color:var(--soft)}
+  p{margin:0 0 15px;font-size:16.5px;line-height:1.62;color:var(--soft);max-width:68ch}
+  ul,ol{margin:0 0 16px;padding-left:22px}
+  li{font-size:16.5px;line-height:1.62;color:var(--soft);margin:0 0 7px;max-width:66ch}
+  blockquote{margin:0 0 16px;padding:12px 0 12px 18px;border-left:2px solid var(--acc);
+    color:var(--ink);font-size:17px;line-height:1.55}
+  hr{border:0;border-top:1px solid var(--rule);margin:32px 0}
+  code{font:500 14px/1.4 ui-monospace,monospace;background:var(--panel);
+    padding:2px 6px;border-radius:6px;color:var(--acc)}
+  .code{position:relative;margin:0 0 22px}
+  .code pre{margin:0;background:var(--panel);border:1px solid var(--rule);border-radius:14px;
+    padding:44px 16px 16px;overflow-x:auto;font:500 13.5px/1.62 ui-monospace,monospace;
+    color:var(--ink);white-space:pre-wrap;word-break:break-word}
+  .copy{position:absolute;top:8px;right:8px;min-height:32px;padding:0 14px;border-radius:9px;
+    background:#1a3648;color:var(--ink);border:1px solid var(--rule);cursor:pointer;
+    font:600 13px/1 system-ui;transition:transform .12s ease,background .12s ease}
+  .copy:hover{background:#20455b} .copy:active{transform:scale(.96)}
+  .copy.done{background:#1c5a45;border-color:#2f8b6b}
+  .tw{overflow-x:auto;margin:0 0 20px}
+  table{border-collapse:collapse;width:100%;font-size:15px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--rule);vertical-align:top;
+    line-height:1.5;color:var(--soft)}
+  th{color:var(--ink);font-weight:600;white-space:nowrap}
+  .grp{margin:0 0 34px}
+  .grp h2{border:0;padding:0;margin:0 0 4px}
+  .grp .note{color:var(--faint);font-size:14.5px;margin:0 0 14px}
+  .list{display:grid;gap:10px}
+  .item{display:block;padding:15px 17px;background:var(--panel);border:1px solid var(--rule);
+    border-radius:14px;color:var(--ink);transition:border-color .15s}
+  .item:hover{border-color:var(--acc);text-decoration:none}
+  .item b{display:block;font-size:16.5px;margin-bottom:3px}
+  .item span{color:var(--faint);font-size:14px}
+  @media (prefers-contrast:more){:root{--faint:rgba(242,247,245,.82);--rule:rgba(242,247,245,.4)}}
+</style>
+<header>
+  <a class="eyebrow" href="/docs/" style="color:var(--faint)">Solutions101 · документы</a>
+  <a class="back" href="/docs/">← ко всем</a>
+</header>
+<main><h1>Starting prompts</h1>
+<p>Paste one of these into a fresh Claude Code session. The first one is for someone joining the project for the first time.</p>
+<hr>
+<h2>PROMPT 0 — a new person / a new machine</h2>
+<div class="code"><button class="copy" data-for="c0" type="button">Скопировать</button><pre id="c0">Read CLAUDE.md in the repo root, then docs/HANDOFF.md, then docs/BRIEF.md, before
+you touch anything. HANDOFF is 400 lines of traps that each cost a full evening —
+do not skim it. BRIEF is every requirement, transcribed from the client's own
+voice messages; do not write any copy without reading it.
+
+Then get the site running and show me a screenshot before you change a line:
+
+  git checkout react &amp;&amp; git pull
+  cd app &amp;&amp; npm install &amp;&amp; npm run build
+
+The page being worked on is app/src/v2/ — v2.html on the live site. The old
+index.html page is legacy; leave it alone.
+
+Rules I care about most:
+- Show evidence for every claim. curl the live bundle and grep for your change,
+  or screenshot the simulator. "It should work" is not done.
+- Anything that MOVES cannot be verified in the preview pane — it reports
+  document.hidden, which freezes both requestAnimationFrame and the CSS
+  animation timeline. Use the iOS Simulator or a real foregrounded window.
+- Two of us work on `react` at the same time, both pushing to it. So: pull before
+  you start, commit small, and push with `git pull --rebase origin react` first,
+  every time. Never `git push --force` — on a shared branch that deletes whatever
+  the other person pushed. Never commit straight to `main`; that is the deploy
+  branch and only one of us touches it at a time.
+- English and short with me. The site copy stays Russian.</pre></div>
+<hr>
+<h2>PROMPT 1 — the current work: content and pages</h2>
+<div class="code"><button class="copy" data-for="c1" type="button">Скопировать</button><pre id="c1">Read CLAUDE.md, docs/HANDOFF.md and docs/BRIEF.md first.
+
+The DNA header is finished and verified — do not reopen it. Its scrub, its idle
+loop and its beam all have measured proof behind them in HANDOFF traps 5.12-5.15.
+If something about the header looks wrong, read those four traps before touching
+the code; three of them describe a symptom that is not a bug.
+
+This session is CONTENT. Six pages exist as hash routes in V2.tsx (PAGES):
+Главная, О нас, Услуги, Инструменты, Работы, Контакты. The home page is built.
+The others need real depth — Rainur's one repeated rule is «ноль воды»: concrete
+over prose, numbers because "бизнес любит цифры", a separate animation per
+service rather than one for the whole site.
+
+Everything you need is already written down and must not be reinvented:
+  docs/BRIEF.md          — 14 voice messages, the Telegram spec, the whiteboard
+  docs/catalogue.md      — 582 lines, the offers
+  docs/software-types.md — 345 lines
+  docs/feedback-rainur.md
+
+Damir's four decisions, already made: free prototype then 50% (every "0
+предоплаты" claim comes out); team of 3-4, London education is the accent; prices
+as RANGES not "от X"; our dark AI aesthetic on mabk.pro's structure.
+
+One vertical slice at a time — one page, all layers, ending in something Damir
+can click. Not "all the copy, then all the CSS". Screenshot each one and give him
+2-3 options on anything visual.</pre></div>
+<hr>
+<h2>What NOT to let a fresh session do</h2>
+<ul><li><b>Reopen the video header.</b> It took an evening and every behaviour in it is</li></ul>
+<p>  backed by a measurement. Traps 5.12–5.15.</p>
+<ul><li><b>Touch HTTPS.</b> The certificate is stuck; an attempt on 4 Aug briefly took the</li></ul>
+<p>  domain offline. Not in scope until Damir says so.</p>
+<ul><li><b>Invent prices or contact details.</b> They are deliberately «указать» in the</li></ul>
+<p>  footer. Damir supplies them; do not ask twice and do not guess.</p>
+<ul><li><b>Add a motion library for one component</b>, or rewrite sections below the fold</li></ul>
+<p>  "while it's in there".</p>
+<ul><li><b>Deploy to <code>main</code> while the other person is mid-deploy.</b> Say it out loud first.</li></ul></main>
+<script>
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('.copy'); if (!b) return;
+  const pre = document.getElementById(b.dataset.for); if (!pre) return;
+  navigator.clipboard.writeText(pre.textContent).then(() => {
+    b.textContent = 'Скопировано'; b.classList.add('done');
+    setTimeout(() => { b.textContent = 'Скопировать'; b.classList.remove('done') }, 1800);
+  }).catch(() => { b.textContent = 'Выделите вручную' });
+});
+</script>

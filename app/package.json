@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "node tools/build-docs.mjs && tsc -b && vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "docs": "node tools/build-docs.mjs"
   },
   "dependencies": {
     "@paper-design/shaders": "^0.0.78",

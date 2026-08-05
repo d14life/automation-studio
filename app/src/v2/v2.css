@@ -856,3 +856,8 @@ a.v2card:hover .v2card__win{color:var(--accent)}
 .v2bg video.is-mir{transform:rotate(180deg)}
 .v2bg video.is-flip{filter:blur(10px)}
 @media (prefers-reduced-motion:reduce){.v2bg video.is-flip{filter:none}}
+
+/* the documents link in the footer - small, deliberate, not part of the nav */
+.v2docs{margin-top:14px;font:500 13px/1.5 Golos,sans-serif;color:var(--ink-faint)}
+.v2docs a{color:var(--accent);text-decoration:none}
+.v2docs a:hover{text-decoration:underline}

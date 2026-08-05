@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Промпт: ДНК-шапка на реальном 3D вместо видео — Solutions101</title>
+<style>
+  :root{--bg:#0e202d;--panel:#132937;--ink:#F2F7F5;--soft:rgba(242,247,245,.86);
+    --faint:rgba(242,247,245,.58);--acc:#7FD8FF;--rule:rgba(242,247,245,.13)}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:var(--acc);text-decoration:none} a:hover{text-decoration:underline}
+  a:focus-visible,button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+  header{position:sticky;top:0;z-index:9;background:var(--bg);border-bottom:1px solid var(--rule);
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:0 clamp(14px,3vw,28px);min-height:52px}
+  .eyebrow{font:600 12px/1 ui-monospace,monospace;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--faint)}
+  .back{display:inline-flex;align-items:center;min-height:44px;padding:0 8px;font-size:14px}
+  main{max-width:860px;margin:0 auto;padding:clamp(24px,4vw,52px) clamp(14px,3vw,28px) 96px}
+  h1{font:700 clamp(28px,4.4vw,44px)/1.08 system-ui;letter-spacing:-.02em;margin:0 0 24px}
+  h2{font:700 clamp(21px,2.6vw,29px)/1.15 system-ui;letter-spacing:-.015em;
+    margin:44px 0 14px;padding-top:22px;border-top:1px solid var(--rule)}
+  h3{font:700 clamp(17px,1.9vw,21px)/1.25 system-ui;margin:30px 0 10px}
+  h4{font:700 16px/1.3 system-ui;margin:22px 0 8px;color:var(--soft)}
+  p{margin:0 0 15px;font-size:16.5px;line-height:1.62;color:var(--soft);max-width:68ch}
+  ul,ol{margin:0 0 16px;padding-left:22px}
+  li{font-size:16.5px;line-height:1.62;color:var(--soft);margin:0 0 7px;max-width:66ch}
+  blockquote{margin:0 0 16px;padding:12px 0 12px 18px;border-left:2px solid var(--acc);
+    color:var(--ink);font-size:17px;line-height:1.55}
+  hr{border:0;border-top:1px solid var(--rule);margin:32px 0}
+  code{font:500 14px/1.4 ui-monospace,monospace;background:var(--panel);
+    padding:2px 6px;border-radius:6px;color:var(--acc)}
+  .code{position:relative;margin:0 0 22px}
+  .code pre{margin:0;background:var(--panel);border:1px solid var(--rule);border-radius:14px;
+    padding:44px 16px 16px;overflow-x:auto;font:500 13.5px/1.62 ui-monospace,monospace;
+    color:var(--ink);white-space:pre-wrap;word-break:break-word}
+  .copy{position:absolute;top:8px;right:8px;min-height:32px;padding:0 14px;border-radius:9px;
+    background:#1a3648;color:var(--ink);border:1px solid var(--rule);cursor:pointer;
+    font:600 13px/1 system-ui;transition:transform .12s ease,background .12s ease}
+  .copy:hover{background:#20455b} .copy:active{transform:scale(.96)}
+  .copy.done{background:#1c5a45;border-color:#2f8b6b}
+  .tw{overflow-x:auto;margin:0 0 20px}
+  table{border-collapse:collapse;width:100%;font-size:15px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--rule);vertical-align:top;
+    line-height:1.5;color:var(--soft)}
+  th{color:var(--ink);font-weight:600;white-space:nowrap}
+  .grp{margin:0 0 34px}
+  .grp h2{border:0;padding:0;margin:0 0 4px}
+  .grp .note{color:var(--faint);font-size:14.5px;margin:0 0 14px}
+  .list{display:grid;gap:10px}
+  .item{display:block;padding:15px 17px;background:var(--panel);border:1px solid var(--rule);
+    border-radius:14px;color:var(--ink);transition:border-color .15s}
+  .item:hover{border-color:var(--acc);text-decoration:none}
+  .item b{display:block;font-size:16.5px;margin-bottom:3px}
+  .item span{color:var(--faint);font-size:14px}
+  @media (prefers-contrast:more){:root{--faint:rgba(242,247,245,.82);--rule:rgba(242,247,245,.4)}}
+</style>
+<header>
+  <a class="eyebrow" href="/docs/" style="color:var(--faint)">Solutions101 · документы</a>
+  <a class="back" href="/docs/">← ко всем</a>
+</header>
+<main><h1>Промпт: ДНК-шапка на реальном 3D вместо видео</h1>
+<p>Эксперимент, а не замена. Цель — сравнить с текущим видео на одной странице и решить глазами, а не по описанию.</p>
+<hr>
+<h2>Что в статье правда, а что нет — для НАШЕГО случая</h2>
+<p><b>Правда:</b></p>
+<ul><li>Пропадают все потолки, в которые мы упёрлись: 42 МБ загрузки, перекачка на</li></ul>
+<p>  каждый деплой, портретный кроп на телефоне, конечное число кадров, шов в петле.   Геометрию можно нарисовать в любом положении — кадров бесконечно много.</p>
+<ul><li>Бесплатно. Three.js и React Three Fiber — открытые библиотеки.</li></ul>
+<p><b>Неправда, и это важно:</b></p>
+<ul><li><b>Нам не нужен ИИ-генератор 3D.</b> Meshy и Spline AI делают игровые пропы</li></ul>
+<p>  среднего качества, и спираль ДНК от них будет хуже нашего рендера. Но двойная   спираль — это формула: две трубки по синусоиде плюс перемычки, сорок строк кода.   Генерировать её ИИ — как просить ИИ нарисовать окружность.</p>
+<ul><li><b>Spline-эмбед не «лёгкий».</b> Его рантайм — это ещё мегабайт-два JS плюс сцена,</li></ul>
+<p>  и он крутится постоянно. Для одной спирали это лишний слой: чистый Three.js   весит меньше и управляется скроллом напрямую.</p>
+<p><b>Чего мы лишимся, и это честно:</b> кинематографического света, настоящей глубины резкости, преломления в стекле. Реалтайм может выглядеть отлично, но по-другому — резче и «техничнее», чем отрендеренный ролик.</p>
+<p><b>Что мы выиграем сверх списка выше:</b> разрушение перестанет быть записанной сценой. Сейчас видео проигрывает один и тот же дубль; геометрию можно разрушить ровно на столько, на сколько прокрутил человек, в любой момент, бесконечно. Наш сценарий — «скролл = степень разрушения» — идеально ложится на процедурку.</p>
+<hr>
+<h2>Промпт — вставлять целиком</h2>
+<div class="code"><button class="copy" data-for="c0" type="button">Скопировать</button><pre id="c0">Собери герой-секцию сайта: двойная спираль ДНК на Three.js, которая собирается и
+разрушается по скроллу. Один самодостаточный HTML-файл, Three.js из importmap
+(esm.sh), больше никаких зависимостей. Никакого Spline, никаких готовых 3D-моделей
+и никаких видео — вся геометрия строится кодом.
+
+ГЕОМЕТРИЯ
+- Две нити двойной спирали: точки по параметру t, x = cos(t), y = t * шаг,
+  z = sin(t), вторая нить со сдвигом фазы на PI. Нити — трубки (TubeGeometry по
+  CatmullRomCurve3) радиусом примерно 1/12 радиуса спирали.
+- Перемычки между нитями каждые N шагов — цилиндры от точки одной нити к
+  соответствующей точке другой.
+- Всё в одной группе, медленное вращение вокруг вертикальной оси, постоянная
+  скорость, без ускорений.
+
+РАЗРУШЕНИЕ ПО СКРОЛЛУ — это главное
+- Одна переменная damage от 0 до 1, привязана к прогрессу скролла по секции.
+- При damage=0 спираль целая. При damage=1 она полностью разлетелась.
+- Разлёт делай во ВЕРШИННОМ ШЕЙДЕРЕ, не на CPU: каждой вершине по её позиции
+  считается псевдослучайное направление (хеш-функция от позиции), и вершина
+  смещается вдоль него на damage * сила, плюс поворот куска вокруг собственного
+  центра. Так разрушение стоит одинаково при любом количестве полигонов и
+  обратимо: уменьшил damage — спираль собралась обратно.
+- Разрушение должно идти ВОЛНОЙ сверху вниз, а не всё сразу: вершина начинает
+  разлетаться, когда damage превысит порог, зависящий от её высоты.
+- Обязательно обратимо и без гистерезиса: одно и то же значение damage всегда
+  даёт одну и ту же картинку.
+
+МАТЕРИАЛ И СВЕТ
+- Тёмная сцена: фон #0e202d. Нити — тёмный металл с чётким бликом
+  (MeshStandardMaterial, metalness ~0.9, roughness ~0.25).
+- Свет: одна яркая направленная сверху-сбоку для бликов вдоль нитей, одна
+  холодная заполняющая синяя (#7FD8FF) слабее, и слабый ambient. Блик вдоль нити
+  — это то, что делает картинку дорогой, добейся его.
+- Лёгкий bloom не обязателен; если добавляешь — только через UnrealBloomPass и
+  только на десктопе.
+
+ПРОИЗВОДИТЕЛЬНОСТЬ — жёсткие требования
+- renderer.setPixelRatio(Math.min(devicePixelRatio, 2)).
+- Рендерить только когда секция в кадре (IntersectionObserver) и только когда
+  что-то изменилось: damage поменялся или идёт вращение. Вне экрана —
+  cancelAnimationFrame, а не пустой кадр.
+- Сегментов у трубок ровно столько, сколько нужно: на телефоне вдвое меньше,
+  чем на десктопе, определяй по innerWidth один раз при старте.
+- Учитывай prefers-reduced-motion: тогда вращение выключено, damage управляется
+  только скроллом.
+- Покажи счётчик FPS по флагу ?fps=1.
+
+СТРАНИЦА
+- Секция высотой 400svh, внутри position:sticky канвас на весь экран — скролл
+  внутри секции гонит damage от 0 до 1.
+- Поверх канваса текст: надзаголовок «АВТОМАТИЗАЦИЯ БИЗНЕС-ПРОЦЕССОВ», заголовок
+  «Меняем ДНК вашего бизнеса», абзац и две кнопки. Текст читаемый на любом кадре:
+  тёмная подложка-градиент снизу, не на весь экран.
+- Палитра: фон #0e202d, текст #F2F7F5, приглушённый rgba(242,247,245,.72),
+  акцент #7FD8FF. Шрифт system-ui. Русский интерфейс. Никаких эмодзи.
+- Работает на телефоне 375px: спираль должна помещаться по высоте, а не
+  обрезаться по краям.
+
+ЧЕГО НЕ ДЕЛАТЬ
+- Не подключать Spline, drei, postprocessing целиком, GSAP и любые UI-библиотеки.
+- Не гонять рендер вне экрана.
+- Не пересобирать геометрию каждый кадр — геометрия строится один раз,
+  анимируется только uniform damage и поворот группы.</pre></div>
+<hr>
+<h2>Как мы это оценим</h2>
+<p>Я вставлю результат на страницу под флагом <code>?hero=gl</code> рядом с текущим видео, и мы сравним на одной машине по трём числам: вес загрузки, FPS при скролле, и как выглядит на портретном телефоне — единственная вещь, которую видео не умеет починить в принципе. Дальше решаешь глазами.</p>
+<p>Если картинка окажется слабее ролика, но скролл — заметно живее, есть третий путь: оставить видео на десктопе, а на телефоне показывать 3D, где как раз и болит и вес, и портретный кроп.</p></main>
+<script>
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('.copy'); if (!b) return;
+  const pre = document.getElementById(b.dataset.for); if (!pre) return;
+  navigator.clipboard.writeText(pre.textContent).then(() => {
+    b.textContent = 'Скопировано'; b.classList.add('done');
+    setTimeout(() => { b.textContent = 'Скопировать'; b.classList.remove('done') }, 1800);
+  }).catch(() => { b.textContent = 'Выделите вручную' });
+});
+</script>

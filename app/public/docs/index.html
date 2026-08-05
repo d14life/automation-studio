@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Документы — Solutions101</title>
+<style>
+  :root{--bg:#0e202d;--panel:#132937;--ink:#F2F7F5;--soft:rgba(242,247,245,.86);
+    --faint:rgba(242,247,245,.58);--acc:#7FD8FF;--rule:rgba(242,247,245,.13)}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:var(--acc);text-decoration:none} a:hover{text-decoration:underline}
+  a:focus-visible,button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+  header{position:sticky;top:0;z-index:9;background:var(--bg);border-bottom:1px solid var(--rule);
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:0 clamp(14px,3vw,28px);min-height:52px}
+  .eyebrow{font:600 12px/1 ui-monospace,monospace;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--faint)}
+  .back{display:inline-flex;align-items:center;min-height:44px;padding:0 8px;font-size:14px}
+  main{max-width:860px;margin:0 auto;padding:clamp(24px,4vw,52px) clamp(14px,3vw,28px) 96px}
+  h1{font:700 clamp(28px,4.4vw,44px)/1.08 system-ui;letter-spacing:-.02em;margin:0 0 24px}
+  h2{font:700 clamp(21px,2.6vw,29px)/1.15 system-ui;letter-spacing:-.015em;
+    margin:44px 0 14px;padding-top:22px;border-top:1px solid var(--rule)}
+  h3{font:700 clamp(17px,1.9vw,21px)/1.25 system-ui;margin:30px 0 10px}
+  h4{font:700 16px/1.3 system-ui;margin:22px 0 8px;color:var(--soft)}
+  p{margin:0 0 15px;font-size:16.5px;line-height:1.62;color:var(--soft);max-width:68ch}
+  ul,ol{margin:0 0 16px;padding-left:22px}
+  li{font-size:16.5px;line-height:1.62;color:var(--soft);margin:0 0 7px;max-width:66ch}
+  blockquote{margin:0 0 16px;padding:12px 0 12px 18px;border-left:2px solid var(--acc);
+    color:var(--ink);font-size:17px;line-height:1.55}
+  hr{border:0;border-top:1px solid var(--rule);margin:32px 0}
+  code{font:500 14px/1.4 ui-monospace,monospace;background:var(--panel);
+    padding:2px 6px;border-radius:6px;color:var(--acc)}
+  .code{position:relative;margin:0 0 22px}
+  .code pre{margin:0;background:var(--panel);border:1px solid var(--rule);border-radius:14px;
+    padding:44px 16px 16px;overflow-x:auto;font:500 13.5px/1.62 ui-monospace,monospace;
+    color:var(--ink);white-space:pre-wrap;word-break:break-word}
+  .copy{position:absolute;top:8px;right:8px;min-height:32px;padding:0 14px;border-radius:9px;
+    background:#1a3648;color:var(--ink);border:1px solid var(--rule);cursor:pointer;
+    font:600 13px/1 system-ui;transition:transform .12s ease,background .12s ease}
+  .copy:hover{background:#20455b} .copy:active{transform:scale(.96)}
+  .copy.done{background:#1c5a45;border-color:#2f8b6b}
+  .tw{overflow-x:auto;margin:0 0 20px}
+  table{border-collapse:collapse;width:100%;font-size:15px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--rule);vertical-align:top;
+    line-height:1.5;color:var(--soft)}
+  th{color:var(--ink);font-weight:600;white-space:nowrap}
+  .grp{margin:0 0 34px}
+  .grp h2{border:0;padding:0;margin:0 0 4px}
+  .grp .note{color:var(--faint);font-size:14.5px;margin:0 0 14px}
+  .list{display:grid;gap:10px}
+  .item{display:block;padding:15px 17px;background:var(--panel);border:1px solid var(--rule);
+    border-radius:14px;color:var(--ink);transition:border-color .15s}
+  .item:hover{border-color:var(--acc);text-decoration:none}
+  .item b{display:block;font-size:16.5px;margin-bottom:3px}
+  .item span{color:var(--faint);font-size:14px}
+  @media (prefers-contrast:more){:root{--faint:rgba(242,247,245,.82);--rule:rgba(242,247,245,.4)}}
+</style>
+<header>
+  <a class="eyebrow" href="/docs/" style="color:var(--faint)">Solutions101 · документы</a>
+  <a class="back" href="/v2.html">← на сайт</a>
+</header>
+<main><h1>Документы проекта</h1>
+<p>Всё, что накоплено по Solutions101: промпты, первоисточники от клиента и то, как устроен сайт. Открывается с телефона, промпты копируются одной кнопкой.</p><div class="grp"><h2>Промпты — это копируешь и вставляешь в Claude</h2><p class="note">Каждый блок кода на странице копируется одной кнопкой.</p><div class="list"><a class="item" href="/docs/system-prompt-demos.html"><b>Системный промпт: демо, которые не выглядят как бухгалтерия</b><span>Собран из наших собственных 62 офферов (catalogue.md), их разбора по 12 типам</span></a><a class="item" href="/docs/prompts-b2b-demos.html"><b>Пять промптов: серьёзные B2B-инструменты, не витринные фокусы</b><span>Каждый — из наших 62 (номер и название цитируются из catalogue.md). Отобраны по</span></a><a class="item" href="/docs/prompt-mvp-5-ideas.html"><b>Пять больших MVP — там, где коробки нет</b><span>Отбор по одному правилу: не лезть туда, где уже сидит сильный игрок.</span></a><a class="item" href="/docs/prompt-mvp-tms.html"><b>Промпт: MVP «Диспетчерская» — система управления перевозками</b><span>Большая система, которой у нас ещё нет, и которую можно продавать любой</span></a><a class="item" href="/docs/prompts-prototypes.html"><b>Промпты для Claude — по одному на прототип</b><span>Копируешь блок целиком, вставляешь в Claude, получаешь работающий прототип, не</span></a><a class="item" href="/docs/prompt-hero-3d.html"><b>Промпт: ДНК-шапка на реальном 3D вместо видео</b><span>Эксперимент, а не замена. Цель — сравнить с текущим видео на одной странице и</span></a></div></div><div class="grp"><h2>Что мы знаем о клиенте и о рынке</h2><p class="note">Первоисточники. Ничего не выдумывать поверх них.</p><div class="list"><a class="item" href="/docs/brief.html"><b>Бриф Райнура — полная расшифровка</b><span>Всё, что Райнур сказал по сайту, в одном месте: голосовые (2 августа и 4 августа),</span></a><a class="item" href="/docs/feedback-rainur.html"><b>Правки Райнура — 3 августа 2026</b><span>Записано с его голосовых и сообщений. Ничего пока не внедрено, это список.</span></a><a class="item" href="/docs/catalogue.html"><b>Каталог предложений Solutions101</b><span>Что мы можем предложить компании. Шестьдесят услуг в восьми направлениях плюс два</span></a><a class="item" href="/docs/software-types.html"><b>Типы программ и что показывать в прототипе</b><span>Шестьдесят предложений — это не шестьдесят разных программ. Под ними лежит</span></a><a class="item" href="/docs/types-12.html"><b>12 типов софта — на человеческом языке</b><span>Каталог из 62 офферов разложен по 12 типам в software-types.md. Это не</span></a></div></div><div class="grp"><h2>Как устроен сайт</h2><p class="note">Читать до правок. Здесь ловушки, каждая из которых стоила вечера.</p><div class="list"><a class="item" href="/docs/handoff.html"><b>Solutions101 — everything a fresh session needs</b><span>Read this first. It is the whole project in one file: what it is, where the code</span></a><a class="item" href="/docs/pages.html"><b>Страницы: раскладка, эффекты, тексты</b><span>Спецификация на весь сайт. Одна секция = один блок ниже: что в ней стоит, как она</span></a><a class="item" href="/docs/spec.html"><b>SPEC — техническое задание на весь сайт</b><span>Мастер-документ. Собирает всё, что есть: голосовые Райнура (BRIEF.md), доску,</span></a><a class="item" href="/docs/prototypes.html"><b>15 прототипов — что строим вместо 62 фейковых анимаций</b><span>Райнур про старые плейсхолдеры сказал прямо: это не демонстрация ничего.</span></a><a class="item" href="/docs/portfolio-board.html"><b>Доска MVP: что построено, что строится, что брать дальше</b><span>Правило доски одно: один тип софта — один MVP. Не потому что красиво, а потому</span></a><a class="item" href="/docs/prompt-next-session.html"><b>Starting prompts</b><span>Paste one of these into a fresh Claude Code session. The first one is for someone</span></a><a class="item" href="/docs/tools-verdict.html"><b>Figma, Base44, Claude Code — проверенные факты</b><span>Проверка 4 августа 2026: официальная документация, отзывы практиков, форумы.</span></a></div></div></main>
+<script>
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('.copy'); if (!b) return;
+  const pre = document.getElementById(b.dataset.for); if (!pre) return;
+  navigator.clipboard.writeText(pre.textContent).then(() => {
+    b.textContent = 'Скопировано'; b.classList.add('done');
+    setTimeout(() => { b.textContent = 'Скопировать'; b.classList.remove('done') }, 1800);
+  }).catch(() => { b.textContent = 'Выделите вручную' });
+});
+</script>

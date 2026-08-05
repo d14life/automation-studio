@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Figma, Base44, Claude Code — проверенные факты — Solutions101</title>
+<style>
+  :root{--bg:#0e202d;--panel:#132937;--ink:#F2F7F5;--soft:rgba(242,247,245,.86);
+    --faint:rgba(242,247,245,.58);--acc:#7FD8FF;--rule:rgba(242,247,245,.13)}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:var(--acc);text-decoration:none} a:hover{text-decoration:underline}
+  a:focus-visible,button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+  header{position:sticky;top:0;z-index:9;background:var(--bg);border-bottom:1px solid var(--rule);
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:0 clamp(14px,3vw,28px);min-height:52px}
+  .eyebrow{font:600 12px/1 ui-monospace,monospace;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--faint)}
+  .back{display:inline-flex;align-items:center;min-height:44px;padding:0 8px;font-size:14px}
+  main{max-width:860px;margin:0 auto;padding:clamp(24px,4vw,52px) clamp(14px,3vw,28px) 96px}
+  h1{font:700 clamp(28px,4.4vw,44px)/1.08 system-ui;letter-spacing:-.02em;margin:0 0 24px}
+  h2{font:700 clamp(21px,2.6vw,29px)/1.15 system-ui;letter-spacing:-.015em;
+    margin:44px 0 14px;padding-top:22px;border-top:1px solid var(--rule)}
+  h3{font:700 clamp(17px,1.9vw,21px)/1.25 system-ui;margin:30px 0 10px}
+  h4{font:700 16px/1.3 system-ui;margin:22px 0 8px;color:var(--soft)}
+  p{margin:0 0 15px;font-size:16.5px;line-height:1.62;color:var(--soft);max-width:68ch}
+  ul,ol{margin:0 0 16px;padding-left:22px}
+  li{font-size:16.5px;line-height:1.62;color:var(--soft);margin:0 0 7px;max-width:66ch}
+  blockquote{margin:0 0 16px;padding:12px 0 12px 18px;border-left:2px solid var(--acc);
+    color:var(--ink);font-size:17px;line-height:1.55}
+  hr{border:0;border-top:1px solid var(--rule);margin:32px 0}
+  code{font:500 14px/1.4 ui-monospace,monospace;background:var(--panel);
+    padding:2px 6px;border-radius:6px;color:var(--acc)}
+  .code{position:relative;margin:0 0 22px}
+  .code pre{margin:0;background:var(--panel);border:1px solid var(--rule);border-radius:14px;
+    padding:44px 16px 16px;overflow-x:auto;font:500 13.5px/1.62 ui-monospace,monospace;
+    color:var(--ink);white-space:pre-wrap;word-break:break-word}
+  .copy{position:absolute;top:8px;right:8px;min-height:32px;padding:0 14px;border-radius:9px;
+    background:#1a3648;color:var(--ink);border:1px solid var(--rule);cursor:pointer;
+    font:600 13px/1 system-ui;transition:transform .12s ease,background .12s ease}
+  .copy:hover{background:#20455b} .copy:active{transform:scale(.96)}
+  .copy.done{background:#1c5a45;border-color:#2f8b6b}
+  .tw{overflow-x:auto;margin:0 0 20px}
+  table{border-collapse:collapse;width:100%;font-size:15px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--rule);vertical-align:top;
+    line-height:1.5;color:var(--soft)}
+  th{color:var(--ink);font-weight:600;white-space:nowrap}
+  .grp{margin:0 0 34px}
+  .grp h2{border:0;padding:0;margin:0 0 4px}
+  .grp .note{color:var(--faint);font-size:14.5px;margin:0 0 14px}
+  .list{display:grid;gap:10px}
+  .item{display:block;padding:15px 17px;background:var(--panel);border:1px solid var(--rule);
+    border-radius:14px;color:var(--ink);transition:border-color .15s}
+  .item:hover{border-color:var(--acc);text-decoration:none}
+  .item b{display:block;font-size:16.5px;margin-bottom:3px}
+  .item span{color:var(--faint);font-size:14px}
+  @media (prefers-contrast:more){:root{--faint:rgba(242,247,245,.82);--rule:rgba(242,247,245,.4)}}
+</style>
+<header>
+  <a class="eyebrow" href="/docs/" style="color:var(--faint)">Solutions101 · документы</a>
+  <a class="back" href="/docs/">← ко всем</a>
+</header>
+<main><h1>Figma, Base44, Claude Code — проверенные факты</h1>
+<p>Проверка 4 августа 2026: официальная документация, отзывы практиков, форумы. Три независимых агента, каждому давался список моих утверждений с просьбой помечать «подтверждено / частично / неверно» и прямо писать, где я преувеличил.</p>
+<p><b>Видео посмотреть не удалось ни одному из трёх</b> — YouTube требует проверку на робота, а она упирается в куки браузера. Лечится: закрыть Chrome или войти в YouTube в Safari. Пока эта часть непроверена, и я её не прикрываю.</p>
+<hr>
+<h2>Что я говорил неверно</h2>
+<h3>1. «Выгрузка на GitHub у Base44 односторонняя»</h3>
+<p><b>Устарело.</b> Двусторонняя синхронизация вышла в декабре 2025: слияние в ветку <code>main</code> возвращается обратно в редактор Base44.</p>
+<p>Оговорки, которые оставляют суть претензии живой: работает только с <code>main</code>, сама Base44 в документации пишет, что ручные правки в репозитории <b>могут сломать разбор вёрстки</b>, подключение GitHub <b>отключает историю версий</b> за прежние периоды, и синхронизируется по-прежнему <b>только лицевая часть</b> — база и логика остаются у них.</p>
+<h3>2. «Уведомления о платеже приходят только пока пользователь залогинен»</h3>
+<p><b>Я подал это как факт, а источник ровно один.</b> Ни документация Base44, ни второй независимый источник это не подтверждают. Более того, у них есть серверные функции по расписанию, что этому противоречит.</p>
+<p>Правильная формулировка: <b>сообщается, что так, но не проверено.</b> Проверяется только опытом — прогнать реальный платёж и посмотреть.</p>
+<h3>3. «Анимации Figma нельзя выгрузить в код»</h3>
+<p><b>Слишком категорично.</b> У самой Figma экспорта нет. Но плагины (Motion Export и подобные) переводят её переходы в CSS, React, Framer Motion.</p>
+<h3>4. «Одним запросом получаю из Figma код, скриншот и картинки»</h3>
+<p><b>Это три разных инструмента</b>, вызываются по очереди. Итог тот же, описание было неверным.</p>
+<h3>5. «Примерно треть работы — то, чего нет в макете»</h3>
+<p><b>Число я взял из головы.</b> Направление подтверждается всеми источниками — адаптивность, состояния, движение, длина текста, доступность в макет не попадают. Но «треть» никем не измерена. Это моя прикидка, а не знание.</p>
+<h3>6. Главное, что я пропустил: <b>Figma Sites</b></h3>
+<p>Figma теперь <b>публикует настоящий живой сайт</b> — адаптивный, с управлением контентом и своим доменом на платных тарифах — прямо из макета, <b>без кода</b>. Моё «Figma умеет только передать в разработку» было неверным.</p>
+<p>Оговорки: открытая бета, обзоры сообщают, что «без кода — без проблем» на практике не работает. Есть ещё <b>Figma Make</b> (сборка по описанию), но разработчики сходятся, что выдача примитивнее конкурентов и в продакшн без доработки не годится.</p>
+<hr>
+<h2>Что подтвердилось</h2>
+<h3>Figma Dev Mode</h3>
+<p>Только осмотр. Отдаёт стили по одному блоку, <b>не делает адаптивность</b> даже когда правила заданы в макете, не собирает компоненты. Сторонние плагины существуют именно потому, что эту дыру надо чем-то закрывать.</p>
+<p><b>Цены (проверено живьём, август 2026):</b> бесплатный тариф — 3 файла. Полное место $16/мес при годовой, $20 помесячно. Место разработчика $12/$15. Место для комментариев $3/$5.</p>
+<h3>Base44</h3>
+<div class="tw"><table><thead><tr><th>что</th><th>подтверждено</th></tr></thead><tbody><tr><td>выгрузка кода только на платных</td><td>да, от Builder</td></tr><tr><td>выгружается только лицевая часть</td><td>да — база, вход, логика, интеграции остаются у них</td></tr><tr><td>нельзя поставить у себя</td><td>да — нет ни исходников, ни образа, ни версии для сервера</td></tr><tr><td>серверные функции есть, но не уносятся</td><td>да — они написаны под их же сервисы</td></tr><tr><td>встроенные платежи только Stripe</td><td>да</td></tr></tbody></table></div>
+<p><b>Цены (август 2026):</b></p>
+<div class="tw"><table><thead><tr><th>тариф</th><th>помесячно</th><th>за год</th><th>сообщений</th><th>что даёт</th></tr></thead><tbody><tr><td>Free</td><td>$0</td><td>$0</td><td>25/мес</td><td>вход и база есть; нет домена, функций, выгрузки</td></tr><tr><td>Starter</td><td>$20</td><td>$16</td><td>100</td><td>правка кода; выгрузки всё ещё нет</td></tr><tr><td>Builder</td><td>$50</td><td>$40</td><td>250</td><td>серверные функции, свой домен, GitHub, Stripe</td></tr><tr><td>Pro</td><td>$100</td><td>$80</td><td>500</td><td>выбор модели</td></tr><tr><td>Elite</td><td>$200</td><td>$160</td><td>1200</td><td>приоритет, <b>выбор региона хранения ЕС/Британия</b></td></tr></tbody></table></div>
+<hr>
+<h2>Чего я не знал, и это важнее всего остального</h2>
+<h3>Оценка пользователей: 2.8 из 5 при 783 отзывах</h3>
+<p>Повторяющиеся жалобы: кредиты сгорают на исправлении ошибок, которые ИИ сам же и внёс; сложная отмена подписки; неожиданные списания. Задокументирован случай июля 2026, когда сгенерированный код <b>сжёг 16 384 кредита за минуты</b>, и вернули только треть.</p>
+<h3>После покупки Wix стало хуже</h3>
+<p>Wix купил Base44 за ~$80 млн, сделка закрыта в июле 2025. Поддержка, по отзывам, съехала с «часов» на «дни и недели» — включая платящих по высоким тарифам. Цены поднялись на 15-30%, бесплатный тариф урезали со 100 сообщений до 25.</p>
+<h3>Wix блокирует россиян</h3>
+<p>С 12 сентября 2024 Wix закрыл доступ резидентам России — и платным, и бесплатным, сайты снимались с публикации.</p>
+<p><b>Не подтверждено</b>, что это дословно распространили на Base44: в их правилах речь про страны под полным эмбарго, а Россия формально не в этой категории. Это серая зона, а не решённый вопрос.</p>
+<h3>Где хранятся данные</h3>
+<p>По умолчанию <b>США</b>. Выбор региона (ЕС или Британия) появился в апреле 2026 и доступен <b>только на Elite</b> — это $160 в месяц. <b>Российского региона нет вообще, ни за какие деньги.</b></p>
+<p>И даже с выбранным регионом их собственная документация признаёт: выбор определяет, <b>где данные лежат, но не где обрабатываются</b> — запросы могут проходить через другие регионы.</p>
+<h3>152-ФЗ ужесточили</h3>
+<p>С 1 июля 2025 сбор и хранение персональных данных россиян должны идти <b>только на серверах в России</b>. Прежняя лазейка с промежуточной базой закрыта. Имя, телефон, почта — персональные данные. Исключений для малого бизнеса и B2B нет.</p>
+<p><b>Штрафы: 1-6 млн ₽ за первое нарушение, 6-18 млн за повторное.</b></p>
+<h3>Уехать с Base44 можно, но не их средствами</h3>
+<p>Есть два способа, <b>оба неофициальные</b>: подменная библиотека <code>base44-to-supabase-sdk</code>, которая переводит вызовы на свой собственный Supabase, и платная услуга EscapeBase44, которая разбирает их backend и переносит всё на своё железо.</p>
+<p>Сам факт, что эти инструменты существуют и на них есть спрос, — лучшее доказательство привязки.</p>
+<hr>
+<h2>Итог</h2>
+<p><b>Для сайта Solutions101</b> — ничего не меняется. Claude Code. Сайт есть, вылизан по скорости, его ценность в живой графике, которую ни Figma, ни Base44 не воспроизведут.</p>
+<p><b>Для клиентских сайтов</b> — Figma имеет смысл, если рисуешь <b>ты</b>. Появился второй сценарий: Figma Sites может и опубликовать сайт целиком, без кода. Но это бета, и это снова чужой хостинг с ежемесячной платой — та же привязка, только с другим логотипом.</p>
+<p><b>Для клиентских приложений на Base44</b> — нет, и причины стали жёстче, чем я говорил:</p>
+<ol><li>Wix уже блокирует российских резидентов (насколько это касается Base44 —</li></ol>
+<p>   неясно, но риск реальный)</p>
+<ol><li>152-ФЗ прямо запрещает хранить данные российских клиентов на их серверах,</li></ol>
+<p>   а российского региона у них нет ни за какие деньги</p>
+<ol><li>Их собственная касса Россию не поддерживает, Stripe тоже</li><li>2.8 из 5 и рухнувшая поддержка — это про то, каково будет <b>чинить</b> систему</li></ol>
+<p>   клиента через год</p>
+<p>Ни один из четырёх пунктов не лечится инженерией.</p>
+<p><b>Что остаётся для клиентских систем:</b> свои заготовки на своём или российском хостинге, с прямым подключением ЮKassa, Т-Банка, СБП или Робокассы. Скучно, но это единственный законный путь для российского клиента.</p></main>
+<script>
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('.copy'); if (!b) return;
+  const pre = document.getElementById(b.dataset.for); if (!pre) return;
+  navigator.clipboard.writeText(pre.textContent).then(() => {
+    b.textContent = 'Скопировано'; b.classList.add('done');
+    setTimeout(() => { b.textContent = 'Скопировать'; b.classList.remove('done') }, 1800);
+  }).catch(() => { b.textContent = 'Выделите вручную' });
+});
+</script>

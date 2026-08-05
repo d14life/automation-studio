@@ -1434,6 +1434,9 @@ export default function V2() {
               <p className="v2eyebrow">Контакты</p>
               <p className="v2foot__big">Solutions<b>101</b></p>
               <p className="v2note">Автоматизация бизнес-процессов</p>
+              {/* not in the nav: this is for us and for whoever picks the project up,
+                  not for a visitor. Findable, not advertised. */}
+              <p className="v2docs"><a href="/docs/">Документы проекта</a></p>
             </div>
             <ul className="v2contacts">
               <li><span>Telegram</span><a href="https://t.me/">указать</a></li>
