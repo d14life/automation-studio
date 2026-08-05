@@ -304,7 +304,22 @@ function patch(mat, isCore) {
       float shrink = pow(1.0 - k, 0.3333);
       /* where the piece lives right now: its own word's slot, travelling to the slot
          the other word needs filled */
-      vec3 home = mix(aCenter, aPartner, smoothstep(0.42, 1.0, t));
+      /* ONE JOURNEY, NOT TWO - and this is the extra stage. BOTH words were travelling
+         to their partner's slot. The 101's rubble flew all the way out to where
+         Solutions would be; then the trade handed over to rocks whose partner slot is
+         back in the 101, and those flew the same route a second time. The pile went
+         out, came back, and went out again.
+
+         Only the arriving word travels. The 101 breaks apart WHERE IT STANDS and stops
+         there; the swap happens in that pile; and the Solutions rocks carry it from
+         there to their own slots. One trip.
+
+         The two are exactly co-located at the moment they trade, which is what makes
+         it invisible: a mate's partner slot IS its partner's home slot, and it inherits
+         the same throw seed, so both sit at the identical point with the identical
+         scatter. */
+      float trav = smoothstep(0.42, 1.0, t) * aWord;
+      vec3 home = mix(aCenter, aPartner, trav);
       /* PHYSICS, NOT A BLENDER. The spin was t*6.2 plus a term driven by the global
          clock, so every fragment tumbled forever at speed - which reads as a special
          effect, not as something breaking. Real debris does three things: it bursts
@@ -456,13 +471,42 @@ const build = (gltf) => { try {
     const v = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1)
     return v.lengthSq() < 1e-6 ? new THREE.Vector3(0, 1, 0) : v.normalize()
   }
-  A.forEach((m) => { m.s = dir(); m.t = Math.random() })
-  A.forEach((m, i) => { m.mate = B[Math.floor(i * B.length / A.length)] })
-  B.forEach((m, i) => {
-    const a = A[Math.floor(i * A.length / B.length)]
+  /* PAIR BY SIZE, RANK FOR RANK. This is the last thing that made the exchange
+     visible. The mapping was by INDEX - and index is the order Blender happened to
+     emit cells in, which is to say random - so a fist-sized cell of the 101 would
+     trade with a chip of Solutions. One rock shrinks away, an unrelated small one
+     grows somewhere: read as things disappearing and other things appearing, however
+     well the timing was hidden.
+
+     Sorting both words by volume and pairing largest-with-largest down to
+     smallest-with-smallest means every trade is between two rocks of nearly the same
+     size. The shape still changes - a 101 cell and a Solutions cell are different
+     solids and have to be - but a shape change at constant size reads as a rock
+     turning over, which is what it should look like. Equal counts are what make this
+     a clean bijection with no rock left unpartnered at either end. */
+  const vol = (m) => {
+    const d = m.pb.getSize(new THREE.Vector3())
+    return Math.max(d.x, 1e-6) * Math.max(d.y, 1e-6) * Math.max(d.z, 1e-6)
+  }
+  const byVol = (l) => l.slice().sort((x, y) => vol(y) - vol(x))
+  const As = byVol(A), Bs = byVol(B)
+  As.forEach((m, i) => {
+    m.s = dir(); m.t = Math.random()
+    m.mate = Bs[Math.min(i, Bs.length - 1)]
+  })
+  Bs.forEach((m, i) => {
+    const a = As[Math.min(i, As.length - 1)]
     m.mate = a; m.s = a.s.clone(); m.t = a.t
   })
   for (const m of meta) m.p = m.mate.c
+
+  /* prove the pairing actually matches sizes rather than just claiming it */
+  const ratios = As.map((m) => vol(m) / Math.max(vol(m.mate), 1e-9)).sort((x, y) => x - y)
+  window.__pairing = {
+    pieces: As.length + Bs.length,
+    medianSizeRatio: +ratios[ratios.length >> 1].toFixed(3),
+    worstRatio: +ratios[ratios.length - 1].toFixed(3),
+  }
 
   for (const { pid, meshes, pb, c, w, p, s, t: tone } of meta) {
 
