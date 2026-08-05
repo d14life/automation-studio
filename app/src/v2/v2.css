@@ -46,9 +46,16 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none}
    object-fit:cover. It is `fill` at 100%+130px with a 62% focal offset, moved again
    on phones. A second layer given its own geometry meets this one at a hard vertical
    seam - that is exactly what the canvas overlay produced before it was removed. */
+/* THE 300-BYTE FIRST PAINT. Even the 41KB poster is a network request, and on a cold cache
+   there is a moment before it lands where this element is transparent. This is frame 0 at
+   32px wide, inlined, so it costs no request at all and paints with the stylesheet - the
+   browser scales it up and the result is a blurred version of the exact picture that is
+   coming. It sits on the VIDEO element, not on .v2bg, so background-size:100% 100% traces the
+   same box the fill'd video does and nothing shifts when the real frame replaces it. */
 .v2bg video{position:absolute;top:0;left:0;
   width:100%;height:calc(100% + 130px);max-width:none;max-height:none;
   object-fit:fill;object-position:center 62%;display:block;
+  background:url(data:image/jpeg;base64,/9j//gAQTGF2YzYyLjI4LjEwMQD/2wBDAAgYGBwYHCEhISEhISckJygoKCcnJycoKCgrKyszMzMrKysoKCsrMDAzMzc5NzQ0MzQ5OTw8PEhIRUVUVFdnZ3z/xABgAAEBAQEBAQAAAAAAAAAAAAAEAwEHAgUBAQEBAAAAAAAAAAAAAAAAAAMCBBABAAIDAAICAwEAAAAAAAAAAQARAiExQRJRcZFhA7ERAQEBAAAAAAAAAAAAAAAAAAABEf/AABEIABIAIAMBIgACEQADEQD/2gAMAwEAAhEDEQA/AOTuuymC47qy67v8Tw20u719TccvXF0LdFvnw/M0MpOTe0cE+eMvj/Qt836tv67/AJCuYY+vSfOAx2S5cRgFtdYo2wUbj2AdrKEm9lCIN//Z) 0 0/100% 100% no-repeat;
   transition:filter .45s ease}
 /* THE LIGHT VERSION IS THE SAME CLIP. The donor's pale hero is not a second video, it is this
    footage inverted over a warm background - white strand on cream instead of dark on black.
