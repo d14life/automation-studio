@@ -25,13 +25,14 @@ the hole.
 """
 import bpy, bmesh, random, json
 from mathutils import Vector
+from mathutils import noise as mnoise
 from mathutils.bvhtree import BVHTree
 
 SEED   = 7
 FONT_A = "/System/Library/Fonts/Supplemental/Arial Black.ttf"   # heavy, open counters
 FONT_B = "/System/Library/Fonts/Supplemental/Impact.ttf"
-OUT    = bpy.path.abspath("//words_v3.glb")
-META   = bpy.path.abspath("//words_v3.json")
+OUT    = bpy.path.abspath("//words_v5.glb")
+META   = bpy.path.abspath("//words_v5.json")
 
 bpy.ops.wm.read_factory_settings(use_empty=True)
 
@@ -57,11 +58,12 @@ def build_word(body, pieces, prefix, extrude, target_h, font, spacing=1.0, bold=
     t.data.body = body
     t.data.align_x = 'CENTER'; t.data.align_y = 'CENTER'
     t.data.extrude = extrude
-    # ANGULAR, NOT ROUND. A rounded bevel and 12-segment curves give fragments with
-    # smooth curved faces, which read as pebbles. Real fractured stone is flat planes
-    # meeting at sharp edges - so no bevel at all, and the glyph outlines are coarse
-    # polygons rather than smooth curves.
-    t.data.resolution_u = 2
+    # THE LETTERFORM IS DRAWN PROPERLY; THE ROCK SUPPLIES THE ANGULARITY. Dropping
+    # curve resolution to 2 did make straight edges, but it also turned the O and the
+    # S into crude polygons - the shapes looked badly drawn because they were. The
+    # outlines go back to a clean 6 segments, still with no bevel, and the broken-stone
+    # look now comes from roughen() below, which is where it belongs.
+    t.data.resolution_u = 6
     t.data.space_character = spacing
     # a little extra weight ON TOP of an already-heavy face. Safe here in a way it
     # was not with Impact: Arial Black draws its counters wide enough that 0.018 of
@@ -128,11 +130,40 @@ def build_word(body, pieces, prefix, extrude, target_h, font, spacing=1.0, bold=
             hit = bvh.find_nearest(f.center)
             d = hit[3] if hit and hit[3] is not None else 9e9
             f.material_index = 0 if d < extrude * 0.14 else 1
+        roughen(me, extrude * 0.28)
         out.append(ob)
 
     bpy.data.objects.remove(src, do_unlink=True)
     print(f"[words] {body}: {len(out)} raw cells")
     return out
+
+
+def roughen(me, amp, cuts=1):
+    """Turn a clean Voronoi polyhedron into something shaped like a rock.
+
+    A bisected cell is a convex solid of perfectly flat faces - which is a crystal,
+    not a stone. Subdividing and then pushing every vertex through a noise field
+    breaks the faces into irregular planes and chips the edges, so the piece has real
+    form instead of relying on the texture to sell it.
+
+    The displacement is a function of POSITION, never of the vertex normal. Two
+    neighbouring cells share the vertices along their cut face; a normal points a
+    different way in each of them and would tear the pair apart, while a position
+    field moves both by exactly the same vector and the word stays watertight."""
+    bm = bmesh.new(); bm.from_mesh(me)
+    if cuts:
+        bmesh.ops.subdivide_edges(bm, edges=bm.edges[:], cuts=cuts, use_grid_fill=True)
+    for v in bm.verts:
+        p = v.co.copy()
+        d = Vector((mnoise.noise(p * 11.0),
+                    mnoise.noise(p * 11.0 + Vector((31.4, 0.0, 0.0))),
+                    mnoise.noise(p * 11.0 + Vector((0.0, 57.1, 0.0)))))
+        f = Vector((mnoise.noise(p * 34.0),
+                    mnoise.noise(p * 34.0 + Vector((11.7, 0.0, 0.0))),
+                    mnoise.noise(p * 34.0 + Vector((0.0, 23.9, 0.0)))))
+        v.co = p + d * amp + f * (amp * 0.45)
+    bm.normal_update()
+    bm.to_mesh(me); bm.free()
 
 
 def centre_of(ob):
