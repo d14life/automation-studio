@@ -201,15 +201,22 @@ function patch(mat, isCore) {
       float t = breakT(aCenter, clamp(own * 1.4, 0.0, 1.0), uMinY, uMaxY);
       vT = t; vTone = aTone; vFade = 1.0 - smoothstep(0.62, 1.0, own);
       vec3 home = aCenter;
-      float ang = t * 6.2 + uSpin * (0.6 + aTone * 1.4) * t;
+      /* PHYSICS, NOT A BLENDER. The spin was t*6.2 plus a term driven by the global
+         clock, so every fragment tumbled forever at speed - which reads as a special
+         effect, not as something breaking. Real debris does three things: it bursts
+         fast and decelerates (drag), it falls (gravity, accelerating), and it tumbles
+         only a little, by an amount fixed per piece rather than by a running clock.
+         pow(t,0.55) is the deceleration - most of the distance is covered early. */
+      float fly = pow(t, 0.55);
+      float ang = fly * (0.35 + aTone * 0.8);
       mat3 R = axisRot(normalize(aSeed + vec3(0.001)), ang);
       vec3 transformed = home + R * (position - aCenter)
-                       + aSeed * t * 0.62
-                       + vec3(0.0, t * t * -0.16, 0.0);
+                       + aSeed * fly * 0.62
+                       + vec3(0.0, t * t * -0.55, 0.0);   /* gravity accelerates */
     `)
     sh.vertexShader = sh.vertexShader.replace('#include <beginnormal_vertex>', `
       float tn = breakT(aCenter, clamp(mix(uMorph,1.0-uMorph,aWord)*1.4,0.0,1.0), uMinY, uMaxY);
-      float angn = tn * 6.2 + uSpin * (0.6 + aTone * 1.4) * tn;
+      float angn = pow(tn, 0.55) * (0.35 + aTone * 0.8);
       vec3 objectNormal = axisRot(normalize(aSeed + vec3(0.001)), angn) * normal;
       vLocalN = objectNormal;
     `)
