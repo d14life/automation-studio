@@ -1943,3 +1943,78 @@ console.log('Проверка сумм прописью:',WORDS_TESTS.map(v=>v+'
 </script>
 </body>
 </html>
+<style>
+/* ═══ ВИД: атмосфера вместо плоского чёрного ═════════════════════════════════
+   Приём взят из герой-секции, которую он прислал (21st.dev): огромные размытые
+   градиентные пятна за интерфейсом плюс зерно. Но взят ПРИЁМ, а не компонент —
+   тот на React, Tailwind и motion, а этот файл обязан работать офлайн одним
+   куском. Три радужных пятна на финансовой панели читались бы как игрушка,
+   поэтому здесь их два, приглушённых, и они стоят ЗА панелями: цвет виден в
+   промежутках и по краям, а числа остаются на спокойном тёмном.
+
+   Его замечания, по пунктам: текст был серым — стал белым; было «жёстко, как
+   будто ИИ рисовал» — добавлены скругления, стеклянные поверхности и цвет;
+   цветов было мало — теперь их два семейства, тёплое и холодное. */
+
+body::before{
+  content:'';position:fixed;inset:-20% -10% auto -10%;height:70vh;z-index:0;
+  pointer-events:none;filter:blur(90px);opacity:.42;
+  background:
+    radial-gradient(38rem 12rem at 18% 22%, #7c4dff 0%, transparent 68%),
+    radial-gradient(42rem 12rem at 74% 8%,  #ff7a4d 0%, transparent 66%),
+    radial-gradient(34rem 11rem at 52% 34%, #1fa2ff 0%, transparent 70%);
+}
+body::after{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.055;
+  /* зерно: одна маленькая SVG-турбулентность, никаких картинок */
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+#app,#nav,.modal,.toast{position:relative;z-index:1}
+
+/* ТЕКСТ БЕЛЫЙ, а не серый — его прямое замечание. Приглушённый остаётся
+   приглушённым, но поднят настолько, чтобы читаться на стекле. */
+:root{
+  --muted:#E3ECF3; --dim:#B6C4D1; --steel:#8FA0AE;
+  --panel:rgba(24,29,35,.72); --panel2:rgba(31,38,46,.78); --panel3:rgba(41,49,58,.85);
+  --lc:rgba(255,255,255,.14); --line:1px solid rgba(255,255,255,.14);
+  --ok:#4FD69C; --danger:#FF6B6B; --warn:#F2C14E; --acc:#FFB43D;
+}
+/* стекло: панели пропускают пятна за собой, поэтому цвет живёт в интерфейсе,
+   а не только в фоне */
+.card,.kpi,.modal>div,.seg,#nav{
+  backdrop-filter:blur(18px) saturate(1.35);
+  -webkit-backdrop-filter:blur(18px) saturate(1.35);
+}
+.card,.kpi{border-radius:16px}
+.card:hover{border-color:rgba(255,255,255,.2)}
+
+/* КНОПКИ — таблетки, как в присланном примере */
+.btn{border-radius:999px;min-height:44px;padding:11px 20px;transition:transform .12s ease,filter .15s ease}
+.btn.sm{min-height:38px;padding:9px 16px;border-radius:999px}
+.btn:active{transform:scale(.97)}
+.btn.pri{background:linear-gradient(135deg,#FFC65C,#FF8A3D);color:#171310;border:0;font-weight:700}
+.btn.pri:hover{filter:brightness(1.07)}
+.seg button{border-radius:999px;min-height:38px}
+.x{min-width:44px;min-height:44px;border-radius:999px}
+.navb{min-height:44px;border-radius:12px}
+
+/* цифры KPI — градиентом, чтобы главный экран не был одноцветным */
+.kpi .val{
+  background:linear-gradient(180deg,#FFFFFF 0%,#C7D8E6 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.kpi .val.danger{background:linear-gradient(180deg,#FF9B9B,#E5484D);
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.kpi .val.ok{background:linear-gradient(180deg,#8FF3C6,#3FB980);
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* таблицы: строка подсвечивается тёплым, а не серым */
+tbody tr:hover{background:linear-gradient(90deg,rgba(255,180,61,.09),transparent 60%)}
+thead th{color:var(--dim)}
+
+@media (prefers-reduced-transparency:reduce){
+  body::before,body::after{display:none}
+  .card,.kpi,.modal>div,.seg,#nav{backdrop-filter:none;-webkit-backdrop-filter:none;
+    background:#16191D}
+}
+@media (prefers-reduced-motion:reduce){.btn{transition:none}}
+</style>
