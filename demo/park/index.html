@@ -1,0 +1,1945 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<style>
+  /* SELF-HOSTED. A demo that needs the internet is a demo that dies in a meeting room
+     with bad wifi - and this file's whole promise is that it runs offline. The site
+     serves both faces subset to Cyrillic. */
+  @font-face{font-family:'Golos Text';font-style:normal;font-weight:400 900;font-display:swap;
+    src:url(/fonts/golos-cyrillic.woff2) format('woff2');
+    unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+  @font-face{font-family:'Golos Text';font-style:normal;font-weight:400 900;font-display:swap;
+    src:url(/fonts/golos-latin.woff2) format('woff2')}
+  @font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:400 700;font-display:swap;
+    src:url(/fonts/jbmono-cyrillic.woff2) format('woff2')}
+</style>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Арендный парк</title>
+
+
+<style>
+:root{
+  --bg:#0E1013; --panel:#16191D; --panel2:#1C2025; --panel3:#242A31;
+  --text:#FFFFFF; --muted:#C9D5DF; --dim:#98A8B6;
+  --acc:#F5A524; --danger:#E5484D; --ok:#3FB980; --warn:#D8A72E; --steel:#616B77;
+  --line:1px solid rgba(255,255,255,.11); --lc:rgba(255,255,255,.11);
+  --ui:"Golos Text",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+  --rail:68px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;color:var(--text);font-family:var(--ui);font-size:14px;line-height:1.5;letter-spacing:-.008em;-webkit-text-size-adjust:100%}
+/* ponytail: у страницы и рельса полос нет; внутренние таблицы оставляют тонкую тёмную —
+   без неё 500px договоров недостижимы */
+html,body,#nav{scrollbar-width:none}
+html::-webkit-scrollbar,body::-webkit-scrollbar,#nav::-webkit-scrollbar{width:0;height:0}
+.card,.gantt,.modal .body,#modalWrap{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.20) transparent}
+.card::-webkit-scrollbar,.gantt::-webkit-scrollbar,.modal .body::-webkit-scrollbar,#modalWrap::-webkit-scrollbar{width:8px;height:8px}
+.card::-webkit-scrollbar-track,.gantt::-webkit-scrollbar-track,.modal .body::-webkit-scrollbar-track,#modalWrap::-webkit-scrollbar-track{background:transparent}
+.card::-webkit-scrollbar-thumb,.gantt::-webkit-scrollbar-thumb,.modal .body::-webkit-scrollbar-thumb,#modalWrap::-webkit-scrollbar-thumb{background:rgba(255,255,255,.20);border-radius:4px}
+.card::-webkit-scrollbar-thumb:hover,.gantt::-webkit-scrollbar-thumb:hover,.modal .body::-webkit-scrollbar-thumb:hover{background:rgba(245,165,36,.6)}
+body{overflow-x:hidden;background:
+  radial-gradient(1100px 520px at 72% -12%,rgba(245,165,36,.055),transparent 62%),
+  radial-gradient(700px 400px at 0% 100%,rgba(255,255,255,.03),transparent 60%),
+  repeating-linear-gradient(90deg,rgba(255,255,255,.028) 0 1px,transparent 1px 40px),
+  repeating-linear-gradient(0deg,rgba(255,255,255,.028) 0 1px,transparent 1px 40px),
+  var(--bg);background-attachment:fixed}
+.num,td.n,th.n,.mono{font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1}
+td.n,th.n{text-align:right}
+a{color:var(--text);text-decoration:none}
+a:hover{color:var(--acc);text-decoration:underline;text-underline-offset:3px}
+button{font:inherit;color:inherit}
+.caps{text-transform:uppercase;letter-spacing:.05em;font:600 10.5px/1.3 var(--ui);color:var(--dim)}
+#app{display:flex;min-height:100vh}
+
+/* ── рельс ── */
+#nav{width:var(--rail);flex:none;background:linear-gradient(180deg,rgba(23,49,63,.9),rgba(19,41,55,.9));border-right:var(--line);padding:14px 0 20px;display:flex;flex-direction:column;align-items:center;gap:4px;position:sticky;top:0;height:100vh;backdrop-filter:blur(6px);z-index:40}
+.brand{width:38px;height:38px;flex:none;display:grid;place-items:center;border-radius:7px;margin-bottom:10px;
+  font:800 13px/1 var(--ui);letter-spacing:.03em;color:var(--acc);
+  background:rgba(245,165,36,.10);box-shadow:inset 0 0 0 1px rgba(245,165,36,.45)}
+.navadd{width:38px;height:38px;flex:none;display:grid;place-items:center;border-radius:7px;border:0;cursor:pointer;
+  background:var(--acc);color:#17130A;margin-bottom:14px}
+.navadd:hover{background:#FFB63F}
+.navb{position:relative;width:46px;height:42px;display:grid;place-items:center;border-radius:7px;background:none;border:0;cursor:pointer;color:var(--dim)}
+.navb span:not(.badge){display:none}
+.navb:hover{color:var(--text);background:rgba(255,255,255,.06)}
+.navb[aria-current="true"]{color:var(--acc);background:rgba(245,165,36,.12);box-shadow:inset 0 0 0 1px rgba(245,165,36,.28)}
+.navb[aria-current="true"]::before{content:'';position:absolute;left:-11px;top:11px;bottom:11px;width:3px;border-radius:0 3px 3px 0;background:var(--acc);box-shadow:0 0 10px 1px rgba(245,165,36,.8)}
+.navb::after{content:attr(data-t);position:absolute;left:52px;top:50%;transform:translateY(-50%) scale(.96);transform-origin:left center;white-space:nowrap;background:var(--panel3);border:var(--line);border-radius:8px;padding:5px 9px;font-size:12px;color:var(--text);opacity:0;pointer-events:none;transition:.12s;z-index:60;box-shadow:0 8px 22px rgba(0,0,0,.5)}
+.navb:hover::after{opacity:1;transform:translateY(-50%) scale(1)}
+.navb .badge{position:absolute;top:4px;right:4px;min-width:15px;height:15px;padding:0 3px;font:600 10px/15px var(--mono);background:var(--danger);color:#0e202d;border-radius:8px}
+.navsp{flex:1}
+/* ponytail: своя история — у приложения один URL, кнопка «назад» браузера тут бесполезна */
+.hedge{position:fixed;top:0;bottom:0;width:12px;z-index:55;border:0;padding:0;cursor:pointer;
+  background:rgba(255,255,255,.045);color:transparent;display:grid;place-items:center;
+  transition:width .14s ease,background .14s ease,color .14s ease}
+.hedge:not(.r){left:var(--rail);border-left:var(--line)}
+.hedge.r{right:0;border-right:var(--line)}
+.hedge:hover,.hedge:focus-visible{width:34px;background:rgba(255,255,255,.11);color:var(--text);outline:none}
+.hedge:active{background:rgba(245,165,36,.18);color:var(--acc)}
+.hedge svg{flex:none}
+.hedge.r svg{transform:scaleX(-1)}
+.hedge[hidden]{display:none}
+@media (prefers-reduced-motion:reduce){.hedge{transition:none}}
+
+main{flex:1;min-width:0;display:flex;flex-direction:column}
+/* ── шапка ── */
+#top{position:sticky;top:0;z-index:30;padding:13px 22px 12px;border-bottom:var(--line);
+  background:linear-gradient(180deg,rgba(14,32,45,.96),rgba(14,32,45,.86));backdrop-filter:blur(10px);
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+#top .tl{display:flex;align-items:baseline;gap:10px;min-width:0}
+#top h1{font-size:19px;margin:0;font-weight:650;letter-spacing:-.01em;white-space:nowrap}
+#top .sub{font:500 12.5px/1.3 var(--ui);color:var(--muted);letter-spacing:0}
+.spacer,#top .sp{flex:1}
+.searchwrap{position:relative;display:flex;align-items:center}
+.searchwrap svg{position:absolute;left:10px;opacity:.45;pointer-events:none}
+input,select,textarea{background:rgba(9,24,34,.72);border:var(--line);color:var(--text);border-radius:6px;padding:9px 11px;font:inherit;outline:none;width:100%}
+input:focus,select:focus,textarea:focus{border-color:rgba(245,165,36,.65);box-shadow:0 0 0 3px rgba(245,165,36,.13)}
+input[type=date]{color-scheme:dark;font-family:var(--mono);font-size:13px}
+#search{padding-left:32px;width:200px;font-size:13px}
+#search::placeholder{color:var(--dim)}
+.btn{background:var(--panel2);border:var(--line);border-radius:6px;padding:8px 13px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;white-space:nowrap;transition:.14s}
+.btn:hover{border-color:rgba(255,255,255,.32);background:var(--panel3)}
+.btn.pri{background:var(--acc);color:#17130A;border-color:transparent;font-weight:700;box-shadow:none}
+.btn.pri:hover{background:#FFB63F;border-color:transparent}
+.btn.term{background:rgba(255,255,255,.06);color:var(--text);border-color:rgba(255,255,255,.30);font-weight:650}
+.btn.term:hover{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.55)}
+.btn.dgr{color:var(--danger)}
+.btn.dgr:hover{border-color:rgba(229,72,77,.5);background:rgba(229,72,77,.08)}
+.btn.sm{padding:5px 10px;font-size:12.5px;border-radius:6px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+#view{padding:20px 22px 90px;flex:1}
+#view>*{animation:rise .36s cubic-bezier(.2,.7,.2,1) both}
+#view>*:nth-child(2){animation-delay:.05s}#view>*:nth-child(3){animation-delay:.09s}
+#view>*:nth-child(4){animation-delay:.12s}#view>*:nth-child(5){animation-delay:.15s}
+#view>*:nth-child(n+6){animation-delay:.18s}
+@keyframes rise{from{opacity:0;transform:translateY(9px)}}
+
+/* ── панели ── */
+.card{background:linear-gradient(180deg,rgba(255,255,255,.035),transparent 70%),var(--panel);border:var(--line);border-radius:8px;padding:16px;overflow-x:auto}
+.card h3{margin:0 0 12px;font:600 11px/1 var(--ui);text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.grid{display:grid;gap:14px}
+.muted{color:var(--muted)}.dim{color:var(--dim)}
+.danger{color:var(--danger)}.ok{color:var(--ok)}.warn{color:var(--warn)}.acc{color:var(--acc)}
+.tag{display:inline-flex;align-items:center;gap:5px;font:500 11.5px/1.5 var(--ui);padding:2px 8px;border-radius:6px;border:var(--line);color:var(--muted);white-space:nowrap;letter-spacing:.02em}
+.tag.ok{border-color:rgba(63,185,128,.55);color:var(--ok);background:rgba(63,185,128,.14)}
+.tag.dgr{border-color:rgba(229,72,77,.55);color:var(--danger);background:rgba(229,72,77,.14)}
+.tag.wrn{border-color:rgba(216,167,46,.55);color:var(--warn);background:rgba(216,167,46,.14)}
+.tag.acc{border-color:rgba(245,165,36,.55);color:var(--acc);background:rgba(245,165,36,.14)}
+
+/* ── таблицы ── */
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font:600 11px/1.3 var(--ui);text-transform:uppercase;letter-spacing:.05em;color:var(--dim);padding:0 12px 9px;white-space:nowrap}
+td{padding:10px 12px;border-top:var(--line);vertical-align:top}
+td.n,th.n{white-space:nowrap;font-variant-numeric:tabular-nums}
+tbody tr{transition:background .12s}
+tbody tr:hover{background:rgba(245,165,36,.05)}
+tr.clk{cursor:pointer}
+tr.clk:hover td:first-child{box-shadow:inset 2px 0 0 var(--acc)}
+@media (min-width:901px){.resp td:first-child{min-width:150px}.resp td{white-space:nowrap}.resp td>div{overflow:hidden;text-overflow:ellipsis}}
+
+/* ── табло KPI ── */
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(172px,1fr));gap:12px}
+.kpi .k{position:relative;overflow:hidden;background:linear-gradient(180deg,rgba(255,255,255,.045),transparent 62%),var(--panel);border:var(--line);border-radius:8px;padding:13px 15px 14px}
+.kpi .k .lbl{font:600 10.5px/1.3 var(--ui);text-transform:uppercase;letter-spacing:.05em;color:var(--dim);margin-bottom:9px}
+.kpi .k .val{font:650 25px/1.08 var(--mono);letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi .k .note,.kpi .k .nt{font:12px/1.4 var(--ui);color:var(--muted);margin-top:6px}
+.kpi .k::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:rgba(255,255,255,.1)}
+.kpi .k-ok::before{background:var(--ok);box-shadow:0 0 12px rgba(63,185,128,.5)}
+.kpi .k-warn::before{background:repeating-linear-gradient(135deg,var(--warn) 0 3px,transparent 3px 6px)}
+.kpi .k-danger::before{background:repeating-linear-gradient(135deg,var(--danger) 0 3px,transparent 3px 6px)}
+.kpi .k-danger{box-shadow:inset 0 0 0 1px rgba(229,72,77,.28)}
+
+/* ── формы ── */
+.f{margin-bottom:12px}
+.f label{display:block;font:600 10.5px/1.3 var(--ui);text-transform:uppercase;letter-spacing:.05em;color:var(--dim);margin-bottom:6px}
+.f .err{color:var(--danger);font-size:12px;margin-top:5px;display:none}
+.f.bad input,.f.bad select,.f.bad textarea{border-color:var(--danger);box-shadow:0 0 0 3px rgba(229,72,77,.14)}
+.f.bad .err{display:block}
+.hint{font-size:11.5px;color:var(--dim);margin-top:6px}
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.row>*{flex:1;min-width:130px}
+
+/* ── модальные ── */
+#modalWrap{position:fixed;inset:0;background:rgba(4,12,18,.72);display:flex;align-items:flex-start;justify-content:center;padding:24px 12px;z-index:100;overflow:auto;backdrop-filter:blur(3px);animation:fade .16s both}
+@keyframes fade{from{opacity:0}}
+#modalWrap[hidden]{display:none}
+.modal{background:linear-gradient(180deg,rgba(255,255,255,.04),transparent 40%),var(--panel);border:var(--line);border-radius:16px;width:100%;max-width:640px;margin:auto;box-shadow:0 30px 70px rgba(0,0,0,.6);animation:pop .2s cubic-bezier(.2,.8,.2,1) both}
+@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.985)}}
+.modal header{display:flex;align-items:center;gap:10px;padding:15px 18px;border-bottom:var(--line)}
+.modal header h2{margin:0;font-size:15px;font-weight:650;letter-spacing:-.01em}
+.modal .body{padding:16px 18px;max-height:calc(100vh - 210px);overflow:auto}
+.modal footer{display:flex;gap:10px;justify-content:flex-end;padding:13px 18px;border-top:var(--line);flex-wrap:wrap;background:rgba(9,24,34,.4);border-radius:0 0 16px 16px}
+.x{background:none;border:0;cursor:pointer;color:var(--muted);padding:5px;line-height:0;border-radius:6px}
+.x:hover{color:var(--text);background:rgba(255,255,255,.08)}
+#toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,140%);opacity:0;visibility:hidden;background:var(--panel3);border:var(--line);border-radius:7px;padding:11px 15px;z-index:200;transition:transform .24s cubic-bezier(.2,.8,.2,1),opacity .2s;display:flex;gap:12px;align-items:center;max-width:92vw;box-shadow:0 16px 40px rgba(0,0,0,.55),0 0 0 1px rgba(245,165,36,.14)}
+#toast.on{transform:translate(-50%,0);opacity:1;visibility:visible}
+
+/* ── Гантт-календарь ── */
+.gantt{--cw:34px;--nm:196px;position:relative;overflow:auto;border:var(--line);border-radius:8px;background:var(--panel);max-height:calc(100vh - 200px);min-height:280px;box-shadow:0 1px 0 rgba(255,255,255,.05) inset,0 18px 40px -28px rgba(0,0,0,.8)}
+.gwrap{position:relative;min-width:calc(var(--nm) + var(--cw)*var(--n))}
+.gover{position:absolute;top:0;bottom:0;left:var(--nm);right:0;pointer-events:none;z-index:0}
+.gover i{position:absolute;top:0;bottom:0;width:var(--cw);background:rgba(255,255,255,.035)}
+.gtop{position:absolute;top:0;bottom:0;left:var(--nm);right:0;pointer-events:none;z-index:0}
+.gtop i{position:absolute;top:0;bottom:0;width:2px;margin-left:calc(var(--cw)/2 - 1px);background:var(--acc);box-shadow:none;opacity:.9}
+.grow{position:relative;z-index:2;display:flex;border-top:var(--line)}
+.grow:hover .gname{background:var(--panel2)}
+.gname{position:sticky;left:0;z-index:5;flex:0 0 var(--nm);width:var(--nm);padding:8px 12px;background:var(--panel);border-right:var(--line)}
+.gname .un{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gname .um{display:flex;align-items:center;gap:7px;margin-top:4px}
+.gname .um b{font:600 10.5px var(--mono);color:var(--muted);flex:none}
+.gtrack{position:relative;flex:1;height:46px;cursor:copy;background-color:transparent;
+  background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.06) 0 1px,transparent 1px var(--cw))}
+.ghead{border-top:0;position:sticky;top:0;z-index:8;background:linear-gradient(180deg,var(--panel2),var(--panel))}
+.ghead .gname{background:transparent;border-bottom:var(--line)}
+.ghead .gtrack{height:38px;cursor:default;border-bottom:var(--line);background:none}
+.gd{position:absolute;top:5px;width:var(--cw);text-align:center;font:600 11px/1.15 var(--mono);color:var(--muted)}
+.gd s{display:block;text-decoration:none;font:600 9.5px/1.5 var(--ui);color:var(--dim);text-transform:uppercase;letter-spacing:.04em}
+.gd.we{color:var(--dim)}
+.gd.td{color:var(--acc)}
+.gbar{position:absolute;top:8px;height:30px;border-radius:5px;display:flex;align-items:center;padding:0 10px;gap:6px;min-width:0;
+  font-size:11.5px;color:var(--text);font-weight:600;overflow:hidden;white-space:nowrap;cursor:pointer;
+  background:#252C34;box-shadow:inset 0 0 0 1px rgba(255,255,255,.10),inset 3px 0 0 0 var(--acc);transition:background .12s,box-shadow .12s}
+.gbar:hover{background:#2E363F;box-shadow:inset 0 0 0 1px rgba(245,165,36,.45),inset 3px 0 0 0 var(--acc);z-index:5}
+.gbar.past{background:rgba(255,255,255,.04);color:var(--muted);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08),inset 3px 0 0 0 var(--steel)}
+.gbar.mnt{background:repeating-linear-gradient(135deg,rgba(216,167,46,.85) 0 5px,rgba(22,25,29,.95) 5px 10px);color:var(--text);
+  box-shadow:inset 0 0 0 1px rgba(216,167,46,.55);font-weight:600}
+.gbar.mnt span{background:rgba(22,25,29,.9);padding:1px 5px;border-radius:4px}
+.gbar.clash{background:rgba(229,72,77,.18);color:var(--text);box-shadow:inset 0 0 0 1px rgba(229,72,77,.65),inset 3px 0 0 0 var(--danger)}
+.legend{display:flex;gap:18px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:12px;align-items:center}
+.sw{display:inline-block;width:14px;height:10px;border-radius:3px;vertical-align:-1px;margin-right:7px}
+.bar{height:5px;border-radius:4px;background:rgba(255,255,255,.1);overflow:hidden;flex:1;min-width:40px}
+.bar i{display:block;height:100%;border-radius:4px}
+
+.empty{text-align:center;padding:56px 20px;color:var(--muted);max-width:540px;margin:0 auto}
+.empty h3{font-size:17px;margin:16px 0 8px;color:var(--text);letter-spacing:-.01em}
+.empty p{margin:0 0 18px;font-size:13.5px;text-wrap:pretty}
+.seg{display:inline-flex;background:rgba(9,24,34,.6);border:var(--line);border-radius:7px;padding:3px;gap:2px}
+.seg button{background:none;border:0;padding:6px 11px;border-radius:8px;cursor:pointer;color:var(--muted);font-size:12.5px;white-space:nowrap}
+.seg button:hover{color:var(--text)}
+.seg button[aria-pressed="true"]{background:rgba(245,165,36,.15);color:var(--acc);box-shadow:inset 0 0 0 1px rgba(245,165,36,.25)}
+.hd{display:flex;align-items:center;gap:12px;margin:26px 0 11px;flex-wrap:wrap}
+.hd h2{font:600 11px/1 var(--ui);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0;flex:none}
+.hd .dim{font:11px var(--mono)}
+.hd::after{content:'';flex:1;min-width:20px;height:1px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.2) 0 3px,transparent 3px 7px)}
+.note{position:relative;padding:10px 13px 10px 14px;background:rgba(245,165,36,.06);border-radius:6px;font-size:12.5px;color:var(--muted);overflow:hidden}
+.note::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--acc)}
+.note.dgr{background:rgba(229,72,77,.08);color:var(--text)}
+.note.dgr::before{background:repeating-linear-gradient(135deg,var(--danger) 0 3px,transparent 3px 6px)}
+.note.wrn{background:rgba(216,167,46,.08)}
+.note.wrn::before{background:repeating-linear-gradient(135deg,var(--warn) 0 3px,transparent 3px 6px)}
+.note b{color:var(--text)}
+.gbar em{font-style:normal;font-family:var(--mono);font-size:10.5px;opacity:.7;margin-left:auto;letter-spacing:-.02em}
+.gbar span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.gbar em{flex:none}
+.kpi .val i{font-style:normal;opacity:.42;font-size:.6em;margin-left:.2em;vertical-align:.08em;letter-spacing:0}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.navb:focus-visible,.btn:focus-visible{outline-offset:3px}
+@media (prefers-reduced-motion:reduce){*,#view>*{animation:none !important;transition:none !important}}
+#print{display:none}
+
+@media (max-width:900px){
+  /* ponytail: рельс остаётся слева на всех ширинах — не превращаем его в верхнюю полосу с горизонтальным скроллом */
+  :root{--rail:56px}
+  #nav{padding:10px 0 14px}
+  .navb{width:42px;height:40px}
+  #top{padding:11px 13px;gap:10px}
+  #top h1{font-size:16px}
+  #view{padding:15px 13px 100px}
+  #search{width:100%}
+  .searchwrap{flex:1 1 100%;order:3}
+  .kpi{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+  .kpi .k .val{font-size:21px}
+  .gantt{--nm:132px;--cw:30px;max-height:none}
+  .modal .body{max-height:none}
+  #modalWrap{padding:10px}
+  table.resp thead{display:none}
+  table.resp tr{display:block;border-top:var(--line);padding:9px 0}
+  table.resp tr:first-child{border-top:0}
+  table.resp td{display:flex;justify-content:space-between;gap:14px;border:0;padding:3px 2px}
+  table.resp td::before{content:attr(data-l);color:var(--dim);font:600 11px/1.4 var(--ui);text-transform:uppercase;letter-spacing:.05em;flex:none}
+  table.resp td.n{text-align:right}
+  tr.clk:hover td:first-child{box-shadow:none}
+}
+@media print{
+  #app,#toast,#modalWrap{display:none !important}
+  #print{display:block}
+  html,body{background:#fff;color:#000;font-size:11pt}
+  @page{size:A4;margin:14mm}
+  .doc{max-width:180mm;margin:0 auto}
+  .doc h1{font-size:15pt;margin:0 0 2mm}
+  .doc table{border-collapse:collapse;width:100%;margin:4mm 0}
+  .doc th,.doc td{border:1px solid #000;padding:2mm 2.5mm;font-size:10pt;color:#000;text-transform:none;letter-spacing:0}
+  .doc th{background:#eee;font-size:10pt}
+  .doc .sig{margin-top:10mm;display:flex;gap:16mm}
+  .doc .sig div{flex:1;border-top:1px solid #000;padding-top:1.5mm;font-size:9pt}
+  .doc .meta{font-size:10pt;margin:1mm 0}
+  .doc hr{border:0;border-top:2px solid #000;margin:3mm 0}
+  .pb{page-break-after:always}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <nav id="nav"></nav>
+  <main>
+    <header id="top">
+      <div class="tl"><h1 id="viewTitle">—</h1><span class="sub" id="viewSub"></span></div>
+      <span class="sp"></span>
+      <span class="searchwrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="search" placeholder="Поиск  /"></span>
+      <span id="actions" style="display:flex;gap:8px;flex-wrap:wrap"></span>
+    </header>
+    <div id="view"></div>
+  </main>
+</div>
+<div id="modalWrap" hidden></div>
+<div id="toast"></div>
+<div id="print"></div>
+<script>
+"use strict";
+/* ═══════════ 0. Утилиты ═══════════ */
+const $=(s,r)=>(r||document).querySelector(s), $$=(s,r)=>[...(r||document).querySelectorAll(s)];
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const uid=p=>p+'_'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+
+/* — числа — */
+function fmt(n,d){ // разряды пробелами
+  if(n==null||!isFinite(n)) return '—';
+  const dec = d==null ? (Math.abs(n%1)>0.004?2:0) : d;
+  const s=Math.abs(n).toFixed(dec).split('.');
+  s[0]=s[0].replace(/\B(?=(\d{3})+(?!\d))/g,'\u2009');
+  return (n<0?'−':'')+s.join(',');
+}
+const money=(n,d)=>fmt(n,d)+'\u2009₽';
+function parseAmount(raw){ // «1 234,56» «1234.56» «1 234 567»
+  if(raw==null) return NaN;
+  let s=String(raw).trim().replace(/[\s\u00a0\u2009']/g,'').replace(/₽|руб\.?/gi,'');
+  if(!s) return NaN;
+  const neg=/^-/.test(s); s=s.replace(/^[+-]/,'');
+  if(!/^[\d.,]+$/.test(s)) return NaN;
+  const lc=s.lastIndexOf(','), ld=s.lastIndexOf('.');
+  const sep=Math.max(lc,ld);
+  let int,frac='';
+  if(sep>=0){
+    const tail=s.slice(sep+1);
+    if(/^\d{3}$/.test(tail) && (s.match(/[.,]/g)||[]).length>1){ int=s.replace(/[.,]/g,''); }
+    else if(/^\d{1,2}$/.test(tail)){ int=s.slice(0,sep).replace(/[.,]/g,''); frac=tail; }
+    else { int=s.replace(/[.,]/g,''); }
+  } else int=s;
+  if(!/^\d+$/.test(int)||(frac&&!/^\d+$/.test(frac))) return NaN;
+  const v=parseFloat(int+(frac?'.'+frac:''));
+  return neg?-v:v;
+}
+const r2=n=>Math.round((n+Number.EPSILON)*100)/100;
+
+/* — даты (ISO YYYY-MM-DD, арифметика в UTC) — */
+const MS=86400000;
+const iso=d=>d.toISOString().slice(0,10);
+const D=s=>new Date(s+'T00:00:00Z');
+const today=()=>iso(new Date(Date.now()-new Date().getTimezoneOffset()*60000));
+const addDays=(s,n)=>iso(new Date(D(s).getTime()+n*MS));
+const daysBetween=(a,b)=>Math.round((D(b)-D(a))/MS); // b-a
+const dayCount=(a,b)=>daysBetween(a,b)+1;           // включительно
+const dow=s=>(D(s).getUTCDay()+6)%7;                // 0=пн
+const isWeekend=s=>dow(s)>=5;
+const MON=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+const MONN=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+const dmy=s=>s?s.slice(8,10)+'.'+s.slice(5,7)+'.'+s.slice(0,4):'—';
+const dlong=s=>s?(+s.slice(8,10))+' '+MON[+s.slice(5,7)-1]+' '+s.slice(0,4)+' г.':'—';
+const monthStart=s=>s.slice(0,8)+'01';
+const monthEnd=s=>{const y=+s.slice(0,4),m=+s.slice(5,7);return iso(new Date(Date.UTC(y,m,0)))};
+const overlaps=(a1,a2,b1,b2)=>a1<=b2&&b1<=a2;
+function eachDay(a,b,fn){for(let t=D(a).getTime(),e=D(b).getTime();t<=e;t+=MS)fn(iso(new Date(t)));}
+function plural(n,f){const a=Math.abs(n)%100,b=a%10;if(a>10&&a<20)return f[2];if(b>1&&b<5)return f[1];if(b===1)return f[0];return f[2];}
+
+/* — сумма прописью — */
+const W1=['','один','два','три','четыре','пять','шесть','семь','восемь','девять'];
+const W1F=['','одна','две','три','четыре','пять','шесть','семь','восемь','девять'];
+const WT=['десять','одиннадцать','двенадцать','тринадцать','четырнадцать','пятнадцать','шестнадцать','семнадцать','восемнадцать','девятнадцать'];
+const WD=['','','двадцать','тридцать','сорок','пятьдесят','шестьдесят','семьдесят','восемьдесят','девяносто'];
+const WH=['','сто','двести','триста','четыреста','пятьсот','шестьсот','семьсот','восемьсот','девятьсот'];
+function tri(n,fem){
+  const o=[],h=Math.floor(n/100),t=Math.floor(n%100/10),u=n%10;
+  if(h)o.push(WH[h]);
+  if(t===1)o.push(WT[u]); else {if(t)o.push(WD[t]); if(u)o.push((fem?W1F:W1)[u]);}
+  return o.join(' ');
+}
+function intWords(n,fem){
+  n=Math.floor(Math.abs(n));
+  if(n===0)return 'ноль';
+  const sc=[[1e9,['миллиард','миллиарда','миллиардов'],false],[1e6,['миллион','миллиона','миллионов'],false],[1e3,['тысяча','тысячи','тысяч'],true]];
+  const out=[];let rest=n;
+  for(const [div,forms,f] of sc){const g=Math.floor(rest/div);rest-=g*div;if(g){out.push(tri(g,f));out.push(plural(g,forms));}}
+  if(rest)out.push(tri(rest,fem));
+  return out.filter(Boolean).join(' ');
+}
+function moneyWords(v){
+  const neg=v<0; v=Math.abs(r2(v));
+  const rub=Math.floor(v+1e-9), kop=Math.round(r2(v-rub)*100);
+  let s=intWords(rub,false)+' '+plural(rub,['рубль','рубля','рублей'])+' '+String(kop).padStart(2,'0')+' '+plural(kop,['копейка','копейки','копеек']);
+  s=s[0].toUpperCase()+s.slice(1);
+  return (neg?'Минус ':'')+s;
+}
+const WORDS_TESTS=[1,2,5,11,21,1000,1000000,1234.56,0,112,21341.05];
+
+/* — ИНН — */
+function innValid(v){
+  const s=String(v||'').trim();
+  if(!/^\d{10}$/.test(s)&&!/^\d{12}$/.test(s))return false;
+  const d=s.split('').map(Number);
+  const cs=(a,w)=>w.reduce((s,k,i)=>s+k*a[i],0)%11%10;
+  if(d.length===10)return cs(d,[2,4,10,3,5,9,4,6,8])===d[9];
+  return cs(d,[7,2,4,10,3,5,9,4,6,8])===d[10] && cs(d,[3,7,2,4,10,3,5,9,4,6,8])===d[11];
+}
+/* иконки — Icons8, Material Outlined (24×24), один набор на весь проект */
+const I={
+  cal:'<path d="M 6 1 L 6 3 L 5 3 C 3.9 3 3 3.9 3 5 L 3 19 C 3 20.1 3.9 21 5 21 L 19 21 C 20.1 21 21 20.1 21 19 L 21 5 C 21 3.9 20.1 3 19 3 L 18 3 L 18 1 L 16 1 L 16 3 L 8 3 L 8 1 L 6 1 z M 5 5 L 6 5 L 8 5 L 16 5 L 18 5 L 19 5 L 19 7 L 5 7 L 5 5 z M 5 9 L 19 9 L 19 19 L 5 19 L 5 9 z"/>',
+  park:'<path d="M 5 4 A 1 1 0 0 0 4 5 L 4 11.609375 C 2.2234889 12.523708 1 14.3737 1 16.5 C 1 19.525721 3.4742785 22 6.5 22 C 9.0054253 22 11.12762 20.301307 11.785156 18 L 16.050781 18 C 16.026575 18.164905 16 18.328781 16 18.5 C 16 20.421152 17.578848 22 19.5 22 C 21.421152 22 23 20.421152 23 18.5 C 23 17.116848 22.175306 15.9223 21 15.355469 L 21 13 L 21 10 A 1 1 0 0 0 20 9 L 17 9 L 17 6 L 19 6 L 19 4 L 17 4 C 15.906937 4 15 4.9069372 15 6 L 15 9 L 12.677734 9 L 10.927734 4.6289062 A 1 1 0 0 0 10 4 L 5 4 z M 6 6 L 9.3222656 6 L 11.072266 10.371094 A 1 1 0 0 0 12 11 L 19 11 L 19 13 L 19 15.050781 C 18.254531 15.160206 17.580203 15.496618 17.0625 16.001953 A 1 1 0 0 0 17 16 L 11.974609 16 C 11.719773 13.206642 9.3570532 11 6.5 11 C 6.3313317 11 6.164908 11.010346 6 11.025391 L 6 6 z M 6.5 13 C 8.4448413 13 10 14.555159 10 16.5 C 10 18.444841 8.4448413 20 6.5 20 C 4.5551587 20 3 18.444841 3 16.5 C 3 14.555159 4.5551587 13 6.5 13 z M 6.5 15 A 1.5 1.5 0 0 0 5 16.5 A 1.5 1.5 0 0 0 6.5 18 A 1.5 1.5 0 0 0 8 16.5 A 1.5 1.5 0 0 0 6.5 15 z M 19.5 17 C 20.340272 17 21 17.659728 21 18.5 C 21 19.340272 20.340272 20 19.5 20 C 18.659728 20 18 19.340272 18 18.5 C 18 17.659728 18.659728 17 19.5 17 z"/>',
+  doc:'<path d="M 5 1 C 3.9 1 3 1.9 3 3 L 3 17 L 5 17 L 5 3 L 17 3 L 17 1 L 5 1 z M 9 5 C 7.9 5 7 5.9 7 7 L 7 21 C 7 22.1 7.9 23 9 23 L 20 23 C 21.1 23 22 22.1 22 21 L 22 7 C 22 5.895 21.105 5 20 5 L 9 5 z M 9 7 L 20 7 L 20 21 L 9 21 L 9 7 z M 11 9 L 11 11 L 18 11 L 18 9 L 11 9 z M 11 13 L 11 15 L 18 15 L 18 13 L 11 13 z M 11 17 L 11 19 L 18 19 L 18 17 L 11 17 z"/>',
+  clock:'<path d="M 12 2 C 6.4889971 2 2 6.4889971 2 12 C 2 17.511003 6.4889971 22 12 22 C 17.511003 22 22 17.511003 22 12 C 22 6.4889971 17.511003 2 12 2 z M 12 4 C 16.430123 4 20 7.5698774 20 12 C 20 16.430123 16.430123 20 12 20 C 7.5698774 20 4 16.430123 4 12 C 4 7.5698774 7.5698774 4 12 4 z M 11 6 L 11 12.414062 L 15.292969 16.707031 L 16.707031 15.292969 L 13 11.585938 L 13 6 L 11 6 z"/>',
+  money:'<path d="M 3 3 C 2.448 3 2 3.448 2 4 L 2 14 C 2 14.552 2.448 15 3 15 L 21 15 C 21.552 15 22 14.552 22 14 L 22 4 C 22 3.448 21.552 3 21 3 L 3 3 z M 4.9121094 5 L 19.087891 5 A 1.5 1.5 0 0 0 20 5.9121094 L 20 12.087891 A 1.5 1.5 0 0 0 19.087891 13 L 4.9121094 13 A 1.5 1.5 0 0 0 4 12.087891 L 4 5.9121094 A 1.5 1.5 0 0 0 4.9121094 5 z M 12 6 A 3 3 0 0 0 9 9 A 3 3 0 0 0 12 12 A 3 3 0 0 0 15 9 A 3 3 0 0 0 12 6 z M 7 8 C 6.448 8 6 8.447 6 9 C 6 9.553 6.448 10 7 10 C 7.552 10 8 9.553 8 9 C 8 8.447 7.552 8 7 8 z M 17 8 C 16.448 8 16 8.447 16 9 C 16 9.553 16.448 10 17 10 C 17.552 10 18 9.553 18 9 C 18 8.447 17.552 8 17 8 z M 3.9902344 17 L 19.228516 20.96875 C 19.763516 21.10775 20.308266 20.785953 20.447266 20.251953 L 21.294922 17 L 19.228516 17 L 18.992188 17.900391 C 18.543187 17.939391 18.137766 18.178781 17.884766 18.550781 L 11.927734 17 L 3.9902344 17 z"/>',
+  chart:'<path d="M 17 4 C 16.448 4 16 4.448 16 5 L 16 19 C 16 19.552 16.448 20 17 20 L 21 20 C 21.552 20 22 19.552 22 19 L 22 5 C 22 4.448 21.552 4 21 4 L 17 4 z M 18 6 L 20 6 L 20 18 L 18 18 L 18 6 z M 10 8 C 9.448 8 9 8.448 9 9 L 9 19 C 9 19.552 9.448 20 10 20 L 14 20 C 14.552 20 15 19.552 15 19 L 15 9 C 15 8.448 14.552 8 14 8 L 10 8 z M 11 10 L 13 10 L 13 18 L 11 18 L 11 10 z M 3 12 C 2.448 12 2 12.448 2 13 L 2 19 C 2 19.552 2.448 20 3 20 L 7 20 C 7.552 20 8 19.552 8 19 L 8 13 C 8 12.448 7.552 12 7 12 L 3 12 z M 4 14 L 6 14 L 6 18 L 4 18 L 4 14 z"/>',
+  users:'<path d="M 8 5 C 6.343 5 5 6.343 5 8 C 5 9.657 6.343 11 8 11 C 9.657 11 11 9.657 11 8 C 11 6.343 9.657 5 8 5 z M 16 5 C 14.343 5 13 6.343 13 8 C 13 9.657 14.343 11 16 11 C 17.657 11 19 9.657 19 8 C 19 6.343 17.657 5 16 5 z M 8 7 C 8.551 7 9 7.449 9 8 C 9 8.551 8.551 9 8 9 C 7.449 9 7 8.551 7 8 C 7 7.449 7.449 7 8 7 z M 16 7 C 16.551 7 17 7.449 17 8 C 17 8.551 16.551 9 16 9 C 15.449 9 15 8.551 15 8 C 15 7.449 15.449 7 16 7 z M 8 13 C 5 13 1 14.464 1 16.5 L 1 19 L 14.078125 19 L 15 19 L 23 19 L 23 16.5 C 23 14.464 19 13 16 13 C 14.715935 13 13.261676 13.282936 12.003906 13.75 C 10.743781 13.281749 9.2867106 13 8 13 z M 8 15 C 10.36 15 12.62 16.025609 13 16.599609 L 13 17 L 3 17 L 3 16.599609 C 3.38 16.025609 5.64 15 8 15 z M 16 15 C 18.36 15 20.62 16.025609 21 16.599609 L 21 17 L 15 17 L 15 16.5 C 15 16.018241 14.770344 15.569952 14.388672 15.164062 C 14.908294 15.069313 15.444772 15 16 15 z"/>',
+  db:'<path d="M 6 2 C 4.895 2 4 2.895 4 4 L 4 20 C 4 21.105 4.895 22 6 22 L 18 22 C 19.105 22 20 21.105 20 20 L 20 4 C 20 2.895 19.105 2 18 2 L 6 2 z M 6 4 L 18 4 L 18 8 L 6 8 L 6 4 z M 6 10 L 18 10 L 18 14 L 6 14 L 6 10 z M 6 16 L 18 16 L 18 20 L 6 20 L 6 16 z"/>',
+  plus:'<path d="M 11 5 L 11 11 L 5 11 L 5 13 L 11 13 L 11 19 L 13 19 L 13 13 L 19 13 L 19 11 L 13 11 L 13 5 L 11 5 z"/>',
+  wrench:'<path d="M 15 3 C 11.698375 3 9 5.6983746 9 9 C 9 9.5259934 9.157478 9.9941578 9.2851562 10.472656 L 4.6347656 15.123047 C 3.1294504 15.513823 2 16.878977 2 18.5 C 2 20.421152 3.578848 22 5.5 22 C 7.1210229 22 8.486177 20.87055 8.8769531 19.365234 L 13.527344 14.714844 C 14.005842 14.842522 14.474007 15 15 15 C 18.301625 15 21 12.301625 21 9 C 21 8.2201415 20.839011 7.4833762 20.578125 6.8164062 L 20.021484 5.3925781 L 17.707031 7.7070312 L 17.705078 7.7070312 C 17.506764 7.9059013 17.258094 8 17 8 C 16.741906 8 16.493283 7.9059014 16.294922 7.7070312 L 16.292969 7.7070312 C 15.894042 7.3081043 15.894042 6.6918957 16.292969 6.2929688 L 18.607422 3.9785156 L 17.183594 3.421875 C 16.516624 3.1609894 15.779858 3 15 3 z M 14.814453 5.0371094 C 13.778085 6.2088531 13.759143 8.0013308 14.878906 9.1210938 C 15.460545 9.7042236 16.234094 10 17 10 C 17.708672 10 18.399092 9.6873874 18.962891 9.1875 C 18.860525 11.314481 17.15379 13 15 13 C 14.493858 13 14.007952 12.895958 13.544922 12.714844 L 12.935547 12.476562 L 8.5625 16.849609 C 8.2370689 16.251687 7.7483126 15.762931 7.1503906 15.4375 L 11.523438 11.064453 L 11.285156 10.455078 C 11.104042 9.9920482 11 9.5061415 11 9 C 11 6.8455427 12.686533 5.1384927 14.814453 5.0371094 z M 5.5 17 C 6.3402718 17 7 17.659728 7 18.5 C 7 19.340272 6.3402718 20 5.5 20 C 4.6597282 20 4 19.340272 4 18.5 C 4 17.659728 4.6597282 17 5.5 17 z"/>',
+  print:'<path d="M 6 3 L 6 7 L 5 7 C 3.35 7 2 8.35 2 10 L 2 17 L 6 17 L 6 21 L 18 21 L 18 17 L 22 17 L 22 10 C 22 8.35 20.65 7 19 7 L 18 7 L 18 3 L 6 3 z M 8 5 L 16 5 L 16 7 L 8 7 L 8 5 z M 5 9 L 19 9 C 19.552 9 20 9.448 20 10 L 20 15 L 18 15 L 18 13 L 6 13 L 6 15 L 4 15 L 4 10 C 4 9.448 4.448 9 5 9 z M 18 10 A 1 1 0 0 0 17 11 A 1 1 0 0 0 18 12 A 1 1 0 0 0 19 11 A 1 1 0 0 0 18 10 z M 8 15 L 16 15 L 16 19 L 8 19 L 8 15 z"/>',
+  warn:'<path d="M 12 3.0292969 C 11.436813 3.0292969 10.873869 3.2917399 10.558594 3.8164062 L 1.7617188 18.451172 C 1.1134854 19.529186 1.94287 21 3.2011719 21 L 20.796875 21 C 22.054805 21 22.886515 19.529186 22.238281 18.451172 L 13.441406 3.8164062 C 13.126131 3.29174 12.563187 3.0292969 12 3.0292969 z M 12 5.2988281 L 20.236328 19 L 3.7636719 19 L 12 5.2988281 z M 11 9 L 11 14 L 13 14 L 13 9 L 11 9 z M 11 16 L 11 18 L 13 18 L 13 16 L 11 16 z"/>',
+  back:'<path d="M 13 5.9296875 L 6.9296875 12 L 13 18.070312 L 14.5 16.570312 L 9.9296875 12 L 14.5 7.4296875 L 13 5.9296875 z"/>',
+  trash:'<path d="M 10 2 L 9 3 L 4 3 L 4 5 L 5 5 L 5 20 C 5 20.522222 5.1913289 21.05461 5.5683594 21.431641 C 5.9453899 21.808671 6.4777778 22 7 22 L 17 22 C 17.522222 22 18.05461 21.808671 18.431641 21.431641 C 18.808671 21.05461 19 20.522222 19 20 L 19 5 L 20 5 L 20 3 L 15 3 L 14 2 L 10 2 z M 7 5 L 17 5 L 17 20 L 7 20 L 7 5 z M 9 7 L 9 18 L 11 18 L 11 7 L 9 7 z M 13 7 L 13 18 L 15 18 L 15 7 L 13 7 z"/>',
+  undo:'<path d="M 2 7 L 2 16 L 11 16 L 7.3789062 12.378906 C 8.7653195 11.211569 10.5449 10.5 12.5 10.5 C 16.034 10.5 19.024984 12.794656 20.083984 15.972656 L 22.451172 15.183594 C 21.062172 11.012594 17.138 8 12.5 8 C 9.8539699 8 7.4458759 8.9863164 5.6035156 10.603516 L 2 7 z"/>',
+  check:'<path d="M 21.292969 3.2929688 L 11 13.585938 L 7.7070312 10.292969 L 6.2929688 11.707031 L 11 16.414062 L 22.707031 4.7070312 L 21.292969 3.2929688 z"/>',
+  x:'<path d="M 6.4101562 5 L 5 6.4101562 L 10.589844 12 L 5 17.589844 L 6.4101562 19 L 12 13.410156 L 17.589844 19 L 19 17.589844 L 13.410156 12 L 19 6.4101562 L 17.589844 5 L 12 10.589844 L 6.4101562 5 z"/>',
+  dl:'<path d="M 10.5 2 C 9.6829372 2 9 2.6829372 9 3.5 L 9 10 L 4.5859375 10 L 12 17.414062 L 19.414062 10 L 15 10 L 15 3.5 C 15 2.6829372 14.317063 2 13.5 2 L 10.5 2 z M 11 4 L 13 4 L 13 12 L 14.585938 12 L 12 14.585938 L 9.4140625 12 L 11 12 L 11 4 z M 2 20 L 2 22 L 22 22 L 22 20 L 2 20 z"/>',
+};
+const ico=(k,sz)=>'<svg width="'+(sz||16)+'" height="'+(sz||16)+'" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">'+I[k]+'</svg>';
+/* ═══════════ 1. Хранилище, версия, миграция ═══════════ */
+const KEY='arendapark';
+const BLANK=()=>({version:1,demo:false,units:[],clients:[],contracts:[],shifts:[],maint:[],payments:[],ui:{}});
+let db=BLANK();
+
+function migrate(raw){
+  // приводим любую сохранённую структуру к version:1
+  if(!raw||typeof raw!=='object')return BLANK();
+  let d=raw;
+  if(d.version==null){ // v0: без номера версии — считаем ранним черновиком
+    d=Object.assign(BLANK(),d,{version:1});
+  }
+  if(d.version===1){/* актуальная */}
+  else if(d.version>1){ throw new Error('Файл создан более новой версией программы (version '+d.version+').'); }
+  const b=BLANK();
+  for(const k of ['units','clients','contracts','shifts','maint','payments'])
+    b[k]=Array.isArray(d[k])?d[k]:[];
+  b.demo=!!d.demo; b.ui=(d.ui&&typeof d.ui==='object')?d.ui:{};
+  // добора полей по умолчанию (форвард-совместимость)
+  b.units.forEach(u=>{u.archived=!!u.archived;u.toInterval=u.toInterval||250;u.meter0=u.meter0||0;});
+  b.clients.forEach(c=>{c.archived=!!c.archived;c.defer=c.defer==null?0:c.defer;});
+  b.contracts.forEach(c=>{c.status=c.status||'active';c.deposit=c.deposit||0;c.minShift=c.minShift||0;c.otAfter=c.otAfter||0;c.otMult=c.otMult||1;c.depWithheld=c.depWithheld||0;});
+  return b;
+}
+function load(){
+  let raw=null;
+  try{ raw=JSON.parse(localStorage.getItem(KEY)||'null'); }
+  catch(e){ console.warn('Повреждённое состояние, начинаем заново',e); raw=null; }
+  try{ db=migrate(raw); }catch(e){ db=BLANK(); alert(e.message); }
+}
+let saveT=null;
+function save(){ clearTimeout(saveT); saveT=setTimeout(()=>{
+  try{ localStorage.setItem(KEY,JSON.stringify(db)); }
+  catch(e){ toast('Не удалось сохранить: '+e.message); }
+},60); }
+function commit(msg){ save(); render(); if(msg)toast(msg); }
+
+/* — валидация импорта — */
+function validateDump(o){
+  const E=[];
+  if(!o||typeof o!=='object'||Array.isArray(o))return['Файл не содержит объект с данными.'];
+  if(typeof o.version!=='number')E.push('Нет числового поля "version" — это не файл базы арендного парка.');
+  else if(o.version>1)E.push('Версия файла '+o.version+' новее поддерживаемой (1).');
+  const need={units:['id','name'],clients:['id','name'],contracts:['id','clientId','unitId','from','to'],shifts:['id','contractId','date'],maint:['id','unitId','date'],payments:['id','date','amount']};
+  for(const k in need){
+    if(o[k]==null){E.push('Отсутствует раздел «'+k+'».');continue;}
+    if(!Array.isArray(o[k])){E.push('Раздел «'+k+'» должен быть списком.');continue;}
+    o[k].forEach((it,i)=>{
+      if(!it||typeof it!=='object'){E.push(k+'['+i+']: не объект.');return;}
+      need[k].forEach(f=>{if(it[f]==null||it[f]==='')E.push(k+'['+i+']: нет поля «'+f+'».');});
+    });
+  }
+  if(E.length)return E.slice(0,12);
+  const ids=k=>new Set(o[k].map(x=>x.id));
+  const U=ids('units'),C=ids('clients'),K=ids('contracts');
+  o.contracts.forEach((c,i)=>{
+    if(!U.has(c.unitId))E.push('Договор №'+(i+1)+': техника '+c.unitId+' не найдена в файле.');
+    if(!C.has(c.clientId))E.push('Договор №'+(i+1)+': клиент '+c.clientId+' не найден в файле.');
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(c.from||'')||!/^\d{4}-\d{2}-\d{2}$/.test(c.to||''))E.push('Договор №'+(i+1)+': некорректные даты.');
+    else if(c.to<c.from)E.push('Договор №'+(i+1)+': дата окончания раньше начала.');
+  });
+  o.shifts.forEach((s,i)=>{if(!K.has(s.contractId))E.push('Смена №'+(i+1)+': договор не найден.');});
+  o.maint.forEach((m,i)=>{if(!U.has(m.unitId))E.push('Ремонт №'+(i+1)+': техника не найдена.');});
+  return E.slice(0,12);
+}
+
+/* ═══════════ 2. Тост / отмена удаления ═══════════ */
+const undoStack=[];
+let toastT=null;
+function toast(html,undoFn){
+  const t=$('#toast');
+  t.innerHTML='<span>'+html+'</span>'+(undoFn?'<button class="btn sm" id="undoBtn">'+ico('undo',13)+' Отменить</button>':'');
+  t.classList.add('on');
+  if(undoFn)$('#undoBtn').onclick=()=>{undoFn();t.classList.remove('on');};
+  clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('on'),undoFn?9000:3500);
+}
+function removeWithUndo(coll,items,label){
+  const arr=db[coll], snap=items.map(it=>({it,i:arr.indexOf(it)}));
+  snap.sort((a,b)=>a.i-b.i);
+  items.forEach(it=>{const i=arr.indexOf(it);if(i>=0)arr.splice(i,1);});
+  const restore=()=>{snap.forEach(({it,i})=>arr.splice(Math.min(i,arr.length),0,it));commit('Удаление отменено');};
+  undoStack.push(restore);
+  save();render();
+  toast(label,()=>{const f=undoStack.pop();if(f)f();});
+}
+addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'&&!/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)){
+    e.preventDefault();
+    const f=undoStack.pop();
+    if(f)f(); else toast('Отменять нечего');
+  }
+});
+
+/* ═══════════ 3. Модальные окна ═══════════ */
+let modalStack=[];
+function modal({title,body,footer,onOpen,wide}){
+  const w=$('#modalWrap');
+  const m=document.createElement('div');
+  m.className='modal'; if(wide)m.style.maxWidth='860px';
+  m.innerHTML='<header><h2>'+esc(title)+'</h2><span class="spacer" style="flex:1"></span><button class="x" data-close>'+ico('x',18)+'</button></header><div class="body">'+body+'</div>'+(footer?'<footer>'+footer+'</footer>':'');
+  w.innerHTML=''; w.appendChild(m); w.hidden=false;
+  $$('[data-close]',m).forEach(b=>b.onclick=closeModal);
+  w.onclick=e=>{if(e.target===w)closeModal();};
+  modalStack=[m];
+  const first=$('input,select,textarea,button.pri',m); if(first&&!('ontouchstart' in window))setTimeout(()=>first.focus(),30);
+  if(onOpen)onOpen(m);
+  return m;
+}
+function closeModal(){ $('#modalWrap').hidden=true; $('#modalWrap').innerHTML=''; modalStack=[]; }
+addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&modalStack.length){e.preventDefault();closeModal();}
+  if(e.key==='/'&&!/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)){e.preventDefault();$('#search').focus();$('#search').select();}
+  if(e.key==='Enter'&&modalStack.length&&!e.shiftKey&&document.activeElement.tagName!=='TEXTAREA'){
+    const b=$('button.pri',modalStack[0]); if(b){e.preventDefault();b.click();}
+  }
+});
+function fieldErr(m,name,msg){
+  const f=$('[data-f="'+name+'"]',m); if(!f)return;
+  f.classList.add('bad'); $('.err',f).textContent=msg;
+  const i=$('input,select,textarea',f); if(i)i.focus();
+}
+function clearErrs(m){ $$('.f.bad',m).forEach(f=>f.classList.remove('bad')); }
+
+/* ═══════════ 4. Справочники / поиск сущностей ═══════════ */
+const byId=(coll,id)=>db[coll].find(x=>x.id===id)||null;
+const unit=id=>byId('units',id), client=id=>byId('clients',id), contract=id=>byId('contracts',id);
+const uName=id=>{const u=unit(id);return u?u.name:'‹удалено›'};
+const cName=id=>{const c=client(id);return c?c.name:'‹удалён›'};
+const TYPES=['Экскаватор','Погрузчик','Бульдозер','Автокран','Самосвал','Компрессор','Генератор','Виброплита','Бетононасос','Ямобур'];
+const RATE={hour:'час',shift:'смена',day:'сутки'};
+
+/* ═══════════ 5. Расчётное ядро ═══════════ */
+// Начисление по одной смене с учётом минимальной смены и переработки
+function shiftAmount(c,s){
+  const h=+s.hours||0;
+  if(c.rateMode==='hour'){
+    const billed=Math.max(h,+c.minShift||0);
+    const norm=+c.otAfter||0;
+    if(norm>0&&billed>norm) return r2(norm*c.rate+(billed-norm)*c.rate*(+c.otMult||1));
+    return r2(billed*c.rate);
+  }
+  if(c.rateMode==='shift'){
+    const norm=(+c.otAfter||8);
+    let a=+c.rate;
+    if(h>norm) a+=(h-norm)*(c.rate/norm)*(+c.otMult||1);
+    return r2(a);
+  }
+  // day: одна запись = сутки
+  const norm=(+c.otAfter||24);
+  let a=+c.rate;
+  if(h>norm) a+=(h-norm)*(c.rate/norm)*(+c.otMult||1);
+  return r2(a);
+}
+const cShifts=cid=>db.shifts.filter(s=>s.contractId===cid);
+function shiftBreak(c,s){ // расшифровка для акта
+  const h=+s.hours||0;
+  if(c.rateMode==='hour'){
+    const billed=Math.max(h,+c.minShift||0), norm=+c.otAfter||0;
+    const ot=norm>0?Math.max(0,billed-norm):0;
+    return {base:billed-ot,ot:ot,unit:'ч',minApplied:billed>h};
+  }
+  const norm=c.rateMode==='shift'?(+c.otAfter||8):(+c.otAfter||24);
+  return {base:1,ot:Math.max(0,h-norm),unit:c.rateMode==='shift'?'смена':'сутки',minApplied:false};
+}
+function contractAccrued(c,upto){
+  let sum=0;
+  for(const s of cShifts(c.id)) if(!upto||s.date<=upto) sum+=shiftAmount(c,s);
+  return r2(sum);
+}
+const contractHours=cid=>r2(cShifts(cid).reduce((a,s)=>a+(+s.hours||0),0));
+const contractPaid=c=>r2(db.payments.filter(p=>p.contractId===c.id&&p.kind==='аренда').reduce((a,p)=>a+p.amount,0));
+const contractDebt=c=>r2(contractAccrued(c)-contractPaid(c));
+function contractDue(c){ const cl=client(c.clientId); return addDays(c.to,cl?(+cl.defer||0):0); }
+function contractOverdue(c){ const d=contractDebt(c); return d>0.004&&today()>contractDue(c)?d:0; }
+const depositPaid=c=>r2(db.payments.filter(p=>p.contractId===c.id&&p.kind==='залог').reduce((a,p)=>a+p.amount,0)
+                       -db.payments.filter(p=>p.contractId===c.id&&p.kind==='возврат залога').reduce((a,p)=>a+p.amount,0));
+
+// Занятость / конфликты
+const unitContracts=uid=>db.contracts.filter(c=>c.unitId===uid);
+function conflicts(uid,from,to,exceptId){
+  return db.contracts.filter(c=>c.unitId===uid&&c.id!==exceptId&&c.status!=='cancelled'&&overlaps(c.from,c.to,from,to));
+}
+function maintDays(uid,from,to){ // множество дней простоя по ремонтам
+  const set=new Set();
+  db.maint.filter(m=>m.unitId===uid&&(+m.down||0)>0).forEach(m=>{
+    eachDay(m.date,addDays(m.date,(+m.down||0)-1),d=>{if((!from||d>=from)&&(!to||d<=to))set.add(d);});
+  });
+  return set;
+}
+function rentDays(uid,from,to){
+  const set=new Set();
+  unitContracts(uid).filter(c=>c.status!=='cancelled').forEach(c=>{
+    const a=c.from>from?c.from:from, b=c.to<to?c.to:to;
+    if(a<=b)eachDay(a,b,d=>set.add(d));
+  });
+  return set;
+}
+function utilization(uid,from,to){
+  const total=dayCount(from,to);
+  const md=maintDays(uid,from,to), rd=rentDays(uid,from,to);
+  let rent=0; rd.forEach(d=>{if(!md.has(d))rent++;});
+  const avail=Math.max(0,total-md.size);
+  return {total,repair:md.size,rent,avail,idle:Math.max(0,avail-rent),k:avail?rent/avail:0};
+}
+// Наработка (моточасы) единицы
+function unitHours(uid,upto){
+  const cids=new Set(unitContracts(uid).map(c=>c.id));
+  return r2(db.shifts.filter(s=>cids.has(s.contractId)&&(!upto||s.date<=upto)).reduce((a,s)=>a+(+s.hours||0),0));
+}
+const unitMeter=uid=>r2((unit(uid)?+unit(uid).meter0||0:0)+unitHours(uid));
+function unitRevenue(uid,from,to){
+  let sum=0;
+  unitContracts(uid).forEach(c=>{
+    cShifts(c.id).forEach(s=>{ if((!from||s.date>=from)&&(!to||s.date<=to)) sum+=shiftAmount(c,s); });
+  });
+  return r2(sum);
+}
+const unitDayRate=u=>u.rateDay||(u.rateShift?u.rateShift*1.4:(u.rateHour?u.rateHour*11:0));
+// Экономика единицы за период
+function unitEcon(uid,from,to){
+  const u=unit(uid); if(!u)return null;
+  const rev=unitRevenue(uid,from,to);
+  const ms=db.maint.filter(m=>m.unitId===uid&&m.date>=from&&m.date<=to);
+  const service=r2(ms.filter(m=>m.kind==='ТО').reduce((a,m)=>a+(+m.cost||0),0));
+  const repair=r2(ms.filter(m=>m.kind!=='ТО').reduce((a,m)=>a+(+m.cost||0),0));
+  const ut=utilization(uid,from,to);
+  const dayRate=unitDayRate(u);
+  const downLoss=r2(ut.repair*dayRate);         // упущенная выручка за дни ремонта
+  const net=r2(rev-service-repair-downLoss);
+  return {u,rev,service,repair,downLoss,net,ut,dayRate,
+          days:dayCount(from,to),from,to,
+          maint:ms.slice().sort((a,b)=>a.date<b.date?1:-1)};
+}
+function unitLifetime(uid){
+  const u=unit(uid); const from=u.purchase||'2000-01-01', to=today();
+  const e=unitEcon(uid,from,to);
+  e.payback=u.cost?e.net/u.cost*100:0;
+  return e;
+}
+// Дебиторка клиента
+function clientMoney(cid){
+  const cs=db.contracts.filter(c=>c.clientId===cid);
+  let accr=0,paid=0,over=0,dep=0;
+  cs.forEach(c=>{accr+=contractAccrued(c);paid+=contractPaid(c);over+=contractOverdue(c);dep+=depositPaid(c);});
+  const other=r2(db.payments.filter(p=>p.clientId===cid&&!p.contractId&&p.kind==='аренда').reduce((a,p)=>a+p.amount,0));
+  return {accr:r2(accr),paid:r2(paid+other),debt:r2(accr-paid-other),overdue:r2(over),deposits:r2(dep),contracts:cs};
+}
+// Плановое ТО по моточасам
+function toStatus(uid){
+  const u=unit(uid); const iv=+u.toInterval||250;
+  const m=unitMeter(uid);
+  const done=db.maint.filter(x=>x.unitId===uid&&x.kind==='ТО'&&x.meter!=null).map(x=>+x.meter);
+  const last=done.length?Math.max.apply(null,done):(+u.meter0||0);
+  const next=last+iv;
+  const left=r2(next-m);
+  // средняя наработка в день по последним 45 дням
+  const cids=new Set(unitContracts(uid).map(c=>c.id));
+  const since=addDays(today(),-45);
+  const recent=db.shifts.filter(s=>cids.has(s.contractId)&&s.date>=since).reduce((a,s)=>a+(+s.hours||0),0);
+  const perDay=recent/45;
+  const etaDays=perDay>0.05?Math.max(0,Math.round(left/perDay)):null;
+  const etaDate=etaDays!=null?addDays(today(),etaDays):null;
+  const warnAt=Math.max(20,Math.round(iv*0.12));   // предупреждаем за N моточасов
+  const affected=etaDate?unitContracts(uid).filter(c=>c.status==='active'&&c.to>=today()&&overlaps(c.from,c.to,etaDate,addDays(etaDate,2))):[];
+  return {meter:m,last,next,left,iv,perDay:r2(perDay),etaDays,etaDate,warnAt,due:left<=0,soon:left>0&&left<=warnAt,affected};
+}
+/* Проблемы, которые система обязана поймать */
+function issues(){
+  const out=[];
+  db.clients.forEach(c=>{
+    const m=clientMoney(c.id);
+    if(m.overdue>0.004)out.push({lvl:'dgr',t:'Просрочка платежа',d:c.name+' — '+money(m.overdue)+' сверх отсрочки',go:()=>go('money')});
+  });
+  db.units.filter(u=>!u.archived).forEach(u=>{
+    const t=toStatus(u.id);
+    if(t.due)out.push({lvl:'dgr',t:'ТО просрочено',d:u.name+': наработка '+fmt(t.meter,1)+' м/ч, ТО было положено на '+fmt(t.next,0),go:()=>openUnit(u.id)});
+    else if(t.soon)out.push({lvl:'wrn',t:'ТО подходит',d:u.name+': осталось '+fmt(t.left,1)+' м/ч'+(t.etaDate?' (ожидаемо '+dmy(t.etaDate)+')':'')+(t.affected.length?', затронет '+t.affected.length+' '+plural(t.affected.length,['бронь','брони','броней']):''),go:()=>openUnit(u.id)});
+    const e=unitLifetime(u.id);
+    if(e.net<0)out.push({lvl:'dgr',t:'Отрицательная доходность',d:u.name+': '+money(e.net)+' с даты покупки',go:()=>openUnit(u.id)});
+  });
+  db.contracts.filter(c=>c.status==='active'&&c.to<today()).forEach(c=>{
+    out.push({lvl:'wrn',t:'Договор не закрыт',d:uName(c.unitId)+' / '+cName(c.clientId)+', срок истёк '+dmy(c.to),go:()=>openContract(c.id)});
+  });
+  db.contracts.filter(c=>c.status==='active'&&c.from<=today()&&cShifts(c.id).length===0&&c.from<addDays(today(),-4)).forEach(c=>{
+    out.push({lvl:'wrn',t:'Нет наработки',d:uName(c.unitId)+' / '+cName(c.clientId)+': аренда с '+dmy(c.from)+', смены не внесены — начислений нет',go:()=>go('shifts')});
+  });
+  db.clients.filter(c=>c.inn&&!innValid(c.inn)).forEach(c=>{
+    out.push({lvl:'wrn',t:'ИНН не проходит проверку',d:c.name+': '+c.inn,go:()=>go('clients')});
+  });
+  const ord={dgr:0,wrn:1};
+  return out.sort((a,b)=>ord[a.lvl]-ord[b.lvl]);
+}
+/* ═══════════ 6. Демо-данные: генерируются кодом ═══════════ */
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;}}
+function makeInn10(rnd){ // корректный ИНН — контрольная цифра считается
+  const d=[];for(let i=0;i<9;i++)d.push(i===0?1+Math.floor(rnd()*8):Math.floor(rnd()*10));
+  const w=[2,4,10,3,5,9,4,6,8];
+  d.push(w.reduce((s,k,i)=>s+k*d[i],0)%11%10);
+  return d.join('');
+}
+function genDemo(){
+  const rnd=mulberry32(7734211);
+  const pick=a=>a[Math.floor(rnd()*a.length)];
+  const ri=(a,b)=>a+Math.floor(rnd()*(b-a+1));
+  const d=BLANK(); d.demo=true;
+  const END=today(), START=addDays(monthStart(END),-273);
+
+  /* — техника — */
+  const SPEC=[
+    ['Экскаватор','ЭО-2621 №1',       'hour', 2400, 19000, 4900000, 250],
+    ['Экскаватор','Hyundai R180 (демо)','hour',3100, 24500, 8400000, 250],
+    ['Погрузчик','Фронтальный 3 т',   'hour', 1900, 15200, 3600000, 200],
+    ['Погрузчик','Мини-погрузчик',    'hour', 1500, 12000, 2450000, 200],
+    ['Автокран','Автокран 25 т',      'shift',3600, 26000, 11500000,300],
+    ['Самосвал','Самосвал 20 м³ №1',  'shift',2100, 17500, 6900000, 400],
+    ['Самосвал','Самосвал 20 м³ №2',  'shift',2100, 17500, 6900000, 400],
+    ['Бульдозер','Бульдозер 14 т',    'hour', 2800, 22000, 7800000, 250],
+    ['Компрессор','Компрессор 5 м³/мин','day', 480,  3400,  760000, 500],
+    ['Бетононасос','Бетононасос 32 м','day',  4200, 34000, 9800000, 300],
+    ['Виброплита','Виброплита 500 кг','day',  320,  2400,  240000, 500],
+    ['Ямобур','Ямобур на базе ГАЗ',   'day',  1800, 14500, 3900000, 300]
+  ];
+  const CRANE=4, IDLE=9;                            // намеренно убыточные
+  SPEC.forEach((s,i)=>{
+    const [type,name,mode,rh,rs,cost,iv]=s;
+    d.units.push({id:'u'+(i+1),name,inv:'ИН-'+String(101+i*3),type,
+      rateHour:rh,rateShift:rs,rateDay:mode==='day'?rs:Math.round(rs*1.45),
+      cost,purchase:iso(new Date(Date.UTC(2019+ri(0,4),ri(0,11),ri(1,27)))),
+      toInterval:iv,meter0:ri(140,3400),mode,archived:false});
+  });
+  /* — клиенты — */
+  const P1=['СтройМонтаж','ГрадПроект','Гранит','ТехноСфера','Магистраль','ДорСтрой','ЖилКапитал','Инжсети','УралБетон','Северный Путь','КапРемонт','Промзона','АкваГрад','ЗемРаботы','Высота','Кровля-Про','ТеплоСети','Лесная Дача'];
+  const FORM=['ООО','ООО','ООО','АО','ИП','ООО'];
+  P1.forEach((n,i)=>{
+    const f=FORM[i%FORM.length];
+    d.clients.push({id:'c'+(i+1),name:f+' «'+n+'»',
+      inn:i===6?'7712345678':makeInn10(rnd),        // у одного ИНН с ошибкой контрольной цифры
+      phone:'+7 9'+ri(10,89)+' '+ri(100,999)+'-'+ri(10,99)+'-'+ri(10,99),
+      contact:pick(['Смирнов А.В.','Кузнецова Е.П.','Попов Д.И.','Иванова М.С.','Соколов Р.Н.','Морозов И.И.','Волкова Т.А.'])+'',
+      defer:pick([0,0,5,7,10,14,14,30]),archived:false});
+  });
+  /* — договоры: по единице последовательно, без пересечений — */
+  const cur=d.units.map((u,i)=>addDays(START,i===IDLE?ri(20,60):ri(0,16)));
+  const done=d.units.map(()=>false);
+  const gaps=d.units.map(()=>[]);
+  let n=0,guard=0,seq=1;
+  const mk=(i,from,to)=>{
+    const u=d.units[i];
+    const cl=d.clients[ri(0,d.clients.length-1)];
+    const rate=u.mode==='hour'?u.rateHour:(u.mode==='shift'?u.rateShift:u.rateDay);
+    d.contracts.push({id:'k'+(n+1),no:'А-'+String(seq++).padStart(3,'0')+'/'+from.slice(2,4),
+      clientId:cl.id,unitId:u.id,from,to,rateMode:u.mode,rate,
+      minShift:u.mode==='hour'?ri(0,1)*8:0,
+      otAfter:u.mode==='hour'?8:(u.mode==='shift'?8:24),
+      otMult:pick([1,1,1.25,1.5]),
+      deposit:pick([0,0,1,1,2])*Math.round(rate*(u.mode==='hour'?12:2)/1000)*1000,
+      note:'',status:'active',depWithheld:0,created:from});
+    n++;
+  };
+  const busy=(i,from,to)=>d.contracts.some(c=>c.unitId===d.units[i].id&&overlaps(c.from,c.to,from,to));
+  // часть техники в аренде прямо сейчас — иначе текущий месяц календаря пустой
+  [0,2,3,6,8,11].forEach(i=>{ mk(i,addDays(today(),-ri(2,11)),addDays(today(),ri(4,18))); });
+  while(n<60&&guard++<400){
+    for(let i=0;i<d.units.length&&n<60;i++){
+      if(done[i])continue;
+      if(i===IDLE&&gaps[i].length>=1){done[i]=true;continue;}   // спроса на бетононасос почти нет
+      const u=d.units[i];
+      const len=i===IDLE?ri(3,5):(u.mode==='day'?ri(4,18):ri(6,26));
+      const from=cur[i], to=addDays(from,len-1);
+      if(to>END){done[i]=true;continue;}
+      if(i===CRANE&&from>addDays(START,120)){done[i]=true;continue;} // кран встал в ремонт
+      if(busy(i,from,to)){cur[i]=addDays(to,ri(4,14));continue;}     // уже занята — сдвигаем курсор
+      mk(i,from,to);
+      const gap=i===IDLE?ri(60,120):ri(24,52);
+      gaps[i].push([addDays(to,1),addDays(to,gap)]);
+      cur[i]=addDays(to,gap+1);
+    }
+  }
+  /* — смены (наработка) — */
+  const OPER=['Гусев П.А.','Тарасов М.В.','Логинов С.С.','Дьяков А.Н.','Ким В.О.','Жуков Р.Т.','Панин Е.Г.','Абдулов Т.Х.'];
+  const noShiftContract=d.contracts.filter(c=>c.to<addDays(END,-6)).slice(-1)[0]; // намеренно без наработки
+  const meter={}; d.units.forEach(u=>meter[u.id]=u.meter0);
+  let si=1;
+  d.contracts.forEach(c=>{
+    if(c===noShiftContract)return;
+    const u=d.units.find(x=>x.id===c.unitId);
+    eachDay(c.from,c.to>END?END:c.to,day=>{
+      if(dow(day)===6)return;
+      if(rnd()<(u.mode==='day'?0.12:0.18))return;
+      const hours=u.mode==='day'?ri(8,24):(rnd()<0.22?ri(9,12):ri(6,8));
+      const st=meter[c.unitId]; meter[c.unitId]=r2(st+hours);
+      d.shifts.push({id:'s'+(si++),contractId:c.id,date:day,hours,
+        operator:OPER[ri(0,OPER.length-1)],meterStart:r2(st),meterEnd:meter[c.unitId]});
+    });
+  });
+  /* — обслуживание: ТО по моточасам + три ремонта с простоем — */
+  let mi=1;
+  const addM=(uid,date,kind,desc,cost,down,mtr)=>d.maint.push({id:'m'+(mi++),unitId:uid,date,kind,desc,cost:r2(cost),down,meter:mtr});
+  d.units.forEach((u,i)=>{
+    const total=meter[u.id]-u.meter0, iv=u.toInterval;
+    // «остаток до следующего ТО» задаём явно: у первой единицы перебег, у четвёртой ТО на подходе
+    const want=i===0?-Math.round(iv*0.14):(i===3?Math.round(iv*0.06):Math.round(iv*(0.4+0.4*rnd())));
+    const marks=[];
+    for(let m=u.meter0+total-(iv-want);m>u.meter0+iv*0.4;m-=iv)marks.push(r2(m));
+    marks.reverse().forEach((m,k)=>{
+      const sh=d.shifts.filter(s=>{const c=d.contracts.find(x=>x.id===s.contractId);return c.unitId===u.id&&s.meterEnd>=m;})[0];
+      const date=sh?addDays(sh.date,1):addDays(START,30);
+      addM(u.id,date>END?END:date,'ТО','Плановое ТО-'+(k+1)+', замена масла и фильтров',
+        Math.round(u.cost*0.0035/500)*500+2500,0,m);
+    });
+  });
+  function longestGap(i){ return gaps[i].slice().sort((a,b)=>dayCount(b[0],b[1])-dayCount(a[0],a[1]))[0]; }
+  // 1) капитальный ремонт автокрана — техника выбыла надолго
+  {const g=longestGap(CRANE)||[addDays(START,130),END];
+   addM('u'+(CRANE+1),g[0],'Ремонт','Капитальный ремонт гидравлики, замена секции стрелы (ожидание запчастей)',1250000,Math.min(dayCount(g[0],g[1]),46),null);}
+  // 2) ремонт экскаватора
+  {const g=longestGap(1)||[addDays(START,60),addDays(START,70)];
+   addM('u2',g[0],'Ремонт','Замена гидронасоса и рукавов высокого давления',268000,Math.min(dayCount(g[0],g[1]),9),null);}
+  // 3) ремонт самосвала
+  {const g=longestGap(5)||[addDays(START,90),addDays(START,96)];
+   addM('u6',g[0],'Ремонт','Ремонт КПП, замена сцепления',154000,Math.min(dayCount(g[0],g[1]),6),null);}
+  // дорогое ТО простаивающего бетононасоса — регламент не зависит от загрузки
+  {const u=d.units[IDLE];
+   addM(u.id,addDays(START,42),'ТО','Регламентное ТО бетононасоса: промывка, замена поршней',95000,0,null);
+   addM(u.id,addDays(START,196),'ТО','Регламентное ТО бетононасоса: гидроаккумулятор, сальники',95000,0,null);}
+
+  /* — платежи, закрытие договоров, залоги — */
+  // клиент с просрочкой — у кого больше всего давних договоров с начислениями
+  const accrOf=c=>r2(d.shifts.filter(s=>s.contractId===c.id).reduce((a,s)=>a+shiftAmount(c,s),0));
+  const cand=cid=>d.contracts.filter(c=>c.clientId===cid&&c.to<addDays(END,-45)&&accrOf(c)>0);
+  const OVER=d.clients.slice().sort((a,b)=>cand(b.id).length-cand(a.id).length)[0].id;
+  const overCs=cand(OVER);
+  const overUnpaid=overCs[overCs.length-1]||null;                 // не платит и не закрыт
+  const overHold=overCs.length>1?overCs[0]:null;                  // закрыт с удержанием залога
+  let pi=1;
+  const addP=(cid,kid,date,amount,kind)=>d.payments.push({id:'p'+(pi++),clientId:cid,contractId:kid,date,amount:r2(amount),kind});
+  const openLeft=[];                                 // договоры, которые оставим не закрытыми
+  d.contracts.forEach((c,idx)=>{
+    const cl=d.clients.find(x=>x.id===c.clientId);
+    const accr=r2(d.shifts.filter(s=>s.contractId===c.id).reduce((a,s)=>a+shiftAmount(c,s),0));
+    if(c.deposit>0)addP(c.clientId,c.id,c.from,c.deposit,'залог');
+    const expired=c.to<addDays(END,-2);
+    if(!expired)  { if(accr>0&&rnd()<0.4)addP(c.clientId,c.id,addDays(c.from,ri(3,9)),r2(accr*0.5),'аренда'); return; }
+    if(c===noShiftContract){ openLeft.push(c); return; }            // намеренно: аренда без внесённой наработки
+    if(c===overUnpaid){ openLeft.push(c); return; }
+    if(c===overHold){
+      if(!c.deposit){c.deposit=Math.round(c.rate*4/1000)*1000;addP(c.clientId,c.id,c.from,c.deposit,'залог');}
+      if(accr>0)addP(c.clientId,c.id,addDays(c.to,1),accr,'аренда');
+      const hold=Math.round(c.deposit*0.6/1000)*1000;
+      c.status='closed'; c.closedAt=addDays(c.to,3); c.depWithheld=hold;
+      c.note='Удержано из залога: повреждение ковша, простой на диагностике.';
+      if(c.deposit-hold>0)addP(c.clientId,c.id,c.closedAt,c.deposit-hold,'возврат залога');
+      return;
+    }
+    if(idx%17===5){ openLeft.push(c); if(accr>0)addP(c.clientId,c.id,addDays(c.to,2),accr,'аренда'); return; }  // оплачен, но не закрыт
+    const payDate=addDays(c.to,ri(1,Math.max(1,+cl.defer||3)));
+    if(accr>0)addP(c.clientId,c.id,payDate>END?END:payDate,accr,'аренда');
+    c.status='closed'; c.closedAt=payDate>END?END:payDate;
+    if(c.deposit>0){ addP(c.clientId,c.id,c.closedAt,c.deposit,'возврат залога'); c.depWithheld=0; }
+  });
+  return d;
+}
+function loadDemo(){
+  db=genDemo(); save();
+  route={v:'cal'}; render();
+  toast('Демо-данные созданы: '+db.units.length+' ед. техники, '+db.clients.length+' клиентов, '+db.contracts.length+' договоров, '+db.shifts.length+' смен');
+}
+/* ═══════════ 7. Оболочка, роутер, рендер ═══════════ */
+let route={v:'cal'};
+let q='';
+let calMonth=monthStart(today());
+let periodFrom=monthStart(addDays(today(),-60)), periodTo=today();
+
+const NAV=[['cal','Календарь','cal'],['park','Парк','park'],['contracts','Договоры','doc'],
+           ['shifts','Наработка','clock'],['money','Деньги','money'],['analytics','Аналитика','chart'],
+           ['clients','Клиенты','users'],['data','Данные','db']];
+const HIST=[]; let HI=-1;
+function show(v,id){ route={v,id}; q=''; $('#search').value=''; closeModal(); render(); window.scrollTo(0,0); histSync(); }
+function go(v,id){ const c=HIST[HI];
+  if(!c||c.v!==v||c.id!==id){ HIST.splice(HI+1); HIST.push({v,id}); if(HIST.length>50)HIST.shift(); HI=HIST.length-1; }
+  show(v,id); }
+function histJump(d){ const i=HI+d; if(i<0||i>=HIST.length)return; HI=i; show(HIST[i].v,HIST[i].id); }
+function histSync(){ const a=$('#hprev'),b=$('#hnext'); if(!a)return; a.hidden=HI<=0; b.hidden=HI>=HIST.length-1; }
+function histUI(){ document.body.insertAdjacentHTML('beforeend',
+  '<button class="hedge" id="hprev" title="Назад" aria-label="Назад" hidden>'+ico('back',20)+'</button>'+
+  '<button class="hedge r" id="hnext" title="Вперёд" aria-label="Вперёд" hidden>'+ico('back',20)+'</button>');
+  $('#hprev').onclick=()=>histJump(-1); $('#hnext').onclick=()=>histJump(1);
+  addEventListener('keydown',e=>{ if(e.altKey&&e.key==='ArrowLeft'){e.preventDefault();histJump(-1)}
+    if(e.altKey&&e.key==='ArrowRight'){e.preventDefault();histJump(1)} }); }
+
+function renderNav(){
+  const alerts=issues().filter(i=>i.lvl==='dgr').length;
+  $('#nav').innerHTML='<div class="brand" title="Арендный парк">АП</div>'+'<button class="navadd" id="quickAdd" title="Новая бронь">'+ico('plus',20)+'</button>'+
+    NAV.map(([v,t,i])=>'<button class="navb" data-t="'+t+'" data-nav="'+v+'" aria-current="'+(route.v===v||(route.v==='unit'&&v==='park')||(route.v==='contract'&&v==='contracts')||(route.v==='client'&&v==='clients'))+'">'+ico(i,19)+'<span>'+t+'</span>'+
+      (v==='analytics'&&alerts?'<span class="badge">'+alerts+'</span>':'')+'</button>').join('');
+  $$('#nav [data-nav]').forEach(b=>b.onclick=()=>go(b.dataset.nav));
+  $('#quickAdd').onclick=()=>{go('cal');const b=$('#nb');if(b)b.click();};
+}
+const F=(name,label,input,hint)=>'<div class="f" data-f="'+name+'"><label>'+label+'</label>'+input+'<div class="err"></div>'+(hint?'<div class="hint">'+hint+'</div>':'')+'</div>';
+const V=(m,n)=>{const el=$('[data-f="'+n+'"] input,[data-f="'+n+'"] select,[data-f="'+n+'"] textarea',m);return el?el.value.trim():''};
+function selOpts(list,sel,fn){return list.map(o=>'<option value="'+esc(o.id)+'"'+(o.id===sel?' selected':'')+'>'+esc(fn(o))+'</option>').join('')}
+const unitOpts=sel=>selOpts(db.units.filter(u=>!u.archived||u.id===sel).sort((a,b)=>a.name.localeCompare(b.name,'ru')),sel,u=>u.name+' · '+u.inv);
+const clientOpts=sel=>selOpts(db.clients.filter(c=>!c.archived||c.id===sel).sort((a,b)=>a.name.localeCompare(b.name,'ru')),sel,c=>c.name);
+
+function render(){
+  renderNav();
+  const V_={cal:renderCal,park:renderPark,unit:renderUnit,contracts:renderContracts,contract:renderContract,
+            shifts:renderShifts,money:renderMoney,analytics:renderAnalytics,clients:renderClients,client:renderClient,data:renderData};
+  const f=V_[route.v]||renderCal;
+  const empty=!db.units.length&&!db.clients.length;
+  if(empty&&route.v!=='data'){ renderEmptyAll(); return; }
+  f();
+}
+function head(title,sub,actions){
+  $('#viewTitle').innerHTML=title; $('#viewSub').textContent=sub||'';
+  $('#actions').innerHTML=actions||'';
+}
+
+function renderEmptyAll(){
+  head('Начало работы','');
+  $('#view').innerHTML='<div class="empty">'+ico('park',34)+
+    '<h3>Пока нет ни техники, ни клиентов</h3>'+
+    '<p>Первый шаг — добавьте единицу техники: название, инвентарный номер, ставку и стоимость приобретения. После этого можно заводить клиентов и брони в календаре. Доходность и окупаемость считаются автоматически из введённых смен, ремонтов и платежей.</p>'+
+    '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">'+
+    '<button class="btn pri" id="e1">'+ico('plus')+' Добавить технику</button>'+
+    '<button class="btn" id="e2">Загрузить демо-данные</button></div>'+
+    '<p class="dim" style="margin-top:18px;font-size:12px">Демо-данные помечены как демонстрационные и удаляются одной кнопкой.</p></div>';
+  $('#e1').onclick=()=>unitForm(null);
+  $('#e2').onclick=()=>loadDemo();
+}
+
+/* ═══════════ 8. Календарь занятости ═══════════ */
+const WDS=['пн','вт','ср','чт','пт','сб','вс'];
+function dayRuns(set){
+  const arr=[...set].sort(), out=[];
+  arr.forEach(d=>{const l=out[out.length-1]; if(l&&addDays(l[1],1)===d)l[1]=d; else out.push([d,d]);});
+  return out;
+}
+function renderCal(){
+  const from=monthStart(calMonth), to=monthEnd(calMonth), days=[];
+  eachDay(from,to,d=>days.push(d));
+  const n=days.length, live=db.units.filter(u=>!u.archived);
+  const busyNow=live.filter(u=>unitContracts(u.id).some(c=>c.status!=='cancelled'&&c.from<=today()&&c.to>=today())).length;
+  head('Календарь занятости',
+    MONN[+calMonth.slice(5,7)-1]+' '+calMonth.slice(0,4)+(live.length?' · в аренде '+busyNow+'/'+live.length:''),
+    '<div class="seg"><button id="mp" title="Предыдущий месяц">‹</button><button id="mt">Сегодня</button><button id="mn" title="Следующий месяц">›</button></div>'+
+    '<button class="btn pri" id="nb">'+ico('plus')+' Бронь</button>');
+  if(!db.units.length){
+    $('#view').innerHTML='<div class="empty">'+ico('cal',30)+'<h3>Календарь пуст</h3><p>Добавьте технику — каждая единица станет строкой календаря. Затем бронируйте: пересечение двух договоров по одной единице система не даст сохранить.</p><button class="btn pri" id="e1">'+ico('plus')+' Добавить технику</button></div>';
+    $('#e1').onclick=()=>unitForm(null); bindCalNav(); return;
+  }
+  const list=live.filter(u=>!q||(u.name+' '+u.inv+' '+u.type).toLowerCase().includes(q));
+  const pos=(off,len)=>'left:calc(var(--cw)*'+off+' + 2px);width:calc(var(--cw)*'+len+' - 4px)';
+  const rows=list.map(u=>{
+    const ut=utilization(u.id,from,to), md=maintDays(u.id,from,to);
+    let bars='';
+    unitContracts(u.id).filter(c=>c.status!=='cancelled'&&overlaps(c.from,c.to,from,to)).forEach(c=>{
+      const s=c.from>from?c.from:from, e=c.to<to?c.to:to;
+      const off=daysBetween(from,s), len=dayCount(s,e);
+      const clash=conflicts(u.id,c.from,c.to,c.id).length>0;
+      bars+='<a class="gbar'+(clash?' clash':(c.to<today()?' past':''))+'" href="#" data-k="'+c.id+'" style="'+pos(off,len)+'" title="'+
+        esc((c.no?c.no+' · ':'')+cName(c.clientId)+' · '+dmy(c.from)+'—'+dmy(c.to)+' · '+money(c.rate)+' за '+RATE[c.rateMode])+'">'+
+        (len>=3?'<span>'+esc(cName(c.clientId))+'</span>':'')+(len>=13?'<em>'+money(contractAccrued(c),0)+'</em>':'')+'</a>';
+    });
+    dayRuns(md).forEach(([s,e])=>{
+      const off=daysBetween(from,s), len=dayCount(s,e);
+      bars+='<div class="gbar mnt" style="'+pos(off,len)+'" title="'+esc('Ремонт / ТО: '+dmy(s)+'—'+dmy(e))+'">'+(len>=4?'<span>ремонт</span>':'')+'</div>';
+    });
+    return '<div class="grow"><div class="gname"><div class="un"><a href="#" data-u="'+u.id+'">'+esc(u.name)+'</a></div>'+
+      '<div class="um"><b>'+Math.round(ut.k*100)+'%</b>'+bar(ut.k,ut.k<0.4?'var(--warn)':'var(--acc)')+'</div></div>'+
+      '<div class="gtrack" data-track="'+u.id+'">'+bars+'</div></div>';
+  }).join('');
+  const ti=days.indexOf(today());
+  $('#view').innerHTML=
+   '<div class="gantt" style="--n:'+n+'"><div class="gwrap">'+
+    '<div class="gover">'+days.map((d,i)=>isWeekend(d)?'<i style="left:calc(var(--cw)*'+i+')"></i>':'').join('')+'</div>'+
+    (ti>=0?'<div class="gtop"><i style="left:calc(var(--cw)*'+ti+')"></i></div>':'')+
+    '<div class="grow ghead"><div class="gname"><div class="caps">Единица · загрузка</div></div><div class="gtrack">'+
+      days.map((d,i)=>'<span class="gd'+(isWeekend(d)?' we':'')+(d===today()?' td':'')+'" style="left:calc(var(--cw)*'+i+')">'+(+d.slice(8,10))+'<s>'+WDS[dow(d)]+'</s></span>').join('')+
+    '</div></div>'+(list.length?rows:'<div class="grow"><div class="gname"></div><div class="gtrack" style="display:grid;place-items:center;cursor:default"><span class="dim" style="font-size:12px">Ничего не нашлось по запросу</span></div></div>')+
+   '</div></div>'+
+   '<div class="legend"><span><i class="sw" style="background:#252C34;box-shadow:inset 0 0 0 1px rgba(255,255,255,.10),inset 3px 0 0 0 #F5A524"></i>в аренде</span>'+
+   '<span><i class="sw" style="background:rgba(255,255,255,.05);box-shadow:inset 0 0 0 1px rgba(255,255,255,.10),inset 3px 0 0 0 #616B77"></i>завершённые</span>'+
+   '<span><i class="sw" style="background:repeating-linear-gradient(135deg,rgba(216,167,46,.9) 0 4px,#16191D 4px 8px)"></i>ремонт и ТО</span>'+
+   '<span class="dim">клик по свободному дню — новая бронь · клик по полосе — договор</span></div>';
+  bindCalNav();
+  $$('#view [data-u]').forEach(el=>el.onclick=ev=>{ev.preventDefault();ev.stopPropagation();openUnit(el.dataset.u)});
+  $$('#view .gbar[data-k]').forEach(el=>el.onclick=ev=>{ev.preventDefault();ev.stopPropagation();openContract(el.dataset.k)});
+  $$('#view [data-track]').forEach(tr=>tr.onclick=ev=>{
+    const r=tr.getBoundingClientRect();
+    const i=clamp(Math.floor((ev.clientX-r.left)/(r.width/n)),0,n-1);
+    contractForm(null,{unitId:tr.dataset.track,from:days[i],to:addDays(days[i],6)});
+  });
+}
+function bindCalNav(){
+  const b=(id,fn)=>{const e=$('#'+id); if(e)e.onclick=fn;};
+  b('mp',()=>{calMonth=monthStart(addDays(monthStart(calMonth),-1));render()});
+  b('mn',()=>{calMonth=monthStart(addDays(monthEnd(calMonth),1));render()});
+  b('mt',()=>{calMonth=monthStart(today());render()});
+  b('nb',()=>contractForm(null,{}));
+}
+/* ═══════════ 9. Формы ═══════════ */
+function numField(name,label,val,hint){return F(name,label,'<input inputmode="decimal" class="num" value="'+esc(val==null?'':fmt(val))+'">',hint)}
+function readNum(m,name,{min,max,req,int,label}={}){
+  const raw=V(m,name);
+  if(raw===''){ if(req){fieldErr(m,name,'Заполните поле');return null;} return 0; }
+  const v=parseAmount(raw);
+  if(!isFinite(v)){fieldErr(m,name,'Не похоже на число. Примеры: 1 234,56 · 1234.56 · 1 234 567');return null;}
+  if(int&&Math.abs(v%1)>1e-9){fieldErr(m,name,'Нужно целое число');return null;}
+  if(min!=null&&v<min){fieldErr(m,name,'Не меньше '+fmt(min));return null;}
+  if(max!=null&&v>max){fieldErr(m,name,'Не больше '+fmt(max));return null;}
+  return r2(v);
+}
+function readDate(m,name,{req=true}={}){
+  const v=V(m,name);
+  if(!v){if(req){fieldErr(m,name,'Укажите дату');return null;}return ''}
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(v)||isNaN(D(v))){fieldErr(m,name,'Некорректная дата');return null;}
+  return v;
+}
+/* — техника — */
+function unitForm(id){
+  const u=id?unit(id):null;
+  const body=F('name','Название','<input value="'+esc(u?u.name:'')+'" placeholder="Экскаватор ЭО-2621 №1">')+
+   '<div class="row">'+F('inv','Инвентарный номер','<input value="'+esc(u?u.inv:'')+'" placeholder="ИН-101">')+
+   F('type','Тип','<select>'+TYPES.concat(u&&!TYPES.includes(u.type)?[u.type]:[]).map(t=>'<option'+(u&&u.type===t?' selected':'')+'>'+esc(t)+'</option>').join('')+'</select>')+'</div>'+
+   '<div class="row">'+numField('rateHour','Ставка, ₽/час',u?u.rateHour:'')+numField('rateShift','Ставка, ₽/смена',u?u.rateShift:'')+numField('rateDay','Ставка, ₽/сутки',u?u.rateDay:'')+'</div>'+
+   '<div class="row">'+numField('cost','Стоимость приобретения, ₽',u?u.cost:'')+F('purchase','Дата покупки','<input type="date" value="'+esc(u?u.purchase:'')+'">')+'</div>'+
+   '<div class="row">'+numField('toInterval','Межсервисный интервал, моточасов',u?u.toInterval:250,'Предупреждение выводится за 12% интервала до ТО')+
+   numField('meter0','Показания счётчика при постановке на учёт, м/ч',u?u.meter0:0)+'</div>';
+  const m=modal({title:u?'Единица техники':'Новая единица техники',body,
+    footer:(u?'<button class="btn dgr" id="del">'+ico('trash',14)+' Удалить</button>':'')+'<span style="flex:1"></span><button class="btn" data-close>Отмена</button><button class="btn pri" id="ok">Сохранить</button>'});
+  if(u)$('#del',m).onclick=()=>tryDelete('units',u,u.name);
+  $('#ok',m).onclick=()=>{
+    clearErrs(m);
+    const name=V(m,'name'), inv=V(m,'inv');
+    if(!name)return fieldErr(m,'name','Название обязательно');
+    if(!inv)return fieldErr(m,'inv','Инвентарный номер обязателен');
+    if(db.units.some(x=>x.inv.toLowerCase()===inv.toLowerCase()&&x.id!==id))return fieldErr(m,'inv','Такой инвентарный номер уже есть');
+    const rh=readNum(m,'rateHour',{min:0}),rs=readNum(m,'rateShift',{min:0}),rd=readNum(m,'rateDay',{min:0});
+    if(rh===null||rs===null||rd===null)return;
+    if(!rh&&!rs&&!rd)return fieldErr(m,'rateHour','Нужна хотя бы одна ставка');
+    const cost=readNum(m,'cost',{min:0,req:true}); if(cost===null)return;
+    const pu=readDate(m,'purchase'); if(pu===null)return;
+    if(pu>today())return fieldErr(m,'purchase','Дата покупки в будущем');
+    const iv=readNum(m,'toInterval',{min:1,req:true}); if(iv===null)return;
+    const m0=readNum(m,'meter0',{min:0}); if(m0===null)return;
+    const o=u||{id:uid('u'),archived:false};
+    Object.assign(o,{name,inv,type:V(m,'type'),rateHour:rh,rateShift:rs,rateDay:rd,cost,purchase:pu,toInterval:iv,meter0:m0});
+    if(!u)db.units.push(o);
+    closeModal(); commit(u?'Сохранено':'Техника добавлена: '+name);
+  };
+}
+/* — клиент — */
+function clientForm(id){
+  const c=id?client(id):null;
+  const body=F('name','Наименование','<input value="'+esc(c?c.name:'')+'" placeholder="ООО «СтройМонтаж»">')+
+   '<div class="row">'+F('inn','ИНН','<input class="num" value="'+esc(c?c.inn:'')+'" inputmode="numeric" placeholder="10 или 12 цифр">','Проверяется по контрольным цифрам')+
+   F('phone','Телефон','<input value="'+esc(c?c.phone:'')+'">')+'</div>'+
+   '<div class="row">'+F('contact','Контактное лицо','<input value="'+esc(c?c.contact:'')+'">')+
+   numField('defer','Отсрочка платежа, дней',c?c.defer:0,'Считается от даты окончания договора')+'</div>';
+  const m=modal({title:c?'Клиент':'Новый клиент',body,
+    footer:(c?'<button class="btn dgr" id="del">'+ico('trash',14)+' Удалить</button>':'')+'<span style="flex:1"></span><button class="btn" data-close>Отмена</button><button class="btn pri" id="ok">Сохранить</button>'});
+  if(c)$('#del',m).onclick=()=>tryDelete('clients',c,c.name);
+  $('#ok',m).onclick=()=>{
+    clearErrs(m);
+    const name=V(m,'name'); if(!name)return fieldErr(m,'name','Наименование обязательно');
+    const inn=V(m,'inn').replace(/\s/g,'');
+    if(inn&&!innValid(inn))return fieldErr(m,'inn',/^\d{10}$|^\d{12}$/.test(inn)?'Контрольная цифра не сходится — проверьте ИНН':'ИНН — это 10 цифр (организация) или 12 (ИП)');
+    if(inn&&db.clients.some(x=>x.inn===inn&&x.id!==id))return fieldErr(m,'inn','Клиент с таким ИНН уже есть');
+    const df=readNum(m,'defer',{min:0,max:365,int:true}); if(df===null)return;
+    const o=c||{id:uid('c'),archived:false};
+    Object.assign(o,{name,inn,phone:V(m,'phone'),contact:V(m,'contact'),defer:df});
+    if(!c)db.clients.push(o);
+    closeModal(); commit(c?'Сохранено':'Клиент добавлен');
+  };
+}
+/* — договор / бронь — */
+function contractForm(id,pre){
+  pre=pre||{};
+  const c=id?contract(id):null;
+  const cur=c||pre;
+  const mode=cur.rateMode||'shift';
+  const u0=cur.unitId||(db.units.filter(x=>!x.archived)[0]||{}).id||'';
+  if(!db.units.length)return modal({title:'Сначала добавьте технику',body:'<p class="muted">Бронировать нечего: в парке нет ни одной единицы техники.</p>',footer:'<button class="btn" data-close>Закрыть</button><button class="btn pri" id="ok">Добавить технику</button>',onOpen:m=>$('#ok',m).onclick=()=>{closeModal();unitForm(null)}});
+  if(!db.clients.length)return modal({title:'Сначала добавьте клиента',body:'<p class="muted">Договор заключается с клиентом — в базе пока нет ни одного.</p>',footer:'<button class="btn" data-close>Закрыть</button><button class="btn pri" id="ok">Добавить клиента</button>',onOpen:m=>$('#ok',m).onclick=()=>{closeModal();clientForm(null)}});
+  const body='<div id="conf"></div>'+
+   '<div class="row">'+F('unitId','Техника','<select>'+unitOpts(u0)+'</select>')+F('clientId','Клиент','<select>'+clientOpts(cur.clientId||'')+'</select>')+'</div>'+
+   '<div class="row">'+F('from','Начало','<input type="date" value="'+esc(cur.from||today())+'">')+F('to','Окончание','<input type="date" value="'+esc(cur.to||addDays(today(),6))+'">')+
+   F('no','Номер договора','<input value="'+esc(cur.no||'')+'" placeholder="А-001/'+today().slice(2,4)+'">')+'</div>'+
+   '<div class="row">'+F('rateMode','Тариф','<select>'+Object.keys(RATE).map(k=>'<option value="'+k+'"'+(k===mode?' selected':'')+'>за '+RATE[k]+'</option>').join('')+'</select>')+
+   numField('rate','Ставка, ₽',cur.rate!=null?cur.rate:'')+numField('deposit','Залог, ₽',cur.deposit||0)+'</div>'+
+   '<div class="row">'+numField('minShift','Минимальная смена, часов',cur.minShift||0,'Меньше — оплата всё равно по минимуму')+
+   numField('otAfter','Переработка после, часов',cur.otAfter||8)+numField('otMult','Коэффициент переработки',cur.otMult||1,'1 = без повышения')+'</div>'+
+   F('note','Условия и примечания','<textarea rows="2">'+esc(cur.note||'')+'</textarea>');
+  const m=modal({title:c?'Договор '+(c.no||''):'Новая бронь',body,wide:true,
+    footer:(c?'<button class="btn dgr" id="del">'+ico('trash',14)+' Удалить</button>':'')+'<span style="flex:1"></span><button class="btn" data-close>Отмена</button><button class="btn pri" id="ok">Сохранить</button>'});
+  if(c)$('#del',m).onclick=()=>tryDelete('contracts',c,'Договор '+(c.no||''));
+  // ставка подставляется из карточки техники по выбранному тарифу, пока её не правили вручную
+  const rateEl=$('[data-f="rate"] input',m);
+  const autoRate=()=>{
+    const u=unit(V(m,'unitId')); if(!u)return;
+    const md=V(m,'rateMode');
+    const r=md==='hour'?u.rateHour:(md==='shift'?u.rateShift:u.rateDay);
+    if(r&&(!rateEl.value.trim()||rateEl.dataset.auto==='1')){rateEl.value=fmt(r);rateEl.dataset.auto='1';}
+  };
+  $('[data-f="unitId"] select',m).onchange=autoRate;
+  $('[data-f="rateMode"] select',m).onchange=autoRate;
+  rateEl.oninput=()=>{rateEl.dataset.auto=''};
+  if(!c&&(!rateEl.value.trim()||parseAmount(rateEl.value)===0)){rateEl.value='';autoRate();}
+  $('#ok',m).onclick=()=>{
+    clearErrs(m); $('#conf',m).innerHTML='';
+    const uid_=V(m,'unitId'), cid=V(m,'clientId');
+    const from=readDate(m,'from'); if(from===null)return;
+    const to=readDate(m,'to'); if(to===null)return;
+    if(to<from)return fieldErr(m,'to','Окончание раньше начала');
+    if(dayCount(from,to)>400)return fieldErr(m,'to','Слишком длинный период (больше 400 дней)');
+    const rate=readNum(m,'rate',{min:0.01,req:true}); if(rate===null)return;
+    const dep=readNum(m,'deposit',{min:0}); if(dep===null)return;
+    const ms=readNum(m,'minShift',{min:0,max:24}); if(ms===null)return;
+    const oa=readNum(m,'otAfter',{min:0,max:24}); if(oa===null)return;
+    const om=readNum(m,'otMult',{min:1,max:5}); if(om===null)return;
+    const cf=conflicts(uid_,from,to,id);
+    if(cf.length){
+      const x=cf[0];
+      $('#conf',m).innerHTML='<div class="note dgr" style="margin-bottom:14px">'+ico('warn',14)+' <b>Пересечение броней.</b> «'+esc(uName(uid_))+'» уже занята: договор '+esc(x.no||x.id)+', '+esc(cName(x.clientId))+', '+dmy(x.from)+' — '+dmy(x.to)+'.'+
+        (cf.length>1?' И ещё '+(cf.length-1)+'.':'')+'<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn sm" id="goK">Открыть занятый договор</button><button class="btn sm" id="freeK">Первая свободная дата: '+dmy(freeFrom(uid_,from,dayCount(from,to)))+'</button></div></div>';
+      $('#goK',m).onclick=()=>{closeModal();openContract(x.id)};
+      $('#freeK',m).onclick=()=>{const f=freeFrom(uid_,from,dayCount(from,to));$('[data-f="from"] input',m).value=f;$('[data-f="to"] input',m).value=addDays(f,dayCount(from,to)-1);$('#conf',m).innerHTML='';};
+      $('#conf',m).scrollIntoView?null:null;
+      return;
+    }
+    const md=maintDays(uid_,from,to);
+    const o=c||{id:uid('k'),status:'active',depWithheld:0,created:today()};
+    Object.assign(o,{unitId:uid_,clientId:cid,from,to,no:V(m,'no')||('А-'+String(db.contracts.length+1).padStart(3,'0')+'/'+from.slice(2,4)),
+      rateMode:V(m,'rateMode'),rate,deposit:dep,minShift:ms,otAfter:oa,otMult:om,note:V(m,'note')});
+    if(!c)db.contracts.push(o);
+    closeModal(); commit(c?'Договор сохранён':'Бронь создана: '+uName(uid_)+', '+dmy(from)+'—'+dmy(to));
+    if(md.size)toast('Внимание: в этот период есть '+md.size+' '+plural(md.size,['день','дня','дней'])+' ремонта по этой единице');
+  };
+}
+function freeFrom(uid_,after,len){
+  let d=after;
+  for(let i=0;i<800;i++){
+    if(!conflicts(uid_,d,addDays(d,len-1)).length)return d;
+    d=addDays(d,1);
+  }
+  return after;
+}
+/* — смена — */
+function contractLabel(c){return (c.no?c.no+' · ':'')+uName(c.unitId)+' · '+cName(c.clientId)+' · '+dmy(c.from)+'—'+dmy(c.to)}
+function shiftForm(id,pre){
+  pre=pre||{};
+  const s=id?byId('shifts',id):null;
+  const cs=db.contracts.filter(c=>c.status!=='closed'||(s&&s.contractId===c.id));
+  const list=(cs.length?cs:db.contracts).sort((a,b)=>a.from<b.from?1:-1);
+  if(!list.length)return modal({title:'Нет договоров',body:'<p class="muted">Наработка вносится по договору. Сначала создайте бронь в календаре.</p>',footer:'<button class="btn pri" data-close>Понятно</button>'});
+  const cur=s||pre;
+  const body=F('contractId','Договор','<select>'+selOpts(list,cur.contractId||list[0].id,contractLabel)+'</select>')+
+   '<div class="row">'+F('date','Дата','<input type="date" value="'+esc(cur.date||today())+'">')+
+   numField('hours','Часы',cur.hours!=null?cur.hours:8)+F('operator','Оператор','<input value="'+esc(cur.operator||'')+'">')+'</div>'+
+   '<div class="row">'+numField('meterEnd','Показания счётчика на конец, м/ч',cur.meterEnd!=null?cur.meterEnd:'','Необязательно; влияет только на историю')+'</div>'+
+   '<div id="calc" class="note"></div>';
+  const m=modal({title:s?'Смена':'Новая смена',body,
+    footer:(s?'<button class="btn dgr" id="del">'+ico('trash',14)+' Удалить</button>':'')+'<span style="flex:1"></span><button class="btn" data-close>Отмена</button><button class="btn pri" id="ok">Сохранить</button>',
+    onOpen:mm=>{const upd=()=>{
+      const c=contract(V(mm,'contractId')); const h=parseAmount(V(mm,'hours'));
+      if(!c||!isFinite(h)){$('#calc',mm).textContent='';return;}
+      const tmp={hours:h}; const b=shiftBreak(c,tmp);
+      $('#calc',mm).innerHTML='К начислению за смену: <b class="num">'+money(shiftAmount(c,tmp))+'</b> · тариф за '+RATE[c.rateMode]+' '+money(c.rate)+
+        (b.minApplied?' · применён минимум '+fmt(c.minShift)+' ч':'')+(b.ot>0?' · переработка '+fmt(b.ot,1)+' ч × '+fmt(c.otMult,2):'');
+    };
+    $$('select,input',mm).forEach(e=>{e.oninput=upd;e.onchange=upd}); upd();}});
+  if(s)$('#del',m).onclick=()=>tryDelete('shifts',s,'Смена '+dmy(s.date));
+  $('#ok',m).onclick=()=>{
+    clearErrs(m);
+    const c=contract(V(m,'contractId')); if(!c)return fieldErr(m,'contractId','Выберите договор');
+    const date=readDate(m,'date'); if(date===null)return;
+    if(date<c.from||date>c.to)return fieldErr(m,'date','Дата вне срока договора ('+dmy(c.from)+' — '+dmy(c.to)+')');
+    if(date>today())return fieldErr(m,'date','Смена в будущем — наработки ещё нет');
+    const hours=readNum(m,'hours',{min:0.1,max:24,req:true}); if(hours===null)return;
+    const dup=db.shifts.find(x=>x.contractId===c.id&&x.date===date&&x.id!==id);
+    if(dup)return fieldErr(m,'date','За этот день по договору уже внесено '+fmt(dup.hours,1)+' ч. Отредактируйте её.');
+    const me=readNum(m,'meterEnd',{min:0}); if(me===null)return;
+    const o=s||{id:uid('s')};
+    Object.assign(o,{contractId:c.id,date,hours,operator:V(m,'operator'),meterEnd:me||null,meterStart:me?r2(me-hours):null});
+    if(!s)db.shifts.push(o);
+    closeModal(); commit((s?'Смена сохранена':'Смена внесена')+': '+money(shiftAmount(c,o)));
+  };
+}
+/* — обслуживание — */
+function maintForm(id,pre){
+  pre=pre||{}; const x=id?byId('maint',id):null; const cur=x||pre;
+  const body='<div id="conf"></div><div class="row">'+F('unitId','Техника','<select>'+unitOpts(cur.unitId||'')+'</select>')+
+   F('date','Дата','<input type="date" value="'+esc(cur.date||today())+'">')+
+   F('kind','Вид','<select><option'+(cur.kind==='ТО'?' selected':'')+'>ТО</option><option'+(cur.kind&&cur.kind!=='ТО'?' selected':'')+'>Ремонт</option></select>')+'</div>'+
+   F('desc','Что сделали','<textarea rows="2">'+esc(cur.desc||'')+'</textarea>')+
+   '<div class="row">'+numField('cost','Стоимость, ₽',cur.cost!=null?cur.cost:'')+numField('down','Простой, дней',cur.down||0,'Дни простоя вычитаются из доступного фонда и считаются упущенной выручкой')+
+   numField('meter','Показания счётчика, м/ч',cur.meter!=null?cur.meter:'','Для ТО — от него отсчитывается следующее')+'</div>';
+  const m=modal({title:x?'Обслуживание':'Обслуживание / ремонт',body,
+    footer:(x?'<button class="btn dgr" id="del">'+ico('trash',14)+' Удалить</button>':'')+'<span style="flex:1"></span><button class="btn" data-close>Отмена</button><button class="btn pri" id="ok">Сохранить</button>'});
+  if(x)$('#del',m).onclick=()=>tryDelete('maint',x,'Запись обслуживания');
+  let forced=false;
+  $('#ok',m).onclick=()=>{
+    clearErrs(m);
+    const uid_=V(m,'unitId'); const date=readDate(m,'date'); if(date===null)return;
+    const cost=readNum(m,'cost',{min:0,req:true}); if(cost===null)return;
+    const down=readNum(m,'down',{min:0,max:365,int:true}); if(down===null)return;
+    const meter=readNum(m,'meter',{min:0}); if(meter===null)return;
+    if(!V(m,'desc'))return fieldErr(m,'desc','Опишите работы — это попадёт в историю единицы');
+    if(down>0&&!forced){
+      const cf=conflicts(uid_,date,addDays(date,down-1),null).filter(c=>c.status!=='closed');
+      if(cf.length){
+        $('#conf',m).innerHTML='<div class="note wrn" style="margin-bottom:14px">'+ico('warn',14)+' Простой пересекается с бронями: '+cf.map(c=>esc((c.no||'')+' '+cName(c.clientId))).join(', ')+'. Проверьте календарь — возможно, брони нужно перенести.</div>';
+        $('#ok',m).textContent='Сохранить всё равно'; forced=true; return;
+      }
+    }
+    const o=x||{id:uid('m')};
+    Object.assign(o,{unitId:uid_,date,kind:V(m,'kind'),desc:V(m,'desc'),cost,down,meter:meter||null});
+    if(!x)db.maint.push(o);
+    closeModal(); commit('Запись обслуживания сохранена');
+  };
+}
+/* — платёж — */
+function paymentForm(id,pre){
+  pre=pre||{}; const p=id?byId('payments',id):null; const cur=p||pre;
+  if(!db.clients.length)return modal({title:'Нет клиентов',body:'<p class="muted">Платёж привязывается к клиенту.</p>',footer:'<button class="btn pri" data-close>Понятно</button>'});
+  const cid0=cur.clientId||db.clients[0].id;
+  const kOpts=c=>'<option value="">— без договора —</option>'+selOpts(db.contracts.filter(x=>x.clientId===c),cur.contractId||'',contractLabel);
+  const body='<div class="row">'+F('clientId','Клиент','<select>'+clientOpts(cid0)+'</select>')+F('contractId','Договор','<select>'+kOpts(cid0)+'</select>')+'</div>'+
+   '<div class="row">'+F('date','Дата','<input type="date" value="'+esc(cur.date||today())+'">')+numField('amount','Сумма, ₽',cur.amount!=null?cur.amount:'')+
+   F('kind','Назначение','<select>'+['аренда','залог','возврат залога'].map(k=>'<option'+(cur.kind===k?' selected':'')+'>'+k+'</option>').join('')+'</select>')+'</div>'+
+   '<div id="bal" class="note"></div>';
+  const m=modal({title:p?'Платёж':'Новый платёж',body,onOpen:mm=>{
+    const upd=()=>{
+      const c=contract(V(mm,'contractId'));
+      if(c){const a=contractAccrued(c),pd=contractPaid(c);
+        $('#bal',mm).innerHTML='По договору начислено <b class="num">'+money(a)+'</b>, оплачено <b class="num">'+money(pd)+'</b>, остаток <b class="num '+(a-pd>0.004?'danger':'ok')+'">'+money(a-pd)+'</b>. Залог по договору: '+money(c.deposit)+', внесено '+money(depositPaid(c))+'.';
+      } else {const mn=clientMoney(V(mm,'clientId'));$('#bal',mm).innerHTML='Долг клиента: <b class="num">'+money(mn.debt)+'</b>, из них просрочено <b class="num'+(mn.overdue>0?' danger':'')+'">'+money(mn.overdue)+'</b>.';}
+    };
+    $('[data-f="clientId"] select',mm).onchange=e=>{$('[data-f="contractId"] select',mm).innerHTML=kOpts(e.target.value);upd()};
+    $$('select,input',mm).forEach(e=>{e.onchange=upd;e.oninput=upd}); upd();
+  },footer:(p?'<button class="btn dgr" id="del">'+ico('trash',14)+' Удалить</button>':'')+'<span style="flex:1"></span><button class="btn" data-close>Отмена</button><button class="btn pri" id="ok">Сохранить</button>'});
+  if(p)$('#del',m).onclick=()=>tryDelete('payments',p,'Платёж '+money(p.amount));
+  $('#ok',m).onclick=()=>{
+    clearErrs(m);
+    const date=readDate(m,'date'); if(date===null)return;
+    const amount=readNum(m,'amount',{min:0.01,req:true}); if(amount===null)return;
+    const kid=V(m,'contractId'), kind=V(m,'kind');
+    if(kind!=='аренда'&&!kid)return fieldErr(m,'contractId','Залог и его возврат привязываются к договору');
+    const o=p||{id:uid('p')};
+    Object.assign(o,{clientId:V(m,'clientId'),contractId:kid||null,date,amount,kind});
+    if(!p)db.payments.push(o);
+    closeModal(); commit('Платёж сохранён: '+money(amount));
+  };
+}
+/* — закрытие договора с залогом — */
+function closeForm(id){
+  const c=contract(id); if(!c)return;
+  const accr=contractAccrued(c), paid=contractPaid(c), debt=r2(accr-paid), dep=depositPaid(c);
+  const body='<table style="margin-bottom:14px"><tbody>'+
+    '<tr><td>Начислено по наработке ('+cShifts(c.id).length+' '+plural(cShifts(c.id).length,['смена','смены','смен'])+', '+fmt(contractHours(c.id),1)+' ч)</td><td class="n num">'+money(accr)+'</td></tr>'+
+    '<tr><td>Оплачено</td><td class="n num">'+money(paid)+'</td></tr>'+
+    '<tr><td><b>Долг по аренде</b></td><td class="n num '+(debt>0.004?'danger':'ok')+'"><b>'+money(debt)+'</b></td></tr>'+
+    '<tr><td>Залог внесён</td><td class="n num">'+money(dep)+'</td></tr></tbody></table>'+
+    numField('hold','Удержать из залога, ₽',Math.min(dep,Math.max(0,debt)),'Не больше внесённого залога — '+money(dep))+
+    F('why','Основание удержания','<textarea rows="2" placeholder="Повреждение, недоплата, перепробег…">'+esc(c.note||'')+'</textarea>')+
+    '<div id="res" class="note"></div>';
+  const m=modal({title:'Закрытие договора '+(c.no||''),body,onOpen:mm=>{
+    const upd=()=>{
+      const h=clamp(parseAmount(V(mm,'hold'))||0,0,dep);
+      const back=r2(dep-h), rest=r2(debt-h);
+      $('#res',mm).innerHTML='Вернуть клиенту: <b class="num">'+money(back)+'</b>'+
+        (rest>0.004?' · останется долг <b class="num danger">'+money(rest)+'</b>':(rest<-0.004?' · переплата <b class="num ok">'+money(-rest)+'</b>':' · расчёты закрыты полностью'));
+    };
+    $('[data-f="hold"] input',mm).oninput=upd; upd();
+  },footer:'<span style="flex:1"></span><button class="btn" data-close>Отмена</button><button class="btn term" id="ok">Закрыть договор</button>'});
+  $('#ok',m).onclick=()=>{
+    clearErrs(m);
+    const hold=readNum(m,'hold',{min:0,max:dep}); if(hold===null)return;
+    if(hold>0&&!V(m,'why'))return fieldErr(m,'why','Укажите основание удержания — оно попадёт в акт');
+    c.status='closed'; c.closedAt=today(); c.depWithheld=hold; c.note=V(m,'why');
+    const back=r2(dep-hold);
+    if(back>0.004)db.payments.push({id:uid('p'),clientId:c.clientId,contractId:c.id,date:today(),amount:back,kind:'возврат залога'});
+    closeModal(); commit('Договор закрыт'+(hold>0?', удержано из залога '+money(hold):'')+(back>0?', возвращено '+money(back):''));
+  };
+}
+/* — удаление со ссылочной защитой — */
+function refsOf(coll,o){
+  const r=[];
+  if(coll==='units'){
+    const k=unitContracts(o.id); if(k.length)r.push(k.length+' '+plural(k.length,['договор','договора','договоров']));
+    const mm=db.maint.filter(x=>x.unitId===o.id); if(mm.length)r.push(mm.length+' '+plural(mm.length,['запись обслуживания','записи обслуживания','записей обслуживания']));
+  }
+  if(coll==='clients'){
+    const k=db.contracts.filter(c=>c.clientId===o.id); if(k.length)r.push(k.length+' '+plural(k.length,['договор','договора','договоров']));
+    const p=db.payments.filter(x=>x.clientId===o.id); if(p.length)r.push(p.length+' '+plural(p.length,['платёж','платежа','платежей']));
+  }
+  if(coll==='contracts'){
+    const s=cShifts(o.id); if(s.length)r.push(s.length+' '+plural(s.length,['смена','смены','смен']));
+    const p=db.payments.filter(x=>x.contractId===o.id); if(p.length)r.push(p.length+' '+plural(p.length,['платёж','платежа','платежей']));
+  }
+  return r;
+}
+function tryDelete(coll,o,label){
+  const r=refsOf(coll,o);
+  const canArchive=coll==='units'||coll==='clients';
+  if(r.length){
+    modal({title:'Удалить нельзя',body:'<p>На «'+esc(label)+'» ссылаются: <b>'+r.join(', ')+'</b>. Удаление разорвало бы историю и сломало расчёты.</p>'+
+      (canArchive?'<p class="muted">Вместо удаления — архивирование: запись исчезнет из списков выбора и календаря, но все прошлые расчёты, акты и платежи останутся верными.</p>':'<p class="muted">Сначала удалите зависимые записи '+(coll==='contracts'?'(смены и платежи по договору)':'')+'.</p>'),
+      footer:'<span style="flex:1"></span><button class="btn" data-close>Отмена</button>'+(canArchive?'<button class="btn term" id="arch">'+(o.archived?'Вернуть из архива':'Архивировать')+'</button>':'')});
+    if(canArchive)$('#arch',$('#modalWrap')).onclick=()=>{o.archived=!o.archived;closeModal();commit(o.archived?'«'+label+'» в архиве':'Возвращено из архива');};
+    return;
+  }
+  closeModal();
+  if(route.v==='unit'||route.v==='contract'||route.v==='client')go(route.v==='unit'?'park':route.v==='contract'?'contracts':'clients');
+  removeWithUndo(coll,[o],'Удалено: '+esc(label));
+}
+/* ═══════════ 10. Период и общие блоки ═══════════ */
+const PRESETS=[['m','Текущий месяц'],['m3','3 месяца'],['m9','9 месяцев'],['all','С начала данных'],['c','Свой период']];
+/* OPENS ON NINE MONTHS, not three. The whole argument of this product is "two of your
+   twelve machines are not paying for themselves" - and on a three-month window only one
+   unit went red and the кран, the single best story in the data, showed a flat zero. The
+   default has to be the window where the point is visible without a click. */
+let preset='m9';
+function applyPreset(p){
+  preset=p;
+  const t=today();
+  if(p==='m'){periodFrom=monthStart(t);periodTo=monthEnd(t)>t?t:monthEnd(t);}
+  if(p==='m3'){periodFrom=monthStart(addDays(t,-89));periodTo=t;}
+  if(p==='m9'){periodFrom=monthStart(addDays(t,-273));periodTo=t;}
+  if(p==='all'){
+    const all=db.shifts.map(s=>s.date).concat(db.contracts.map(c=>c.from),db.maint.map(m=>m.date));
+    periodFrom=all.length?all.reduce((a,b)=>a<b?a:b):monthStart(t); periodTo=t;
+  }
+}
+const periodBar=()=>'<div class="row" style="align-items:flex-end;gap:10px;margin-bottom:14px">'+
+  '<div style="flex:0 0 auto"><div class="seg" id="pset">'+PRESETS.map(([k,t])=>'<button data-p="'+k+'" aria-pressed="'+(preset===k)+'">'+t+'</button>').join('')+'</div></div>'+
+  '<div style="flex:0 0 auto;display:flex;gap:8px;align-items:center"><input type="date" id="pf" value="'+periodFrom+'" style="width:150px"><span class="dim">—</span><input type="date" id="pt" value="'+periodTo+'" style="width:150px"></div>'+
+  '<div class="dim" style="flex:1;min-width:120px;text-align:right;font-size:12px">'+dayCount(periodFrom,periodTo)+' '+plural(dayCount(periodFrom,periodTo),['день','дня','дней'])+' в периоде</div></div>';
+function bindPeriod(){
+  $$('#pset [data-p]').forEach(b=>b.onclick=()=>{if(b.dataset.p==='c'){preset='c';}else applyPreset(b.dataset.p);render()});
+  const f=$('#pf'),t=$('#pt');
+  if(f)f.onchange=()=>{if(f.value){periodFrom=f.value;preset='c';if(periodTo<periodFrom)periodTo=periodFrom;render()}};
+  if(t)t.onchange=()=>{if(t.value){periodTo=t.value;preset='c';if(periodTo<periodFrom)periodFrom=periodTo;render()}};
+}
+const m0=n=>money(n,0);
+const mB=n=>Math.abs(n)>=1e7?fmt(n/1e6,1)+'\u2009млн\u2009₽':money(n,0);
+const kpi=arr=>'<div class="kpi">'+arr.map(([l,v,n,c])=>'<div class="k'+(c?' k-'+c:'')+'"><div class="lbl">'+l+'</div><div class="val'+(c?' '+c:'')+'">'+v+'</div>'+(n?'<div class="nt">'+n+'</div>':'')+'</div>').join('')+'</div>';
+const bar=(k,c)=>'<div class="bar"><i style="width:'+clamp(k*100,0,100)+'%;background:'+(c||'var(--acc)')+'"></i></div>';
+
+/* — почему единица убыточна: текст строится из расчёта — */
+function whyBad(e){
+  const r=[];
+  const rep=e.maint.filter(m=>m.kind!=='ТО'), to=e.maint.filter(m=>m.kind==='ТО');
+  if(rep.length&&(e.repair>e.rev*0.25||e.repair>0&&e.net<0))
+    r.push('Ремонты: '+rep.map(m=>dmy(m.date)+' — '+money(m.cost)+(m.down?' и '+m.down+' '+plural(m.down,['день','дня','дней'])+' простоя':'')).join('; ')+'.');
+  if(e.ut.repair>0)
+    r.push('Простой в ремонте '+e.ut.repair+' '+plural(e.ut.repair,['день','дня','дней'])+' — упущенная выручка '+money(e.downLoss)+' по суточной ставке '+money(e.dayRate)+'.');
+  if(e.ut.k<0.5)
+    r.push('Загрузка '+Math.round(e.ut.k*100)+'%: в аренде '+e.ut.rent+' из '+e.ut.avail+' доступных дней, свободными простояли '+e.ut.idle+'.');
+  if(to.length&&e.service>e.rev*0.3)
+    r.push('Регламентное ТО '+money(e.service)+' при выручке '+money(e.rev)+' — обслуживание не зависит от загрузки.');
+  if(!r.length)r.push('Выручка '+money(e.rev)+' не покрыла расходы '+money(e.service+e.repair+e.downLoss)+' за период.');
+  return r;
+}
+
+/* ═══════════ 11. Парк / доходность ═══════════ */
+function renderPark(){
+  head('Доходность парка','выручка минус обслуживание, ремонты и простой',
+    '<button class="btn" id="addM">'+ico('wrench',14)+' Обслуживание</button><button class="btn pri" id="addU">'+ico('plus')+' Техника</button>');
+  const list=db.units.filter(u=>!q||(u.name+' '+u.inv+' '+u.type).toLowerCase().includes(q));
+  if(!db.units.length){
+    $('#view').innerHTML='<div class="empty">'+ico('park',30)+'<h3>Парк пуст</h3><p>Добавьте первую единицу: ставка и стоимость приобретения нужны, чтобы считать доходность и окупаемость.</p><button class="btn pri" id="e1">'+ico('plus')+' Добавить технику</button> <button class="btn" id="e2">Демо-данные</button></div>';
+    $('#e1').onclick=()=>unitForm(null);$('#e2').onclick=()=>loadDemo();bindPark();return;
+  }
+  const rows=list.map(u=>({e:unitEcon(u.id,periodFrom,periodTo),l:unitLifetime(u.id),u}))
+                 .sort((a,b)=>a.e.net-b.e.net);
+  const T={rev:0,srv:0,rep:0,dl:0,net:0,cost:0,lnet:0};
+  rows.forEach(({e,l,u})=>{T.rev+=e.rev;T.srv+=e.service;T.rep+=e.repair;T.dl+=e.downLoss;T.net+=e.net;T.cost+=u.cost;T.lnet+=l.net;});
+  $('#view').innerHTML=periodBar()+
+   kpi([['Выручка за период',m0(T.rev)],['Обслуживание и ремонты',m0(T.srv+T.rep),'ТО '+m0(T.srv)+' · ремонт '+m0(T.rep)],
+        ['Упущено на простоях',m0(T.dl),'по суточным ставкам'],['Результат за период',m0(T.net),null,T.net<0?'danger':'ok'],
+        ['Отбито от стоимости парка',(T.cost?fmt(T.lnet/T.cost*100,1):'0')+'%','накопительно · парк '+mB(T.cost)]])+
+   '<div class="hd"><h2>По единицам</h2><span class="dim">сортировка: хуже — выше</span></div>'+
+   '<div class="card" style="padding:6px 4px"><table class="resp"><thead><tr><th>Единица</th><th class="n">Загрузка</th><th class="n">Выручка</th><th class="n">ТО</th><th class="n">Ремонт</th><th class="n">Простой</th><th class="n">Результат</th><th class="n">Накопительно</th><th class="n">Окупаемость</th></tr></thead><tbody>'+
+   rows.map(({e,l,u})=>'<tr class="clk" data-u="'+u.id+'">'+
+     '<td data-l="Единица"><div>'+esc(u.name)+(u.archived?' <span class="tag">архив</span>':'')+'</div><div class="dim" style="font-size:11.5px">'+esc(u.inv+' · '+u.type)+'</div></td>'+
+     '<td class="n" data-l="Загрузка"><span class="num">'+Math.round(e.ut.k*100)+'%</span>'+bar(e.ut.k,e.ut.k<0.4?'var(--warn)':'var(--acc)')+'</td>'+
+     '<td class="n num" data-l="Выручка">'+money(e.rev)+'</td><td class="n num dim" data-l="ТО">'+money(e.service)+'</td>'+
+     '<td class="n num'+(e.repair>0?' warn':' dim')+'" data-l="Ремонт">'+money(e.repair)+'</td>'+
+     '<td class="n num dim" data-l="Простой">'+money(e.downLoss)+'</td>'+
+     '<td class="n num '+(e.net<0?'danger':'')+'" data-l="Результат"><b>'+money(e.net)+'</b></td>'+
+     '<td class="n num '+(l.net<0?'danger':'')+'" data-l="Накопительно">'+money(l.net)+'</td>'+
+     '<td class="n num '+(l.payback<0?'danger':(l.payback>=100?'ok':''))+'" data-l="Окупаемость">'+fmt(l.payback,1)+'%</td></tr>').join('')+
+   '</tbody></table></div>'+
+   (rows.some(r=>r.e.net<0)?'<div class="hd"><h2>Убыточные единицы за период</h2></div>'+
+     rows.filter(r=>r.e.net<0).map(({e,u})=>'<div class="note dgr" style="margin-bottom:10px"><b>'+esc(u.name)+'</b> — '+money(e.net)+'<ul style="margin:6px 0 0 16px;padding:0">'+whyBad(e).map(t=>'<li>'+t+'</li>').join('')+'</ul><div style="margin-top:8px"><button class="btn sm" data-u2="'+u.id+'">Открыть карточку</button></div></div>').join(''):'');
+  bindPark();
+  $$('#view [data-u]').forEach(tr=>tr.onclick=()=>openUnit(tr.dataset.u));
+  $$('#view [data-u2]').forEach(b=>b.onclick=e=>{e.stopPropagation();openUnit(b.dataset.u2)});
+  bindPeriod();
+}
+function bindPark(){
+  const a=$('#addU'); if(a)a.onclick=()=>unitForm(null);
+  const b=$('#addM'); if(b)b.onclick=()=>maintForm(null,{});
+}
+const openUnit=id=>{route={v:'unit',id};render();window.scrollTo(0,0)};
+const openContract=id=>{route={v:'contract',id};render();window.scrollTo(0,0)};
+const openClient=id=>{route={v:'client',id};render();window.scrollTo(0,0)};
+
+/* ═══════════ 12. Карточка единицы ═══════════ */
+function renderUnit(){
+  const u=unit(route.id); if(!u)return go('park');
+  const e=unitEcon(u.id,periodFrom,periodTo), l=unitLifetime(u.id), t=toStatus(u.id);
+  head('<button class="x" id="bk" style="vertical-align:-3px">'+ico('back',18)+'</button> '+esc(u.name),u.inv+' · '+u.type,
+    '<button class="btn" id="ed">Изменить</button><button class="btn" id="mt">'+ico('wrench',14)+' ТО / ремонт</button><button class="btn pri" id="bk2">'+ico('plus')+' Бронь</button>');
+  const ks=db.contracts.filter(c=>c.unitId===u.id).sort((a,b)=>a.from<b.from?1:-1);
+  $('#view').innerHTML=periodBar()+
+   kpi([['Выручка за период',m0(e.rev),cShiftsCount(u.id,periodFrom,periodTo)+' смен · '+fmt(unitHoursIn(u.id,periodFrom,periodTo),1)+' ч'],
+        ['Результат за период',m0(e.net),'ТО '+m0(e.service)+' · ремонт '+m0(e.repair)+' · простой '+m0(e.downLoss),e.net<0?'danger':'ok'],
+        ['Загрузка',Math.round(e.ut.k*100)+'%','в аренде '+e.ut.rent+' из '+e.ut.avail+' дн. (ремонт '+e.ut.repair+' дн. исключён)'],
+        ['Накопительно с покупки',m0(l.net),dlong(u.purchase),l.net<0?'danger':''],
+        ['Окупаемость',fmt(l.payback,1)+'%','стоимость '+m0(u.cost),l.payback<0?'danger':(l.payback>=100?'ok':'')]])+
+   (e.net<0?'<div class="note dgr" style="margin-top:14px"><b>Почему в минусе за выбранный период</b><ul style="margin:6px 0 0 16px;padding:0">'+whyBad(e).map(x=>'<li>'+x+'</li>').join('')+'</ul></div>':'')+
+   '<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr));margin-top:16px">'+
+    '<div class="card"><h3>Ставки и учёт</h3><table><tbody>'+
+      '<tr><td>За час</td><td class="n num">'+money(u.rateHour)+'</td></tr>'+
+      '<tr><td>За смену</td><td class="n num">'+money(u.rateShift)+'</td></tr>'+
+      '<tr><td>За сутки</td><td class="n num">'+money(u.rateDay)+'</td></tr>'+
+      '<tr><td>Стоимость приобретения</td><td class="n num">'+money(u.cost)+'</td></tr>'+
+      '<tr><td>Дата покупки</td><td class="n">'+dmy(u.purchase)+'</td></tr>'+
+      '<tr><td>Счётчик сейчас</td><td class="n num">'+fmt(t.meter,1)+' м/ч</td></tr></tbody></table></div>'+
+    '<div class="card"><h3>Плановое ТО по моточасам</h3>'+
+      '<div class="'+(t.due?'note dgr':(t.soon?'note wrn':'note'))+'">'+
+      (t.due?'<b>ТО просрочено.</b> Отметка '+fmt(t.next,0)+' м/ч пройдена, сейчас '+fmt(t.meter,1)+' м/ч — перебег '+fmt(-t.left,1)+' м/ч.'
+        :(t.soon?'<b>ТО подходит.</b> Осталось '+fmt(t.left,1)+' м/ч до отметки '+fmt(t.next,0)+'.'
+        :'До ТО '+fmt(t.left,1)+' м/ч (отметка '+fmt(t.next,0)+' м/ч).'))+
+      (t.etaDate?' При текущем темпе '+fmt(t.perDay,1)+' м/ч в день — ориентировочно '+dmy(t.etaDate)+'.':' Темп наработки за 45 дней нулевой — прогноз даты не строится.')+
+      (t.affected.length?'<div style="margin-top:8px">Затронет брони: '+t.affected.map(c=>'<a href="#" data-k="'+c.id+'">'+esc((c.no||'')+' '+cName(c.clientId))+'</a> ('+dmy(c.from)+'—'+dmy(c.to)+')').join(', ')+'</div>':'')+
+      '</div><div class="hint">Интервал '+fmt(t.iv,0)+' м/ч · предыдущее ТО на '+fmt(t.last,0)+' м/ч · предупреждение за '+fmt(t.warnAt,0)+' м/ч</div></div>'+
+   '</div>'+
+   '<div class="hd"><h2>Договоры</h2><span class="dim">'+ks.length+'</span></div>'+
+   (ks.length?'<div class="card" style="padding:6px 4px"><table class="resp"><thead><tr><th>Договор</th><th>Клиент</th><th>Период</th><th class="n">Смен</th><th class="n">Часов</th><th class="n">Начислено</th><th class="n">Долг</th><th>Статус</th></tr></thead><tbody>'+
+     ks.map(c=>{const d=contractDebt(c),ov=contractOverdue(c);return '<tr class="clk" data-k="'+c.id+'"><td data-l="Договор">'+esc(c.no||'—')+'</td><td data-l="Клиент">'+esc(cName(c.clientId))+'</td>'+
+     '<td data-l="Период" class="num">'+dmy(c.from)+' — '+dmy(c.to)+'</td><td class="n num" data-l="Смен">'+cShifts(c.id).length+'</td><td class="n num" data-l="Часов">'+fmt(contractHours(c.id),1)+'</td>'+
+     '<td class="n num" data-l="Начислено">'+money(contractAccrued(c))+'</td><td class="n num '+(ov?'danger':'')+'" data-l="Долг">'+money(d)+'</td>'+
+     '<td data-l="Статус">'+statusTag(c)+'</td></tr>'}).join('')+'</tbody></table></div>':'<div class="card muted">Броней не было. Кликните свободный день в календаре, чтобы создать первую.</div>')+
+   '<div class="hd"><h2>Обслуживание и ремонты</h2></div>'+
+   (function(){const ms=db.maint.filter(m=>m.unitId===u.id).sort((a,b)=>a.date<b.date?1:-1);
+     return ms.length?'<div class="card" style="padding:6px 4px"><table class="resp"><thead><tr><th>Дата</th><th>Вид</th><th>Работы</th><th class="n">Стоимость</th><th class="n">Простой</th><th class="n">Счётчик</th></tr></thead><tbody>'+
+     ms.map(m=>'<tr class="clk" data-m="'+m.id+'"><td data-l="Дата" class="num">'+dmy(m.date)+'</td><td data-l="Вид">'+(m.kind==='ТО'?'<span class="tag">ТО</span>':'<span class="tag wrn">Ремонт</span>')+'</td>'+
+       '<td data-l="Работы">'+esc(m.desc||'')+'</td><td class="n num" data-l="Стоимость">'+money(m.cost)+'</td><td class="n num" data-l="Простой">'+(m.down?m.down+' дн.':'—')+'</td><td class="n num dim" data-l="Счётчик">'+(m.meter!=null?fmt(m.meter,0):'—')+'</td></tr>').join('')+
+     '</tbody></table></div>':'<div class="card muted">Записей нет. Ремонты и ТО влияют на доходность и на дни простоя — вносите их сразу.</div>';})();
+  $('#bk').onclick=()=>go('park'); $('#ed').onclick=()=>unitForm(u.id);
+  $('#mt').onclick=()=>maintForm(null,{unitId:u.id}); $('#bk2').onclick=()=>contractForm(null,{unitId:u.id});
+  $$('#view [data-k]').forEach(el=>el.onclick=ev=>{ev.preventDefault();openContract(el.dataset.k)});
+  $$('#view [data-m]').forEach(el=>el.onclick=()=>maintForm(el.dataset.m));
+  bindPeriod();
+}
+function cShiftsCount(uid,f,t){const cids=new Set(unitContracts(uid).map(c=>c.id));return db.shifts.filter(s=>cids.has(s.contractId)&&s.date>=f&&s.date<=t).length}
+function unitHoursIn(uid,f,t){const cids=new Set(unitContracts(uid).map(c=>c.id));return r2(db.shifts.filter(s=>cids.has(s.contractId)&&s.date>=f&&s.date<=t).reduce((a,s)=>a+(+s.hours||0),0))}
+function statusTag(c){
+  if(c.status==='closed')return '<span class="tag ok">закрыт'+(c.depWithheld>0?', залог удержан':'')+'</span>';
+  if(contractOverdue(c))return '<span class="tag dgr">просрочка</span>';
+  if(c.to<today())return '<span class="tag wrn">срок истёк</span>';
+  if(c.from>today())return '<span class="tag acc">бронь</span>';
+  return '<span class="tag">в аренде</span>';
+}
+/* ═══════════ 13. Договоры ═══════════ */
+let kFilter='all';
+function renderContracts(){
+  head('Договоры аренды','',
+    '<div class="seg" id="kf">'+[['all','Все'],['active','Действующие'],['over','Просрочка'],['closed','Закрытые']].map(([k,t])=>'<button data-f="'+k+'" aria-pressed="'+(kFilter===k)+'">'+t+'</button>').join('')+'</div>'+
+    '<button class="btn pri" id="add">'+ico('plus')+' Договор</button>');
+  let list=db.contracts.slice().sort((a,b)=>a.from<b.from?1:-1);
+  if(kFilter==='active')list=list.filter(c=>c.status==='active');
+  if(kFilter==='closed')list=list.filter(c=>c.status==='closed');
+  if(kFilter==='over')list=list.filter(c=>contractOverdue(c));
+  if(q)list=list.filter(c=>((c.no||'')+' '+uName(c.unitId)+' '+cName(c.clientId)).toLowerCase().includes(q));
+  $('#view').innerHTML=(list.length?
+   '<div class="card" style="padding:6px 4px"><table class="resp"><thead><tr><th>№</th><th>Техника</th><th>Клиент</th><th>Период</th><th>Тариф</th><th class="n">Начислено</th><th class="n">Оплачено</th><th class="n">Долг</th><th class="n">Залог</th><th>Статус</th></tr></thead><tbody>'+
+   list.map(c=>{const a=contractAccrued(c),p=contractPaid(c),ov=contractOverdue(c);
+     return '<tr class="clk" data-k="'+c.id+'"><td data-l="№">'+esc(c.no||'—')+'</td><td data-l="Техника">'+esc(uName(c.unitId))+'</td><td data-l="Клиент">'+esc(cName(c.clientId))+'</td>'+
+     '<td data-l="Период" class="num">'+dmy(c.from)+' — '+dmy(c.to)+'</td><td data-l="Тариф" class="num">'+money(c.rate)+'/'+RATE[c.rateMode]+(c.otMult>1?' ·×'+fmt(c.otMult,2):'')+'</td>'+
+     '<td class="n num" data-l="Начислено">'+money(a)+'</td><td class="n num dim" data-l="Оплачено">'+money(p)+'</td>'+
+     '<td class="n num '+(ov?'danger':(a-p>0.004?'warn':'dim'))+'" data-l="Долг">'+money(a-p)+'</td>'+
+     '<td class="n num dim" data-l="Залог">'+(c.deposit?money(depositPaid(c)):'—')+'</td><td data-l="Статус">'+statusTag(c)+'</td></tr>'}).join('')+
+   '</tbody></table></div>':
+   '<div class="empty">'+ico('doc',30)+'<h3>Договоров нет</h3><p>Договор — это бронь техники на период плюс условия оплаты: тариф, минимальная смена, коэффициент переработки, залог и отсрочка. Создайте первый — календарь сразу покажет занятость.</p><button class="btn pri" id="e1">'+ico('plus')+' Создать договор</button></div>');
+  const a=$('#add')||$('#e1'); if(a)a.onclick=()=>contractForm(null,{});
+  const e1=$('#e1'); if(e1)e1.onclick=()=>contractForm(null,{});
+  $$('#kf [data-f]').forEach(b=>b.onclick=()=>{kFilter=b.dataset.f;render()});
+  $$('#view [data-k]').forEach(tr=>tr.onclick=()=>openContract(tr.dataset.k));
+}
+function renderContract(){
+  const c=contract(route.id); if(!c)return go('contracts');
+  const sh=cShifts(c.id).sort((a,b)=>a.date<b.date?1:-1);
+  const accr=contractAccrued(c), paid=contractPaid(c), debt=r2(accr-paid), dep=depositPaid(c);
+  const ov=contractOverdue(c), due=contractDue(c), cl=client(c.clientId);
+  head('<button class="x" id="bk" style="vertical-align:-3px">'+ico('back',18)+'</button> Договор '+esc(c.no||''),uName(c.unitId)+' · '+cName(c.clientId),
+    '<button class="btn" id="ed">Изменить</button><button class="btn" id="ash">'+ico('plus',14)+' Смена</button><button class="btn" id="apay">'+ico('money',14)+' Платёж</button>'+
+    '<button class="btn" id="pact">'+ico('print',14)+' Акт</button><button class="btn" id="pinv">'+ico('print',14)+' Счёт</button>'+
+    (c.status==='active'?'<button class="btn term" id="cl">Закрыть договор</button>':''));
+  $('#view').innerHTML=
+   kpi([['Начислено',money(accr),sh.length+' '+plural(sh.length,['смена','смены','смен'])+' · '+fmt(contractHours(c.id),1)+' ч'],
+        ['Оплачено',money(paid)],
+        ['Долг',money(debt),'срок оплаты '+dmy(due)+(cl&&cl.defer?' (отсрочка '+cl.defer+' дн.)':''),ov?'danger':(debt>0.004?'warn':'ok')],
+        ['Залог',money(dep),c.deposit?'по договору '+money(c.deposit)+(c.depWithheld?' · удержано '+money(c.depWithheld):''):'не предусмотрен',c.depWithheld?'warn':''],
+        ['Статус',statusTag(c),c.status==='closed'?'закрыт '+dmy(c.closedAt):'до '+dmy(c.to)]])+
+   (ov?'<div class="note dgr" style="margin-top:14px">'+ico('warn',14)+' Просрочка '+money(ov)+': срок оплаты был '+dmy(due)+', прошло '+daysBetween(due,today())+' '+plural(daysBetween(due,today()),['день','дня','дней'])+'.</div>':'')+
+   (c.note?'<div class="note" style="margin-top:14px"><b>Условия / примечания.</b> '+esc(c.note)+'</div>':'')+
+   '<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin-top:16px"><div class="card"><h3>Условия начисления</h3><table><tbody>'+
+     '<tr><td>Тариф</td><td class="n num">'+money(c.rate)+' за '+RATE[c.rateMode]+'</td></tr>'+
+     '<tr><td>Минимальная смена</td><td class="n num">'+(c.minShift?fmt(c.minShift,1)+' ч':'нет')+'</td></tr>'+
+     '<tr><td>Переработка после</td><td class="n num">'+fmt(c.otAfter,1)+' ч</td></tr>'+
+     '<tr><td>Коэффициент переработки</td><td class="n num">'+fmt(c.otMult,2)+'</td></tr>'+
+     '<tr><td>Залог по договору</td><td class="n num">'+money(c.deposit)+'</td></tr>'+
+     '<tr><td>Отсрочка клиента</td><td class="n num">'+(cl?cl.defer:0)+' дн.</td></tr></tbody></table></div>'+
+    '<div class="card"><h3>Платежи</h3>'+paymentsTable(db.payments.filter(p=>p.contractId===c.id))+'</div></div>'+
+   '<div class="hd"><h2>Наработка и начисление</h2><span class="dim">каждая строка посчитана по условиям договора</span></div>'+
+   (sh.length?'<div class="card" style="padding:6px 4px"><table class="resp"><thead><tr><th>Дата</th><th>Оператор</th><th class="n">Часы</th><th class="n">К оплате</th><th>Расшифровка</th><th class="n">Счётчик</th></tr></thead><tbody>'+
+     sh.map(s=>{const b=shiftBreak(c,s);return '<tr class="clk" data-s="'+s.id+'"><td class="num" data-l="Дата">'+dmy(s.date)+'</td><td data-l="Оператор">'+esc(s.operator||'—')+'</td>'+
+     '<td class="n num" data-l="Часы">'+fmt(s.hours,1)+'</td><td class="n num" data-l="К оплате">'+money(shiftAmount(c,s))+'</td>'+
+     '<td class="dim" data-l="Расшифровка">'+fmt(b.base,b.unit==='ч'?1:0)+' '+b.unit+' × '+money(c.rate)+(b.ot?' + переработка '+fmt(b.ot,1)+' ч × '+fmt(c.otMult,2):'')+(b.minApplied?' · минимум смены':'')+'</td>'+
+     '<td class="n num dim" data-l="Счётчик">'+(s.meterEnd!=null?fmt(s.meterEnd,1):'—')+'</td></tr>'}).join('')+
+     '<tr><td colspan="3" style="text-align:right"><b>Итого</b></td><td class="n num"><b>'+money(accr)+'</b></td><td colspan="2" class="dim">'+moneyWords(accr)+'</td></tr>'+
+     '</tbody></table></div>':'<div class="card muted">Смен не внесено — начислений по договору нет. Пока не появится наработка, счёт выставлять не из чего.</div>');
+  $('#bk').onclick=()=>go('contracts'); $('#ed').onclick=()=>contractForm(c.id);
+  $('#ash').onclick=()=>shiftForm(null,{contractId:c.id,date:clamp2(today(),c.from,c.to)});
+  $('#apay').onclick=()=>paymentForm(null,{clientId:c.clientId,contractId:c.id,amount:Math.max(0,debt),kind:'аренда'});
+  $('#pact').onclick=()=>printAct(c.id); $('#pinv').onclick=()=>printInvoice(c.id);
+  const b=$('#cl'); if(b)b.onclick=()=>closeForm(c.id);
+  $$('#view [data-s]').forEach(tr=>tr.onclick=()=>shiftForm(tr.dataset.s));
+  $$('#view [data-p]').forEach(tr=>tr.onclick=()=>paymentForm(tr.dataset.p));
+}
+const clamp2=(v,a,b)=>v<a?a:(v>b?b:v);
+function paymentsTable(list){
+  if(!list.length)return '<div class="muted">Платежей нет.</div>';
+  return '<table><tbody>'+list.slice().sort((a,b)=>a.date<b.date?1:-1).map(p=>'<tr class="clk" data-p="'+p.id+'"><td class="num">'+dmy(p.date)+'</td><td>'+esc(p.kind)+'</td><td class="n num'+(p.kind==='возврат залога'?' dim':'')+'">'+money(p.amount)+'</td></tr>').join('')+'</tbody></table>';
+}
+/* ═══════════ 14. Наработка: быстрый ввод ═══════════ */
+function renderShifts(){
+  head('Наработка','быстрый ввод смен: Tab между полями, Enter — сохранить','<button class="btn" id="add">'+ico('plus',14)+' Смена подробно</button>');
+  const act=db.contracts.filter(c=>c.status!=='closed'&&c.from<=today()).sort((a,b)=>a.to<b.to?1:-1);
+  const recent=db.shifts.slice().sort((a,b)=>a.date<b.date?1:(a.date>b.date?-1:0)).slice(0,40);
+  $('#view').innerHTML=
+   (act.length?'<div class="card"><h3>Быстрый ввод</h3><div class="row" style="align-items:flex-end">'+
+     '<div style="flex:3;min-width:240px">'+F('qc','Договор','<select>'+selOpts(act,act[0].id,contractLabel)+'</select>')+'</div>'+
+     '<div style="flex:1">'+F('qd','Дата','<input type="date" value="'+today()+'">')+'</div>'+
+     '<div style="flex:0 0 90px">'+F('qh','Часы','<input class="num" inputmode="decimal" value="8">')+'</div>'+
+     '<div style="flex:1">'+F('qo','Оператор','<input>')+'</div>'+
+     '<div style="flex:0 0 auto;margin-bottom:12px"><button class="btn pri" id="qs">Сохранить</button></div></div>'+
+     '<div id="qcalc" class="note"></div></div>'
+    :'<div class="empty">'+ico('clock',30)+'<h3>Нет действующих договоров</h3><p>Наработка вносится по договору: система умножает часы или смены на ставку и учитывает минимальную смену с переработкой. Создайте бронь в календаре — она появится здесь.</p><button class="btn pri" id="e1">Перейти в календарь</button></div>')+
+   (recent.length?'<div class="hd"><h2>Последние смены</h2><span class="dim">всего '+db.shifts.length+'</span></div>'+
+    '<div class="card" style="padding:6px 4px"><table class="resp"><thead><tr><th>Дата</th><th>Техника</th><th>Клиент</th><th>Оператор</th><th class="n">Часы</th><th class="n">Начислено</th></tr></thead><tbody>'+
+    recent.map(s=>{const c=contract(s.contractId);if(!c)return '';
+      return '<tr class="clk" data-s="'+s.id+'"><td class="num" data-l="Дата">'+dmy(s.date)+'</td><td data-l="Техника">'+esc(uName(c.unitId))+'</td><td data-l="Клиент">'+esc(cName(c.clientId))+'</td>'+
+      '<td data-l="Оператор">'+esc(s.operator||'—')+'</td><td class="n num" data-l="Часы">'+fmt(s.hours,1)+'</td><td class="n num" data-l="Начислено">'+money(shiftAmount(c,s))+'</td></tr>'}).join('')+
+    '</tbody></table></div>':'');
+  const ad=$('#add'); if(ad)ad.onclick=()=>shiftForm(null,{});
+  const e1=$('#e1'); if(e1)e1.onclick=()=>go('cal');
+  $$('#view [data-s]').forEach(tr=>tr.onclick=()=>shiftForm(tr.dataset.s));
+  if(!act.length)return;
+  const upd=()=>{
+    const c=contract($('[data-f="qc"] select').value), h=parseAmount($('[data-f="qh"] input').value);
+    const d=$('[data-f="qd"] input').value;
+    if(!c){$('#qcalc').textContent='';return;}
+    const bad=d&&(d<c.from||d>c.to);
+    $('#qcalc').className='note'+(bad?' dgr':'');
+    $('#qcalc').innerHTML=bad?'Дата вне срока договора ('+dmy(c.from)+' — '+dmy(c.to)+')':
+      (isFinite(h)?'К начислению: <b class="num">'+money(shiftAmount(c,{hours:h}))+'</b> · '+money(c.rate)+' за '+RATE[c.rateMode]+(c.minShift?' · минимум '+fmt(c.minShift,1)+' ч':'')+(c.otMult>1?' · переработка после '+fmt(c.otAfter,1)+' ч ×'+fmt(c.otMult,2):''):'Введите часы');
+  };
+  ['qc','qd','qh'].forEach(n=>{const el=$('[data-f="'+n+'"] select,[data-f="'+n+'"] input');el.oninput=upd;el.onchange=upd;});
+  const saveQuick=()=>{
+    const c=contract($('[data-f="qc"] select').value);
+    const d=$('[data-f="qd"] input').value, hraw=$('[data-f="qh"] input').value;
+    clearErrs(document);
+    if(!c)return;
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(d))return fieldErr(document,'qd','Укажите дату');
+    if(d<c.from||d>c.to)return fieldErr(document,'qd','Дата вне срока договора');
+    if(d>today())return fieldErr(document,'qd','Смена в будущем');
+    const h=parseAmount(hraw);
+    if(!isFinite(h)||h<=0||h>24)return fieldErr(document,'qh','Часы: 0,1—24');
+    if(db.shifts.some(x=>x.contractId===c.id&&x.date===d))return fieldErr(document,'qd','За этот день смена уже есть');
+    const s={id:uid('s'),contractId:c.id,date:d,hours:r2(h),operator:$('[data-f="qo"] input').value.trim(),meterEnd:null,meterStart:null};
+    db.shifts.push(s); save();
+    const amt=shiftAmount(c,s);
+    render();
+    toast('Смена '+dmy(d)+' внесена: '+money(amt));
+    const sel=$('[data-f="qc"] select'); if(sel){sel.value=c.id;}
+    const nd=$('[data-f="qd"] input'); if(nd){nd.value=clamp2(addDays(d,1),c.from,c.to);nd.focus();}
+  };
+  $('#qs').onclick=saveQuick;
+  ['qd','qh','qo'].forEach(n=>{const el=$('[data-f="'+n+'"] input');el.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();saveQuick();}};});
+  upd();
+}
+/* ═══════════ 15. Деньги: дебиторка и залоги ═══════════ */
+function renderMoney(){
+  head('Деньги','дебиторка с отсрочками, залоги','<button class="btn pri" id="add">'+ico('plus',14)+' Платёж</button>');
+  const rows=db.clients.map(c=>({c,m:clientMoney(c.id)})).filter(r=>!q||r.c.name.toLowerCase().includes(q));
+  const T=rows.reduce((a,r)=>({accr:a.accr+r.m.accr,paid:a.paid+r.m.paid,debt:a.debt+r.m.debt,over:a.over+r.m.overdue,dep:a.dep+r.m.deposits}),{accr:0,paid:0,debt:0,over:0,dep:0});
+  const held=r2(db.contracts.reduce((a,c)=>a+(+c.depWithheld||0),0));
+  const toReturn=r2(db.contracts.filter(c=>c.status==='active').reduce((a,c)=>a+depositPaid(c),0));
+  const withDebt=rows.filter(r=>r.m.debt>0.004).sort((a,b)=>b.m.overdue-a.m.overdue||b.m.debt-a.m.debt);
+  if(!db.clients.length){
+    $('#view').innerHTML='<div class="empty">'+ico('money',30)+'<h3>Денег пока нет</h3><p>Дебиторка появится, когда будут клиенты, договоры и внесённая наработка: начисления считаются из смен, а срок оплаты — от даты окончания договора плюс отсрочка клиента.</p><button class="btn pri" id="e1">Добавить клиента</button></div>';
+    $('#e1').onclick=()=>clientForm(null); return;
+  }
+  $('#view').innerHTML=
+   kpi([['Начислено всего',mB(T.accr)],['Оплачено',mB(T.paid)],['Долг',m0(T.debt),null,T.debt>0.004?'warn':'ok'],
+        ['Просрочено',m0(T.over),T.over>0?'сверх отсрочки':'все в пределах отсрочки',T.over>0?'danger':'ok'],
+        ['Залоги на руках',m0(toReturn),'вернуть при закрытии действующих договоров'],
+        ['Удержано из залогов',m0(held),'по закрытым договорам',held>0?'warn':'']])+
+   '<div class="hd"><h2>Дебиторка по клиентам</h2><span class="dim">'+withDebt.length+' с долгом</span></div>'+
+   (withDebt.length?'<div class="card" style="padding:6px 4px"><table class="resp"><thead><tr><th>Клиент</th><th class="n">Отсрочка</th><th class="n">Начислено</th><th class="n">Оплачено</th><th class="n">Долг</th><th class="n">Просрочено</th><th>Ближайший срок</th></tr></thead><tbody>'+
+     withDebt.map(({c,m})=>{
+       const dueList=m.contracts.filter(x=>contractDebt(x)>0.004).map(x=>({d:contractDue(x),k:x})).sort((a,b)=>a.d<b.d?-1:1);
+       const n=dueList[0];
+       return '<tr class="clk" data-c="'+c.id+'"><td data-l="Клиент">'+esc(c.name)+'</td><td class="n num" data-l="Отсрочка">'+c.defer+' дн.</td>'+
+       '<td class="n num" data-l="Начислено">'+money(m.accr)+'</td><td class="n num dim" data-l="Оплачено">'+money(m.paid)+'</td>'+
+       '<td class="n num" data-l="Долг"><b>'+money(m.debt)+'</b></td><td class="n num '+(m.overdue>0?'danger':'dim')+'" data-l="Просрочено">'+money(m.overdue)+'</td>'+
+       '<td data-l="Ближайший срок" class="num">'+(n?dmy(n.d)+(n.d<today()?' <span class="tag dgr">просрочен</span>':''):'—')+'</td></tr>'}).join('')+
+   '</tbody></table></div>':'<div class="card ok">Долгов нет: всё начисленное оплачено.</div>')+
+   '<div class="hd"><h2>Залоги</h2></div>'+
+   (function(){const list=db.contracts.filter(c=>c.deposit>0||c.depWithheld>0);
+    return list.length?'<div class="card" style="padding:6px 4px"><table class="resp"><thead><tr><th>Договор</th><th>Клиент</th><th class="n">По договору</th><th class="n">Внесено</th><th class="n">Удержано</th><th class="n">К возврату</th><th>Статус</th></tr></thead><tbody>'+
+    list.sort((a,b)=>a.from<b.from?1:-1).map(c=>{const d=depositPaid(c);
+      return '<tr class="clk" data-k="'+c.id+'"><td data-l="Договор">'+esc(c.no||'—')+'</td><td data-l="Клиент">'+esc(cName(c.clientId))+'</td>'+
+      '<td class="n num dim" data-l="По договору">'+money(c.deposit)+'</td><td class="n num" data-l="Внесено">'+money(d)+'</td>'+
+      '<td class="n num '+(c.depWithheld>0?'warn':'dim')+'" data-l="Удержано">'+money(c.depWithheld||0)+'</td>'+
+      '<td class="n num" data-l="К возврату">'+(c.status==='closed'?'—':money(d))+'</td><td data-l="Статус">'+statusTag(c)+'</td></tr>'}).join('')+
+    '</tbody></table></div>':'<div class="card muted">Залоги по договорам не предусмотрены.</div>';})()+
+   '<div class="hd"><h2>Последние платежи</h2></div><div class="card" style="padding:6px 4px">'+
+   (db.payments.length?'<table class="resp"><thead><tr><th>Дата</th><th>Клиент</th><th>Договор</th><th>Назначение</th><th class="n">Сумма</th></tr></thead><tbody>'+
+     db.payments.slice().sort((a,b)=>a.date<b.date?1:-1).slice(0,30).map(p=>'<tr class="clk" data-p="'+p.id+'"><td class="num" data-l="Дата">'+dmy(p.date)+'</td><td data-l="Клиент">'+esc(cName(p.clientId))+'</td>'+
+     '<td data-l="Договор">'+esc(p.contractId&&contract(p.contractId)?contract(p.contractId).no:'—')+'</td><td data-l="Назначение">'+esc(p.kind)+'</td><td class="n num" data-l="Сумма">'+money(p.amount)+'</td></tr>').join('')+'</tbody></table>'
+    :'<div class="muted">Платежей нет.</div>')+'</div>';
+  $('#add').onclick=()=>paymentForm(null,{});
+  $$('#view [data-c]').forEach(tr=>tr.onclick=()=>openClient(tr.dataset.c));
+  $$('#view [data-k]').forEach(tr=>tr.onclick=()=>openContract(tr.dataset.k));
+  $$('#view [data-p]').forEach(tr=>tr.onclick=()=>paymentForm(tr.dataset.p));
+}
+/* ═══════════ 16. Аналитика по парку ═══════════ */
+function renderAnalytics(){
+  head('Аналитика по парку','');
+  const is=issues();
+  const units=db.units.filter(u=>!u.archived);
+  const rows=units.map(u=>({u,e:unitEcon(u.id,periodFrom,periodTo),l:unitLifetime(u.id)}));
+  const T=rows.reduce((a,r)=>({rev:a.rev+r.e.rev,cost:a.cost+r.u.cost,net:a.net+r.e.net,rent:a.rent+r.e.ut.rent,avail:a.avail+r.e.ut.avail,rep:a.rep+r.e.repair+r.e.service}),{rev:0,cost:0,net:0,rent:0,avail:0,rep:0});
+  const byType={};
+  rows.forEach(r=>{const t=byType[r.u.type]=byType[r.u.type]||{n:0,rev:0,net:0,rent:0,avail:0,cost:0};
+    t.n++;t.rev+=r.e.rev;t.net+=r.e.net;t.rent+=r.e.ut.rent;t.avail+=r.e.ut.avail;t.cost+=r.u.cost;});
+  const hrs=r2(db.shifts.filter(s=>s.date>=periodFrom&&s.date<=periodTo).reduce((a,s)=>a+(+s.hours||0),0));
+  $('#view').innerHTML=periodBar()+
+   kpi([['Выручка',m0(T.rev),hrs?fmt(hrs,1)+' моточасов':'наработки нет'],
+        ['Результат',m0(T.net),null,T.net<0?'danger':'ok'],
+        ['Загрузка парка',(T.avail?Math.round(T.rent/T.avail*100):0)+'%',T.rent+' из '+T.avail+' доступных машино-дней'],
+        ['Расходы на технику',m0(T.rep)],
+        ['Стоимость парка',mB(T.cost),units.length+' '+plural(units.length,['единица','единицы','единиц'])],
+        ['Средняя выручка на единицу',m0(units.length?T.rev/units.length:0)]])+
+   '<div class="hd"><h2>Требует внимания</h2><span class="dim">'+is.length+'</span></div>'+
+   (is.length?'<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(320px,1fr))">'+
+     is.map((x,i)=>'<div class="note '+(x.lvl==='dgr'?'dgr':'wrn')+'" style="display:flex;gap:10px;align-items:flex-start"><span style="color:'+(x.lvl==='dgr'?'var(--danger)':'var(--warn)')+'">'+ico('warn',15)+'</span><span><b>'+esc(x.t)+'</b><br>'+esc(x.d)+'</span><span style="flex:1"></span><button class="btn sm" data-i="'+i+'">Открыть</button></div>').join('')+'</div>'
+    :'<div class="card ok">Проблем не найдено: просрочек нет, ТО в графике, убыточных единиц нет.</div>')+
+   '<div class="hd"><h2>По типам техники</h2></div>'+
+   '<div class="card" style="padding:6px 4px"><table class="resp"><thead><tr><th>Тип</th><th class="n">Единиц</th><th class="n">Загрузка</th><th class="n">Выручка</th><th class="n">Результат</th><th class="n">Выручка на 1 ₽ стоимости</th></tr></thead><tbody>'+
+   Object.keys(byType).sort((a,b)=>byType[b].rev-byType[a].rev).map(t=>{const x=byType[t];
+     return '<tr><td data-l="Тип">'+esc(t)+'</td><td class="n num" data-l="Единиц">'+x.n+'</td><td class="n num" data-l="Загрузка">'+(x.avail?Math.round(x.rent/x.avail*100):0)+'%</td>'+
+     '<td class="n num" data-l="Выручка">'+money(x.rev)+'</td><td class="n num '+(x.net<0?'danger':'')+'" data-l="Результат">'+money(x.net)+'</td>'+
+     '<td class="n num dim" data-l="Выручка на 1 ₽">'+(x.cost?fmt(x.rev/x.cost,3):'—')+'</td></tr>'}).join('')+'</tbody></table></div>'+
+   '<div class="hd"><h2>Рейтинг единиц по результату за период</h2></div>'+
+   '<div class="card">'+rows.slice().sort((a,b)=>b.e.net-a.e.net).map(r=>{
+     const max=Math.max.apply(null,rows.map(x=>Math.abs(x.e.net)).concat([1]));
+     return '<div style="display:flex;align-items:center;gap:10px;padding:5px 0"><div style="flex:0 0 190px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><a href="#" data-u="'+r.u.id+'">'+esc(r.u.name)+'</a></div>'+
+     '<div style="flex:1">'+bar(Math.abs(r.e.net)/max,r.e.net<0?'var(--danger)':'var(--ok)')+'</div>'+
+     '<div class="num '+(r.e.net<0?'danger':'')+'" style="flex:0 0 120px;text-align:right">'+money(r.e.net)+'</div></div>';}).join('')+'</div>'+
+   '<div class="hd"><h2>График ТО по моточасам</h2></div>'+
+   '<div class="card" style="padding:6px 4px"><table class="resp"><thead><tr><th>Единица</th><th class="n">Счётчик</th><th class="n">Следующее ТО</th><th class="n">Осталось</th><th class="n">Темп</th><th>Прогноз</th><th>Затронутые брони</th></tr></thead><tbody>'+
+   units.map(u=>{const t=toStatus(u.id);
+     return '<tr class="clk" data-u2="'+u.id+'"><td data-l="Единица">'+esc(u.name)+'</td><td class="n num" data-l="Счётчик">'+fmt(t.meter,1)+'</td>'+
+     '<td class="n num" data-l="Следующее ТО">'+fmt(t.next,0)+'</td><td class="n num '+(t.due?'danger':(t.soon?'warn':'dim'))+'" data-l="Осталось">'+fmt(t.left,1)+'</td>'+
+     '<td class="n num dim" data-l="Темп">'+fmt(t.perDay,1)+' м/ч·дн</td><td data-l="Прогноз" class="num">'+(t.etaDate?dmy(t.etaDate):'—')+'</td>'+
+     '<td data-l="Затронутые брони">'+(t.affected.length?t.affected.map(c=>esc((c.no||'')+' '+cName(c.clientId))).join(', '):'<span class="dim">нет</span>')+'</td></tr>'}).join('')+
+   '</tbody></table></div>';
+  $$('#view [data-i]').forEach(b=>b.onclick=()=>is[+b.dataset.i].go());
+  $$('#view [data-u],#view [data-u2]').forEach(el=>el.onclick=e=>{e.preventDefault();openUnit(el.dataset.u||el.dataset.u2)});
+  bindPeriod();
+}
+/* ═══════════ 17. Клиенты ═══════════ */
+function renderClients(){
+  head('Клиенты','','<button class="btn pri" id="add">'+ico('plus',14)+' Клиент</button>');
+  const list=db.clients.filter(c=>!q||(c.name+' '+(c.inn||'')+' '+(c.contact||'')).toLowerCase().includes(q));
+  if(!db.clients.length){
+    $('#view').innerHTML='<div class="empty">'+ico('users',30)+'<h3>Клиентов нет</h3><p>Клиент нужен для договора. Отсрочка платежа задаётся в карточке — от неё считается просрочка по дебиторке. ИНН проверяется по контрольным цифрам.</p><button class="btn pri" id="e1">'+ico('plus')+' Добавить клиента</button></div>';
+    $('#e1').onclick=()=>clientForm(null); return;
+  }
+  $('#view').innerHTML='<div class="card" style="padding:6px 4px"><table class="resp"><thead><tr><th>Клиент</th><th>ИНН</th><th>Контакт</th><th class="n">Отсрочка</th><th class="n">Договоров</th><th class="n">Начислено</th><th class="n">Долг</th><th class="n">Залоги</th></tr></thead><tbody>'+
+   list.map(c=>{const m=clientMoney(c.id);
+     return '<tr class="clk" data-c="'+c.id+'"><td data-l="Клиент">'+esc(c.name)+(c.archived?' <span class="tag">архив</span>':'')+'</td>'+
+     '<td data-l="ИНН" class="num">'+(c.inn?esc(c.inn)+(innValid(c.inn)?'':' <span class="tag dgr">ошибка</span>'):'<span class="dim">—</span>')+'</td>'+
+     '<td data-l="Контакт">'+esc(c.contact||'—')+'<div class="dim num" style="font-size:11.5px">'+esc(c.phone||'')+'</div></td>'+
+     '<td class="n num" data-l="Отсрочка">'+c.defer+' дн.</td><td class="n num" data-l="Договоров">'+m.contracts.length+'</td>'+
+     '<td class="n num" data-l="Начислено">'+money(m.accr)+'</td>'+
+     '<td class="n num '+(m.overdue>0?'danger':(m.debt>0.004?'warn':'dim'))+'" data-l="Долг">'+money(m.debt)+'</td>'+
+     '<td class="n num dim" data-l="Залоги">'+money(m.deposits)+'</td></tr>'}).join('')+'</tbody></table></div>';
+  $('#add').onclick=()=>clientForm(null);
+  $$('#view [data-c]').forEach(tr=>tr.onclick=()=>openClient(tr.dataset.c));
+}
+function renderClient(){
+  const c=client(route.id); if(!c)return go('clients');
+  const m=clientMoney(c.id);
+  head('<button class="x" id="bk" style="vertical-align:-3px">'+ico('back',18)+'</button> '+esc(c.name),(c.inn?'ИНН '+c.inn:'')+(c.contact?' · '+c.contact:''),
+    '<button class="btn" id="ed">Изменить</button><button class="btn" id="apay">'+ico('money',14)+' Платёж</button><button class="btn pri" id="ak">'+ico('plus',14)+' Договор</button>');
+  const held=r2(m.contracts.reduce((a,x)=>a+(+x.depWithheld||0),0));
+  const active=r2(m.contracts.filter(x=>x.status==='active').reduce((a,x)=>a+depositPaid(x),0));
+  $('#view').innerHTML=
+   kpi([['Начислено',money(m.accr)],['Оплачено',money(m.paid)],['Долг',money(m.debt),null,m.debt>0.004?'warn':'ok'],
+        ['Просрочено',money(m.overdue),'отсрочка '+c.defer+' дн.',m.overdue>0?'danger':'ok'],
+        ['Залоги на руках',money(active),'вернуть при закрытии'],['Удержано из залогов',money(held),null,held>0?'warn':'']])+
+   (c.inn&&!innValid(c.inn)?'<div class="note dgr" style="margin-top:14px">'+ico('warn',14)+' ИНН '+esc(c.inn)+' не проходит проверку по контрольным цифрам. Документы с таким ИНН не примут — исправьте в карточке.</div>':'')+
+   '<div class="hd"><h2>Договоры</h2></div>'+
+   (m.contracts.length?'<div class="card" style="padding:6px 4px"><table class="resp"><thead><tr><th>№</th><th>Техника</th><th>Период</th><th class="n">Начислено</th><th class="n">Долг</th><th class="n">Срок оплаты</th><th>Статус</th></tr></thead><tbody>'+
+     m.contracts.slice().sort((a,b)=>a.from<b.from?1:-1).map(x=>'<tr class="clk" data-k="'+x.id+'"><td data-l="№">'+esc(x.no||'—')+'</td><td data-l="Техника">'+esc(uName(x.unitId))+'</td>'+
+     '<td class="num" data-l="Период">'+dmy(x.from)+' — '+dmy(x.to)+'</td><td class="n num" data-l="Начислено">'+money(contractAccrued(x))+'</td>'+
+     '<td class="n num '+(contractOverdue(x)?'danger':'')+'" data-l="Долг">'+money(contractDebt(x))+'</td>'+
+     '<td class="n num" data-l="Срок оплаты">'+dmy(contractDue(x))+'</td><td data-l="Статус">'+statusTag(x)+'</td></tr>').join('')+'</tbody></table></div>'
+    :'<div class="card muted">Договоров нет.</div>')+
+   '<div class="hd"><h2>Платежи</h2></div><div class="card" style="padding:6px 4px">'+paymentsTable(db.payments.filter(p=>p.clientId===c.id))+'</div>';
+  $('#bk').onclick=()=>go('clients'); $('#ed').onclick=()=>clientForm(c.id);
+  $('#apay').onclick=()=>paymentForm(null,{clientId:c.id,amount:Math.max(0,m.debt)});
+  $('#ak').onclick=()=>contractForm(null,{clientId:c.id});
+  $$('#view [data-k]').forEach(tr=>tr.onclick=()=>openContract(tr.dataset.k));
+  $$('#view [data-p]').forEach(tr=>tr.onclick=()=>paymentForm(tr.dataset.p));
+}
+/* ═══════════ 18. Данные: экспорт / импорт / демо ═══════════ */
+function renderData(){
+  head('Данные','локальное хранилище браузера, версия '+db.version,'');
+  const raw=JSON.stringify(db);
+  const org=db.ui.org||{};
+  $('#view').innerHTML=
+   '<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(320px,1fr))">'+
+   '<div class="card"><h3>Экспорт и импорт</h3><p class="muted" style="font-size:13px;margin-top:0">Вся база — один JSON-файл: техника, клиенты, договоры, смены, обслуживание, платежи. Импорт проверяет структуру и ссылки и отказывается загружать посторонний файл.</p>'+
+     '<div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn pri" id="exp">'+ico('dl',14)+' Экспорт JSON</button><button class="btn" id="imp">Импорт JSON</button><input type="file" id="file" accept=".json,application/json" hidden></div>'+
+     '<div class="hint">Размер базы: '+fmt(raw.length/1024,1)+' КБ · ключ хранения <span class="mono">'+KEY+'</span></div></div>'+
+   '<div class="card"><h3>Состав базы</h3><table><tbody>'+
+     [['Техника','units'],['Клиенты','clients'],['Договоры','contracts'],['Смены','shifts'],['Обслуживание','maint'],['Платежи','payments']]
+      .map(([l,k])=>'<tr><td>'+l+'</td><td class="n num">'+db[k].length+'</td></tr>').join('')+
+     '</tbody></table></div>'+
+   '<div class="card"><h3>Реквизиты для печатных форм</h3>'+
+     F('oname','Арендодатель','<input value="'+esc(org.name||'')+'" placeholder="ООО «Ваша компания»">')+
+     '<div class="row">'+F('oinn','ИНН','<input class="num" value="'+esc(org.inn||'')+'">')+F('oacc','Расчётный счёт','<input class="num" value="'+esc(org.acc||'')+'">')+'</div>'+
+     F('oaddr','Адрес','<input value="'+esc(org.addr||'')+'">')+
+     '<button class="btn pri" id="osave">Сохранить реквизиты</button>'+
+     '<div class="hint">Пустые поля печатаются пропусками — программа ничего не придумывает за вас.</div></div>'+
+   '<div class="card"><h3>Демонстрационные данные</h3><p class="muted" style="font-size:13px;margin-top:0">Генерируются кодом при каждом запуске заново: 12 единиц техники, 18 клиентов, около 60 договоров за 9 месяцев, смены по будням, ТО по моточасам, три ремонта с простоем. Внутри намеренные проблемы — их система должна поймать сама.</p>'+
+     '<div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn'+(db.demo?'':' pri')+'" id="gen">'+(db.demo?'Пересоздать демо':'Загрузить демо-данные')+'</button>'+
+     (db.demo?'<button class="btn dgr" id="wipe">Удалить демо-данные</button>':'')+'</div></div>'+
+   '<div class="card"><h3>Проверка суммы прописью</h3><table><tbody>'+
+     WORDS_TESTS.map(v=>'<tr><td class="num">'+fmt(v,v%1?2:0)+'</td><td>'+moneyWords(v)+'</td></tr>').join('')+
+     '</tbody></table><div class="hint">Функция склоняет рубли и копейки по правилам русского языка; в актах и счетах используется она же.</div></div>'+
+   '<div class="card"><h3>Опасная зона</h3><p class="muted" style="font-size:13px;margin-top:0">Полная очистка удаляет все записи из этого браузера без возможности вернуть. Сначала выгрузите JSON.</p>'+
+     '<button class="btn dgr" id="clr">Очистить всё</button></div>'+
+   '</div>';
+  $('#exp').onclick=()=>{
+    const blob=new Blob([JSON.stringify(db,null,1)],{type:'application/json'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='arendapark-'+today()+'.json';
+    a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+    toast('Файл выгружен: '+a.download);
+  };
+  $('#imp').onclick=()=>$('#file').click();
+  $('#file').onchange=e=>{
+    const f=e.target.files[0]; if(!f)return;
+    const fr=new FileReader();
+    fr.onload=()=>{
+      let o=null,parseErr=null;
+      try{o=JSON.parse(fr.result)}catch(err){parseErr=err.message}
+      if(parseErr)return importFail(['Файл не читается как JSON: '+parseErr]);
+      const errs=validateDump(o);
+      if(errs.length)return importFail(errs);
+      const st=[o.units.length+' ед. техники',o.clients.length+' клиентов',o.contracts.length+' договоров',o.shifts.length+' смен',o.payments.length+' платежей'].join(', ');
+      modal({title:'Импорт проверен',body:'<p>Файл корректен: '+st+'.</p><p class="muted">Текущая база в этом браузере будет полностью заменена. Отменить это нельзя — при сомнениях сначала сделайте экспорт.</p>',
+        footer:'<span style="flex:1"></span><button class="btn" data-close>Отмена</button><button class="btn term" id="ok">Заменить базу</button>'});
+      $('#ok',$('#modalWrap')).onclick=()=>{db=migrate(o);save();closeModal();route={v:'cal'};render();toast('База загружена: '+st);};
+    };
+    fr.readAsText(f); e.target.value='';
+  };
+  function importFail(errs){
+    modal({title:'Импорт отклонён',body:'<div class="note dgr">Файл не похож на базу арендного парка или содержит противоречия. Ничего не изменено.</div><ul style="margin:12px 0 0 18px;padding:0;font-size:13px">'+errs.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>',
+      footer:'<span style="flex:1"></span><button class="btn pri" data-close>Понятно</button>'});
+  }
+  $('#osave').onclick=()=>{
+    const m=document;
+    const inn=V(m,'oinn');
+    clearErrs(m);
+    if(inn&&!innValid(inn))return fieldErr(m,'oinn','ИНН не проходит проверку по контрольным цифрам');
+    db.ui.org={name:V(m,'oname'),inn,acc:V(m,'oacc'),addr:V(m,'oaddr')};
+    commit('Реквизиты сохранены');
+  };
+  $('#gen').onclick=()=>{
+    if(db.units.length||db.clients.length){
+      modal({title:'Заменить текущие данные демонстрационными?',body:'<p class="muted">В базе уже есть записи. Демо-данные заменят их полностью.</p>',
+        footer:'<span style="flex:1"></span><button class="btn" data-close>Отмена</button><button class="btn term" id="ok">Заменить на демо</button>'});
+      $('#ok',$('#modalWrap')).onclick=()=>{closeModal();loadDemo()};
+    } else loadDemo();
+  };
+  const w=$('#wipe'); if(w)w.onclick=()=>{db=BLANK();save();route={v:'data'};render();toast('Демо-данные удалены');};
+  $('#clr').onclick=()=>{
+    modal({title:'Очистить всю базу?',body:'<div class="note dgr">Будут удалены все '+(db.units.length+db.clients.length+db.contracts.length+db.shifts.length+db.maint.length+db.payments.length)+' записей. Действие необратимо.</div>',
+      footer:'<span style="flex:1"></span><button class="btn" data-close>Отмена</button><button class="btn dgr" id="ok">Удалить всё</button>'});
+    $('#ok',$('#modalWrap')).onclick=()=>{db=BLANK();save();closeModal();route={v:'data'};render();toast('База очищена');};
+  };
+}
+/* ═══════════ 19. Печатные формы ═══════════ */
+const orgLine=()=>{const o=db.ui.org||{};return (o.name||'________________________')+(o.inn?', ИНН '+o.inn:'')+(o.addr?', '+o.addr:'')};
+function clientLine(cl){return cl?(cl.name+(cl.inn?', ИНН '+cl.inn:'')):'________________'}
+function doPrint(html){
+  $('#print').innerHTML=html;
+  window.print();
+  setTimeout(()=>{$('#print').innerHTML=''},1200);
+}
+function printAct(id){
+  const c=contract(id); if(!c)return;
+  const u=unit(c.unitId), cl=client(c.clientId);
+  const sh=cShifts(c.id).sort((a,b)=>a.date<b.date?-1:1);
+  const total=contractAccrued(c);
+  const hours=contractHours(c.id);
+  doPrint('<div class="doc"><h1>Акт о наработке и оказанных услугах аренды № '+esc(c.no||c.id)+'</h1>'+
+   '<div class="meta">Дата составления: '+dlong(today())+'</div><hr>'+
+   '<div class="meta"><b>Исполнитель (арендодатель):</b> '+esc(orgLine())+'</div>'+
+   '<div class="meta"><b>Заказчик (арендатор):</b> '+esc(clientLine(cl))+'</div>'+
+   '<div class="meta"><b>Договор аренды:</b> № '+esc(c.no||'—')+', период с '+dlong(c.from)+' по '+dlong(c.to)+'</div>'+
+   '<div class="meta"><b>Техника:</b> '+esc(u?u.name+' (инв. № '+u.inv+', '+u.type+')':'—')+'</div>'+
+   '<div class="meta"><b>Тариф:</b> '+money(c.rate)+' за '+RATE[c.rateMode]+
+     (c.minShift?', минимальная смена '+fmt(c.minShift,1)+' ч':'')+
+     (c.otMult>1?', переработка свыше '+fmt(c.otAfter,1)+' ч с коэффициентом '+fmt(c.otMult,2):'')+'</div>'+
+   (sh.length?'<table><thead><tr><th>№</th><th>Дата</th><th>Оператор</th><th>Часы</th><th>Расшифровка</th><th>Сумма, ₽</th></tr></thead><tbody>'+
+     sh.map((s,i)=>{const b=shiftBreak(c,s);
+       return '<tr><td>'+(i+1)+'</td><td>'+dmy(s.date)+'</td><td>'+esc(s.operator||'—')+'</td><td>'+fmt(s.hours,1)+'</td>'+
+       '<td>'+fmt(b.base,b.unit==='ч'?1:0)+' '+b.unit+' × '+fmt(c.rate)+(b.ot?' + '+fmt(b.ot,1)+' ч × '+fmt(c.otMult,2):'')+(b.minApplied?' (минимум смены)':'')+'</td>'+
+       '<td style="text-align:right">'+fmt(shiftAmount(c,s),2)+'</td></tr>'}).join('')+
+     '<tr><td colspan="3"><b>Итого</b></td><td><b>'+fmt(hours,1)+'</b></td><td></td><td style="text-align:right"><b>'+fmt(total,2)+'</b></td></tr></tbody></table>'
+    :'<p>За период наработка не зафиксирована, начисление не производится.</p>')+
+   '<div class="meta"><b>Всего к оплате: '+fmt(total,2)+' ₽</b></div>'+
+   '<div class="meta">Сумма прописью: '+moneyWords(total)+'</div>'+
+   /* ALL THREE DEPOSIT FIGURES WERE WRONG. depositPaid() is the BALANCE still held -
+      paid minus returned - and it was being printed as the deposit itself; "возвращено"
+      was depositPaid(c)-0, which is not a subtraction of anything. On the one closed
+      contract in the demo the truth is 37 000 held / 22 000 withheld / 15 000 returned
+      and the act printed 22 000 / 22 000 / 22 000. Now each number is derived from its
+      own source: the contract's agreed deposit, the recorded withholding, and what is
+      actually left over. */
+   (c.deposit>0?(function(){
+     const agreed=r2(c.deposit||0), withheld=r2(c.depWithheld||0);
+     const returned=r2(Math.max(0, agreed-withheld));
+     return '<div class="meta">Залог по договору: '+fmt(agreed,2)+' ₽'+
+       (c.status==='closed'?'; удержано '+fmt(withheld,2)+' ₽'+
+         (withheld>0&&c.note?' (основание: '+esc(c.note)+')':'')+
+         '; возвращено '+fmt(returned,2)+' ₽':
+        '; на руках '+fmt(depositPaid(c),2)+' ₽')+'</div>';
+   })():'')+
+   '<p style="margin-top:6mm;font-size:10pt">Услуги оказаны в полном объёме. Претензий по объёму и качеству нет.</p>'+
+   '<div class="sig"><div>Исполнитель ______________ / '+esc((db.ui.org||{}).name||'')+'</div><div>Заказчик ______________ / '+esc(cl?cl.name:'')+'</div></div></div>');
+}
+function printInvoice(id){
+  const c=contract(id); if(!c)return;
+  const u=unit(c.unitId), cl=client(c.clientId);
+  const accr=contractAccrued(c), paid=contractPaid(c), debt=r2(accr-paid);
+  const sh=cShifts(c.id);
+  /* THE LINE HAS TO MULTIPLY OUT. Before this, Кол-во ignored overtime while Сумма
+     included it, so 33 of 59 demo invoices printed a row where qty x rate did not
+     equal the total - the one arithmetic a client's accountant checks first, on the
+     one piece of paper that leaves the meeting. Overtime is now its OWN line at its
+     own rate, so every row multiplies and the total is the sum of the rows. */
+  const baseQty=c.rateMode==='hour'
+    ? r2(sh.reduce((a,s)=>a+Math.min(Math.max(s.hours,c.minShift||0), c.otAfter||1e9),0))
+    : sh.length;
+  const otQty=c.rateMode==='hour'
+    ? r2(sh.reduce((a,s)=>a+Math.max(0,Math.max(s.hours,c.minShift||0)-(c.otAfter||1e9)),0))
+    : r2(sh.reduce((a,s)=>{const norm=c.rateMode==='day'?24:8;return a+Math.max(0,(s.hours||0)-norm)/norm},0));
+  const otRate=r2(c.rate*(c.otMult||1));
+  const baseSum=r2(baseQty*c.rate), otSum=r2(otQty*otRate);
+  const qty=baseQty;
+  const unitName=c.rateMode==='hour'?'час':(c.rateMode==='shift'?'смена':'сутки');
+  const o=db.ui.org||{};
+  doPrint('<div class="doc"><h1>Счёт на оплату № '+esc(c.no||c.id)+' от '+dmy(today())+'</h1><hr>'+
+   '<div class="meta"><b>Поставщик:</b> '+esc(orgLine())+(o.acc?'<br>Р/с '+esc(o.acc):'')+'</div>'+
+   '<div class="meta"><b>Покупатель:</b> '+esc(clientLine(cl))+'</div>'+
+   '<div class="meta"><b>Основание:</b> договор аренды № '+esc(c.no||'—')+' от '+dlong(c.from)+'</div>'+
+   '<table><thead><tr><th>№</th><th>Наименование</th><th>Кол-во</th><th>Ед.</th><th>Цена, ₽</th><th>Сумма, ₽</th></tr></thead><tbody>'+
+   '<tr><td>1</td><td>Аренда: '+esc(u?u.name+' (инв. № '+u.inv+')':'—')+', период с '+dmy(c.from)+' по '+dmy(c.to)+'</td>'+
+   '<td style="text-align:right">'+fmt(baseQty,c.rateMode==='hour'?1:0)+'</td><td>'+unitName+'</td><td style="text-align:right">'+fmt(c.rate,2)+'</td><td style="text-align:right">'+fmt(baseSum,2)+'</td></tr>'+
+   (otQty>0.001?'<tr><td>2</td><td>Переработка сверх нормы (коэффициент '+fmt(c.otMult||1,2)+')</td>'+
+     '<td style="text-align:right">'+fmt(otQty,c.rateMode==='hour'?1:2)+'</td><td>'+unitName+'</td>'+
+     '<td style="text-align:right">'+fmt(otRate,2)+'</td><td style="text-align:right">'+fmt(otSum,2)+'</td></tr>':'')+
+   '<tr><td colspan="5"><b>Итого начислено по наработке</b></td><td style="text-align:right"><b>'+fmt(accr,2)+'</b></td></tr>'+
+   (paid>0?'<tr><td colspan="5">Оплачено ранее</td><td style="text-align:right">−'+fmt(paid,2)+'</td></tr>'+
+    '<tr><td colspan="5"><b>К оплате</b></td><td style="text-align:right"><b>'+fmt(debt,2)+'</b></td></tr>':'')+
+   '</tbody></table>'+
+   '<div class="meta">Всего к оплате: <b>'+fmt(debt,2)+' ₽</b></div>'+
+   '<div class="meta">Сумма прописью: '+moneyWords(debt)+'</div>'+
+   '<div class="meta">Срок оплаты: '+dlong(contractDue(c))+(cl&&cl.defer?' (отсрочка '+cl.defer+' '+plural(cl.defer,['день','дня','дней'])+' от окончания договора)':'')+'</div>'+
+   (c.deposit>0?'<div class="meta">Залог по договору: '+fmt(c.deposit,2)+' ₽, внесено '+fmt(depositPaid(c),2)+' ₽.</div>':'')+
+   '<div class="sig"><div>Руководитель ______________</div><div>Бухгалтер ______________</div></div></div>');
+}
+/* ═══════════ 20. Старт ═══════════ */
+$('#search').addEventListener('input',e=>{q=e.target.value.trim().toLowerCase();render();$('#search').focus();$('#search').value=e.target.value;});
+$('#search').addEventListener('keydown',e=>{if(e.key==='Escape'){e.target.value='';q='';render();}});
+load();
+applyPreset('m3');
+histUI();
+HIST.push({v:route.v,id:route.id}); HI=0;
+render(); histSync();
+console.log('Проверка сумм прописью:',WORDS_TESTS.map(v=>v+' → '+moneyWords(v)).join('\n'));
+
+
+
+
+
+
+
+
+</script>
+</body>
+</html>

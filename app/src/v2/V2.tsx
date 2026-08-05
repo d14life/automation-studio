@@ -998,8 +998,36 @@ export default function V2() {
           <Process />
         </div></section>
 
+        {/* THE DEMOS WENT MISSING and it is worth saying how: they were built, linked and
+            deployed, then a later revert of this file took the section with them while the
+            HTML files sat untouched in app/public/demo. Every one of them was 404 on the
+            live site while the code that made them still existed. Anything that ships as a
+            separate file needs its link checked after any revert of the page that links it. */}
+        <section className="v2sec" id="demos"><div className="v2wrap">
+          <p className="v2eyebrow">02 / Демо</p>
+          <h2 className="v2h2">Потрогайте сами</h2>
+          <p className="v2lede">Не картинки, а работающие страницы на демо-данных. Вводите
+             своё, ломайте, перезагружайте — состояние сохраняется.</p>
+          <div className="v2grid">
+            {[
+              ['park', 'Аренда техники', 'Полная система: календарь занятости, наработка по сменам, доходность каждой единицы и окупаемость парка.'],
+              ['crm', 'CRM логиста', 'Воронка перевозок: перетащите сделку — клиент получает статус, документы формируются.'],
+              ['sborschik', 'Сборщик прайсов', 'Три прайса поставщиков слетаются в одну таблицу с лучшей ценой по каждой позиции.'],
+              ['bot', 'Бот-калькулятор', 'Считает стоимость по прайсу компании и оформляет заявку — или зовёт человека.'],
+              ['raspoznavatel', 'Распознаватель накладных', 'Фото мятой накладной превращается в строки таблицы и уезжает в 1С.'],
+              ['otchet', 'Утренний отчёт владельцу', 'В 7:00 в Telegram приходит выручка, касса, долги и три проблемы — сам.'],
+            ].map(([slug, t, d]) => (
+              <a className="v2card v2card--demo" href={`/demo/${slug}/`} key={slug}>
+                <h3>{t}</h3>
+                <p>{d}</p>
+                <p className="v2card__win">Открыть демо →</p>
+              </a>
+            ))}
+          </div>
+        </div></section>
+
         <section className="v2sec" id="clients"><div className="v2wrap">
-          <p className="v2eyebrow">02 / С нами работают</p>
+          <p className="v2eyebrow">03 / С нами работают</p>
           <div className="v2clients"><span>Негабарит-12</span><em>логистика — работают с нашими инструментами</em></div>
           <p className="v2note">Список короткий, потому что честный. Он будет пополняться.</p>
         </div></section>
@@ -1121,8 +1149,36 @@ export default function V2() {
             </article>
           </div>
         </div></section>
+        {/* THE DEMOS WENT MISSING and it is worth saying how: they were built, linked and
+            deployed, then a later revert of this file took the section with them while the
+            HTML files sat untouched in app/public/demo. Every one of them was 404 on the
+            live site while the code that made them still existed. Anything that ships as a
+            separate file needs its link checked after any revert of the page that links it. */}
+        <section className="v2sec" id="demos"><div className="v2wrap">
+          <p className="v2eyebrow">02 / Демо</p>
+          <h2 className="v2h2">Потрогайте сами</h2>
+          <p className="v2lede">Не картинки, а работающие страницы на демо-данных. Вводите
+             своё, ломайте, перезагружайте — состояние сохраняется.</p>
+          <div className="v2grid">
+            {[
+              ['park', 'Аренда техники', 'Полная система: календарь занятости, наработка по сменам, доходность каждой единицы и окупаемость парка.'],
+              ['crm', 'CRM логиста', 'Воронка перевозок: перетащите сделку — клиент получает статус, документы формируются.'],
+              ['sborschik', 'Сборщик прайсов', 'Три прайса поставщиков слетаются в одну таблицу с лучшей ценой по каждой позиции.'],
+              ['bot', 'Бот-калькулятор', 'Считает стоимость по прайсу компании и оформляет заявку — или зовёт человека.'],
+              ['raspoznavatel', 'Распознаватель накладных', 'Фото мятой накладной превращается в строки таблицы и уезжает в 1С.'],
+              ['otchet', 'Утренний отчёт владельцу', 'В 7:00 в Telegram приходит выручка, касса, долги и три проблемы — сам.'],
+            ].map(([slug, t, d]) => (
+              <a className="v2card v2card--demo" href={`/demo/${slug}/`} key={slug}>
+                <h3>{t}</h3>
+                <p>{d}</p>
+                <p className="v2card__win">Открыть демо →</p>
+              </a>
+            ))}
+          </div>
+        </div></section>
+
         <section className="v2sec" id="clients"><div className="v2wrap">
-          <p className="v2eyebrow">02 / С нами работают</p>
+          <p className="v2eyebrow">03 / С нами работают</p>
           <div className="v2clients"><span>Негабарит-12</span><em>логистика — работают с нашими инструментами</em></div>
           <p className="v2note">Список короткий, потому что честный. Он будет пополняться.</p>
         </div></section>
@@ -1244,8 +1300,36 @@ export default function V2() {
             </article>
           </div>
         </div></section>
+        {/* THE DEMOS WENT MISSING and it is worth saying how: they were built, linked and
+            deployed, then a later revert of this file took the section with them while the
+            HTML files sat untouched in app/public/demo. Every one of them was 404 on the
+            live site while the code that made them still existed. Anything that ships as a
+            separate file needs its link checked after any revert of the page that links it. */}
+        <section className="v2sec" id="demos"><div className="v2wrap">
+          <p className="v2eyebrow">02 / Демо</p>
+          <h2 className="v2h2">Потрогайте сами</h2>
+          <p className="v2lede">Не картинки, а работающие страницы на демо-данных. Вводите
+             своё, ломайте, перезагружайте — состояние сохраняется.</p>
+          <div className="v2grid">
+            {[
+              ['park', 'Аренда техники', 'Полная система: календарь занятости, наработка по сменам, доходность каждой единицы и окупаемость парка.'],
+              ['crm', 'CRM логиста', 'Воронка перевозок: перетащите сделку — клиент получает статус, документы формируются.'],
+              ['sborschik', 'Сборщик прайсов', 'Три прайса поставщиков слетаются в одну таблицу с лучшей ценой по каждой позиции.'],
+              ['bot', 'Бот-калькулятор', 'Считает стоимость по прайсу компании и оформляет заявку — или зовёт человека.'],
+              ['raspoznavatel', 'Распознаватель накладных', 'Фото мятой накладной превращается в строки таблицы и уезжает в 1С.'],
+              ['otchet', 'Утренний отчёт владельцу', 'В 7:00 в Telegram приходит выручка, касса, долги и три проблемы — сам.'],
+            ].map(([slug, t, d]) => (
+              <a className="v2card v2card--demo" href={`/demo/${slug}/`} key={slug}>
+                <h3>{t}</h3>
+                <p>{d}</p>
+                <p className="v2card__win">Открыть демо →</p>
+              </a>
+            ))}
+          </div>
+        </div></section>
+
         <section className="v2sec" id="clients"><div className="v2wrap">
-          <p className="v2eyebrow">02 / С нами работают</p>
+          <p className="v2eyebrow">03 / С нами работают</p>
           <div className="v2clients"><span>Негабарит-12</span><em>логистика</em></div>
         </div></section>
         </>}
