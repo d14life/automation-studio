@@ -322,7 +322,7 @@ function patch(mat, isCore) {
         .replace('#include <roughnessmap_fragment>',
                  'float roughnessFactor = roughness * (0.60 + 0.45 * tri(uRough, vWorld, normalize(vLocalN)).r);')
         .replace('#include <normal_fragment_maps>',
-                 'vec3 nrm = tri(uNormal, vWorld, normalize(vLocalN)) * 2.0 - 1.0; normal = normalize(normal + vec3(nrm.xy, 0.0) * 1.3);')
+                 'vec3 nrm = tri(uNormal, vWorld, normalize(vLocalN)) * 2.0 - 1.0; normal = normalize(normal + vec3(nrm.xy, 0.0) * 0.75);')
       sh.fragmentShader = sh.fragmentShader.replace('#include <dithering_fragment>', `
         #include <dithering_fragment>
         /* a soft rim so near-black stone keeps its silhouette against a near-black
@@ -444,7 +444,15 @@ const build = (gltf) => { try {
       const g = (m.geometry.index ? m.geometry.toNonIndexed() : m.geometry.clone())
       g.applyMatrix4(m.matrixWorld)
       g.applyMatrix4(STAND)
-      if (!g.attributes.normal) g.computeVertexNormals()
+      /* FLAT SHADING, AND IT IS MOST OF THE ROCK LOOK. The GLB ships SMOOTHED normals
+         - averaged across each vertex - so a fragment's flat cut faces get shaded as
+         one continuous curve and the piece reads as a pebble however angular its
+         geometry actually is. The geometry was never round; the shading was.
+
+         The buffers are already non-indexed for the merge, so recomputing normals gives
+         one normal per FACE: every plane shades as a plane and every fracture edge is a
+         hard crease. Free, and it is the difference between stones and boulders. */
+      g.computeVertexNormals()
       const name = (m.material?.name || '').toLowerCase()
       ;(name.includes('core') ? core : skin).push({ g, c, s, t: tone, w, p })
       count++

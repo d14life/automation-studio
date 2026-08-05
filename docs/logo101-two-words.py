@@ -18,8 +18,8 @@ from mathutils.bvhtree import BVHTree
 
 SEED   = 7
 FONT   = "/System/Library/Fonts/Supplemental/Impact.ttf"
-OUT    = bpy.path.abspath("//words330.glb")
-META   = bpy.path.abspath("//words330.json")
+OUT    = bpy.path.abspath("//words_flat.glb")
+META   = bpy.path.abspath("//words_flat.json")
 
 bpy.ops.wm.read_factory_settings(use_empty=True)
 
@@ -44,9 +44,12 @@ def build_word(body, pieces, prefix, extrude, target_h):
     t = bpy.context.object
     t.data.body = body
     t.data.align_x = 'CENTER'; t.data.align_y = 'CENTER'
+    # ANGULAR, NOT ROUND. A rounded bevel and 12-segment curves give fragments with
+    # smooth curved faces, which read as pebbles. Real fractured stone is flat planes
+    # meeting at sharp edges - so no bevel at all, and the glyph outlines are coarse
+    # polygons rather than smooth curves.
+    t.data.resolution_u = 2
     t.data.extrude = extrude
-    t.data.bevel_depth = extrude * 0.19
-    t.data.bevel_resolution = 2
     try:
         t.data.font = bpy.data.fonts.load(FONT)
     except Exception:
