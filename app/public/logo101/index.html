@@ -272,22 +272,8 @@ function patch(mat, isCore) {
          the exact spot its partner is vacating, hidden among the rubble of the letter
          it came from, and what flies afterwards is a rock the viewer has already
          watched come off the 101. Nothing is ever created in open air. */
-      /* A ROCK MAY ONLY APPEAR WHERE A ROCK HAS JUST LEFT. Moving the trade earlier
-         fixed the mid-air growth but not the cause: it still ran on a GLOBAL clock, so
-         a fragment low down in the 1 materialised while the base of the 1 was still
-         solid stone, and it grew straight out through the side of the letter. That is
-         the rock-from-air - it is not the position that is wrong, it is that the moment
-         has nothing to do with what the letter is doing at that spot.
-
-         The trade now rides the HOST fragment's own break. Both members of a pair
-         resolve the same host - a piece of the 101 - so both compute the identical
-         value, and the exchange happens exactly as that piece lets go: late at the
-         base, early at the top, in step with the crack travelling down the letterform.
-         Nothing is uncovered before the stone above it has moved out of the way. */
-      vec3 hostC = mix(aCenter, aPartner, aWord);
-      float hostT = breakT(hostC, smoothstep(0.26, 0.84, g), uMinY, uMaxY);
-      float lo = 0.10 + aTone * 0.16;
-      float kA = smoothstep(lo, lo + 0.26, hostT);
+      float lo = 0.10 + aTone * 0.24;
+      float kA = smoothstep(lo, lo + 0.12, g);
       float k = mix(kA, 1.0 - kA, aWord);
       float shrink = pow(1.0 - k, 0.3333);
       /* where the piece lives right now: its own word's slot, travelling to the slot
