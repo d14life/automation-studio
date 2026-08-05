@@ -35,8 +35,15 @@ Three parts of that line are not optional, and each one has already gone wrong:
   deletes. Demos removed upstream stay behind in `app/public/demo`, get swept into the next
   build, and republish themselves. Three orphan folders (`ekran`, `storozh`, `theatre`) came
   back this way and one was nearly redeployed after being deliberately removed.
-- **`rsync -a --delete app/dist/demo/`** — same reason from the other end: a plain `cp`
-  adds but never removes, so a deleted demo stays live and its card 404s.
+- **`rsync -a app/dist/demo/ demo/`** — `cp -r` merges unpredictably across nested asset
+  folders. Deliberately **without** `--delete`: `/demo/ekran/` and `/demo/storozh/` are
+  live pages that exist only on `main`, and `--delete` would silently unpublish them.
+  Removing a demo for real means deleting it from `app/public/demo` on `react` **and**
+  `demo/` on `main`, in that order.
+
+If a card 404s, the cause is the opposite of the above: the card shipped and the page did
+not. `/demo/theatre/` did exactly that. After any deploy, check every card resolves —
+`for d in $(ls demo); do curl -o /dev/null -w "$d %{http_code}\n" -sk https://solutions101.net/demo/$d/; done`
 
 `git checkout react -- app` on `main` has wiped uncommitted edits five times.
 **Never switch branches with unstaged work.** Commit or stash first, every time.
