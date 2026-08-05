@@ -82,6 +82,11 @@ const HOLD_FADE = 0.08
    because that is where the helix is still whole enough to look the same upside down. */
 /* Overridable from the URL so all versions can be compared on the real site without a
    deploy each time: ?turn=1 · ?turn=0.63 · ?turn=0.2 */
+const START_AT = (() => {
+  const q = parseFloat(new URLSearchParams(location.search).get('start') || '')
+  return Number.isFinite(q) && q >= 0 && q < 0.8 ? q : 0
+})()
+
 const TURN_AT = (() => {
   const q = parseFloat(new URLSearchParams(location.search).get('turn') || '')
   return Number.isFinite(q) && q > 0.05 && q <= 1 ? q : 0.9
@@ -793,7 +798,10 @@ export default function V2() {
       const bell = Math.max(Math.abs(Math.sin(tri * Math.PI)), 0.55)
       if (!REDUCE) phase += dir * (Math.PI / (2 * el.duration)) * LOOP_SPEED * bell * dt * idle
       const t2 = ((phase % 2) + 2) % 2
-      pos = (t2 <= 1 ? t2 : 2 - t2) * TURN_AT
+      /* The strand now lives between START_AT and TURN_AT instead of 0..1, so both ends
+         of the swing can be trimmed - ?start=0.1 cuts the beginning the way ?turn cuts
+         the end. */
+      pos = START_AT + (t2 <= 1 ? t2 : 2 - t2) * (TURN_AT - START_AT)
 
       /* THE MIRROR TURN. Restored to exactly this, because this is the version he
          approved on sight: "now they going up and down, this is great".
@@ -812,7 +820,16 @@ export default function V2() {
          the diagonal but cut harder; animating that rotation swung the corners into
          frame; a faster return read as a fault; the self-closing file read as a fade
          and a restart. */
-      const nowMir = ((Math.floor(phase) % 2) + 2) % 2 === 1
+      /* FLIP ONLY AT THE DESTROYED END - and until now it was flipping at BOTH, which
+         is a bug I asserted was impossible in the comment above. floor(phase) changes at
+         EVERY integer, and both turns land on integers: the destroyed turn at odd ones,
+         the intact turn at even ones. So the clean, fully-recognisable helix was being
+         flipped too, which is the single worst place to spend an edit.
+         floor((phase+1)/2) changes only at ODD integers, so the turn in the debris flips
+         and the turn on the intact strand is crossed with nothing happening at all.
+         The orientation now alternates per cycle rather than returning each time, which
+         is fine: a 180 twice is the identity, so it comes back every second cycle. */
+      const nowMir = ((Math.floor((phase + 1) / 2) % 2) + 2) % 2 === 1
       if (!REDUCE && nowMir !== mirrored) {
         mirrored = nowMir
         el.classList.toggle('is-mir', mirrored)
