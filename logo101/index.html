@@ -346,7 +346,13 @@ function patch(mat, isCore) {
          every piece sink out of frame as it shrank, so the effect read as "these fall
          away and different ones appear" instead of as a transfer. The pieces drift on
          their own axis and trade in place. */
-      vec3 transformed = home + R * (position - aCenter) * shrink
+      /* THE BLACK FLICKER IS Z-FIGHTING. The fracture tiles exactly, so two neighbouring
+         cells hold their shared cut face at IDENTICAL coordinates - and at rest the
+         depth buffer has no way to choose between them, so the pair strobes as the
+         camera drifts. 0.4% off each piece, taken about its own centre, separates every
+         one of those coincident pairs. The gap is a third of a pixel at this scale and
+         the words still read solid. */
+      vec3 transformed = home + R * (position - aCenter) * (shrink * 0.996)
                        + aSeed * fly * 0.11;
       /* vWorld was DECLARED in both shaders and NEVER ASSIGNED. Every triplanar
          lookup therefore sampled the same single texel, and the whole rock pack
@@ -380,7 +386,7 @@ function patch(mat, isCore) {
       sh.fragmentShader = sh.fragmentShader
         .replace('#include <map_fragment>', 'diffuseColor.rgb *= ' + T + ' * 1.5;')
         .replace('#include <roughnessmap_fragment>',
-                 'float roughnessFactor = roughness * (0.60 + 0.45 * tri(uRough, vWorld, normalize(vLocalN)).r);')
+                 'float roughnessFactor = roughness * (0.62 + 0.5 * (1.0 - dot(diffuseColor.rgb, vec3(0.33))));')
         .replace('#include <normal_fragment_maps>',
                  'vec3 nrm = tri(uNormal, vWorld, normalize(vLocalN)) * 2.0 - 1.0; normal = normalize(normal + vec3(nrm.xy, 0.0) * 0.75);')
       sh.fragmentShader = sh.fragmentShader.replace('#include <dithering_fragment>', `
