@@ -1,0 +1,1541 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="fonts/fonts.css" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0}
+body{background:#fff;color:#141414;font-family:'Manrope',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#E01F26;text-decoration:none}
+a:hover{color:#B3161C;text-decoration:underline}
+:focus-visible{outline:2px solid #E01F26;outline-offset:2px}
+input,select,button,textarea{font-family:inherit}
+input[type=range][data-rng]{pointer-events:none;-webkit-appearance:none;appearance:none;background:transparent;border:none}
+input[type=range][data-rng]::-webkit-slider-runnable-track{background:transparent;border:none;height:26px}
+input[type=range][data-rng]::-moz-range-track{background:transparent;border:none;height:26px}
+input[type=range][data-rng]::-webkit-slider-thumb{pointer-events:auto;-webkit-appearance:none;width:18px;height:18px;margin-top:4px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 4px rgba(20,20,20,.35);cursor:grab;background:#E01F26}
+input[type=range][data-rng]::-moz-range-thumb{pointer-events:auto;width:18px;height:18px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 4px rgba(20,20,20,.35);cursor:grab;background:#E01F26}
+input[type=range][data-rng="max"]::-webkit-slider-thumb{background:#141414}
+input[type=range][data-rng="max"]::-moz-range-thumb{background:#141414}
+@keyframes shimmer{0%{background-position:-200px 0}100%{background-position:400px 0}}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.45)}100%{transform:scale(1)}}
+@keyframes fadeup{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+</style>
+</helmet>
+
+<div style="min-height:100vh;display:flex;flex-direction:column">
+
+<div style="background:#141414;color:#c9c9d0;font-size:12.5px;font-weight:500">
+  <div style="max-width:1320px;margin:0 auto;padding:0 20px;min-height:38px;display:flex;flex-wrap:wrap;align-items:center;gap:8px 22px">
+    <span style="display:flex;align-items:center;gap:6px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#E01F26" stroke-width="2"><path d="M12 21s7-6.3 7-11a7 7 0 10-14 0c0 4.7 7 11 7 11z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>Альметьевск</span>
+    <a href="tel:+79061241833" style="color:#fff;font-family:'JetBrains Mono',monospace;white-space:nowrap;font-size:12.5px">8 906 124-18-33</a>
+    <a href="tel:+79172950512" style="color:#fff;font-family:'JetBrains Mono',monospace;white-space:nowrap;font-size:12.5px">8 917 295-05-12</a>
+    <span style="color:#8b8b95">пн–пт 9:00–19:00 · сб 10:00–17:00</span>
+    <span style="flex:1"></span>
+    <a href="https://wa.me/79061241833" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:6px;color:#1E9E5A;font-weight:700"><svg width="14" height="14" viewBox="0 0 24 24" fill="#1E9E5A"><path d="M12 2a10 10 0 00-8.7 15L2 22l5.2-1.3A10 10 0 1012 2zm0 2a8 8 0 11-4.2 14.8l-.4-.2-2.7.7.7-2.6-.2-.4A8 8 0 0112 4z"></path></svg>Написать в WhatsApp</a>
+  </div>
+</div>
+
+<header style="background:#fff;border-bottom:1px solid #E4E4E8;position:sticky;top:0;z-index:40">
+  <div style="max-width:1320px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;gap:28px;flex-wrap:wrap">
+    <div onClick="{{ goHome }}" style="cursor:pointer;display:flex;align-items:stretch;gap:0;flex:none">
+      <img src="assets/logo-stimul.png" alt="STIMUL Автозапчасти" style="height:46px;width:auto;display:block;flex:none">
+    </div>
+    <nav style="display:flex;gap:26px;flex-wrap:wrap">
+      <span onClick="{{ goHome }}" style="cursor:pointer;font:600 13.5px/1 'Manrope',sans-serif;letter-spacing:.09em;text-transform:uppercase;color:#141414;padding:6px 0;border-bottom:2px solid transparent;transition:border-color .18s,color .18s" style-hover="color:#E01F26;border-bottom-color:#E01F26">Главная</span>
+      <span onClick="{{ goCatalogAll }}" style="cursor:pointer;font:600 13.5px/1 'Manrope',sans-serif;letter-spacing:.09em;text-transform:uppercase;color:#141414;padding:6px 0;border-bottom:2px solid transparent;transition:border-color .18s,color .18s" style-hover="color:#E01F26;border-bottom-color:#E01F26">Каталог</span>
+      <span onClick="{{ goDelivery }}" style="cursor:pointer;font:600 13.5px/1 'Manrope',sans-serif;letter-spacing:.09em;text-transform:uppercase;color:#141414;padding:6px 0;border-bottom:2px solid {{ navDeliveryBd }};transition:border-color .18s,color .18s" style-hover="color:#E01F26;border-bottom-color:#E01F26">Оплата и доставка</span>
+      <span onClick="{{ goContacts }}" style="cursor:pointer;font:600 13.5px/1 'Manrope',sans-serif;letter-spacing:.09em;text-transform:uppercase;color:#141414;padding:6px 0;border-bottom:2px solid {{ navContactsBd }};transition:border-color .18s,color .18s" style-hover="color:#E01F26;border-bottom-color:#E01F26">Контакты</span>
+    </nav>
+    <span style="flex:1"></span>
+    <div style="display:flex;align-items:center;gap:12px;flex:1 1 320px;min-width:260px;max-width:560px">
+      <div style="flex:1;display:flex;align-items:center;border:1px solid #E4E4E8;border-radius:3px;height:38px;transition:border-color .18s" style-hover="border-color:#141414">
+        <span onClick="{{ hdrSubmit }}" style="width:36px;display:grid;place-items:center;cursor:pointer;flex:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b6b75" stroke-width="2"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="M15.5 15.5L21 21"></path></svg></span>
+        <input value="{{ catQ }}" onChange="{{ onHdrQ }}" onKeyDown="{{ onHdrEnter }}" placeholder="Поиск по артикулу или названию" style="flex:1;min-width:0;height:36px;border:none;outline:none;background:none;font:500 13.5px 'Manrope',sans-serif;color:#141414">
+      </div>
+      <div style="display:flex;gap:6px;flex:none">
+        <button onClick="{{ goHomeSearch }}" style="height:38px;padding:0 12px;background:#fff;border:1px solid #E4E4E8;border-radius:3px;cursor:pointer;font:700 11.5px 'Manrope',sans-serif;letter-spacing:.09em;text-transform:uppercase;color:#141414;white-space:nowrap;transition:border-color .18s,color .18s" style-hover="border-color:#E01F26;color:#E01F26">Авто</button>
+        <button onClick="{{ goHomeVin }}" style="height:38px;padding:0 12px;background:#fff;border:1px solid #E4E4E8;border-radius:3px;cursor:pointer;font:700 11.5px 'Manrope',sans-serif;letter-spacing:.09em;text-transform:uppercase;color:#141414;white-space:nowrap;transition:border-color .18s,color .18s" style-hover="border-color:#E01F26;color:#E01F26">VIN</button>
+      </div>
+      <div onClick="{{ goCart }}" style="display:flex;align-items:center;gap:8px;cursor:pointer;position:relative">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#141414" stroke-width="1.8"><path d="M3 4h3l2.4 11h9.7l2.2-8H7"></path><circle cx="10" cy="19.5" r="1.6"></circle><circle cx="17.5" cy="19.5" r="1.6"></circle></svg>
+        <span key="{{ cartKey }}" style="min-width:21px;height:21px;padding:0 5px;background:#E01F26;color:#fff;border-radius:11px;display:grid;place-items:center;font:800 11.5px 'Manrope',sans-serif;animation:pop .38s ease">{{ cartCount }}</span>
+      </div>
+    </div>
+  </div>
+  <sc-if value="{{ hasCar }}" hint-placeholder-val="{{ false }}">
+    <div style="background:#F4F4F6;border-top:1px solid #E4E4E8">
+      <div style="max-width:1320px;margin:0 auto;padding:9px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <span style="font:600 11px 'Manrope',sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#6b6b75">Мой автомобиль</span>
+        <span style="display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #E01F26;border-left:4px solid #E01F26;padding:6px 12px;font:700 13px 'Manrope',sans-serif;color:#141414">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#E01F26" stroke-width="1.9"><path d="M3 16l2-6h14l2 6zM6 16v3M18 16v3M8 10l1-4h6l1 4"></path></svg>{{ carLabel }}
+          <span onClick="{{ resetCar }}" aria-label="Убрать автомобиль" style="cursor:pointer;width:18px;height:18px;display:grid;place-items:center;flex:none;border-radius:9px;transition:background .14s" style-hover="background:#F4F4F6"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#8b8b95" stroke-width="2.6"><path d="M5 5l14 14M19 5L5 19"></path></svg></span>
+        </span>
+        <span onClick="{{ resetCar }}" style="cursor:pointer;font:600 12.5px 'Manrope',sans-serif;color:#E01F26;text-decoration:underline">сменить</span>
+      </div>
+    </div>
+  </sc-if>
+</header>
+
+<main style="flex:1">
+
+<sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+<div>
+  <section style="background:#141414;background-image:radial-gradient(circle at 18% 8%,rgba(224,31,38,.35),transparent 46%),repeating-linear-gradient(135deg,rgba(255,255,255,.035) 0 2px,transparent 2px 6px);position:relative;overflow:hidden">
+    
+    <div style="max-width:1320px;margin:0 auto;padding:52px 20px 60px;display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:44px;align-items:center">
+      <div style="max-width:520px">
+        <div style="display:inline-flex;align-items:center;gap:8px;background:#E01F26;padding:5px 11px;margin-bottom:20px">
+          <span style="font:600 11px 'Manrope',sans-serif;letter-spacing:.16em;color:#fff;text-transform:uppercase">Альметьевск · с 2016 года</span>
+        </div>
+        
+        <h1 style="font-family:'Oswald',sans-serif;font-weight:700;font-size:clamp(38px,5.2vw,64px);line-height:1.14;letter-spacing:.018em;text-transform:uppercase;color:#fff;margin:0 0 18px"><span style="color:#E01F26">Автозапчасти</span><br><span style="white-space:nowrap">для иномарок</span><br><span style="white-space:nowrap">и отечественных</span><br>автомобилей</h1><p style="font:500 16.5px/1.55 'Manrope',sans-serif;color:#b9b9c2;margin:0 0 26px;max-width:430px;text-wrap:pretty">В наличии и под заказ. Подбираем по VIN и номеру детали. Самовывоз сегодня на пр. Строителей, 68.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:26px">
+          <div><div style="font-family:'Oswald',sans-serif;font-size:30px;color:#fff;line-height:1">40 000+</div><div style="font:600 11.5px 'Manrope',sans-serif;letter-spacing:.09em;text-transform:uppercase;color:#7d7d88;margin-top:4px">позиций</div></div>
+          <div><div style="font-family:'Oswald',sans-serif;font-size:30px;color:#fff;line-height:1">2–4 дня</div><div style="font:600 11.5px 'Manrope',sans-serif;letter-spacing:.09em;text-transform:uppercase;color:#7d7d88;margin-top:4px">срок под заказ</div></div>
+          <div><div style="font-family:'Oswald',sans-serif;font-size:30px;color:#fff;line-height:1">10 лет</div><div style="font:600 11.5px 'Manrope',sans-serif;letter-spacing:.09em;text-transform:uppercase;color:#7d7d88;margin-top:4px">на одном месте</div></div>
+        </div>
+      </div>
+
+      <div id="poisk">
+      <div style="font:700 11px 'Manrope',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#b9b9c2;margin-bottom:10px">Подбор</div>
+      <div style="background:#fff;border-top:4px solid #E01F26;box-shadow:0 24px 60px rgba(0,0,0,.45)">
+        <div style="display:flex;border-bottom:1px solid #E4E4E8">
+          <button onClick="{{ tabCar }}" style="flex:1;background:{{ tabCarBg }};color:{{ tabCarFg }};border:none;border-right:1px solid #E4E4E8;padding:15px 10px;cursor:pointer;font:700 12.5px 'Manrope',sans-serif;letter-spacing:.07em;text-transform:uppercase;transition:background .16s,color .16s">По автомобилю</button>
+          <button onClick="{{ tabVin }}" style="flex:1;background:{{ tabVinBg }};color:{{ tabVinFg }};border:none;border-right:1px solid #E4E4E8;padding:15px 10px;cursor:pointer;font:700 12.5px 'Manrope',sans-serif;letter-spacing:.07em;text-transform:uppercase;transition:background .16s,color .16s">По VIN</button>
+          <button onClick="{{ tabPart }}" style="flex:1;background:{{ tabPartBg }};color:{{ tabPartFg }};border:none;padding:15px 10px;cursor:pointer;font:700 12.5px 'Manrope',sans-serif;letter-spacing:.07em;text-transform:uppercase;transition:background .16s,color .16s">артикул/название</button>
+        </div>
+
+        <div style="padding:24px">
+          <sc-if value="{{ isTabCar }}" hint-placeholder-val="{{ true }}">
+            <div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px">
+                <label style="display:block"><span style="display:block;font:700 10.5px 'Manrope',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#6b6b75;margin-bottom:6px">Марка</span>
+                  <select value="{{ selBrand }}" onChange="{{ onBrand }}" style="width:100%;height:46px;padding:0 10px;border:1px solid #E4E4E8;border-radius:2px;background:#fff;font:600 14px 'Manrope',sans-serif;color:#141414;cursor:pointer">
+                    <option value="">Выберите марку</option>
+                    <optgroup label="Отечественные">
+                      <sc-for list="{{ domBrands }}" as="b" hint-placeholder-count="5"><option value="{{ b }}">{{ b }}</option></sc-for>
+                    </optgroup>
+                    <optgroup label="Иномарки">
+                      <sc-for list="{{ forBrands }}" as="b" hint-placeholder-count="8"><option value="{{ b }}">{{ b }}</option></sc-for>
+                    </optgroup>
+                  </select>
+                </label>
+                <label style="display:block"><span style="display:block;font:700 10.5px 'Manrope',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#6b6b75;margin-bottom:6px">Модель</span>
+                  <select value="{{ selModel }}" onChange="{{ onModel }}" disabled="{{ noBrand }}" style="width:100%;height:46px;padding:0 10px;border:1px solid #E4E4E8;border-radius:2px;background:{{ modelBg }};font:600 14px 'Manrope',sans-serif;color:#141414;cursor:pointer">
+                    <option value="">{{ modelPh }}</option>
+                    <sc-for list="{{ models }}" as="m" hint-placeholder-count="3"><option value="{{ m }}">{{ m }}</option></sc-for>
+                  </select>
+                </label>
+                <label style="display:block"><span style="display:block;font:700 10.5px 'Manrope',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#6b6b75;margin-bottom:6px">Год</span>
+                  <select value="{{ selYear }}" onChange="{{ onYear }}" disabled="{{ noModel }}" style="width:100%;height:46px;padding:0 10px;border:1px solid #E4E4E8;border-radius:2px;background:{{ yearBg }};font:600 14px 'Manrope',sans-serif;color:#141414;cursor:pointer">
+                    <option value="">{{ yearPh }}</option>
+                    <sc-for list="{{ years }}" as="y" hint-placeholder-count="3"><option value="{{ y }}">{{ y }}</option></sc-for>
+                  </select>
+                </label>
+                <label style="display:block"><span style="display:block;font:700 10.5px 'Manrope',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#6b6b75;margin-bottom:6px">Двигатель</span>
+                  <select value="{{ selEngine }}" onChange="{{ onEngine }}" disabled="{{ noYear }}" style="width:100%;height:46px;padding:0 10px;border:1px solid #E4E4E8;border-radius:2px;background:{{ engBg }};font:600 14px 'Manrope',sans-serif;color:#141414;cursor:pointer">
+                    <option value="">{{ engPh }}</option>
+                    <sc-for list="{{ engines }}" as="e" hint-placeholder-count="2"><option value="{{ e }}">{{ e }}</option></sc-for>
+                  </select>
+                </label>
+              </div>
+              <button onClick="{{ submitCar }}" disabled="{{ noEngine }}" style="margin-top:18px;width:100%;height:52px;background:{{ ctaBg }};color:#fff;border:none;border-radius:2px;cursor:pointer;font:700 14px 'Manrope',sans-serif;letter-spacing:.11em;text-transform:uppercase;transition:background .16s" style-hover="background:#B3161C">Подобрать запчасти</button>
+              <p style="margin:12px 0 0;font:500 12.5px/1.5 'Manrope',sans-serif;color:#6b6b75">Не нашли модификацию? Позвоните — <a href="tel:+79061241833">8 906 124-18-33</a>, подберём по VIN вручную.</p>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isTabVin }}" hint-placeholder-val="{{ false }}">
+            <div>
+              <span style="display:block;font:700 10.5px 'Manrope',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#6b6b75;margin-bottom:6px">VIN-номер автомобиля</span>
+              <div style="position:relative">
+                <input value="{{ vin }}" onChange="{{ onVin }}" placeholder="XTA210740A2938147" maxLength="17" style="width:100%;height:52px;padding:0 92px 0 14px;border:1px solid #E4E4E8;border-radius:2px;font:500 17px 'JetBrains Mono',monospace;white-space:nowrap;letter-spacing:.12em;text-transform:uppercase;color:#141414">
+                <span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);font:500 13px 'JetBrains Mono',monospace;white-space:nowrap;color:{{ vinCountColor }}">{{ vinCount }} / 17</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-top:9px">
+                <span style="font:500 12.5px 'Manrope',sans-serif;color:#6b6b75">17 символов, латиница и цифры. Буквы I, O, Q не используются.</span>
+                
+              </div>
+              <button onClick="{{ submitVin }}" disabled="{{ vinInvalid }}" style="margin-top:18px;width:100%;height:52px;background:{{ vinCtaBg }};color:#fff;border:none;border-radius:2px;cursor:pointer;font:700 14px 'Manrope',sans-serif;letter-spacing:.11em;text-transform:uppercase" style-hover="background:#B3161C">Определить автомобиль</button>
+
+              <sc-if value="{{ vinDecoded }}" hint-placeholder-val="{{ false }}">
+                <div style="margin-top:18px;border:1px solid #E4E4E8;background:#fff">
+                  <div style="background:#141414;padding:11px 14px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+                    <span style="font:700 10.5px 'Manrope',sans-serif;letter-spacing:.13em;text-transform:uppercase;color:#fff">Расшифровка VIN</span>
+                    <span onClick="{{ vinAgain }}" style="cursor:pointer;font:600 11.5px 'Manrope',sans-serif;color:#b9b9c2;text-decoration:underline">Другой VIN</span>
+                  </div>
+                  <div style="padding:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px 18px">
+                    <div>
+                      <div style="font:700 10px 'Manrope',sans-serif;letter-spacing:.13em;text-transform:uppercase;color:#8b8b95;margin-bottom:3px">Марка</div>
+                      <div style="font:800 15px 'Manrope',sans-serif;color:{{ vinBrandColor }}">{{ vinBrand }}</div>
+                    </div>
+                    <div>
+                      <div style="font:700 10px 'Manrope',sans-serif;letter-spacing:.13em;text-transform:uppercase;color:#8b8b95;margin-bottom:3px">Год выпуска</div>
+                      <div style="font:700 15px 'JetBrains Mono',monospace;white-space:nowrap">{{ vinYearTxt }}</div>
+                    </div>
+                    <div>
+                      <div style="font:700 10px 'Manrope',sans-serif;letter-spacing:.13em;text-transform:uppercase;color:#8b8b95;margin-bottom:3px">Регион сборки</div>
+                      <div style="font:600 13.5px/1.35 'Manrope',sans-serif">{{ vinRegionTxt }}</div>
+                    </div>
+                    <div>
+                      <div style="font:700 10px 'Manrope',sans-serif;letter-spacing:.13em;text-transform:uppercase;color:#8b8b95;margin-bottom:3px">Код WMI</div>
+                      <div style="font:700 15px 'JetBrains Mono',monospace;white-space:nowrap">{{ vinWmi }}</div>
+                    </div>
+                    <div>
+                      <div style="font:700 10px 'Manrope',sans-serif;letter-spacing:.13em;text-transform:uppercase;color:#8b8b95;margin-bottom:3px">Завод</div>
+                      <div style="font:700 15px 'JetBrains Mono',monospace;white-space:nowrap">{{ vinPlantTxt }}</div>
+                    </div>
+                    <div>
+                      <div style="font:700 10px 'Manrope',sans-serif;letter-spacing:.13em;text-transform:uppercase;color:#8b8b95;margin-bottom:3px">Серийный номер</div>
+                      <div style="font:700 15px 'JetBrains Mono',monospace;white-space:nowrap">{{ vinSerialTxt }}</div>
+                    </div>
+                  </div>
+
+                  <sc-if value="{{ vinHasModels }}" hint-placeholder-val="{{ true }}">
+                    <div style="border-top:1px solid #E4E4E8;background:#F4F4F6;padding:14px">
+                      <div style="font:500 12.5px/1.5 'Manrope',sans-serif;color:#4a4a54;margin-bottom:10px">Марка и год определены по VIN. Уточните модель и двигатель — и подберём детали.</div>
+                      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px">
+                        <label style="display:block"><span style="display:block;font:700 10.5px 'Manrope',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#6b6b75;margin-bottom:6px">Модель</span>
+                          <select value="{{ selVinModel }}" onChange="{{ onVinModel }}" style="width:100%;height:46px;padding:0 10px;border:1px solid #E4E4E8;border-radius:2px;background:#fff;font:600 14px 'Manrope',sans-serif;color:#141414;cursor:pointer">
+                            <option value="">Выберите модель</option>
+                            <sc-for list="{{ vinModels }}" as="m" hint-placeholder-count="3"><option value="{{ m }}">{{ m }}</option></sc-for>
+                          </select>
+                        </label>
+                        <label style="display:block"><span style="display:block;font:700 10.5px 'Manrope',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#6b6b75;margin-bottom:6px">Двигатель</span>
+                          <select value="{{ selVinEngine }}" onChange="{{ onVinEngine }}" disabled="{{ vinEngDisabled }}" style="width:100%;height:46px;padding:0 10px;border:1px solid #E4E4E8;border-radius:2px;background:{{ vinEngBg }};font:600 14px 'Manrope',sans-serif;color:#141414;cursor:pointer">
+                            <option value="">{{ vinEngPh }}</option>
+                            <sc-for list="{{ vinEngines }}" as="e" hint-placeholder-count="2"><option value="{{ e }}">{{ e }}</option></sc-for>
+                          </select>
+                        </label>
+                      </div>
+                      <button onClick="{{ vinPick }}" disabled="{{ vinPickDisabled }}" style="margin-top:12px;width:100%;height:48px;background:{{ vinPickBg }};color:#fff;border:none;border-radius:2px;cursor:pointer;font:700 13px 'Manrope',sans-serif;letter-spacing:.11em;text-transform:uppercase;transition:background .16s" style-hover="background:#B3161C">Подобрать запчасти</button>
+                    </div>
+                  </sc-if>
+
+                  <sc-if value="{{ vinNoModels }}" hint-placeholder-val="{{ false }}">
+                    <div style="border-top:1px solid #E4E4E8;background:#F4F4F6;padding:14px">
+                      <div style="font:500 12.5px/1.5 'Manrope',sans-serif;color:#4a4a54;margin-bottom:9px">Этой марки пока нет в каталоге подбора. Пришлите VIN — подберём вручную за 15 минут.</div>
+                      <a href="tel:+79061241833" style="font:700 15px 'JetBrains Mono',monospace;white-space:nowrap">8 906 124-18-33</a>
+                    </div>
+                  </sc-if>
+                </div>
+              </sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isTabPart }}" hint-placeholder-val="{{ false }}">
+            <div>
+              <span style="display:block;font:700 10.5px 'Manrope',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#6b6b75;margin-bottom:6px">Артикул, название или бренд</span>
+              <div style="position:relative">
+                <input value="{{ partQ }}" onChange="{{ onPartQ }}" onKeyDown="{{ onPartEnter }}" placeholder="Артикул, название или бренд — например «фильтр» или W92021" style="width:100%;height:52px;padding:0 14px;border:1px solid #E4E4E8;border-radius:2px;font:500 15px 'JetBrains Mono',monospace;white-space:nowrap;color:#141414">
+                <sc-if value="{{ partLoading }}" hint-placeholder-val="{{ false }}">
+                  <div style="position:absolute;left:0;right:0;top:54px;background:#fff;border:1px solid #E4E4E8;box-shadow:0 16px 34px rgba(20,20,20,.14);padding:10px;z-index:20">
+                    <div style="height:16px;margin:8px 0;background:linear-gradient(90deg,#eee 8%,#f7f7f9 18%,#eee 33%);background-size:600px 100%;animation:shimmer 1.1s linear infinite"></div>
+                    <div style="height:16px;margin:8px 0;width:78%;background:linear-gradient(90deg,#eee 8%,#f7f7f9 18%,#eee 33%);background-size:600px 100%;animation:shimmer 1.1s linear infinite"></div>
+                    <div style="height:16px;margin:8px 0;width:56%;background:linear-gradient(90deg,#eee 8%,#f7f7f9 18%,#eee 33%);background-size:600px 100%;animation:shimmer 1.1s linear infinite"></div>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ showSuggest }}" hint-placeholder-val="{{ false }}">
+                  <div style="position:absolute;left:0;right:0;top:54px;background:#fff;border:1px solid #E4E4E8;box-shadow:0 16px 34px rgba(20,20,20,.14);z-index:20;max-height:280px;overflow:auto">
+                    <sc-for list="{{ phraseSug }}" as="w" hint-placeholder-count="3"><div onClick="{{ w.pick }}" style="padding:10px 14px;border-bottom:1px solid #F0F0F3;cursor:pointer;display:flex;align-items:center;gap:10px" style-hover="background:#F4F4F6"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9a9aa2" stroke-width="2" style="flex:none"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4-4"></path></svg><span style="font:600 13.5px 'Manrope',sans-serif;color:#141414;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ w.label }}</span><span style="flex:1"></span><span style="font:600 10.5px 'Manrope',sans-serif;color:#9a9aa2;text-transform:uppercase;letter-spacing:.08em;flex:none">запрос</span></div></sc-for>
+                    <sc-for list="{{ suggestions }}" as="s" hint-placeholder-count="4">
+                      <div onClick="{{ s.open }}" style="padding:11px 14px;border-bottom:1px solid #F0F0F3;cursor:pointer;display:flex;align-items:center;gap:12px" style-hover="background:#F4F4F6">
+                        <span style="font:600 13px 'JetBrains Mono',monospace;white-space:nowrap;color:#E01F26;flex:none">{{ s.oem }}</span>
+                        <span style="font:600 13px 'Manrope',sans-serif;color:#141414;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ s.brand }} · {{ s.name }}</span>
+                        <span style="flex:1"></span>
+                        <span style="font:700 13px 'Manrope',sans-serif;flex:none">{{ s.priceFmt }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+              </div>
+              <p style="margin:10px 0 0;font:500 12.5px/1.5 'Manrope',sans-serif;color:#6b6b75">Ищем по артикулу и OEM-коду, названию детали, бренду и категории. Дефисы и пробелы в артикуле можно не ставить.</p>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+      </div>
+    </div><div style="height:26px;background:#E01F26;clip-path:polygon(0 100%,100% 0,100% 100%)"></div>
+  </section>
+
+  <section style="max-width:1320px;margin:0 auto;padding:56px 20px 10px">
+    <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:22px">
+      <h2 style="font-family:'Oswald',sans-serif;font-weight:600;font-size:30px;letter-spacing:.01em;text-transform:uppercase;margin:0">Каталог</h2>
+      <span style="height:2px;flex:1;background:#E4E4E8"></span>
+      <span onClick="{{ goCatalogAll }}" style="cursor:pointer;font:700 12px 'Manrope',sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#E01F26">Весь каталог →</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px">
+      <sc-for list="{{ categories }}" as="c" hint-placeholder-count="12">
+        <div onClick="{{ c.open }}" style="cursor:pointer;border:1px solid #E4E4E8;background:#fff;padding:18px 16px;display:flex;flex-direction:column;gap:14px;min-height:118px;transition:border-color .18s,box-shadow .18s,transform .18s" style-hover="border-color:#E01F26;box-shadow:0 8px 20px rgba(20,20,20,.09);transform:translateY(-2px)">
+          <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#E01F26" stroke-width="1.4" stroke-linecap="round"><path d="{{ c.icon }}"></path></svg>
+          <div>
+            <div style="font:700 14px/1.3 'Manrope',sans-serif;color:#141414">{{ c.name }}</div>
+            <div style="font:500 12px 'Manrope',sans-serif;color:#8b8b95;margin-top:4px">{{ c.count }} позиций</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  
+
+  <section style="background:#E01F26;margin-top:46px">
+    <div style="max-width:1320px;margin:0 auto;padding:32px 20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:26px">
+      <div style="display:flex;gap:13px;align-items:flex-start"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" style="flex:none"><path d="M4 6h16M4 12h10M4 18h16M17 10l3 3-3 3"></path></svg><div><div style="font:800 15px 'Manrope',sans-serif;color:#fff">Более 40 000 позиций</div><div style="font:500 13px/1.45 'Manrope',sans-serif;color:rgba(255,255,255,.82);margin-top:3px">Склад и поставщики по всей России</div></div></div>
+      <div style="display:flex;gap:13px;align-items:flex-start"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" style="flex:none"><path d="M3 7h13v10H3zM16 10h3l2 3v4h-5"></path><circle cx="7" cy="18" r="1.8"></circle><circle cx="18" cy="18" r="1.8"></circle></svg><div><div style="font:800 15px 'Manrope',sans-serif;color:#fff">В наличии и под заказ</div><div style="font:500 13px/1.45 'Manrope',sans-serif;color:rgba(255,255,255,.82);margin-top:3px">Заказные позиции — 2–4 дня</div></div></div>
+      <div style="display:flex;gap:13px;align-items:flex-start"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" style="flex:none"><path d="M12 3l8 3v6c0 5-3.6 8.2-8 9-4.4-.8-8-4-8-9V6z"></path><path d="M8.5 12l2.5 2.5 4.5-5"></path></svg><div><div style="font:800 15px 'Manrope',sans-serif;color:#fff">Проверяем совместимость по VIN</div><div style="font:500 13px/1.45 'Manrope',sans-serif;color:rgba(255,255,255,.82);margin-top:3px">Не подошло — заменим или вернём</div></div></div>
+      <div style="display:flex;gap:13px;align-items:flex-start"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" style="flex:none"><path d="M12 21s7-6.3 7-11a7 7 0 10-14 0c0 4.7 7 11 7 11z"></path><circle cx="12" cy="10" r="2.5"></circle></svg><div><div style="font:800 15px 'Manrope',sans-serif;color:#fff">Самовывоз сегодня</div><div style="font:500 13px/1.45 'Manrope',sans-serif;color:rgba(255,255,255,.82);margin-top:3px">пр. Строителей, 68 · до 19:00</div></div></div>
+    </div>
+  </section>
+
+  
+</div>
+</sc-if>
+
+<sc-if value="{{ isCatalog }}" hint-placeholder-val="{{ false }}">
+<div style="max-width:1320px;margin:0 auto;padding:20px 20px 60px">
+  <div style="display:flex;gap:8px;align-items:center;font:500 12.5px 'Manrope',sans-serif;color:#8b8b95;margin-bottom:14px;flex-wrap:wrap">
+    <span onClick="{{ goHome }}" style="cursor:pointer;color:#6b6b75">Главная</span><span>/</span>
+    <span onClick="{{ goCatalogAll }}" style="cursor:pointer;color:#6b6b75">Каталог</span><span>/</span>
+    <span style="color:#141414;font-weight:700">{{ catTitle }}</span>
+  </div>
+  <div style="display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;border-bottom:3px solid #141414;padding-bottom:14px;margin-bottom:22px">
+    <h1 style="font-family:'Oswald',sans-serif;font-weight:600;font-size:clamp(26px,3.4vw,38px);text-transform:uppercase;margin:0;line-height:1.05">{{ catHeading }}</h1>
+    <span style="font:600 13.5px 'Manrope',sans-serif;color:#6b6b75;padding-bottom:5px">{{ resultCount }}</span>
+  </div>
+
+  <div style="position:relative;margin-bottom:22px;max-width:620px">
+    <div style="display:flex;border:1px solid #141414">
+      <div style="width:46px;display:grid;place-items:center;flex:none">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6b6b75" stroke-width="1.8"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="M15.5 15.5L21 21"></path></svg>
+      </div>
+      <input value="{{ catQ }}" onChange="{{ onCatQ }}" onFocus="{{ onCatFocus }}" placeholder="Поиск по каталогу: деталь, бренд или артикул" style="flex:1;height:48px;border:none;outline:none;font:500 14.5px 'Manrope',sans-serif;color:#141414;background:#fff">
+      <sc-if value="{{ hasCatQ }}" hint-placeholder-val="{{ false }}">
+        <span onClick="{{ clearCatQ }}" style="width:46px;display:grid;place-items:center;cursor:pointer;flex:none;font:500 20px 'Manrope',sans-serif;color:#8b8b95">×</span>
+      </sc-if>
+    </div>
+
+    <sc-if value="{{ showCatSug }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;left:0;right:0;top:50px;background:#fff;border:1px solid #E4E4E8;box-shadow:0 18px 40px rgba(20,20,20,.16);z-index:30">
+        <sc-for list="{{ catSug }}" as="sg" hint-placeholder-count="5">
+          <div onClick="{{ sg.pick }}" style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;border-bottom:1px solid #F0F0F3" style-hover="background:#F4F4F6">
+            <span style="flex:1;font:600 13.5px 'Manrope',sans-serif;color:#141414">{{ sg.label }}</span>
+            <span style="font:600 10px 'Manrope',sans-serif;letter-spacing:.11em;text-transform:uppercase;color:#8b8b95">{{ sg.kind }}</span>
+            <span style="font:500 12px 'JetBrains Mono',monospace;white-space:nowrap;color:#9a9aa4">{{ sg.count }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ catQAllNote }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:8px;font:500 12.5px 'Manrope',sans-serif;color:#6b6b75">Поиск идёт по всему каталогу, а не только по выбранной категории.</div>
+    </sc-if>
+  </div>
+
+  <div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap">
+    <aside style="flex:1 1 250px;max-width:280px;min-width:240px">
+      <div style="border:1px solid #E4E4E8;background:#fff">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #E4E4E8;background:#F4F4F6">
+          <span style="font:700 12.5px 'Manrope',sans-serif;letter-spacing:.1em;text-transform:uppercase">Фильтры</span>
+          <span onClick="{{ resetFilters }}" style="cursor:pointer;font:600 12px 'Manrope',sans-serif;color:#E01F26;text-decoration:underline">Сбросить</span>
+        </div>
+
+        <div style="padding:16px;border-bottom:1px solid #E4E4E8">
+          <div style="font:700 11px 'Manrope',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#6b6b75;margin-bottom:11px">Каталог</div>
+          <div style="display:flex;flex-direction:column;gap:2px">
+            <sc-for list="{{ catFilters }}" as="c" hint-placeholder-count="11">
+              <div onClick="{{ c.pick }}" style="display:flex;align-items:center;gap:9px;cursor:pointer;padding:7px 9px;background:{{ c.bg }};transition:background .14s" style-hover="background:{{ c.hoverBg }}">
+                <span style="flex:1;font-family:'Manrope',sans-serif;font-size:13.5px;font-weight:{{ c.weight }};color:{{ c.fg }}">{{ c.name }}</span>
+                <span style="font:500 12px 'JetBrains Mono',monospace;white-space:nowrap;color:{{ c.countFg }}">{{ c.count }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="padding:16px;border-bottom:1px solid #E4E4E8">
+          <div style="font:700 11px 'Manrope',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#6b6b75;margin-bottom:11px">Производитель</div>
+          <div style="display:flex;flex-direction:column;gap:9px;max-height:230px;overflow:auto">
+            <sc-for list="{{ brandFilters }}" as="f" hint-placeholder-count="8">
+              <label style="display:flex;align-items:center;gap:9px;cursor:pointer;font:500 13.5px 'Manrope',sans-serif">
+                <input type="checkbox" checked="{{ f.on }}" onChange="{{ f.toggle }}" style="width:16px;height:16px;accent-color:#E01F26;cursor:pointer">
+                <span style="flex:1">{{ f.name }}</span>
+                <span style="font:500 12px 'JetBrains Mono',monospace;white-space:nowrap;color:#9a9aa4">{{ f.count }}</span>
+              </label>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="padding:16px;border-bottom:1px solid #E4E4E8">
+          <div style="font:700 11px 'Manrope',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#6b6b75;margin-bottom:12px">Цена, ₽</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+            <span style="flex:1;border:1px solid #E4E4E8;padding:7px 9px;font:500 13px 'JetBrains Mono',monospace;white-space:nowrap">{{ pMinFmt }}</span>
+            <span style="color:#9a9aa4">—</span>
+            <span style="flex:1;border:1px solid #E4E4E8;padding:7px 9px;font:500 13px 'JetBrains Mono',monospace;white-space:nowrap">{{ pMaxFmt }}</span>
+          </div>
+          <div style="position:relative;height:26px">
+            <div style="position:absolute;top:11px;left:0;right:0;height:4px;background:#E4E4E8"></div>
+            <div style="position:absolute;top:11px;height:4px;background:#E01F26;left:{{ trackLeft }};right:{{ trackRight }}"></div>
+            <input type="range" data-rng="min" min="0" max="14000" step="100" value="{{ pMin }}" onChange="{{ onPMin }}" style="position:absolute;left:0;right:0;top:0;width:100%;margin:0;height:26px;z-index:3">
+            <input type="range" data-rng="max" min="0" max="14000" step="100" value="{{ pMax }}" onChange="{{ onPMax }}" style="position:absolute;left:0;right:0;top:0;width:100%;margin:0;height:26px;z-index:2">
+          </div>
+        </div>
+
+        <sc-for list="{{ filterGroups }}" as="g" hint-placeholder-count="5">
+          <div style="padding:16px;border-bottom:1px solid #E4E4E8">
+            <div style="font:700 11px 'Manrope',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#6b6b75;margin-bottom:11px">{{ g.title }}</div>
+            <div style="display:flex;flex-direction:column;gap:9px">
+              <sc-for list="{{ g.items }}" as="f" hint-placeholder-count="3">
+                <label style="display:flex;align-items:center;gap:9px;cursor:pointer;font:500 13.5px 'Manrope',sans-serif">
+                  <input type="checkbox" checked="{{ f.on }}" onChange="{{ f.toggle }}" style="width:16px;height:16px;accent-color:#E01F26;cursor:pointer">
+                  <span style="flex:1">{{ f.name }}</span>
+                  <span style="font:500 12px 'JetBrains Mono',monospace;white-space:nowrap;color:#9a9aa4">{{ f.count }}</span>
+                </label>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+
+        <div style="padding:16px;background:#F4F4F6">
+          <div style="font:700 13px/1.4 'Manrope',sans-serif;margin-bottom:6px">Не нашли нужное?</div>
+          <div style="font:500 12.5px/1.5 'Manrope',sans-serif;color:#6b6b75;margin-bottom:9px">Подберём вручную по VIN за 15 минут.</div>
+          <a href="tel:+79061241833" style="font:700 14px 'JetBrains Mono',monospace;white-space:nowrap">8 906 124-18-33</a>
+        </div>
+      </div>
+    </aside>
+
+    <div style="flex:1 1 560px;min-width:300px">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;border:1px solid #E4E4E8;padding:10px 12px;margin-bottom:16px;background:#fff">
+        <span style="font:700 11px 'Manrope',sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#6b6b75">Сортировка</span>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <sc-for list="{{ sortOpts }}" as="s" hint-placeholder-count="4">
+            <span onClick="{{ s.pick }}" style="cursor:pointer;display:inline-flex;align-items:center;white-space:nowrap;padding:7px 11px;font:600 12.5px 'Manrope',sans-serif;border:1px solid {{ s.bd }};background:{{ s.bg }};color:{{ s.fg }};transition:all .16s">{{ s.label }}</span>
+          </sc-for>
+        </div>
+        <span style="flex:1"></span>
+        <div style="display:flex;gap:0;border:1px solid #E4E4E8">
+          <button onClick="{{ setGrid }}" aria-label="Сетка" style="width:34px;height:34px;display:grid;place-items:center;border:none;cursor:pointer;background:{{ gridBg }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="{{ gridFg }}"><rect x="3" y="3" width="8" height="8"></rect><rect x="13" y="3" width="8" height="8"></rect><rect x="3" y="13" width="8" height="8"></rect><rect x="13" y="13" width="8" height="8"></rect></svg></button>
+          <button onClick="{{ setList }}" aria-label="Список" style="width:34px;height:34px;display:grid;place-items:center;border:none;border-left:1px solid #E4E4E8;cursor:pointer;background:{{ listBg }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="{{ listFg }}"><rect x="3" y="4" width="18" height="4"></rect><rect x="3" y="10" width="18" height="4"></rect><rect x="3" y="16" width="18" height="4"></rect></svg></button>
+        </div>
+      </div>
+
+      <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ false }}">
+        <div style="border:1px solid #E4E4E8;background:#fff;padding:56px 24px;text-align:center">
+          <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#c9c9d0" stroke-width="1.4" style="margin-bottom:16px"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="M15.5 15.5L21 21M8 10.5h5"></path></svg>
+          <div style="font-family:'Oswald',sans-serif;font-size:24px;text-transform:uppercase;margin-bottom:8px">Ничего не найдено</div>
+          <sc-if value="{{ hasCatFix }}" hint-placeholder-val="{{ false }}">
+            <div style="font:500 14px 'Manrope',sans-serif;color:#4a4a54;margin-bottom:12px">Возможно, вы имели в виду <span onClick="{{ catFixPick }}" style="cursor:pointer;font-weight:800;color:#E01F26;text-decoration:underline">{{ catFixLabel }}</span></div>
+          </sc-if>
+          <div style="font:500 14px/1.55 'Manrope',sans-serif;color:#6b6b75;max-width:420px;margin:0 auto 16px">Позвоните — подберём вручную по VIN или по образцу детали.</div>
+          <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap"><a href="tel:+79061241833" style="font:700 16px 'JetBrains Mono',monospace;white-space:nowrap">8 906 124-18-33</a><a href="tel:+79172950512" style="font:700 16px 'JetBrains Mono',monospace;white-space:nowrap">8 917 295-05-12</a></div>
+          <button onClick="{{ resetFilters }}" style="margin-top:20px;height:44px;padding:0 22px;background:#141414;color:#fff;border:none;cursor:pointer;font:700 12.5px 'Manrope',sans-serif;letter-spacing:.1em;text-transform:uppercase">Сбросить фильтры</button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isGrid }}" hint-placeholder-val="{{ true }}">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(236px,1fr));gap:14px">
+          <sc-for list="{{ page }}" as="p" hint-placeholder-count="9">
+            <div style="border:1px solid #E4E4E8;background:#fff;display:flex;flex-direction:column;animation:fadeup .22s ease both;transition:transform .18s,box-shadow .18s,border-color .18s" style-hover="transform:translateY(-4px);box-shadow:0 12px 26px rgba(20,20,20,.13);border-color:#d3d3da">
+              <div onClick="{{ p.open }}" style="cursor:pointer;position:relative;background:#F4F4F6;border-bottom:1px solid #E4E4E8;height:158px;display:grid;place-items:center">
+                {{ p.photo }}<sc-if value="{{ p.noImg }}" hint-placeholder-val="{{ true }}"><svg viewBox="0 0 24 24" width="58" height="58" fill="none" stroke="#a6a6b0" stroke-width="1.1"><path d="{{ p.icon }}"></path></svg></sc-if>
+                <span style="position:absolute;left:0;top:0;background:#141414;color:#fff;font:700 9px 'Manrope',sans-serif;letter-spacing:.1em;padding:5px 7px;text-transform:uppercase">{{ p.catName }}</span>
+                <label style="position:absolute;right:8px;top:8px;display:flex;align-items:center;gap:5px;background:#fff;border:1px solid #E4E4E8;padding:4px 7px;cursor:pointer;font:600 10.5px 'Manrope',sans-serif;color:#6b6b75">
+                  <input type="checkbox" checked="{{ p.cmp }}" onChange="{{ p.toggleCmp }}" style="width:13px;height:13px;accent-color:#E01F26;cursor:pointer">Сравнить
+                </label>
+              </div>
+              <div style="padding:12px 13px 14px;display:flex;flex-direction:column;gap:7px;flex:1">
+                <div style="display:flex;justify-content:space-between;gap:8px"><span style="font:700 11px 'Manrope',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#8b8b95">{{ p.brand }}</span><span style="font:700 10px 'Manrope',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#9a9aa4">{{ p.orig }}</span></div>
+                <div onClick="{{ p.open }}" style="cursor:pointer;font:600 13.5px/1.35 'Manrope',sans-serif;min-height:36px">{{ p.name }}</div>
+                <div style="font:500 12px 'JetBrains Mono',monospace;white-space:nowrap;color:#6b6b75">арт. {{ p.oem }}</div>
+                <sc-if value="{{ p.inStock }}" hint-placeholder-val="{{ true }}"><span style="align-self:flex-start;display:inline-flex;align-items:center;white-space:nowrap;font:700 11px 'Manrope',sans-serif;color:#1E9E5A;background:#E8F6EE;padding:4px 8px">{{ p.stockLabel }}</span></sc-if>
+                <sc-if value="{{ p.onOrder }}" hint-placeholder-val="{{ false }}"><span style="align-self:flex-start;display:inline-flex;align-items:center;white-space:nowrap;font:700 11px 'Manrope',sans-serif;color:#E08A00;background:#FDF3E0;padding:4px 8px">{{ p.stockLabel }}</span></sc-if>
+                <sc-if value="{{ p.fitsCar }}" hint-placeholder-val="{{ false }}">
+                  <span style="display:flex;align-items:center;gap:6px;font:700 11.5px 'Manrope',sans-serif;color:#1E9E5A"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1E9E5A" stroke-width="2.6"><path d="M4 12.5l5 5L20 6.5"></path></svg>Подходит к вашему авто</span>
+                </sc-if>
+                <span style="flex:1"></span>
+                <div style="display:flex;align-items:baseline;gap:8px"><span style="font-family:'Oswald',sans-serif;font-size:23px">{{ p.priceFmt }}</span><sc-if value="{{ p.hasOld }}" hint-placeholder-val="{{ false }}"><span style="font:500 13px 'Manrope',sans-serif;color:#9a9aa4;text-decoration:line-through">{{ p.oldFmt }}</span></sc-if></div>
+                <button onClick="{{ p.add }}" style="height:40px;background:#E01F26;color:#fff;border:none;cursor:pointer;font:700 12px 'Manrope',sans-serif;letter-spacing:.1em;text-transform:uppercase;transition:background .16s" style-hover="background:#B3161C">В корзину</button>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isList }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <sc-for list="{{ page }}" as="p" hint-placeholder-count="6">
+            <div style="border:1px solid #E4E4E8;background:#fff;display:flex;gap:16px;padding:14px;flex-wrap:wrap;animation:fadeup .22s ease both;transition:border-color .18s,box-shadow .18s" style-hover="border-color:#d3d3da;box-shadow:0 8px 18px rgba(20,20,20,.09)">
+              <div onClick="{{ p.open }}" style="cursor:pointer;flex:none;width:118px;height:100px;background:#F4F4F6;border:1px solid #E4E4E8;display:grid;place-items:center">{{ p.photo }}<sc-if value="{{ p.noImg }}" hint-placeholder-val="{{ true }}"><svg viewBox="0 0 24 24" width="42" height="42" fill="none" stroke="#a6a6b0" stroke-width="1.1"><path d="{{ p.icon }}"></path></svg></sc-if></div>
+              <div style="flex:1 1 260px;display:flex;flex-direction:column;gap:6px">
+                <div style="font:700 11px 'Manrope',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#8b8b95">{{ p.brand }} · {{ p.orig }}</div>
+                <div onClick="{{ p.open }}" style="cursor:pointer;font:700 15.5px/1.3 'Manrope',sans-serif">{{ p.name }}</div>
+                <div style="font:500 12.5px 'JetBrains Mono',monospace;white-space:nowrap;color:#6b6b75">арт. {{ p.oem }} · {{ p.catName }}</div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+                  <sc-if value="{{ p.inStock }}" hint-placeholder-val="{{ true }}"><span style="display:inline-flex;align-items:center;white-space:nowrap;font:700 11px 'Manrope',sans-serif;color:#1E9E5A;background:#E8F6EE;padding:4px 8px">{{ p.stockLabel }}</span></sc-if>
+                  <sc-if value="{{ p.onOrder }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;white-space:nowrap;font:700 11px 'Manrope',sans-serif;color:#E08A00;background:#FDF3E0;padding:4px 8px">{{ p.stockLabel }}</span></sc-if>
+                  <sc-if value="{{ p.fitsCar }}" hint-placeholder-val="{{ false }}"><span style="display:flex;align-items:center;gap:6px;font:700 11.5px 'Manrope',sans-serif;color:#1E9E5A"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1E9E5A" stroke-width="2.6"><path d="M4 12.5l5 5L20 6.5"></path></svg>Подходит к вашему авто</span></sc-if>
+                </div>
+              </div>
+              <div style="flex:none;width:180px;display:flex;flex-direction:column;gap:8px;align-items:flex-end;justify-content:center">
+                <div style="display:flex;align-items:baseline;gap:8px"><span style="font-family:'Oswald',sans-serif;font-size:25px">{{ p.priceFmt }}</span><sc-if value="{{ p.hasOld }}" hint-placeholder-val="{{ false }}"><span style="font:500 13px 'Manrope',sans-serif;color:#9a9aa4;text-decoration:line-through">{{ p.oldFmt }}</span></sc-if></div>
+                <button onClick="{{ p.add }}" style="width:100%;height:42px;background:#E01F26;color:#fff;border:none;cursor:pointer;font:700 12px 'Manrope',sans-serif;letter-spacing:.1em;text-transform:uppercase" style-hover="background:#B3161C">В корзину</button>
+                <span onClick="{{ p.open }}" style="cursor:pointer;font:600 12.5px 'Manrope',sans-serif;color:#6b6b75;text-decoration:underline">Подробнее</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ hasMore }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ showMore }}" style="margin-top:18px;width:100%;height:50px;background:#fff;border:1px solid #141414;color:#141414;cursor:pointer;font:700 12.5px 'Manrope',sans-serif;letter-spacing:.1em;text-transform:uppercase;transition:background .16s,color .16s" style-hover="background:#141414;color:#fff">Показать ещё {{ moreCount }}</button>
+      </sc-if>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isProduct }}" hint-placeholder-val="{{ false }}">
+<div style="max-width:1320px;margin:0 auto;padding:20px 20px 60px">
+  <div style="display:flex;gap:8px;align-items:center;font:500 12.5px 'Manrope',sans-serif;color:#8b8b95;margin-bottom:18px;flex-wrap:wrap">
+    <span onClick="{{ goHome }}" style="cursor:pointer;color:#6b6b75">Главная</span><span>/</span>
+    <span onClick="{{ goCatalogAll }}" style="cursor:pointer;color:#6b6b75">Каталог</span><span>/</span>
+    <span onClick="{{ pr.openCat }}" style="cursor:pointer;color:#6b6b75">{{ pr.catName }}</span><span>/</span>
+    <span style="color:#141414;font-weight:700">{{ pr.oem }}</span>
+  </div>
+
+  <div style="display:flex;gap:34px;flex-wrap:wrap;align-items:flex-start">
+    <div style="flex:1 1 420px;min-width:300px">
+      <div style="border:1px solid #E4E4E8;background:#F4F4F6;aspect-ratio:4/3;display:grid;place-items:center;position:relative">
+        {{ pr.photoBig }}<sc-if value="{{ pr.noImg }}" hint-placeholder-val="{{ true }}"><svg viewBox="0 0 24 24" width="150" height="150" fill="none" stroke="#a0a0aa" stroke-width=".9"><path d="{{ pr.icon }}"></path></svg></sc-if>
+        <span style="position:absolute;left:0;top:0;background:#141414;color:#fff;font:700 10px 'Manrope',sans-serif;letter-spacing:.1em;padding:6px 9px;text-transform:uppercase">{{ pr.catName }}</span>
+        <span style="position:absolute;right:12px;bottom:12px;font:500 11.5px 'Manrope',sans-serif;color:#9a9aa4">фото по запросу — пришлём в WhatsApp</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px">
+        <sc-for list="{{ pr.thumbs }}" as="t" hint-placeholder-count="4">
+          <div style="border:1px solid {{ t.bd }};background:#F4F4F6;aspect-ratio:1;display:grid;place-items:center;cursor:pointer">{{ t.photo }}<sc-if value="{{ t.noImg }}" hint-placeholder-val="{{ true }}"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#a6a6b0" stroke-width="1.1"><path d="{{ t.icon }}"></path></svg></sc-if></div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="flex:1 1 400px;min-width:300px">
+      <div style="font:700 12px 'Manrope',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#E01F26;margin-bottom:8px">{{ pr.brand }}</div>
+      <h1 style="font-family:'Oswald',sans-serif;font-weight:600;font-size:clamp(25px,3vw,34px);line-height:1.1;margin:0 0 14px;text-transform:uppercase">{{ pr.name }}</h1>
+      <div style="display:flex;gap:22px;flex-wrap:wrap;padding:12px 0;border-top:1px solid #E4E4E8;border-bottom:1px solid #E4E4E8;margin-bottom:18px">
+        <div><div style="font:600 10.5px 'Manrope',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#8b8b95">Артикул</div><div style="font:700 14px 'JetBrains Mono',monospace;white-space:nowrap;margin-top:3px">{{ pr.oem }}</div></div>
+        <div><div style="font:600 10.5px 'Manrope',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#8b8b95">Бренд</div><div style="font:700 14px 'Manrope',sans-serif;margin-top:3px">{{ pr.brand }}</div></div>
+        <div><div style="font:600 10.5px 'Manrope',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#8b8b95">Тип</div><div style="font:700 14px 'Manrope',sans-serif;margin-top:3px">{{ pr.orig }}</div></div>
+      </div>
+
+      <sc-if value="{{ pr.fitsCar }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;gap:11px;align-items:center;background:#E8F6EE;border-left:4px solid #1E9E5A;padding:12px 14px;margin-bottom:18px">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1E9E5A" stroke-width="2.6" style="flex:none"><path d="M4 12.5l5 5L20 6.5"></path></svg>
+          <div><div style="font:800 13.5px 'Manrope',sans-serif;color:#14663c">Подходит к вашему автомобилю</div><div style="font:500 12.5px 'Manrope',sans-serif;color:#2f7a52;margin-top:2px">{{ carLabel }}</div></div>
+        </div>
+      </sc-if>
+
+      <div style="display:flex;align-items:flex-end;gap:14px;margin-bottom:14px">
+        <span style="font-family:'Oswald',sans-serif;font-weight:600;font-size:46px;line-height:1">{{ pr.priceFmt }}</span>
+        <sc-if value="{{ pr.hasOld }}" hint-placeholder-val="{{ false }}"><span style="font:500 17px 'Manrope',sans-serif;color:#9a9aa4;text-decoration:line-through;padding-bottom:7px">{{ pr.oldFmt }}</span></sc-if>
+      </div>
+      <sc-if value="{{ pr.inStock }}" hint-placeholder-val="{{ true }}"><span style="display:inline-flex;align-items:center;white-space:nowrap;font:700 12.5px 'Manrope',sans-serif;color:#1E9E5A;background:#E8F6EE;padding:6px 11px;margin-bottom:18px">{{ pr.stockLabel }}</span></sc-if>
+      <sc-if value="{{ pr.onOrder }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;white-space:nowrap;font:700 12.5px 'Manrope',sans-serif;color:#E08A00;background:#FDF3E0;padding:6px 11px;margin-bottom:18px">{{ pr.stockLabel }}</span></sc-if>
+
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:stretch;margin-bottom:12px">
+        <div style="display:flex;border:1px solid #E4E4E8;flex:none">
+          <button onClick="{{ decQty }}" aria-label="Меньше" style="width:44px;background:#F4F4F6;border:none;border-right:1px solid #E4E4E8;cursor:pointer;font-size:20px;color:#141414">−</button>
+          <span style="width:52px;display:grid;place-items:center;font:700 16px 'JetBrains Mono',monospace;white-space:nowrap">{{ qty }}</span>
+          <button onClick="{{ incQty }}" aria-label="Больше" style="width:44px;background:#F4F4F6;border:none;border-left:1px solid #E4E4E8;cursor:pointer;font-size:20px;color:#141414">+</button>
+        </div>
+        <button onClick="{{ addCurrent }}" style="flex:1 1 200px;height:54px;background:#E01F26;color:#fff;border:none;cursor:pointer;font:800 13.5px 'Manrope',sans-serif;letter-spacing:.11em;text-transform:uppercase;transition:background .16s" style-hover="background:#B3161C">В корзину · {{ pr.totalFmt }}</button>
+      </div>
+      <button style="width:100%;height:48px;background:#fff;border:1px solid #141414;color:#141414;cursor:pointer;font:700 12.5px 'Manrope',sans-serif;letter-spacing:.11em;text-transform:uppercase;margin-bottom:20px;transition:background .16s,color .16s" style-hover="background:#141414;color:#fff">Купить в 1 клик</button>
+
+      <div style="border:1px solid #E4E4E8;background:#fff">
+        <div style="display:flex;gap:10px;padding:12px 14px;border-bottom:1px solid #F0F0F3"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1E9E5A" stroke-width="1.8" style="flex:none;margin-top:1px"><path d="M12 21s7-6.3 7-11a7 7 0 10-14 0c0 4.7 7 11 7 11z"></path><circle cx="12" cy="10" r="2.5"></circle></svg><span style="font:500 13px/1.4 'Manrope',sans-serif"><b style="font-weight:800">Самовывоз сегодня</b> — пр. Строителей, 68</span></div>
+        <div style="display:flex;gap:10px;padding:12px 14px;border-bottom:1px solid #F0F0F3"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#141414" stroke-width="1.6" style="flex:none;margin-top:1px"><path d="M3 7h13v10H3zM16 10h3l2 3v4h-5"></path><circle cx="7" cy="18" r="1.6"></circle><circle cx="18" cy="18" r="1.6"></circle></svg><span style="font:500 13px/1.4 'Manrope',sans-serif">Доставка по Альметьевску — завтра, 300 ₽</span></div>
+        <div style="display:flex;gap:10px;padding:12px 14px;border-bottom:1px solid #F0F0F3"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#141414" stroke-width="1.6" style="flex:none;margin-top:1px"><path d="M12 3a9 9 0 100 18 9 9 0 000-18M12 7v5l4 2"></path></svg><span style="font:500 13px/1.4 'Manrope',sans-serif">По Республике Татарстан — 2–3 дня</span></div>
+        <div style="padding:12px 14px;background:#F4F4F6;display:flex;gap:14px;flex-wrap:wrap;align-items:center"><span style="font:600 12.5px 'Manrope',sans-serif;color:#6b6b75">Уточнить по телефону:</span><a href="tel:+79061241833" style="font:700 13.5px 'JetBrains Mono',monospace;white-space:nowrap">8 906 124-18-33</a><a href="tel:+79172950512" style="font:700 13.5px 'JetBrains Mono',monospace;white-space:nowrap">8 917 295-05-12</a></div>
+      </div>
+    </div>
+  </div>
+
+  <section style="margin-top:48px">
+    <h2 style="font-family:'Oswald',sans-serif;font-weight:600;font-size:26px;text-transform:uppercase;margin:0 0 14px;border-bottom:3px solid #141414;padding-bottom:10px">Применимость</h2>
+    <div style="border:1px solid #E4E4E8;overflow:auto">
+      <table style="width:100%;border-collapse:collapse;min-width:640px">
+        <thead><tr style="background:#141414">
+          <th style="text-align:left;padding:11px 14px;font:700 10.5px 'Manrope',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#fff">Марка</th>
+          <th style="text-align:left;padding:11px 14px;font:700 10.5px 'Manrope',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#fff">Модель</th>
+        </tr></thead>
+        <tbody>
+          <sc-for list="{{ pr.fitRows }}" as="r" hint-placeholder-count="5">
+            <tr style="background:{{ r.bg }};border-top:1px solid #E4E4E8">
+              <td style="padding:11px 14px;font:700 13.5px 'Manrope',sans-serif;color:{{ r.fg }}">{{ r.brand }}</td>
+              <td style="padding:11px 14px;font:500 13.5px 'Manrope',sans-serif;color:{{ r.fg }}">{{ r.model }}</td>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div style="display:flex;gap:34px;flex-wrap:wrap;margin-top:44px">
+    <section style="flex:1 1 400px;min-width:300px">
+      <h2 style="font-family:'Oswald',sans-serif;font-weight:600;font-size:26px;text-transform:uppercase;margin:0 0 14px;border-bottom:3px solid #141414;padding-bottom:10px">Характеристики</h2>
+      <div style="border:1px solid #E4E4E8">
+        <sc-for list="{{ pr.specs }}" as="s" hint-placeholder-count="7">
+          <div style="display:flex;gap:14px;padding:11px 14px;border-bottom:1px solid #F0F0F3">
+            <span style="flex:1;font:500 13.5px 'Manrope',sans-serif;color:#6b6b75">{{ s.k }}</span>
+            <span style="flex:1;font:700 13.5px 'Manrope',sans-serif;color:#141414;text-align:right">{{ s.v }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+    <section style="flex:1 1 400px;min-width:300px">
+      <h2 style="font-family:'Oswald',sans-serif;font-weight:600;font-size:26px;text-transform:uppercase;margin:0 0 14px;border-bottom:3px solid #141414;padding-bottom:10px">Описание</h2>
+      <p style="font:500 14.5px/1.65 'Manrope',sans-serif;color:#3c3c44;margin:0 0 14px;text-wrap:pretty">{{ pr.desc }}</p>
+      <div style="background:#F4F4F6;border-left:4px solid #E01F26;padding:14px 16px">
+        <div style="font:800 13px 'Manrope',sans-serif;margin-bottom:5px">Совет магазина</div>
+        <div style="font:500 13px/1.55 'Manrope',sans-serif;color:#4a4a54">{{ pr.tip }}</div>
+      </div>
+    </section>
+  </div>
+
+  <section style="margin-top:44px">
+    <h2 style="font-family:'Oswald',sans-serif;font-weight:600;font-size:26px;text-transform:uppercase;margin:0 0 14px;border-bottom:3px solid #141414;padding-bottom:10px">Аналоги и заменители</h2>
+    <div style="border:1px solid #E4E4E8;overflow:auto">
+      <table style="width:100%;border-collapse:collapse;min-width:720px">
+        <thead><tr style="background:#F4F4F6;border-bottom:1px solid #E4E4E8">
+          <th style="text-align:left;padding:11px 14px;font:700 10.5px 'Manrope',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#6b6b75">Производитель</th>
+          <th style="text-align:left;padding:11px 14px;font:700 10.5px 'Manrope',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#6b6b75">Артикул</th>
+          <th style="text-align:left;padding:11px 14px;font:700 10.5px 'Manrope',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#6b6b75">Наличие</th>
+          <th style="text-align:right;padding:11px 14px;font:700 10.5px 'Manrope',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#6b6b75">Цена</th>
+          <th style="padding:11px 14px"></th>
+        </tr></thead>
+        <tbody>
+          <sc-for list="{{ pr.analogs }}" as="a" hint-placeholder-count="4">
+            <tr style="border-bottom:1px solid #F0F0F3">
+              <td style="padding:12px 14px"><div style="display:flex;align-items:center;gap:11px"><div onClick="{{ a.open }}" style="cursor:pointer;flex:none;width:52px;height:44px;background:#F4F4F6;border:1px solid #E4E4E8;display:grid;place-items:center">{{ a.photo }}<sc-if value="{{ a.noImg }}" hint-placeholder-val="{{ true }}"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#a6a6b0" stroke-width="1.1"><path d="{{ a.icon }}"></path></svg></sc-if></div><div><span onClick="{{ a.open }}" style="cursor:pointer;font:700 13.5px 'Manrope',sans-serif">{{ a.brand }}</span><div style="font:500 12px 'Manrope',sans-serif;color:#8b8b95;margin-top:2px">{{ a.orig }}</div></div></div></td>
+              <td style="padding:12px 14px;font:500 13px 'JetBrains Mono',monospace;white-space:nowrap;color:#E01F26">{{ a.oem }}</td>
+              <td style="padding:12px 14px">
+                <sc-if value="{{ a.inStock }}" hint-placeholder-val="{{ true }}"><span style="display:inline-flex;align-items:center;white-space:nowrap;font:700 11px 'Manrope',sans-serif;color:#1E9E5A;background:#E8F6EE;padding:4px 8px">{{ a.stockLabel }}</span></sc-if>
+                <sc-if value="{{ a.onOrder }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;white-space:nowrap;font:700 11px 'Manrope',sans-serif;color:#E08A00;background:#FDF3E0;padding:4px 8px">{{ a.stockLabel }}</span></sc-if>
+              </td>
+              <td style="padding:12px 14px;text-align:right;font-family:'Oswald',sans-serif;font-size:19px">{{ a.priceFmt }}</td>
+              <td style="padding:12px 14px;text-align:right"><button onClick="{{ a.add }}" style="min-height:36px;padding:9px 16px;white-space:nowrap;background:#E01F26;color:#fff;border:none;cursor:pointer;font:700 11.5px 'Manrope',sans-serif;letter-spacing:.09em;text-transform:uppercase" style-hover="background:#B3161C">В корзину</button></td>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section style="margin-top:44px">
+    <h2 style="font-family:'Oswald',sans-serif;font-weight:600;font-size:26px;text-transform:uppercase;margin:0 0 14px;border-bottom:3px solid #141414;padding-bottom:10px">Отзывы</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px">
+      <sc-for list="{{ reviews }}" as="r" hint-placeholder-count="4">
+        <div style="border:1px solid #E4E4E8;padding:16px;background:#fff">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <span style="font:800 13.5px 'Manrope',sans-serif">{{ r.who }}</span>
+            <span style="font:700 12px 'Manrope',sans-serif;color:#E08A00;letter-spacing:.1em">{{ r.stars }}</span>
+          </div>
+          <div style="font:500 12px 'Manrope',sans-serif;color:#8b8b95;margin-bottom:9px">{{ r.car }} · {{ r.date }}</div>
+          <p style="font:500 13.5px/1.55 'Manrope',sans-serif;color:#3c3c44;margin:0">{{ r.text }}</p>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="margin-top:44px">
+    <h2 style="font-family:'Oswald',sans-serif;font-weight:600;font-size:26px;text-transform:uppercase;margin:0 0 14px;border-bottom:3px solid #141414;padding-bottom:10px">С этим товаром покупают</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px">
+      <sc-for list="{{ pr.related }}" as="p" hint-placeholder-count="4">
+        <div style="border:1px solid #E4E4E8;background:#fff;display:flex;flex-direction:column;transition:transform .18s,box-shadow .18s" style-hover="transform:translateY(-4px);box-shadow:0 12px 26px rgba(20,20,20,.13)">
+          <div onClick="{{ p.open }}" style="cursor:pointer;background:#F4F4F6;border-bottom:1px solid #E4E4E8;height:130px;display:grid;place-items:center">{{ p.photo }}<sc-if value="{{ p.noImg }}" hint-placeholder-val="{{ true }}"><svg viewBox="0 0 24 24" width="50" height="50" fill="none" stroke="#a6a6b0" stroke-width="1.1"><path d="{{ p.icon }}"></path></svg></sc-if></div>
+          <div style="padding:12px 13px 14px;display:flex;flex-direction:column;gap:6px;flex:1">
+            <div style="font:700 11px 'Manrope',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#8b8b95">{{ p.brand }}</div>
+            <div onClick="{{ p.open }}" style="cursor:pointer;font:600 13.5px/1.35 'Manrope',sans-serif;min-height:36px">{{ p.name }}</div>
+            <div style="font:500 12px 'JetBrains Mono',monospace;white-space:nowrap;color:#6b6b75">арт. {{ p.oem }}</div>
+            <span style="flex:1"></span>
+            <div style="font-family:'Oswald',sans-serif;font-size:21px">{{ p.priceFmt }}</div>
+            <button onClick="{{ p.add }}" style="height:38px;background:#141414;color:#fff;border:none;cursor:pointer;font:700 11.5px 'Manrope',sans-serif;letter-spacing:.1em;text-transform:uppercase" style-hover="background:#E01F26">В корзину</button>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+</div>
+</sc-if>
+
+<sc-if value="{{ isDelivery }}" hint-placeholder-val="{{ false }}">
+<div style="max-width:1320px;margin:0 auto;padding:26px 20px 60px">
+  <div style="display:flex;gap:8px;align-items:center;font:500 12.5px 'Manrope',sans-serif;color:#8b8b95;margin-bottom:16px">
+    <span onClick="{{ goHome }}" style="cursor:pointer;color:#6b6b75">Главная</span><span>/</span><span style="color:#141414;font-weight:700">Оплата и доставка</span>
+  </div>
+  <h1 style="font-family:'Oswald',sans-serif;font-weight:600;font-size:clamp(28px,4vw,44px);text-transform:uppercase;margin:0 0 8px;border-bottom:3px solid #141414;padding-bottom:12px">Оплата и доставка</h1>
+  <p style="font:500 15.5px/1.6 'Manrope',sans-serif;color:#4a4a54;max-width:660px;margin:18px 0 34px;text-wrap:pretty">Работаем с частными клиентами и автосервисами Альметьевска и района. Заказ можно оплатить в магазине при получении, картой или переводом — по счёту для организаций.</p>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-bottom:40px">
+    <div style="border:1px solid #E4E4E8;padding:22px">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#E01F26" stroke-width="1.5"><path d="M12 21s7-6.3 7-11a7 7 0 10-14 0c0 4.7 7 11 7 11z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>
+      <div style="font-family:'Oswald',sans-serif;font-size:21px;text-transform:uppercase;margin:14px 0 6px">Самовывоз</div>
+      <div style="font:800 15px 'Manrope',sans-serif;color:#1E9E5A;margin-bottom:8px">Бесплатно, сегодня</div>
+      <p style="font:500 13.5px/1.6 'Manrope',sans-serif;color:#4a4a54;margin:0">пр. Строителей, 68. Позиции в наличии откладываем на 2 суток — приезжайте, когда удобно, в рабочие часы.</p>
+    </div>
+    <div style="border:1px solid #E4E4E8;padding:22px">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#E01F26" stroke-width="1.5"><path d="M3 7h13v10H3zM16 10h3l2 3v4h-5"></path><circle cx="7" cy="18" r="1.8"></circle><circle cx="18" cy="18" r="1.8"></circle></svg>
+      <div style="font-family:'Oswald',sans-serif;font-size:21px;text-transform:uppercase;margin:14px 0 6px">По Альметьевску</div>
+      <div style="font:800 15px 'Manrope',sans-serif;color:#141414;margin-bottom:8px">300 ₽ · на следующий день</div>
+      <p style="font:500 13.5px/1.6 'Manrope',sans-serif;color:#4a4a54;margin:0">Доставка курьером с 10:00 до 18:00. При заказе от 8 000 ₽ — бесплатно. Крупные кузовные детали — по договорённости.</p>
+    </div>
+    <div style="border:1px solid #E4E4E8;padding:22px">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#E01F26" stroke-width="1.5"><path d="M12 3a9 9 0 100 18 9 9 0 000-18M12 7v5l4 2"></path></svg>
+      <div style="font-family:'Oswald',sans-serif;font-size:21px;text-transform:uppercase;margin:14px 0 6px">По Татарстану</div>
+      <div style="font:800 15px 'Manrope',sans-serif;color:#141414;margin-bottom:8px">от 450 ₽ · 2–3 дня</div>
+      <p style="font:500 13.5px/1.6 'Manrope',sans-serif;color:#4a4a54;margin:0">Транспортными компаниями и попутным транспортом: Бугульма, Лениногорск, Заинск, Нижнекамск, Набережные Челны, Казань.</p>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:34px;flex-wrap:wrap">
+    <section style="flex:1 1 380px;min-width:290px">
+      <h2 style="font-family:'Oswald',sans-serif;font-weight:600;font-size:26px;text-transform:uppercase;margin:0 0 14px;border-bottom:3px solid #141414;padding-bottom:10px">Способы оплаты</h2>
+      <div style="border:1px solid #E4E4E8">
+        <div style="display:flex;gap:14px;padding:13px 16px;border-bottom:1px solid #F0F0F3"><span style="flex:1;font:600 13.5px 'Manrope',sans-serif">Наличными в магазине</span><span style="font:700 13.5px 'Manrope',sans-serif;color:#1E9E5A">при получении</span></div>
+        <div style="display:flex;gap:14px;padding:13px 16px;border-bottom:1px solid #F0F0F3"><span style="flex:1;font:600 13.5px 'Manrope',sans-serif">Банковской картой</span><span style="font:700 13.5px 'Manrope',sans-serif;color:#1E9E5A">терминал, без комиссии</span></div>
+        <div style="display:flex;gap:14px;padding:13px 16px;border-bottom:1px solid #F0F0F3"><span style="flex:1;font:600 13.5px 'Manrope',sans-serif">Переводом по СБП</span><span style="font:700 13.5px 'Manrope',sans-serif;color:#1E9E5A">по номеру телефона</span></div>
+        <div style="display:flex;gap:14px;padding:13px 16px"><span style="flex:1;font:600 13.5px 'Manrope',sans-serif">По счёту для организаций</span><span style="font:700 13.5px 'Manrope',sans-serif;color:#6b6b75">отсрочка до 14 дней</span></div>
+      </div>
+      <p style="font:500 13px/1.6 'Manrope',sans-serif;color:#6b6b75;margin:14px 0 0">Заказные позиции стоимостью выше 10 000 ₽ оформляем с предоплатой 50%.</p>
+    </section>
+    <section style="flex:1 1 380px;min-width:290px">
+      <h2 style="font-family:'Oswald',sans-serif;font-weight:600;font-size:26px;text-transform:uppercase;margin:0 0 14px;border-bottom:3px solid #141414;padding-bottom:10px">Возврат и гарантия</h2>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="background:#F4F4F6;border-left:4px solid #E01F26;padding:14px 16px"><div style="font:800 13.5px 'Manrope',sans-serif;margin-bottom:5px">Не подошла деталь</div><div style="font:500 13px/1.55 'Manrope',sans-serif;color:#4a4a54">Принимаем обратно в течение 14 дней, если деталь не устанавливалась и сохранена упаковка. Подберём замену по VIN на месте.</div></div>
+        <div style="background:#F4F4F6;border-left:4px solid #E01F26;padding:14px 16px"><div style="font:800 13.5px 'Manrope',sans-serif;margin-bottom:5px">Заводской брак</div><div style="font:500 13px/1.55 'Manrope',sans-serif;color:#4a4a54">Гарантия производителя от 6 до 48 месяцев — срок указан в карточке каждой позиции. Меняем по акту, экспертиза за наш счёт.</div></div>
+        <div style="background:#F4F4F6;border-left:4px solid #E01F26;padding:14px 16px"><div style="font:800 13.5px 'Manrope',sans-serif;margin-bottom:5px">Электрика и расходники</div><div style="font:500 13px/1.55 'Manrope',sans-serif;color:#4a4a54">Электрооборудование возврату не подлежит — поэтому сверяем артикул и VIN до продажи.</div></div>
+      </div>
+    </section>
+  </div>
+
+  <div style="margin-top:36px;background:#E01F26;padding:26px;display:flex;gap:20px;flex-wrap:wrap;align-items:center;justify-content:space-between">
+    <div><div style="font-family:'Oswald',sans-serif;font-size:26px;text-transform:uppercase;color:#fff;margin-bottom:5px">Остались вопросы по доставке?</div><div style="font:500 14px 'Manrope',sans-serif;color:rgba(255,255,255,.85)">Звоните в рабочие часы — ответим сразу.</div></div>
+    <div style="display:flex;gap:14px;flex-wrap:wrap"><a href="tel:+79061241833" style="color:#fff;font:700 18px 'JetBrains Mono',monospace;white-space:nowrap">8 906 124-18-33</a><a href="tel:+79172950512" style="color:#fff;font:700 18px 'JetBrains Mono',monospace;white-space:nowrap">8 917 295-05-12</a></div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isContacts }}" hint-placeholder-val="{{ false }}">
+<div style="max-width:1320px;margin:0 auto;padding:26px 20px 60px">
+  <div style="display:flex;gap:8px;align-items:center;font:500 12.5px 'Manrope',sans-serif;color:#8b8b95;margin-bottom:16px">
+    <span onClick="{{ goHome }}" style="cursor:pointer;color:#6b6b75">Главная</span><span>/</span><span style="color:#141414;font-weight:700">Контакты</span>
+  </div>
+  <h1 style="font-family:'Oswald',sans-serif;font-weight:600;font-size:clamp(28px,4vw,44px);text-transform:uppercase;margin:0 0 12px;border-bottom:3px solid #141414;padding-bottom:12px">Контакты</h1>
+
+  <div style="display:flex;gap:30px;flex-wrap:wrap;margin-top:26px">
+    <div style="flex:1 1 340px;min-width:280px">
+      <div style="border:1px solid #E4E4E8">
+        <div style="padding:18px;border-bottom:1px solid #E4E4E8">
+          <div style="font:700 10.5px 'Manrope',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#8b8b95;margin-bottom:8px">Адрес магазина</div>
+          <div style="font:600 17px/1.5 'Manrope',sans-serif">г. Альметьевск, пр. Строителей, 68</div>
+          <div style="font:500 13.5px 'Manrope',sans-serif;color:#6b6b75;margin-top:4px">Республика Татарстан, 423450</div>
+          <div style="font:500 13px/1.6 'Manrope',sans-serif;color:#4a4a54;margin-top:10px">Вход со стороны проспекта, вывеска STIMUL АВТОЗАПЧАСТИ. Парковка перед магазином, разгрузка со двора.</div>
+        </div>
+        <div style="padding:18px;border-bottom:1px solid #E4E4E8">
+          <div style="font:700 10.5px 'Manrope',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#8b8b95;margin-bottom:10px">Телефоны</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;gap:12px;align-items:baseline;flex-wrap:wrap"><a href="tel:+79061241833" style="font:700 19px 'JetBrains Mono',monospace;white-space:nowrap">8 906 124-18-33</a><span style="font:500 12.5px 'Manrope',sans-serif;color:#8b8b95">подбор и заказ</span></div>
+            <div style="display:flex;gap:12px;align-items:baseline;flex-wrap:wrap"><a href="tel:+79172950512" style="font:700 19px 'JetBrains Mono',monospace;white-space:nowrap">8 917 295-05-12</a><span style="font:500 12.5px 'Manrope',sans-serif;color:#8b8b95">наличие и доставка</span></div>
+          </div>
+          <a href="https://wa.me/79061241833" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;margin-top:14px;background:#1E9E5A;color:#fff;padding:10px 14px;font:700 12.5px 'Manrope',sans-serif;letter-spacing:.08em;text-transform:uppercase" style-hover="background:#17814a;text-decoration:none"><svg width="15" height="15" viewBox="0 0 24 24" fill="#fff"><path d="M12 2a10 10 0 00-8.7 15L2 22l5.2-1.3A10 10 0 1012 2zm0 2a8 8 0 11-4.2 14.8l-.4-.2-2.7.7.7-2.6-.2-.4A8 8 0 0112 4z"></path></svg>Написать в WhatsApp</a>
+        </div>
+        <div style="padding:18px">
+          <div style="font:700 10.5px 'Manrope',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#8b8b95;margin-bottom:10px">Режим работы</div>
+          <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #F0F0F3"><span style="font:600 14px 'Manrope',sans-serif">Понедельник — суббота</span><span style="font:700 14px 'JetBrains Mono',monospace;white-space:nowrap">9:00–19:00</span></div>
+          <div style="display:flex;justify-content:space-between;padding:7px 0"><span style="font:600 14px 'Manrope',sans-serif">Воскресенье</span><span style="font:700 14px 'JetBrains Mono',monospace;white-space:nowrap">10:00–16:00</span></div>
+        </div>
+      </div>
+      <div style="margin-top:14px;border:1px solid #E4E4E8;background:#F4F4F6;padding:16px">
+        <div style="font:700 10.5px 'Manrope',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#8b8b95;margin-bottom:8px">Реквизиты</div>
+        <div style="font:500 13px/1.7 'Manrope',sans-serif;color:#4a4a54">ИП Хайруллин Р. Р.<br>ИНН 164404567890 · ОГРНИП 316164400052341<br>р/с 40802810100000012345, АО «Ак Барс Банк», БИК 049205805</div>
+      </div>
+    </div>
+
+    <div style="flex:1 1 420px;min-width:300px">
+      <div style="border:1px solid #E4E4E8;background:#F4F4F6;background-image:linear-gradient(rgba(20,20,20,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(20,20,20,.05) 1px,transparent 1px);background-size:34px 34px;height:100%;min-height:430px;position:relative;display:grid;place-items:center;overflow:hidden">
+        <div style="position:absolute;left:0;right:0;top:56%;height:22px;background:#e2e2e7;border-top:1px solid #d3d3da;border-bottom:1px solid #d3d3da"></div>
+        <div style="position:absolute;left:0;right:0;top:62.5%;height:2px;background:#fff"></div>
+        <div style="position:absolute;top:0;bottom:0;left:34%;width:16px;background:#e6e6eb;border-left:1px solid #d8d8de;border-right:1px solid #d8d8de"></div>
+        <span style="position:absolute;left:36%;top:14px;font:600 11px 'Manrope',sans-serif;color:#9a9aa4;letter-spacing:.06em">ул. Ленина</span>
+        <span style="position:absolute;left:16px;top:52%;font:600 11px 'Manrope',sans-serif;color:#9a9aa4;letter-spacing:.06em">пр. Строителей</span>
+        <div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:8px">
+          <svg width="42" height="42" viewBox="0 0 24 24" fill="#E01F26"><path d="M12 22s7-6.6 7-11.5A7 7 0 105 10.5C5 15.4 12 22 12 22z"></path><circle cx="12" cy="10" r="2.6" fill="#fff"></circle></svg>
+          <span style="font:700 12.5px 'Manrope',sans-serif;color:#fff;background:#141414;padding:5px 10px;white-space:nowrap">STIMUL · пр. Строителей, 68</span>
+        </div>
+        <span style="position:absolute;right:14px;bottom:12px;font:500 11.5px 'Manrope',sans-serif;color:#9a9aa4">схема проезда — место под интерактивную карту</span>
+      </div>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isGarage }}" hint-placeholder-val="{{ false }}">
+<div style="max-width:1320px;margin:0 auto;padding:26px 20px 60px">
+  <div style="display:flex;gap:8px;align-items:center;font:500 12.5px 'Manrope',sans-serif;color:#8b8b95;margin-bottom:16px">
+    <span onClick="{{ goHome }}" style="cursor:pointer;color:#6b6b75">Главная</span><span>/</span><span style="color:#141414;font-weight:700">Мой гараж</span>
+  </div>
+  <h1 style="font-family:'Oswald',sans-serif;font-weight:600;font-size:clamp(28px,4vw,44px);text-transform:uppercase;margin:0 0 12px;border-bottom:3px solid #141414;padding-bottom:12px">Мой гараж</h1>
+
+  <sc-if value="{{ garageEmpty }}" hint-placeholder-val="{{ true }}">
+    <div style="border:1px solid #E4E4E8;background:#fff;padding:56px 24px;text-align:center;margin-top:24px">
+      <svg width="54" height="54" viewBox="0 0 24 24" fill="none" stroke="#c9c9d0" stroke-width="1.3" style="margin-bottom:14px"><path d="M3 16l2-6h14l2 6zM6 16v3M18 16v3M8 10l1-4h6l1 4"></path></svg>
+      <div style="font-family:'Oswald',sans-serif;font-size:24px;text-transform:uppercase;margin-bottom:8px">В гараже пока пусто</div>
+      <div style="font:500 14px/1.6 'Manrope',sans-serif;color:#6b6b75;max-width:440px;margin:0 auto 18px">Добавьте автомобиль — и мы будем показывать только подходящие детали, а совместимость проверим по VIN.</div>
+      <button onClick="{{ goHomeSearch }}" style="height:48px;padding:0 26px;background:#E01F26;color:#fff;border:none;cursor:pointer;font:700 12.5px 'Manrope',sans-serif;letter-spacing:.11em;text-transform:uppercase" style-hover="background:#B3161C">Добавить автомобиль</button>
+    </div>
+  </sc-if>
+
+  <sc-for list="{{ garageCars }}" as="g" hint-placeholder-count="0">
+    <div style="border:1px solid #E4E4E8;border-top:4px solid #E01F26;background:#fff;padding:24px;margin-top:24px;display:flex;gap:26px;flex-wrap:wrap;align-items:center">
+      <svg width="58" height="58" viewBox="0 0 24 24" fill="none" stroke="#E01F26" stroke-width="1.3" style="flex:none"><path d="M3 16l2-6h14l2 6zM6 16v3M18 16v3M8 10l1-4h6l1 4"></path></svg>
+      <div style="flex:1 1 260px">
+        <div style="font-family:'Oswald',sans-serif;font-size:28px;text-transform:uppercase;line-height:1.1">{{ g.brand }} {{ g.model }}</div>
+        <div style="display:flex;gap:22px;flex-wrap:wrap;margin-top:12px">
+          <div><div style="font:600 10.5px 'Manrope',sans-serif;letter-spacing:.13em;text-transform:uppercase;color:#8b8b95">Год</div><div style="font:700 14px 'JetBrains Mono',monospace;margin-top:3px;white-space:nowrap">{{ g.year }}</div></div>
+          <div><div style="font:600 10.5px 'Manrope',sans-serif;letter-spacing:.13em;text-transform:uppercase;color:#8b8b95">Двигатель</div><div style="font:700 14px 'Manrope',sans-serif;margin-top:3px">{{ g.engine }}</div></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button onClick="{{ g.openParts }}" style="height:46px;padding:0 20px;background:#E01F26;color:#fff;border:none;cursor:pointer;font:700 12px 'Manrope',sans-serif;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap" style-hover="background:#B3161C">Запчасти для этого авто</button>
+        <button onClick="{{ resetCar }}" style="height:46px;padding:0 20px;background:#fff;border:1px solid #141414;color:#141414;cursor:pointer;font:700 12px 'Manrope',sans-serif;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap" style-hover="background:#141414;color:#fff">Сменить авто</button>
+      </div>
+    </div>
+    <div style="margin-top:14px;background:#F4F4F6;border-left:4px solid #1E9E5A;padding:16px 18px">
+      <div style="font:800 13.5px 'Manrope',sans-serif;margin-bottom:5px">Совместимость проверяется автоматически</div>
+      <div style="font:500 13px/1.55 'Manrope',sans-serif;color:#4a4a54">В каталоге у подходящих позиций появляется зелёная отметка «Подходит к вашему авто», а в карточке товара ваш автомобиль подсвечивается в таблице применимости.</div>
+    </div>
+  </sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{ isCart }}" hint-placeholder-val="{{ false }}">
+<div style="max-width:1320px;margin:0 auto;padding:26px 20px 60px">
+  <div style="display:flex;gap:8px;align-items:center;font:500 12.5px 'Manrope',sans-serif;color:#8b8b95;margin-bottom:16px">
+    <span onClick="{{ goHome }}" style="cursor:pointer;color:#6b6b75">Главная</span><span>/</span><span style="color:#141414;font-weight:700">Корзина</span>
+  </div>
+
+  <sc-if value="{{ ordered }}" hint-placeholder-val="{{ false }}">
+    <div style="border:1px solid #E4E4E8;border-top:4px solid #1E9E5A;background:#fff;padding:52px 26px;text-align:center">
+      <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#1E9E5A" stroke-width="2" style="margin-bottom:16px"><circle cx="12" cy="12" r="10"></circle><path d="M7.5 12.5l3 3 6-6.5"></path></svg>
+      <div style="font-family:'Oswald',sans-serif;font-size:30px;text-transform:uppercase;margin-bottom:10px">Заказ принят</div>
+      <div style="font:700 16px 'JetBrains Mono',monospace;margin-bottom:14px;white-space:nowrap">№ {{ orderNumber }}</div>
+      <div style="font:500 14.5px/1.6 'Manrope',sans-serif;color:#4a4a54;max-width:500px;margin:0 auto 20px">Перезвоним в течение 15 минут в рабочие часы: подтвердим наличие, сверим артикулы по VIN и согласуем время получения.</div>
+      <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:24px"><a href="tel:+79061241833" style="font:700 16px 'JetBrains Mono',monospace;white-space:nowrap">8 906 124-18-33</a><a href="tel:+79172950512" style="font:700 16px 'JetBrains Mono',monospace;white-space:nowrap">8 917 295-05-12</a></div>
+      <button onClick="{{ newOrder }}" style="height:48px;padding:0 26px;background:#141414;color:#fff;border:none;cursor:pointer;font:700 12.5px 'Manrope',sans-serif;letter-spacing:.11em;text-transform:uppercase" style-hover="background:#E01F26">Вернуться в каталог</button>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ showCart }}" hint-placeholder-val="{{ true }}">
+  <div>
+    <div style="display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;border-bottom:3px solid #141414;padding-bottom:12px;margin-bottom:22px">
+      <h1 style="font-family:'Oswald',sans-serif;font-weight:600;font-size:clamp(28px,4vw,44px);text-transform:uppercase;margin:0;line-height:1">Корзина</h1>
+      <span style="font:600 13.5px 'Manrope',sans-serif;color:#6b6b75;padding-bottom:4px">{{ cartCountLabel }}</span>
+    </div>
+
+    <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start">
+      <div style="flex:1 1 520px;min-width:300px;display:flex;flex-direction:column;gap:10px">
+        <sc-if value="{{ cartEmpty }}" hint-placeholder-val="{{ true }}">
+          <div style="border:1px solid #E4E4E8;background:#fff;padding:48px 24px;text-align:center">
+            <svg width="54" height="54" viewBox="0 0 24 24" fill="none" stroke="#c9c9d0" stroke-width="1.3" style="margin-bottom:14px"><path d="M3 4h3l2.4 11h9.7l2.2-8H7"></path><circle cx="10" cy="19.5" r="1.6"></circle><circle cx="17.5" cy="19.5" r="1.6"></circle></svg>
+            <div style="font-family:'Oswald',sans-serif;font-size:24px;text-transform:uppercase;margin-bottom:8px">Корзина пуста</div>
+            <div style="font:500 14px/1.6 'Manrope',sans-serif;color:#6b6b75;max-width:420px;margin:0 auto 18px">Подберите детали по автомобилю, VIN или артикулу — или позвоните, соберём заказ по телефону.</div>
+            <button onClick="{{ goCatalogAll }}" style="height:48px;padding:0 26px;background:#E01F26;color:#fff;border:none;cursor:pointer;font:700 12.5px 'Manrope',sans-serif;letter-spacing:.11em;text-transform:uppercase" style-hover="background:#B3161C">Перейти в каталог</button>
+          </div>
+        </sc-if>
+        <sc-for list="{{ cartRows }}" as="r" hint-placeholder-count="0">
+          <div style="border:1px solid #E4E4E8;background:#fff;padding:14px;display:flex;gap:16px;flex-wrap:wrap;align-items:center">
+            <div onClick="{{ r.open }}" style="cursor:pointer;flex:none;width:92px;height:80px;background:#F4F4F6;border:1px solid #E4E4E8;display:grid;place-items:center">{{ r.photo }}<sc-if value="{{ r.noImg }}" hint-placeholder-val="{{ true }}"><svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="#a6a6b0" stroke-width="1.1"><path d="{{ r.icon }}"></path></svg></sc-if></div>
+            <div style="flex:1 1 220px;display:flex;flex-direction:column;gap:5px">
+              <div style="font:700 11px 'Manrope',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#8b8b95">{{ r.brand }}</div>
+              <div onClick="{{ r.open }}" style="cursor:pointer;font:700 14.5px/1.35 'Manrope',sans-serif">{{ r.name }}</div>
+              <div style="font:500 12px 'JetBrains Mono',monospace;color:#6b6b75;white-space:nowrap">арт. {{ r.oem }}</div>
+              <sc-if value="{{ r.inStock }}" hint-placeholder-val="{{ true }}"><span style="align-self:flex-start;display:inline-flex;align-items:center;white-space:nowrap;font:700 11px 'Manrope',sans-serif;color:#1E9E5A;background:#E8F6EE;padding:4px 8px">{{ r.stockLabel }}</span></sc-if>
+              <sc-if value="{{ r.onOrder }}" hint-placeholder-val="{{ false }}"><span style="align-self:flex-start;display:inline-flex;align-items:center;white-space:nowrap;font:700 11px 'Manrope',sans-serif;color:#E08A00;background:#FDF3E0;padding:4px 8px">{{ r.stockLabel }}</span></sc-if>
+            </div>
+            <div style="flex:none;display:flex;border:1px solid #E4E4E8">
+              <button onClick="{{ r.dec }}" aria-label="Меньше" style="width:38px;height:40px;background:#F4F4F6;border:none;border-right:1px solid #E4E4E8;cursor:pointer;font-size:18px">−</button>
+              <span style="width:46px;display:grid;place-items:center;font:700 15px 'JetBrains Mono',monospace">{{ r.n }}</span>
+              <button onClick="{{ r.inc }}" aria-label="Больше" style="width:38px;height:40px;background:#F4F4F6;border:none;border-left:1px solid #E4E4E8;cursor:pointer;font-size:18px">+</button>
+            </div>
+            <div style="flex:none;width:130px;text-align:right">
+              <div style="font-family:'Oswald',sans-serif;font-size:22px;white-space:nowrap">{{ r.lineFmt }}</div>
+              <div style="font:500 12px 'Manrope',sans-serif;color:#8b8b95;margin-top:2px;white-space:nowrap">{{ r.priceFmt }} / шт</div>
+            </div>
+            <button onClick="{{ r.remove }}" aria-label="Удалить" style="flex:none;width:36px;height:36px;background:#fff;border:1px solid #E4E4E8;cursor:pointer;display:grid;place-items:center" style-hover="border-color:#E01F26"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#E01F26" stroke-width="2"><path d="M5 5l14 14M19 5L5 19"></path></svg></button>
+          </div>
+        </sc-for>
+      </div>
+
+      <aside style="order:-1;flex:1 1 300px;max-width:380px;min-width:280px;border:1px solid #E4E4E8;background:#fff">
+        <div style="padding:16px;border-bottom:1px solid #E4E4E8;background:#F4F4F6;font:700 12.5px 'Manrope',sans-serif;letter-spacing:.1em;text-transform:uppercase">Оформление заказа</div>
+        <div style="padding:18px;display:flex;flex-direction:column;gap:14px">
+          <div>
+            <div style="font:700 10.5px 'Manrope',sans-serif;letter-spacing:.13em;text-transform:uppercase;color:#6b6b75;margin-bottom:8px">Способ получения</div>
+            <div style="display:flex;gap:8px">
+              <button onClick="{{ wayPickup }}" style="flex:1;min-height:44px;padding:8px;border:1px solid #E4E4E8;background:{{ pickupBg }};color:{{ pickupFg }};cursor:pointer;font:700 11.5px 'Manrope',sans-serif;letter-spacing:.06em;text-transform:uppercase">Самовывоз</button>
+              <button onClick="{{ wayDelivery }}" style="flex:1;min-height:44px;padding:8px;border:1px solid #E4E4E8;background:{{ deliveryBg }};color:{{ deliveryFg }};cursor:pointer;font:700 11.5px 'Manrope',sans-serif;letter-spacing:.06em;text-transform:uppercase">Доставка</button>
+            </div>
+          </div>
+          <label style="display:block"><span style="display:block;font:700 10.5px 'Manrope',sans-serif;letter-spacing:.13em;text-transform:uppercase;color:#6b6b75;margin-bottom:6px">Имя</span>
+            <input value="{{ orderName }}" onChange="{{ onOrderName }}" placeholder="Как к вам обращаться" style="width:100%;height:46px;padding:0 12px;border:1px solid #E4E4E8;font:500 14px 'Manrope',sans-serif">
+          </label>
+          <label style="display:block"><span style="display:block;font:700 10.5px 'Manrope',sans-serif;letter-spacing:.13em;text-transform:uppercase;color:#6b6b75;margin-bottom:6px">Телефон</span>
+            <input value="{{ orderPhone }}" onChange="{{ onOrderPhone }}" placeholder="8 900 000-00-00" style="width:100%;height:46px;padding:0 12px;border:1px solid #E4E4E8;font:500 15px 'JetBrains Mono',monospace">
+          </label>
+          <label style="display:block"><span style="display:block;font:700 10.5px 'Manrope',sans-serif;letter-spacing:.13em;text-transform:uppercase;color:#6b6b75;margin-bottom:6px">Комментарий</span>
+            <input value="{{ orderComment }}" onChange="{{ onOrderComment }}" placeholder="VIN, время получения, пожелания" style="width:100%;height:46px;padding:0 12px;border:1px solid #E4E4E8;font:500 14px 'Manrope',sans-serif">
+          </label>
+          <div style="border-top:1px solid #E4E4E8;padding-top:14px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:7px"><span style="font:500 13.5px 'Manrope',sans-serif;color:#6b6b75">Товары</span><span style="font:700 13.5px 'Manrope',sans-serif;white-space:nowrap">{{ cartSumFmt }}</span></div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:12px"><span style="font:500 13.5px 'Manrope',sans-serif;color:#6b6b75">Доставка</span><span style="font:700 13.5px 'Manrope',sans-serif;white-space:nowrap">{{ cartDeliveryFmt }}</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font:700 12px 'Manrope',sans-serif;letter-spacing:.1em;text-transform:uppercase">Итого</span><span style="font-family:'Oswald',sans-serif;font-size:30px;white-space:nowrap">{{ cartTotalFmt }}</span></div>
+          </div>
+          <button onClick="{{ submitOrder }}" disabled="{{ cartEmpty }}" style="min-height:54px;padding:10px;background:{{ orderBg }};color:#fff;border:none;cursor:pointer;font:800 13.5px 'Manrope',sans-serif;letter-spacing:.11em;text-transform:uppercase" style-hover="background:#B3161C">Оформить заказ</button>
+          <div style="font:500 12px/1.55 'Manrope',sans-serif;color:#8b8b95">Оплата при получении. Перед сборкой заказа перезвоним и сверим артикулы.</div>
+        </div>
+      </aside>
+    </div>
+  </div>
+  </sc-if>
+</div>
+</sc-if>
+
+</main>
+
+<footer style="background:#141414;background-image:repeating-linear-gradient(135deg,rgba(255,255,255,.03) 0 2px,transparent 2px 7px);color:#b9b9c2;margin-top:auto">
+  <div style="height:6px;background:#E01F26"></div>
+  <div style="max-width:1320px;margin:0 auto;padding:44px 20px 26px;display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:34px">
+    <div>
+      <div style="display:flex;align-items:stretch;margin-bottom:16px">
+        <img src="assets/logo-stimul.png" alt="STIMUL Автозапчасти" style="height:46px;width:auto;display:block;flex:none">
+      </div>
+      <div style="font:700 12px 'Manrope',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#fff;margin-bottom:8px">Автозапчасти</div>
+      <p style="font:500 13px/1.6 'Manrope',sans-serif;color:#8b8b95;margin:0">для иномарок и отечественных автомобилей — в наличии и под заказ</p>
+    </div>
+    <div>
+      <div style="font:700 11.5px 'Manrope',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#fff;margin-bottom:14px">Контакты</div>
+      <div style="font:500 13.5px/1.6 'Manrope',sans-serif;margin-bottom:10px">г. Альметьевск,<br>пр. Строителей, 68<br><span style="color:#8b8b95">Республика Татарстан</span></div>
+      <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:10px"><a href="tel:+79061241833" style="color:#fff;font:700 15px 'JetBrains Mono',monospace;white-space:nowrap">8 906 124-18-33</a><a href="tel:+79172950512" style="color:#fff;font:700 15px 'JetBrains Mono',monospace;white-space:nowrap">8 917 295-05-12</a></div>
+      <div style="font:500 13px/1.6 'Manrope',sans-serif;color:#8b8b95">пн–сб 9:00–19:00<br>вс 10:00–16:00</div>
+    </div>
+    <div>
+      <div style="font:700 11.5px 'Manrope',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#fff;margin-bottom:14px">Каталог</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <sc-for list="{{ footerCats }}" as="c" hint-placeholder-count="8">
+          <span onClick="{{ c.open }}" style="cursor:pointer;font:500 13.5px 'Manrope',sans-serif;color:#b9b9c2;transition:color .16s" style-hover="color:#fff">{{ c.name }}</span>
+        </sc-for>
+      </div>
+    </div>
+    <div>
+      <div style="font:700 11.5px 'Manrope',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#fff;margin-bottom:14px">Как нас найти</div>
+      <div style="border:1px solid #333;background:#1c1c1c;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:26px 26px;height:170px;position:relative;display:grid;place-items:center">
+        <div style="position:absolute;left:0;right:0;top:58%;height:8px;background:#2a2a2a"></div>
+        <div style="position:absolute;top:0;bottom:0;left:38%;width:6px;background:#252525"></div>
+        <div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:6px">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="#E01F26"><path d="M12 22s7-6.6 7-11.5A7 7 0 105 10.5C5 15.4 12 22 12 22z"></path><circle cx="12" cy="10" r="2.6" fill="#fff"></circle></svg>
+          <span style="font:700 11.5px 'Manrope',sans-serif;color:#fff;background:#141414;padding:3px 7px">пр. Строителей, 68</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="border-top:1px solid #2a2a2a">
+    <div style="max-width:1320px;margin:0 auto;padding:16px 20px;display:flex;gap:16px;flex-wrap:wrap;justify-content:space-between;font:500 12px 'Manrope',sans-serif;color:#6f6f79">
+      <span>ИП Рашитов Р. Р. · ИНН 999999999999 · ОГРНИП 999999999999999</span>
+      <span>© 2016–2026 STIMUL Автозапчасти, Альметьевск</span>
+    </div>
+  </div>
+</footer>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:1000}}">
+const CATS=window.CATS,CATNAME=window.CATNAME,CATICON=window.CATICON,CATCOUNT=window.CATCOUNT,RAW=window.RAW,FITS=window.FITS,DESC=window.DESC,TIPS=window.TIPS,SUGGEST=window.SUGGEST;
+const REVIEWS = [
+ {who:'Ильдар',car:'LADA Vesta 1.6',date:'12 июля 2026',stars:'★★★★★',text:'Заказал утром, к обеду уже забрал на Строителей. Подошло без вопросов, продавец сам сверил по VIN.'},
+ {who:'Сергей М.',car:'Kia Rio 1.6',date:'28 июня 2026',stars:'★★★★★',text:'Цена ниже, чем в двух других магазинах города. Артикул сверил заранее, всё совпало.'},
+ {who:'Айрат',car:'Renault Logan 1.6',date:'3 июня 2026',stars:'★★★★☆',text:'Ждал два дня под заказ, позвонили сразу как пришло. Работает тихо, претензий нет.'},
+ {who:'Марат Г.',car:'УАЗ Патриот 2.7',date:'19 мая 2026',stars:'★★★★★',text:'Беру у них третий год всё на две машины. Подбирают руками, а не по картинке, это главное.'}
+];
+
+const MAKERS = ['Bosch','SKF','TRW','LUK','Sachs','Febi','Mann-Filter','Mahle','NGK','Gates','Trialli','Fenox','ЗМЗ','Мастер-Спорт','ВАЗинтерсервис'];
+
+const DOM_BRANDS = {
+ 'LADA (ВАЗ)':{'Vesta':['1.6 16V (106 л.с.)','1.8 16V (122 л.с.)'],'Granta':['1.6 8V (87 л.с.)','1.6 16V (106 л.с.)'],'Niva Legend':['1.7 8V (83 л.с.)'],'Largus':['1.6 8V (87 л.с.)','1.6 16V (102 л.с.)'],'Priora':['1.6 16V (98 л.с.)'],'Kalina':['1.4 16V (89 л.с.)','1.6 8V (87 л.с.)'],'XRAY':['1.6 16V (106 л.с.)']},
+ 'ГАЗ':{'Газель Next':['УМЗ A275 (107 л.с.)','Cummins ISF 2.8 (120 л.с.)'],'Газель Бизнес':['УМЗ 4216 (107 л.с.)','ЗМЗ 405 (140 л.с.)'],'Соболь':['ЗМЗ 405 (140 л.с.)']},
+ 'УАЗ':{'Патриот':['ЗМЗ 409 (135 л.с.)'],'Хантер':['ЗМЗ 409 (128 л.с.)'],'Профи':['ЗМЗ 409 (150 л.с.)']},
+ 'Москвич':{'3':['1.5 турбо (150 л.с.)'],'6':['1.5 турбо (174 л.с.)']},
+ 'Chevrolet Niva':{'2123':['1.7 8V (80 л.с.)']}
+};
+const FOR_BRANDS = {
+ 'Kia':{'Rio':['1.4 (100 л.с.)','1.6 (123 л.с.)'],'Ceed':['1.6 (129 л.с.)'],'Sportage':['2.0 (150 л.с.)','2.4 (184 л.с.)']},
+ 'Hyundai':{'Solaris':['1.4 (100 л.с.)','1.6 (123 л.с.)'],'Creta':['1.6 (123 л.с.)','2.0 (150 л.с.)'],'Tucson':['2.0 (150 л.с.)']},
+ 'Renault':{'Logan':['1.4 (75 л.с.)','1.6 (102 л.с.)'],'Duster':['1.6 (114 л.с.)','2.0 (143 л.с.)'],'Sandero':['1.6 (102 л.с.)']},
+ 'Toyota':{'Camry':['2.0 (150 л.с.)','2.5 (181 л.с.)'],'Corolla':['1.6 (122 л.с.)'],'RAV4':['2.0 (146 л.с.)','2.5 (180 л.с.)']},
+ 'Volkswagen':{'Polo':['1.6 (105 л.с.)','1.6 (110 л.с.)'],'Tiguan':['1.4 TSI (150 л.с.)','2.0 TSI (180 л.с.)'],'Passat':['1.8 TSI (180 л.с.)']},
+ 'Nissan':{'Almera':['1.6 (102 л.с.)'],'X-Trail':['2.0 (144 л.с.)','2.5 (171 л.с.)'],'Qashqai':['2.0 (144 л.с.)']},
+ 'Ford':{'Focus':['1.6 (105 л.с.)','1.8 (125 л.с.)'],'Mondeo':['2.0 (200 л.с.)'],'Kuga':['1.6 EcoBoost (150 л.с.)']},
+ 'Škoda':{'Octavia':['1.6 (110 л.с.)','1.8 TSI (180 л.с.)'],'Rapid':['1.6 (110 л.с.)'],'Fabia':['1.6 (105 л.с.)']},
+ 'Chevrolet':{'Lacetti':['1.4 (95 л.с.)','1.6 (109 л.с.)'],'Cruze':['1.6 (109 л.с.)','1.8 (141 л.с.)'],'Aveo':['1.6 (115 л.с.)']},
+ 'Daewoo':{'Nexia':['1.5 (80 л.с.)','1.6 (109 л.с.)'],'Matiz':['0.8 (51 л.с.)']},
+ 'Mazda':{'3':['1.6 (105 л.с.)','2.0 (150 л.с.)'],'6':['2.0 (150 л.с.)'],'CX-5':['2.0 (150 л.с.)','2.5 (194 л.с.)']},
+ 'Mitsubishi':{'Lancer':['1.6 (117 л.с.)','2.0 (150 л.с.)'],'Outlander':['2.0 (146 л.с.)','2.4 (167 л.с.)'],'ASX':['1.6 (117 л.с.)']},
+ 'BMW':{'3 серия':['2.0 (184 л.с.)'],'5 серия':['2.0 (249 л.с.)'],'X3':['2.0 (184 л.с.)']},
+ 'Mercedes-Benz':{'C-класс':['1.6 (156 л.с.)','2.0 (184 л.с.)'],'E-класс':['2.0 (184 л.с.)'],'GLK':['2.1 CDI (170 л.с.)']},
+ 'Opel':{'Astra':['1.4 (140 л.с.)','1.6 (115 л.с.)'],'Insignia':['1.8 (140 л.с.)'],'Corsa':['1.4 (100 л.с.)']},
+ 'Peugeot':{'308':['1.6 (120 л.с.)'],'408':['1.6 (115 л.с.)'],'3008':['1.6 THP (150 л.с.)']},
+ 'Citroën':{'C4':['1.6 (115 л.с.)'],'Berlingo':['1.6 (110 л.с.)']},
+ 'Geely':{'Coolray':['1.5 турбо (150 л.с.)'],'Atlas':['2.0 (139 л.с.)'],'Emgrand':['1.5 (122 л.с.)']},
+ 'Haval':{'Jolion':['1.5 турбо (143 л.с.)'],'F7':['1.5 турбо (150 л.с.)','2.0 турбо (190 л.с.)'],'H9':['2.0 турбо (218 л.с.)']},
+ 'Chery':{'Tiggo 4':['1.5 турбо (147 л.с.)'],'Tiggo 7 Pro':['1.5 турбо (147 л.с.)'],'Arrizo 8':['1.6 турбо (186 л.с.)']}
+};
+
+
+const IMG = {};
+
+function makeImg(id,pct){
+  const src = IMG[id];
+  if(!src) return null;
+  return React.createElement('img',{src:src,alt:'',style:{maxWidth:pct+'%',maxHeight:pct+'%',objectFit:'contain',mixBlendMode:'multiply'}});
+}
+const PRODUCTS = RAW.map(function(r){
+  return {id:r[0],cat:r[1],brand:r[2],name:r[3],oem:r[4],price:r[5],old:r[6],qty:r[7],days:r[8],side:r[9],type:r[10],warranty:r[11],orig:r[12],pop:r[13],desc:r[14],specs:r[15],appl:r[16]};
+});
+
+
+
+const WMI = {
+ 'XTA':'LADA (ВАЗ)','XTB':'LADA (ВАЗ)','XTK':'LADA (ВАЗ)','XW8':'Volkswagen','X7L':'Renault','X7M':'Hyundai','Z94':'Hyundai',
+ 'XWE':'Hyundai','XWB':'Chevrolet','XUU':'Chevrolet','XUF':'Chevrolet','X4X':'BMW','X4H':'Haval','XTT':'УАЗ','XTH':'ГАЗ','X96':'ГАЗ','X89':'ГАЗ',
+ 'XW7':'Toyota','Z8N':'Nissan','XU3':'Chevrolet Niva','X9L':'Chevrolet Niva','XW1':'Volkswagen',
+ 'LGW':'Haval','LGB':'Haval','LB3':'Geely','LB2':'Geely','LB1':'Geely','L6T':'Chery','LVV':'Chery','LVX':'Chery','LSJ':'Chery',
+ 'LFV':'Volkswagen','LSV':'Volkswagen','LVS':'Ford','LZW':'Chevrolet','LFP':'Toyota','LVH':'Honda','LJD':'Toyota','LDC':'Peugeot','L5Y':'Geely',
+ 'KMH':'Hyundai','KMF':'Hyundai','KM8':'Hyundai','KNA':'Kia','KND':'Kia','KNE':'Kia','KNC':'Kia','KNM':'Renault','KLA':'Chevrolet','KL1':'Chevrolet','KL3':'Chevrolet','KPT':'SsangYong',
+ 'JTD':'Toyota','JTE':'Toyota','JTM':'Toyota','JTN':'Toyota','JTL':'Toyota','JTH':'Lexus','JTJ':'Lexus','JN1':'Nissan','JN8':'Nissan','JN6':'Nissan',
+ 'JHM':'Honda','JHL':'Honda','JHG':'Honda','JM0':'Mazda','JM1':'Mazda','JMZ':'Mazda','JMB':'Mitsubishi','JA3':'Mitsubishi','JA4':'Mitsubishi',
+ 'JF1':'Subaru','JF2':'Subaru','JS1':'Suzuki','JS2':'Suzuki','JS3':'Suzuki','JNK':'Infiniti','JNR':'Infiniti',
+ 'WVW':'Volkswagen','WV1':'Volkswagen','WV2':'Volkswagen','WAU':'Audi','WA1':'Audi','TRU':'Audi','WBA':'BMW','WBS':'BMW','WBY':'BMW','WMW':'MINI',
+ 'WDB':'Mercedes-Benz','WDD':'Mercedes-Benz','WDC':'Mercedes-Benz','WDF':'Mercedes-Benz','W1K':'Mercedes-Benz','W1N':'Mercedes-Benz','W1V':'Mercedes-Benz',
+ 'WP0':'Porsche','WP1':'Porsche','W0L':'Opel','W0V':'Opel','WF0':'Ford','TMB':'Škoda','TMP':'Škoda','VSS':'SEAT','UU1':'Renault','VF1':'Renault',
+ 'VF3':'Peugeot','VF7':'Citroën','VR1':'Peugeot','VR3':'Peugeot','YV1':'Volvo','YV4':'Volvo','YS3':'Saab','ZFA':'Fiat','ZAR':'Alfa Romeo','ZFF':'Ferrari',
+ 'SAL':'Land Rover','SAJ':'Jaguar','SCB':'Bentley','SCA':'Rolls-Royce','SB1':'Toyota','SJN':'Nissan','SHH':'Honda','TSM':'Suzuki','SUP':'Peugeot',
+ '1G1':'Chevrolet','1GC':'Chevrolet','1GB':'Chevrolet','2G1':'Chevrolet','3GN':'Chevrolet','1G6':'Cadillac','1GY':'Cadillac','1GM':'Pontiac',
+ '1FA':'Ford','1FT':'Ford','1FM':'Ford','2FM':'Ford','3FA':'Ford','1FD':'Ford','1C3':'Chrysler','1C4':'Chrysler','2C3':'Chrysler','1J4':'Jeep','1J8':'Jeep',
+ '1HG':'Honda','2HG':'Honda','19X':'Honda','4T1':'Toyota','5TD':'Toyota','2T1':'Toyota','5TF':'Toyota','1N4':'Nissan','5N1':'Nissan','3N1':'Nissan',
+ '1VW':'Volkswagen','3VW':'Volkswagen','5YJ':'Tesla','4S3':'Subaru','4S4':'Subaru','JF3':'Subaru','4M2':'Mercury','2HM':'Hyundai','5NP':'Hyundai','5XY':'Hyundai','5XX':'Kia','KNH':'Kia'
+};
+const WMI2 = {
+ 'XT':'LADA (ВАЗ)','Z9':'Россия','LB':'Geely','LG':'Haval','LV':'Chery','LS':'Китай','LF':'Китай','LJ':'Китай','LC':'Китай','LZ':'Китай','LE':'Китай',
+ 'KM':'Hyundai','KN':'Kia','KL':'Chevrolet','JT':'Toyota','JN':'Nissan','JH':'Honda','JM':'Mazda','JF':'Subaru','JS':'Suzuki','JA':'Mitsubishi',
+ 'WV':'Volkswagen','WA':'Audi','WB':'BMW','WD':'Mercedes-Benz','W0':'Opel','WF':'Ford','WP':'Porsche','WM':'MINI','TM':'Škoda','VF':'Франция','VS':'SEAT','UU':'Renault',
+ 'YV':'Volvo','ZF':'Fiat','SA':'Великобритания','SB':'Великобритания','SC':'Великобритания'
+};
+const VIN_REGION = {A:'Африка',B:'Африка',C:'Африка',D:'Африка',E:'Африка',F:'Африка',G:'Африка',H:'Африка',J:'Япония',K:'Корея',L:'Китай',M:'Индия / Азия',N:'Турция / Азия',P:'Азия',R:'Азия',S:'Европа (Великобритания / Германия)',T:'Европа (Швейцария / Чехия)',U:'Европа',V:'Европа (Франция / Испания)',W:'Германия',X:'Россия / СНГ',Y:'Скандинавия',Z:'Италия','1':'США','2':'Канада','3':'Мексика','4':'США','5':'США','6':'Австралия','7':'Новая Зеландия','8':'Южная Америка','9':'Бразилия'};
+const VIN_YEAR = {A:1980,B:1981,C:1982,D:1983,E:1984,F:1985,G:1986,H:1987,J:1988,K:1989,L:1990,M:1991,N:1992,P:1993,R:1994,S:1995,T:1996,V:1997,W:1998,X:1999,Y:2000,'1':2001,'2':2002,'3':2003,'4':2004,'5':2005,'6':2006,'7':2007,'8':2008,'9':2009};
+
+function vinChecksum(v){
+  if('12345'.indexOf(v[0])<0) return 'na';
+  const T='0123456789.ABCDEFGH..JKLMN.P.R..STUVWXYZ';
+  const W=[8,7,6,5,4,3,2,10,0,9,8,7,6,5,4,3,2];
+  let sum=0;
+  for(let i=0;i<17;i++){ const n=T.indexOf(v[i])%10; if(n<0) return 'na'; sum+=n*W[i]; }
+  const r=sum%11, want = r===10?'X':String(r);
+  return v[8]===want ? 'ok' : 'bad';
+}
+
+function decodeVin(raw){
+  const v = String(raw||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+  if(v.length!==17) return null;
+  const wmi = v.slice(0,3);
+  let brand = WMI[wmi] || null;
+  let exact = !!brand;
+  if(!brand){ const g = WMI2[v.slice(0,2)]; if(g && g.indexOf('Китай')<0 && g.indexOf('Европа')<0 && g.indexOf('Россия')<0 && g.indexOf('Франция')<0 && g.indexOf('Велико')<0) brand = g; }
+  const yc = v[9];
+  let year = VIN_YEAR[yc] || null;
+  const NOW = 2026;
+  if(year && year<2000 && (year+30)<=NOW) year = year+30;
+  return {
+    vin:v, wmi:wmi, brand:brand, exact:exact,
+    region: (v[0]==='Z' && '6789'.indexOf(v[1])>=0) ? 'Россия / СНГ' : (VIN_REGION[v[0]] || 'не определён'),
+    year: year, yearApprox: !!year && !exact,
+    vds: v.slice(3,8), plant: v[10], serial: v.slice(11),
+    check: vinChecksum(v)
+  };
+}
+
+function norm(s){ return String(s||'').toUpperCase().replace(/Ё/g,'Е').trim(); }
+function textHit(p,q){
+  const Q = norm(q).split(/\s+/).filter(Boolean);
+  const hay = norm([p.name,p.oem,p.brand,p.type,p.orig,CATNAME[p.cat]].join(' '));
+  for(let i=0;i<Q.length;i++){ if(hay.indexOf(Q[i])<0) return false; }
+  return true;
+}
+function lev(a,b){
+  a=norm(a); b=norm(b);
+  const m=a.length,n=b.length;
+  if(!m) return n; if(!n) return m;
+  let prev=[],cur=[];
+  for(let j=0;j<=n;j++) prev[j]=j;
+  for(let i=1;i<=m;i++){
+    cur[0]=i;
+    for(let j=1;j<=n;j++){
+      cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));
+    }
+    prev=cur.slice();
+  }
+  return prev[n];
+}
+function money(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g,' ') + ' ₽'; }
+
+class Component extends DCLogic {
+  state = {
+    screen:'home', tab:'car', items:[], cartKey:0,
+    ordered:false, orderName:'', orderPhone:'', orderWay:'pickup', orderComment:'',
+    brand:'', model:'', year:'', engine:'',
+    car:null,
+    vin:'', vinRes:null, vinModel:'', vinEngine:'', partQ:'', partLoading:false,
+    cat:'tormoz', catQ:'', catFocus:false, sort:'pop', view:'grid', limit:12,
+    fBrands:[], fAvail:[], fSide:[], fType:[], fWarr:[], fOrig:[],
+    pMin:0, pMax:14000,
+    productId:'p1', qty:1, cmp:[]
+  };
+
+  // ——— navigation
+  go(screen){ this.setState({screen:screen}); if(typeof window!=='undefined') window.scrollTo(0,0); }
+  openCat(cat){ this.setState({screen:'catalog',cat:cat,limit:12,catQ:'',catFocus:false,fBrands:[],fAvail:[],fSide:[],fType:[],fWarr:[],fOrig:[],pMin:0,pMax:14000}); if(typeof window!=='undefined') window.scrollTo(0,0); }
+  openProduct(id){ this.setState({screen:'product',productId:id,qty:1}); if(typeof window!=='undefined') window.scrollTo(0,0); }
+  add(id,n){
+    this.setState(function(s){
+      const items = s.items.map(function(it){ return {id:it.id,n:it.n}; });
+      let found = false;
+      items.forEach(function(it){ if(it.id===id){ it.n += n; found = true; } });
+      if(!found) items.push({id:id,n:n});
+      return {items:items, cartKey:s.cartKey+1};
+    });
+  }
+  setQty(id,n){
+    this.setState(function(s){
+      const items = [];
+      s.items.forEach(function(it){ if(it.id===id){ if(n>0) items.push({id:id,n:n}); } else items.push(it); });
+      return {items:items, cartKey:s.cartKey+1};
+    });
+  }
+  cartCount(){ let t=0; this.state.items.forEach(function(it){ t+=it.n; }); return t; }
+  cartSum(){ let t=0; this.state.items.forEach(function(it){ const p=PRODUCTS.filter(function(x){return x.id===it.id;})[0]; if(p) t+=p.price*it.n; }); return t; }
+
+  toggle(key,val){
+    this.setState(function(s){
+      const arr = s[key].slice(), i = arr.indexOf(val);
+      if(i<0) arr.push(val); else arr.splice(i,1);
+      const o = {limit:12}; o[key]=arr; return o;
+    });
+  }
+
+  carLabelOf(c){ return c ? (c.brand+' '+c.model+' '+c.engine.split(' ')[0]+' ('+c.year+')') : ''; }
+
+  matches(p){
+    const s = this.state, c = s.car;
+    if(s.fBrands.length && s.fBrands.indexOf(p.brand)<0) return false;
+    if(s.fAvail.length){
+      const label = p.qty>0 ? 'В наличии' : 'Под заказ';
+      if(s.fAvail.indexOf(label)<0) return false;
+    }
+    if(s.fSide.length && s.fSide.indexOf(p.side)<0) return false;
+    if(s.fType.length && s.fType.indexOf(p.type)<0) return false;
+    if(s.fWarr.length && s.fWarr.indexOf(p.warranty)<0) return false;
+    if(s.fOrig.length && s.fOrig.indexOf(p.orig)<0) return false;
+    if(p.price < s.pMin || p.price > s.pMax) return false;
+    return true;
+  }
+
+  fitsCar(p){
+    const c = this.state.car; if(!c) return false;
+    const rows = FITS[p.cat] || [];
+    const b = c.brand.replace(' (ВАЗ)','');
+    for(let i=0;i<rows.length;i++){ if(rows[i][0]===b) return true; }
+    return false;
+  }
+
+  deco(p){
+    const self = this;
+    return {
+      id:p.id, brand:p.brand, name:p.name, oem:p.oem, orig:p.orig,
+      catName:CATNAME[p.cat], icon:CATICON[p.cat],
+      img:IMG[p.id]||null, hasImg:!!IMG[p.id], noImg:!IMG[p.id],
+      photo:makeImg(p.id,86), photoBig:makeImg(p.id,82),
+      priceFmt:money(p.price), hasOld:p.old>0, oldFmt:p.old>0?money(p.old):'',
+      inStock:p.qty>0, onOrder:p.qty===0,
+      stockLabel: p.qty>0 ? ('В наличии — '+p.qty+' шт') : ('Под заказ — '+p.days+'–'+(p.days+1)+' дня'),
+      fitsCar:this.fitsCar(p),
+      cmp:this.state.cmp.indexOf(p.id)>=0,
+      toggleCmp:function(){ self.toggle('cmp',p.id); },
+      open:function(){ self.openProduct(p.id); },
+      add:function(e){ if(e&&e.stopPropagation) e.stopPropagation(); self.add(p.id,1); }
+    };
+  }
+
+  counts(list,field){
+    const m = {};
+    list.forEach(function(p){ const v = field(p); m[v] = (m[v]||0)+1; });
+    return m;
+  }
+
+  renderVals(){
+    const self = this, s = this.state;
+    const catProducts = PRODUCTS.filter(function(p){ return p.cat===s.cat; });
+    const cq = s.catQ.trim();
+    const base = (cq || s.cat==='all') ? PRODUCTS : catProducts;
+    let results = base.filter(function(p){ return self.matches(p); });
+    if(cq) results = results.filter(function(p){ return textHit(p,cq); });
+    if(s.sort==='pop') results.sort(function(a,b){ return b.pop-a.pop; });
+    if(s.sort==='cheap') results.sort(function(a,b){ return a.price-b.price; });
+    if(s.sort==='exp') results.sort(function(a,b){ return b.price-a.price; });
+    if(s.sort==='fast') results.sort(function(a,b){ return (a.qty>0?0:a.days)-(b.qty>0?0:b.days); });
+
+    const brandCounts = this.counts(base,function(p){ return p.brand; });
+    const brandFilters = Object.keys(brandCounts).sort().map(function(b){
+      return {name:b,count:brandCounts[b],on:s.fBrands.indexOf(b)>=0,toggle:function(){ self.toggle('fBrands',b); }};
+    });
+    function group(title,key,vals){
+      return {title:title,items:vals.map(function(v){
+        return {name:v.n,count:v.c,on:s[key].indexOf(v.n)>=0,toggle:function(){ self.toggle(key,v.n); }};
+      })};
+    }
+    function opts(field){
+      const m = self.counts(base,field);
+      return Object.keys(m).sort().map(function(k){ return {n:k,c:m[k]}; });
+    }
+    const availCounts = this.counts(base,function(p){ return p.qty>0?'В наличии':'Под заказ'; });
+    const filterGroups = [
+      group('Наличие','fAvail',Object.keys(availCounts).map(function(k){ return {n:k,c:availCounts[k]}; })),
+      group('Сторона установки','fSide',opts(function(p){ return p.side; })),
+      s.cat==='all' ? null : group('Подкатегория','fType',opts(function(p){ return p.type; })),
+      group('Гарантия','fWarr',opts(function(p){ return p.warranty; })),
+      group('Оригинал / Аналог','fOrig',opts(function(p){ return p.orig; }))
+    ].filter(function(g){ return g && g.items.length>1; });
+
+    const catFilters = [{name:'Весь каталог',count:PRODUCTS.length,on:s.cat==='all',pick:function(){ self.openCat('all'); }}].concat(
+      CATS.map(function(c){
+        return {name:c[1],count:PRODUCTS.filter(function(p){ return p.cat===c[0]; }).length,on:s.cat===c[0],pick:function(){ self.openCat(c[0]); }};
+      })
+    ).map(function(o){
+      return Object.assign(o,{
+        bg:o.on?'#141414':'#fff', fg:o.on?'#fff':'#141414', hoverBg:o.on?'#141414':'#F4F4F6',
+        countFg:o.on?'#b9b9c2':'#9a9aa4', weight:o.on?800:500
+      });
+    });
+
+    const VOCAB = (function(){
+      const seen = {}, out = [];
+      function push(label,kind){
+        const k = kind+'|'+label;
+        if(!label || seen[k]) return; seen[k]=true;
+        out.push({label:label,kind:kind});
+      }
+      CATS.forEach(function(c){ push(c[1],'категория'); });
+      PRODUCTS.forEach(function(p){ push(p.type,'подкатегория'); push(p.brand,'бренд'); push(p.name,'товар'); push(p.oem,'артикул'); });
+      return out;
+    })();
+    const catSug = cq.length>1 ? VOCAB.map(function(v){
+      const L = norm(v.label), Q = norm(cq);
+      const i = L.indexOf(Q);
+      if(i<0) return null;
+      const n = PRODUCTS.filter(function(p){ return textHit(p,v.label); }).length;
+      return {label:v.label, kind:v.kind, count:n, rank:(i===0?0:1)*100 + L.length,
+              pick:function(){ self.setState({catQ:v.label,limit:12,catFocus:false}); }};
+    }).filter(Boolean).sort(function(a,b){ return a.rank-b.rank; }).slice(0,7) : [];
+
+    let catFix = null;
+    if(cq.length>2 && results.length===0){
+      let best=null;
+      VOCAB.forEach(function(v){
+        const words = norm(v.label).split(/\s+/);
+        words.forEach(function(w){
+          const d = lev(cq,w);
+          if(d<=Math.max(1,Math.floor(w.length/3)) && (!best || d<best.d)) best={d:d,label:v.label};
+        });
+      });
+      if(best) catFix = {label:best.label, pick:function(){ self.setState({catQ:best.label,limit:12}); }};
+    }
+
+    const sortDefs = [['pop','по популярности'],['cheap','сначала дешевле'],['exp','сначала дороже'],['fast','по сроку поставки']];
+    const sortOpts = sortDefs.map(function(d){
+      const on = s.sort===d[0];
+      return {label:d[1],bg:on?'#141414':'#fff',fg:on?'#fff':'#141414',bd:on?'#141414':'#E4E4E8',pick:function(){ self.setState({sort:d[0]}); }};
+    });
+
+    // product page
+    const p = PRODUCTS.filter(function(x){ return x.id===s.productId; })[0] || PRODUCTS[0];
+    const pd = this.deco(p);
+    const analogs = PRODUCTS.filter(function(x){ return x.cat===p.cat && x.id!==p.id; }).slice(0,4).map(function(x){ return self.deco(x); });
+    const relCats = {dvig:'masla',rashod:'rashod',podvesk:'tormoz',kuzov:'svet',elektr:'dvig',tormoz:'podvesk',instr:'rashod',kpp:'dvig',svet:'kuzov',masla:'dvig'};
+    const related = PRODUCTS.filter(function(x){ return x.cat===(relCats[p.cat]||'rashod'); }).slice(0,4).map(function(x){ return self.deco(x); });
+    const carBrand = s.car ? s.car.brand.replace(' (ВАЗ)','') : null;
+    const fitRows = (FITS[p.cat]||[]).map(function(r){
+      const hit = carBrand && r[0]===carBrand;
+      return {brand:r[0],model:r[1],years:r[2],engine:r[3],bg:hit?'#E8F6EE':'#fff',fg:hit?'#14663c':'#141414'};
+    });
+    const specs = [
+      {k:'Категория',v:CATNAME[p.cat]},
+      {k:'Производитель',v:p.brand},
+      {k:'Артикул',v:p.oem},
+      {k:'Тип',v:p.type},
+      {k:'Сторона установки',v:p.side},
+      {k:'Гарантия',v:p.warranty},
+      {k:'Страна производства',v:p.brand==='Trialli'||p.brand==='Fenox'||p.brand==='ЗМЗ'||p.brand==='Мастер-Спорт'||p.brand==='ВАЗинтерсервис'||p.brand==='Тюмень'||p.brand==='Лукойл'?'Россия':'Германия'},
+      {k:'Вес в упаковке',v:'1,8 кг'},
+      {k:'Упаковка',v:'заводская, с маркировкой'}
+    ];
+    const thumbs = [0,1,2,3].map(function(i){ return {icon:CATICON[p.cat],img:IMG[p.id]||null,hasImg:!!IMG[p.id],noImg:!IMG[p.id],photo:makeImg(p.id,86),bd:i===0?'#E01F26':'#E4E4E8'}; });
+
+    // part search suggestions
+    const q = s.partQ.trim().toUpperCase();
+    const suggestions = q.length>1 ? PRODUCTS.filter(function(x){
+      return textHit(x,q) || norm(x.oem).replace(/[^A-ZА-Я0-9]/g,'').indexOf(norm(q).replace(/[^A-ZА-Я0-9]/g,''))>=0;
+    }).slice(0,6).map(function(x){
+      return {oem:x.oem,brand:x.brand,name:x.name,priceFmt:money(x.price),open:function(){ self.openProduct(x.id); }};
+    }) : [];
+
+    const _pq = s.partQ.trim();
+    const phraseSug = _pq.length>0 ? SUGGEST.filter(function(w){ var W=w.toUpperCase(),Q=_pq.toUpperCase(); return W.indexOf(Q)>=0 && W!==Q; }).slice(0,6).map(function(w){ return {label:w, pick:function(){ self.setState({partQ:w,partLoading:false}); }}; }) : [];
+
+    const brandMap = DOM_BRANDS[s.brand] ? DOM_BRANDS[s.brand] : (FOR_BRANDS[s.brand]||null);
+    const models = brandMap ? Object.keys(brandMap) : [];
+    const years = [];
+    if(s.model){ for(let y=2024;y>=2008;y--) years.push(String(y)); }
+    const engines = (brandMap && s.model && s.year) ? brandMap[s.model] : [];
+
+    const catList = CATS.map(function(c){
+      return {name:c[1],icon:c[2],count:(CATCOUNT[c[0]]||PRODUCTS.filter(function(p){ return p.cat===c[0]; }).length),open:function(){ self.openCat(c[0]); }};
+    });
+
+    const vinLen = s.vin.length;
+    const vr = s.vinRes;
+    const vrMap = vr && vr.brand ? (DOM_BRANDS[vr.brand] || FOR_BRANDS[vr.brand] || null) : null;
+    const vinModels = vrMap ? Object.keys(vrMap) : [];
+    const vinEngines = (vrMap && vrMap[s.vinModel]) ? vrMap[s.vinModel] : [];
+    const vinCheck = vr ? (vr.check==='ok' ? {t:'контрольная сумма верна',c:'#1E9E5A'} : vr.check==='bad' ? {t:'контрольная сумма не совпадает — проверьте ввод',c:'#E08A00'} : {t:'контрольный разряд для этого региона не используется',c:'#8b8b95'}) : null;
+
+    const catHeading = (s.cat==='all' ? 'Весь каталог' : CATNAME[s.cat]) + (s.car ? (' — ' + this.carLabelOf(s.car)) : '');
+
+    return {
+      goHome:function(){ self.go('home'); },
+      goHomeSearch:function(){ self.setState({screen:'home',tab:'car'}); if(typeof window!=='undefined') window.scrollTo(0,0); },
+      goHomeVin:function(){ self.setState({screen:'home',tab:'vin'}); if(typeof window!=='undefined') window.scrollTo(0,0); },
+      onHdrQ:function(e){ self.setState({catQ:e.target.value,limit:12}); },
+      onHdrEnter:function(e){
+        if(e.key!=='Enter') return;
+        const v = e.target.value.trim();
+        if(!v) return;
+        self.setState({screen:'catalog',cat:'all',catQ:v,catFocus:false,limit:12});
+        if(typeof window!=='undefined') window.scrollTo(0,0);
+      },
+      hdrSubmit:function(){
+        const v = self.state.catQ.trim();
+        if(!v){ self.setState({screen:'home',tab:'part'}); if(typeof window!=='undefined') window.scrollTo(0,0); return; }
+        self.setState({screen:'catalog',cat:'all',catFocus:false,limit:12});
+        if(typeof window!=='undefined') window.scrollTo(0,0);
+      },
+      goCatalogAll:function(){ self.openCat('all'); },
+      goDelivery:function(){ self.go('delivery'); },
+      goContacts:function(){ self.go('contacts'); },
+      goCart:function(){ self.setState({screen:'cart',ordered:false}); if(typeof window!=='undefined') window.scrollTo(0,0); },
+      goGarage:function(){ self.go('garage'); },
+      isHome:s.screen==='home', isCatalog:s.screen==='catalog', isProduct:s.screen==='product',
+      isDelivery:s.screen==='delivery', isContacts:s.screen==='contacts', isCart:s.screen==='cart', isGarage:s.screen==='garage',
+      navCatalogBd:s.screen==='catalog'?'#E01F26':'transparent',
+      navDeliveryBd:s.screen==='delivery'?'#E01F26':'transparent',
+      navContactsBd:s.screen==='contacts'?'#E01F26':'transparent',
+      cartCount:this.cartCount(), cartKey:s.cartKey,
+      cartEmpty:s.items.length===0,
+      showCart:!s.ordered,
+      cartRows:s.items.map(function(it){
+        const x = PRODUCTS.filter(function(q){ return q.id===it.id; })[0];
+        const d = self.deco(x);
+        d.n = it.n;
+        d.lineFmt = money(x.price*it.n);
+        d.inc = function(){ self.setQty(it.id,it.n+1); };
+        d.dec = function(){ self.setQty(it.id,it.n-1); };
+        d.remove = function(){ self.setQty(it.id,0); };
+        return d;
+      }),
+      cartSumFmt:money(this.cartSum()),
+      cartDeliveryFmt:s.orderWay==='pickup'?'бесплатно':money(300),
+      cartTotalFmt:money(this.cartSum() + (s.orderWay==='pickup'?0:300)),
+      cartCountLabel:'позиций: '+s.items.length+' · товаров: '+this.cartCount(),
+      orderName:s.orderName, orderPhone:s.orderPhone, orderComment:s.orderComment,
+      onOrderName:function(e){ self.setState({orderName:e.target.value}); },
+      onOrderPhone:function(e){ self.setState({orderPhone:e.target.value}); },
+      onOrderComment:function(e){ self.setState({orderComment:e.target.value}); },
+      wayPickup:function(){ self.setState({orderWay:'pickup'}); },
+      wayDelivery:function(){ self.setState({orderWay:'delivery'}); },
+      pickupBg:s.orderWay==='pickup'?'#141414':'#fff', pickupFg:s.orderWay==='pickup'?'#fff':'#141414',
+      deliveryBg:s.orderWay==='delivery'?'#141414':'#fff', deliveryFg:s.orderWay==='delivery'?'#fff':'#141414',
+      canOrder:s.items.length>0 && s.orderName.trim().length>1 && s.orderPhone.replace(/\D/g,'').length>=10,
+      orderBg:(s.items.length>0 && s.orderName.trim().length>1 && s.orderPhone.replace(/\D/g,'').length>=10)?'#E01F26':'#c9c9d0',
+      ordered:s.ordered,
+      orderNumber:'СТ-'+(4820+s.items.length+this.cartCount()),
+      submitOrder:function(){
+        if(!(s.items.length>0 && s.orderName.trim().length>1 && s.orderPhone.replace(/\D/g,'').length>=10)) return;
+        self.setState({ordered:true});
+        if(typeof window!=='undefined') window.scrollTo(0,0);
+      },
+      newOrder:function(){ self.setState({ordered:false,items:[],orderName:'',orderPhone:'',orderComment:'',screen:'home'}); if(typeof window!=='undefined') window.scrollTo(0,0); },
+      hasCar:!!s.car, carLabel:this.carLabelOf(s.car),
+      resetCar:function(){ self.setState({car:null,brand:'',model:'',year:'',engine:'',screen:'home',tab:'car'}); },
+
+      isTabCar:s.tab==='car', isTabVin:s.tab==='vin', isTabPart:s.tab==='part',
+      tabCar:function(){ self.setState({tab:'car'}); }, tabVin:function(){ self.setState({tab:'vin'}); }, tabPart:function(){ self.setState({tab:'part'}); },
+      tabCarBg:s.tab==='car'?'#141414':'#fff', tabCarFg:s.tab==='car'?'#fff':'#6b6b75',
+      tabVinBg:s.tab==='vin'?'#141414':'#fff', tabVinFg:s.tab==='vin'?'#fff':'#6b6b75',
+      tabPartBg:s.tab==='part'?'#141414':'#fff', tabPartFg:s.tab==='part'?'#fff':'#6b6b75',
+
+      domBrands:Object.keys(DOM_BRANDS), forBrands:Object.keys(FOR_BRANDS),
+      models:models, years:years, engines:engines,
+      selBrand:s.brand, selModel:s.model, selYear:s.year, selEngine:s.engine,
+      noBrand:!s.brand, noModel:!s.model, noYear:!s.year, noEngine:!s.engine,
+      modelBg:s.brand?'#fff':'#F4F4F6', yearBg:s.model?'#fff':'#F4F4F6', engBg:s.year?'#fff':'#F4F4F6',
+      modelPh:s.brand?'Выберите модель':'Сначала марка',
+      yearPh:s.model?'Выберите год':'Сначала модель',
+      engPh:s.year?'Выберите двигатель':'Сначала год',
+      ctaBg:s.engine?'#E01F26':'#c9c9d0',
+      onBrand:function(e){ self.setState({brand:e.target.value,model:'',year:'',engine:''}); },
+      onModel:function(e){ self.setState({model:e.target.value,year:'',engine:''}); },
+      onYear:function(e){ self.setState({year:e.target.value,engine:''}); },
+      onEngine:function(e){ self.setState({engine:e.target.value}); },
+      submitCar:function(){
+        if(!s.engine) return;
+        self.setState({car:{brand:s.brand,model:s.model,year:s.year,engine:s.engine},screen:'catalog',cat:'tormoz',limit:12});
+        if(typeof window!=='undefined') window.scrollTo(0,0);
+      },
+
+      vin:s.vin, vinCount:vinLen, vinCountColor:vinLen===17?'#1E9E5A':'#9a9aa4', vinInvalid:vinLen!==17,
+      vinCtaBg:vinLen===17?'#E01F26':'#c9c9d0',
+      onVin:function(e){ self.setState({vin:e.target.value.replace(/[^a-zA-Z0-9]/g,'').slice(0,17).toUpperCase(),vinRes:null,vinModel:'',vinEngine:''}); },
+
+      vinDecoded:!!vr,
+      vinBrand: vr ? (vr.brand || 'не определена по коду') : '',
+      vinBrandColor: vr && vr.brand ? '#141414' : '#8b8b95',
+      vinWmi: vr ? vr.wmi : '',
+      vinRegionTxt: vr ? vr.region : '',
+      vinYearTxt: vr ? (vr.year ? String(vr.year)+' г.' : 'не определён') : '',
+      vinVds: vr ? vr.vds : '',
+      vinPlantTxt: vr ? vr.plant : '',
+      vinSerialTxt: vr ? vr.serial : '',
+      vinCheckTxt: vinCheck ? vinCheck.t : '',
+      vinCheckColor: vinCheck ? vinCheck.c : '#8b8b95',
+      vinHasModels: vinModels.length>0,
+      vinNoModels: !!vr && vinModels.length===0,
+      vinModels:vinModels, vinEngines:vinEngines,
+      selVinModel:s.vinModel, selVinEngine:s.vinEngine,
+      onVinModel:function(e){
+        const m = e.target.value;
+        const eng = (vrMap && vrMap[m] && vrMap[m].length===1) ? vrMap[m][0] : '';
+        self.setState({vinModel:m,vinEngine:eng});
+      },
+      onVinEngine:function(e){ self.setState({vinEngine:e.target.value}); },
+      vinEngDisabled:!s.vinModel,
+      vinEngBg:s.vinModel?'#fff':'#F4F4F6',
+      vinEngPh:s.vinModel?'Выберите двигатель':'Сначала модель',
+      vinPickDisabled:!(s.vinModel && s.vinEngine),
+      vinPickBg:(s.vinModel && s.vinEngine)?'#E01F26':'#c9c9d0',
+      vinPick:function(){
+        if(!(s.vinModel && s.vinEngine)) return;
+        self.setState({car:{brand:vr.brand,model:s.vinModel,year:String(vr.year||''),engine:s.vinEngine},screen:'catalog',cat:'tormoz',limit:12});
+        if(typeof window!=='undefined') window.scrollTo(0,0);
+      },
+      vinAgain:function(){ self.setState({vin:'',vinRes:null,vinModel:'',vinEngine:''}); },
+
+      submitVin:function(){
+        if(s.vin.length!==17) return;
+        const res = decodeVin(s.vin);
+        const map = res && res.brand ? (DOM_BRANDS[res.brand] || FOR_BRANDS[res.brand] || null) : null;
+        const models = map ? Object.keys(map) : [];
+        const m = models.length===1 ? models[0] : '';
+        const eng = (m && map[m].length===1) ? map[m][0] : '';
+        self.setState({vinRes:res,vinModel:m,vinEngine:eng});
+      },
+
+      partQ:s.partQ, partLoading:s.partLoading,
+      showSuggest:!s.partLoading && (suggestions.length>0||phraseSug.length>0), suggestions:suggestions, phraseSug:phraseSug,
+      onPartEnter:function(e){
+        if(e.key!=='Enter') return;
+        const v = e.target.value.trim();
+        if(!v) return;
+        self.setState({screen:'catalog',cat:'all',catQ:v,catFocus:false,limit:12,partLoading:false});
+        if(typeof window!=='undefined') window.scrollTo(0,0);
+      },
+      onPartQ:function(e){
+        const v = e.target.value;
+        self.setState({partQ:v,partLoading:v.trim().length>1});
+        clearTimeout(self._t);
+        self._t = setTimeout(function(){ self.setState({partLoading:false}); },380);
+      },
+
+      categories:catList,
+      footerCats:catList.slice(0,8),
+      makers:MAKERS,
+      hits:PRODUCTS.slice().sort(function(a,b){ return b.pop-a.pop; }).slice(0,8).map(function(x){ return self.deco(x); }),
+
+      catTitle:s.cat==='all'?'Весь каталог':CATNAME[s.cat],
+      catHeading:catHeading,
+      resultCount:'найдено '+results.length+' из '+base.length,
+      brandFilters:brandFilters, filterGroups:filterGroups, sortOpts:sortOpts, catFilters:catFilters,
+      catQ:s.catQ,
+      onCatQ:function(e){ self.setState({catQ:e.target.value,limit:12,catFocus:true}); },
+      onCatFocus:function(){ self.setState({catFocus:true}); },
+      clearCatQ:function(){ self.setState({catQ:'',limit:12,catFocus:false}); },
+      hasCatQ:cq.length>0,
+      catSug:catSug, showCatSug:s.catFocus && catSug.length>0,
+      catQAllNote:cq.length>0,
+      hasCatFix:!!catFix, catFixLabel:catFix?catFix.label:'', catFixPick:catFix?catFix.pick:function(){},
+      resetFilters:function(){ self.setState({catQ:'',fBrands:[],fAvail:[],fSide:[],fType:[],fWarr:[],fOrig:[],pMin:0,pMax:14000,limit:12}); },
+      pMin:s.pMin, pMax:s.pMax, pMinFmt:money(s.pMin), pMaxFmt:money(s.pMax),
+      trackLeft:(s.pMin/14000*100).toFixed(1)+'%', trackRight:(100-s.pMax/14000*100).toFixed(1)+'%',
+      onPMin:function(e){ const v=Number(e.target.value); self.setState({pMin:Math.min(v,s.pMax-100),limit:12}); },
+      onPMax:function(e){ const v=Number(e.target.value); self.setState({pMax:Math.max(v,s.pMin+100),limit:12}); },
+      isGrid:s.view==='grid' && results.length>0, isList:s.view==='list' && results.length>0,
+      setGrid:function(){ self.setState({view:'grid'}); }, setList:function(){ self.setState({view:'list'}); },
+      gridBg:s.view==='grid'?'#141414':'#fff', gridFg:s.view==='grid'?'#fff':'#6b6b75',
+      listBg:s.view==='list'?'#141414':'#fff', listFg:s.view==='list'?'#fff':'#6b6b75',
+      isEmpty:results.length===0,
+      page:results.slice(0,s.limit).map(function(x){ return self.deco(x); }),
+      hasMore:results.length>s.limit,
+      moreCount:Math.min(12,results.length-s.limit),
+      showMore:function(){ self.setState(function(st){ return {limit:st.limit+12}; }); },
+
+      pr:Object.assign({},pd,{
+        fitRows:fitRows, specs:((p.specs&&p.specs.length)?[{k:'Производитель',v:p.brand},{k:'Артикул',v:p.oem},{k:'Категория',v:CATNAME[p.cat]}].concat(p.specs.map(function(sp){return {k:sp[0],v:sp[1]};})):specs), analogs:analogs, related:related, thumbs:thumbs,
+        desc:(p.desc||DESC[p.cat]), tip:TIPS[p.cat],
+        totalFmt:money(p.price*s.qty),
+        openCat:function(){ self.openCat(p.cat); }
+      }),
+      qty:s.qty,
+      incQty:function(){ self.setState(function(st){ return {qty:Math.min(99,st.qty+1)}; }); },
+      decQty:function(){ self.setState(function(st){ return {qty:Math.max(1,st.qty-1)}; }); },
+      addCurrent:function(){ self.add(p.id,s.qty); },
+      garageCars:s.car ? [{label:this.carLabelOf(s.car),brand:s.car.brand,model:s.car.model,year:s.car.year,engine:s.car.engine,
+        openParts:function(){ self.openCat('rashod'); }}] : [],
+      garageEmpty:!s.car,
+      reviews:REVIEWS
+    };
+  }
+}
+
+</script>
+</body>
+</html>
