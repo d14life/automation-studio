@@ -261,8 +261,19 @@ function patch(mat, isCore) {
          lo staggers the moment each pair trades, and because a mate inherits its
          partner's aTone the pair shares one lo - so one shrinks exactly as the other
          grows, in the same place, in the same instant. */
-      float lo = 0.30 + aTone * 0.40;
-      float kA = smoothstep(lo, lo + 0.14, g);
+      /* THE TRADE HAPPENS BEFORE ANYTHING FLIES. This window used to sit at 0.30-0.84,
+         which overlaps the flight almost exactly - so a Solutions fragment did its
+         growing while already out in open space, and it read as rock appearing from
+         nowhere instead of rock coming off a letter.
+
+         A fragment does not start travelling until its own break passes 0.42, which on
+         this curve is about 0.43 of the scroll. Finishing every trade by then means it
+         happens while the mark is still a dense, cracking cluster: the mate grows in
+         the exact spot its partner is vacating, hidden among the rubble of the letter
+         it came from, and what flies afterwards is a rock the viewer has already
+         watched come off the 101. Nothing is ever created in open air. */
+      float lo = 0.10 + aTone * 0.24;
+      float kA = smoothstep(lo, lo + 0.12, g);
       float k = mix(kA, 1.0 - kA, aWord);
       float shrink = pow(1.0 - k, 0.3333);
       /* where the piece lives right now: its own word's slot, travelling to the slot
