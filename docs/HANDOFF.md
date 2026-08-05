@@ -606,3 +606,31 @@ handler holding a detached `<video>` and calling `play()` on it on every click. 
 returning a cleanup from the ref callback (React 19). **Note the consequence:** once a ref
 callback returns a cleanup, React stops calling it with `null`, so clearing `videoRef.current`
 became the cleanup's job.
+
+### 5.19 A state class that sets `transform` wipes the responsive geometry underneath it
+
+`.v2bg video.is-mir{transform:rotate(180deg)}` looked harmless and was invisible on desktop,
+where the video has no transform of its own. In portrait it was destructive: that rule
+**replaced** `translate(-50%,-50%) rotate(-90deg)`, so the loop's turn threw away both the
+quarter turn and the centring, on every turn.
+
+Measured at 375x812:
+
+| | box | covers the screen |
+|---|---|---|
+| normal | `(0,-130) 375x1072` | yes |
+| `.is-mir`, before the fix | `(188,406) 1072x375` | no — starts at the dead centre |
+
+`transform` is a single property, so the last declaration wins outright; there is no cascade
+*within* it. The fix is to let each geometry own its own `transform` and pass the state through
+a custom property instead — `--turn`, composed as a final `rotate(var(--turn))`. **Any future
+state class on this element must do the same: set a variable, never a transform.**
+
+### 5.20 Never write `currentTime` to a byte range the browser has not downloaded
+
+A `<video>` downloads progressively; seeking outside the buffered ranges **aborts the request in
+flight** and restarts it at the new offset. The scrub loop writes `currentTime` up to 50 times a
+second, so scrolling during the first seconds cancelled and restarted the download 50 times a
+second and it could not finish. The idle loop did the same unprompted, which was the "static for
+two seconds" half of the report. Guard every seek with a `buffered` range check, and roll the
+phase back when the target is not there yet, so nothing accumulates invisibly and then jumps.
