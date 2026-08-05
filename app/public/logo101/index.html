@@ -176,7 +176,7 @@ function patch(mat, isCore) {
     sh.vertexShader = sh.vertexShader.replace('#include <begin_vertex>', `
       /* ONE SCROLL, TWO WORDS - and THIS is the line the whole effect hung on.
          aTarget was uploaded correctly for all 484 pieces and uMorph was reaching the
-         shader, but `transformed` was still built from aCenter alone, so every piece
+         shader, but transformed was still built from aCenter alone, so every piece
          flew outward and came straight back home. A ring.
 
          home TRAVELS: 101 at one end, a point sampled on the letterforms of
@@ -291,7 +291,7 @@ function mergeBucket(list) {
 
 let composer = null, bloom = null
 let TARGETS = null
-const build = (gltf) => {
+const build = (gltf) => { try {
   const byPiece = new Map()
   gltf.scene.updateMatrixWorld(true)
   gltf.scene.traverse((o) => {
@@ -402,7 +402,7 @@ const build = (gltf) => {
                    u: uniforms }
   stat.textContent = `${byPiece.size} кусков · ${count} примитивов`
   loop()
-}
+} catch (e) { fail('build: ' + (e && e.message ? e.message : e)) } }
 fetch('./targets.json').then(r => r.json()).then(j => { TARGETS = j })
   .catch(() => { TARGETS = null })
   .finally(() => new GLTFLoader().load('./logo101.glb', build, undefined,
