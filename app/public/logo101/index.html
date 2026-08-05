@@ -107,10 +107,10 @@ scene.add(root)
    one of the ~500 fracture facets, and a surface covered in mirror highlights is
    the definition of shiny. Rock is lit mostly by the room; the directionals are
    now shaping light, not the light. */
-const key  = new THREE.DirectionalLight(0xfff1e0, 0.70); key.position.set(-3, 4, 5)
+const key  = new THREE.DirectionalLight(0xfff1e0, 1.05); key.position.set(-3, 4, 5)
 const rim  = new THREE.DirectionalLight(0x7FD8FF, 0.85); rim.position.set(4, -1, -4)
 const kick = new THREE.DirectionalLight(0xff9a5c, 0.30); kick.position.set(5, 2, 2)
-scene.add(new THREE.HemisphereLight(0x9fc6dd, 0x0b1a24, 0.85))
+scene.add(new THREE.HemisphereLight(0x9fc6dd, 0x0b1a24, 1.25))
 scene.add(key, rim, kick)
 
 /* REAL ROCK MAPS, projected triplanar. The fractured pieces have no UVs - bisect
@@ -155,9 +155,8 @@ const skinMat = new THREE.MeshPhysicalMaterial({
   transparent: true,
 })
 const coreMat = new THREE.MeshPhysicalMaterial({
-  color: 0x123246, metalness: 0.3, roughness: 0.55, transparent: true,
-  emissive: 0xffffff, emissiveIntensity: 1.0, envMapIntensity: 1.3,
-  clearcoat: 0.6, clearcoatRoughness: 0.25,
+  color: 0x2b3238, metalness: 0.0, roughness: 0.85, transparent: true,
+  emissive: 0xffffff, emissiveIntensity: 1.0, envMapIntensity: 0.55,
 })
 
 function patch(mat, isCore) {
@@ -268,6 +267,20 @@ function patch(mat, isCore) {
       sh.fragmentShader = sh.fragmentShader.replace('#include <dithering_fragment>',
         '#include <dithering_fragment>\n        gl_FragColor.a *= vFade;')
     }
+    /* BOTH MATERIALS GET THE ROCK. Blender's skin/interior split is decided by a
+       distance threshold scaled to each word's extrusion, and Solutions is extruded
+       shallower than 101 - so on the smaller word a lot of genuine surface got filed
+       as interior. Skin-only rock maps turned every one of those faces into a flat
+       blue hole punched through an otherwise solid word. Give the interior the same
+       stone and let the EMISSIVE do the reveal, which is what actually distinguishes
+       them anyway: same rock, lit from inside once it breaks. */
+      const T = 'tri(uRock, vWorld, normalize(vLocalN))'
+      sh.fragmentShader = sh.fragmentShader
+        .replace('#include <map_fragment>', 'diffuseColor.rgb *= ' + T + ' * 1.5;')
+        .replace('#include <roughnessmap_fragment>',
+                 'float roughnessFactor = roughness * (0.60 + 0.45 * tri(uRough, vWorld, normalize(vLocalN)).r);')
+        .replace('#include <normal_fragment_maps>',
+                 'vec3 nrm = tri(uNormal, vWorld, normalize(vLocalN)) * 2.0 - 1.0; normal = normalize(normal + vec3(nrm.xy, 0.0) * 1.3);')
   }
   if (!isCore) {
     /* A FRESNEL RIM. Near-black metal on a near-black background loses its own
@@ -288,13 +301,6 @@ function patch(mat, isCore) {
          wearing a rock picture. Albedo, roughness and NORMAL go into the PBR chunks
          instead, so the lights graze real relief. The hand-rolled hash grain goes with
          it - the photograph carries more microstructure than three sines ever did. */
-      const T = 'tri(uRock, vWorld, normalize(vLocalN))'
-      sh.fragmentShader = sh.fragmentShader
-        .replace('#include <map_fragment>', 'diffuseColor.rgb *= ' + T + ' * 1.5;')
-        .replace('#include <roughnessmap_fragment>',
-                 'float roughnessFactor = roughness * (0.60 + 0.45 * tri(uRough, vWorld, normalize(vLocalN)).r);')
-        .replace('#include <normal_fragment_maps>',
-                 'vec3 nrm = tri(uNormal, vWorld, normalize(vLocalN)) * 2.0 - 1.0; normal = normalize(normal + vec3(nrm.xy, 0.0) * 1.3);')
     })(mat.onBeforeCompile)
   }
   mat.customProgramCacheKey = () => (isCore ? 'core' : 'skin')
@@ -407,9 +413,12 @@ const build = (gltf) => { try {
     renderer.setSize(w, h, false)
     camera.aspect = w / h
     const fov = THREE.MathUtils.degToRad(camera.fov)
-    const dh = (size.y * 1.55) / 2 / Math.tan(fov / 2)
-    /* framed for the WIDER word - Solutions is three times the width of 101 */
-    const dw = (size.x * 3.05) / 2 / Math.tan(fov / 2) / Math.max(camera.aspect, 0.0001)
+    const dh = (size.y * 1.5) / 2 / Math.tan(fov / 2)
+    /* size is ALREADY the union box of both words, so Solutions' width is in it -
+       multiplying by 3.05 on top of that pushed the camera three times further back
+       than needed and rendered the whole mark at a third of the frame. 1.2 is the
+       margin, not the word count. */
+    const dw = (size.x * 1.2) / 2 / Math.tan(fov / 2) / Math.max(camera.aspect, 0.0001)
     camera.position.set(0, 0, Math.max(dh, dw))
     camera.lookAt(0, 0, 0)
     camera.updateProjectionMatrix()
