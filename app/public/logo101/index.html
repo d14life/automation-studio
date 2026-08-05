@@ -110,6 +110,8 @@ scene.add(key, rim, kick)
 
 const uniforms = {
   uDamage: { value: 0 },
+  uMorph:  { value: 0 },   /* 0 = the mark is 101, 1 = the swarm has become Solutions */
+  uSpin:   { value: 0 },
   uMinY:   { value: -1 },
   uMaxY:   { value: 1 },
 }
@@ -144,9 +146,9 @@ function patch(mat, isCore) {
   mat.onBeforeCompile = (sh) => {
     Object.assign(sh.uniforms, uniforms)
     sh.vertexShader = `
-      attribute vec3 aCenter; attribute vec3 aSeed; attribute float aTone;
-      uniform float uDamage, uMinY, uMaxY;
-      varying float vT; varying float vTone; varying vec3 vLocalN;
+      attribute vec3 aCenter; attribute vec3 aTarget; attribute vec3 aSeed; attribute float aTone;
+      uniform float uDamage, uMorph, uSpin, uMinY, uMaxY;
+      varying float vT; varying float vTone; varying vec3 vLocalN; varying vec3 vWorld;
       mat3 axisRot(vec3 a, float ang){
         float c=cos(ang), s=sin(ang), o=1.0-c;
         return mat3(c+a.x*a.x*o, a.x*a.y*o-a.z*s, a.x*a.z*o+a.y*s,
@@ -186,11 +188,12 @@ function patch(mat, isCore) {
     `)
     sh.vertexShader = sh.vertexShader.replace('#include <beginnormal_vertex>', `
       float tn = breakT(aCenter, uDamage, uMinY, uMaxY);
-      vec3 objectNormal = axisRot(normalize(aSeed + vec3(0.001)), tn * 1.5) * normal;
+      float angn = tn * 6.2 + uSpin * (0.6 + aTone * 1.4) * tn;
+      vec3 objectNormal = axisRot(normalize(aSeed + vec3(0.001)), angn) * normal;
       vLocalN = objectNormal;
     `)
 
-    sh.fragmentShader = 'varying float vT; varying float vTone; varying vec3 vLocalN;\n' + sh.fragmentShader
+    sh.fragmentShader = 'varying float vT; varying float vTone; varying vec3 vLocalN; varying vec3 vWorld;\n' + sh.fragmentShader
     if (isCore) {
       /* THE REVEAL: the interior is nearly dark while the mark is whole and lifts
          as its own piece separates. Squared, so it stays subtle through the first
@@ -227,6 +230,13 @@ function patch(mat, isCore) {
         #include <dithering_fragment>
         float fres = pow(1.0 - abs(dot(normalize(vLocalN), vec3(0.0, 0.0, 1.0))), 3.2);
         gl_FragColor.rgb += fres * mix(vec3(0.10,0.34,0.52), vec3(0.34,0.20,0.10), vTone) * 0.9;
+        /* GRAIN - smooth facets read as plastic; broken stone has microstructure */
+        vec3 wp = vWorld * 26.0;
+        float n1 = fract(sin(dot(floor(wp),     vec3(12.99,78.23,45.16))) * 43758.5453);
+        float n2 = fract(sin(dot(floor(wp*2.7), vec3(19.43,61.77,31.09))) * 24634.6345);
+        float n3 = fract(sin(dot(floor(wp*7.1), vec3(27.11,53.37,88.21))) * 15731.7431);
+        float grain = (n1 * 0.55 + n2 * 0.31 + n3 * 0.14) - 0.5;
+        gl_FragColor.rgb *= 1.0 + grain * 0.34;
       `)
     })(mat.onBeforeCompile)
   }
@@ -245,6 +255,7 @@ function mergeBucket(list) {
   for (const e of list) n += e.g.attributes.position.count
   const pos = new Float32Array(n * 3), nor = new Float32Array(n * 3)
   const cen = new Float32Array(n * 3), sed = new Float32Array(n * 3)
+  const tgt = new Float32Array(n * 3)
   const ton = new Float32Array(n)
   let o = 0
   for (const e of list) {
@@ -253,6 +264,7 @@ function mergeBucket(list) {
       pos[(o + i) * 3] = p[i * 3]; pos[(o + i) * 3 + 1] = p[i * 3 + 1]; pos[(o + i) * 3 + 2] = p[i * 3 + 2]
       nor[(o + i) * 3] = nm[i * 3]; nor[(o + i) * 3 + 1] = nm[i * 3 + 1]; nor[(o + i) * 3 + 2] = nm[i * 3 + 2]
       cen[(o + i) * 3] = e.c.x; cen[(o + i) * 3 + 1] = e.c.y; cen[(o + i) * 3 + 2] = e.c.z
+      tgt[(o + i) * 3] = e.g2.x; tgt[(o + i) * 3 + 1] = e.g2.y; tgt[(o + i) * 3 + 2] = e.g2.z
       sed[(o + i) * 3] = e.s.x; sed[(o + i) * 3 + 1] = e.s.y; sed[(o + i) * 3 + 2] = e.s.z
       ton[o + i] = e.t
     }
@@ -263,12 +275,14 @@ function mergeBucket(list) {
   g.setAttribute('normal', new THREE.BufferAttribute(nor, 3))
   g.setAttribute('aCenter', new THREE.BufferAttribute(cen, 3))
   g.setAttribute('aSeed', new THREE.BufferAttribute(sed, 3))
+  g.setAttribute('aTarget', new THREE.BufferAttribute(tgt, 3))
   g.setAttribute('aTone', new THREE.BufferAttribute(ton, 1))
   return g
 }
 
 let composer = null, bloom = null
-new GLTFLoader().load('./logo101.glb', (gltf) => {
+let TARGETS = null
+const build = (gltf) => {
   const byPiece = new Map()
   gltf.scene.updateMatrixWorld(true)
   gltf.scene.traverse((o) => {
@@ -295,6 +309,7 @@ new GLTFLoader().load('./logo101.glb', (gltf) => {
      and the wave would still sweep through the old, wrong axis. */
   const STAND = new THREE.Matrix4().makeRotationX(Math.PI / 2)
   const skin = [], core = []
+  let pieceIndex = 0
   let count = 0
   const box = new THREE.Box3()
   for (const [, meshes] of byPiece) {
@@ -310,6 +325,11 @@ new GLTFLoader().load('./logo101.glb', (gltf) => {
     /* bias the throw outward from the mark's own centre, so it opens rather than
        stirs - pure randomness reads as a blender, not a break */
     s.lerp(c.clone().normalize(), 0.55).normalize()
+    /* the landing point inside "Solutions". No STAND here: the exporter's Y-up
+       conversion and STAND compose to the identity, so targets sampled straight from
+       Blender are already in the right space - applying STAND alone tips the word. */
+    const tv = TARGETS && TARGETS.targets && TARGETS.targets[pieceIndex++]
+    const g2 = tv ? new THREE.Vector3(tv[0], tv[1], tv[2]) : c.clone()
     box.union(pb.applyMatrix4(STAND))
     for (const m of meshes) {
       const g = (m.geometry.index ? m.geometry.toNonIndexed() : m.geometry.clone())
@@ -317,7 +337,7 @@ new GLTFLoader().load('./logo101.glb', (gltf) => {
       g.applyMatrix4(STAND)
       if (!g.attributes.normal) g.computeVertexNormals()
       const name = (m.material?.name || '').toLowerCase()
-      ;(name.includes('core') ? core : skin).push({ g, c, s, t: tone })
+      ;(name.includes('core') ? core : skin).push({ g, c, s, t: tone, g2 })
       count++
     }
   }
@@ -336,7 +356,8 @@ new GLTFLoader().load('./logo101.glb', (gltf) => {
     camera.aspect = w / h
     const fov = THREE.MathUtils.degToRad(camera.fov)
     const dh = (size.y * 1.55) / 2 / Math.tan(fov / 2)
-    const dw = (size.x * 1.35) / 2 / Math.tan(fov / 2) / Math.max(camera.aspect, 0.0001)
+    /* framed for the WIDER word - Solutions is three times the width of 101 */
+    const dw = (size.x * 3.05) / 2 / Math.tan(fov / 2) / Math.max(camera.aspect, 0.0001)
     camera.position.set(0, 0, Math.max(dh, dw))
     camera.lookAt(0, 0, 0)
     camera.updateProjectionMatrix()
@@ -358,7 +379,11 @@ new GLTFLoader().load('./logo101.glb', (gltf) => {
 
   stat.textContent = `${byPiece.size} кусков · ${count} примитивов`
   loop()
-}, undefined, (e) => fail('GLB не загрузился: ' + e))
+}
+fetch('./targets.json').then(r => r.json()).then(j => { TARGETS = j })
+  .catch(() => { TARGETS = null })
+  .finally(() => new GLTFLoader().load('./logo101.glb', build, undefined,
+                                       (e) => fail('GLB не загрузился: ' + e)))
 
 let damage = 0, target = 0, spin = 0, last = performance.now()
 slider.addEventListener('input', () => { target = parseFloat(slider.value) })
