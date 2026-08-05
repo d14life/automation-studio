@@ -886,7 +886,13 @@ function loadDemo(){
   toast('Демо-данные созданы: '+db.units.length+' ед. техники, '+db.clients.length+' клиентов, '+db.contracts.length+' договоров, '+db.shifts.length+' смен');
 }
 /* ═══════════ 7. Оболочка, роутер, рендер ═══════════ */
-let route={v:'cal'};
+/* THE DASHBOARD IS THE FRONT DOOR, not the calendar. For someone who already runs the park the
+   calendar is the daily screen and it was the right default; for someone deciding whether this
+   is worth buying it is a grid of coloured bars that answers no question. Аналитика answers the
+   only three that matter in the first ten seconds - what did the park earn, how hard is it
+   working, and what is on fire - and it is also what the card on the site now shows, because
+   that card is a live frame of this page. */
+let route={v:'analytics'};
 let q='';
 let calMonth=monthStart(today());
 let periodFrom=monthStart(addDays(today(),-60)), periodTo=today();
