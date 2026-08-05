@@ -54,8 +54,8 @@ function studioEnv(renderer) {
   const g = cv.getContext('2d')
 
   const sky = g.createLinearGradient(0, 0, 0, H)
-  sky.addColorStop(0.00, '#cfe6f5')   /* ceiling bounce */
-  sky.addColorStop(0.42, '#4d6d84')
+  sky.addColorStop(0.00, '#eaf4ff')   /* ceiling bounce, brighter - the mark had nothing to catch */
+  sky.addColorStop(0.42, '#5f8299')
   sky.addColorStop(0.55, '#16303f')
   sky.addColorStop(1.00, '#050c12')   /* dark floor, so the underside stays weighty */
   g.fillStyle = sky; g.fillRect(0, 0, W, H)
@@ -66,10 +66,17 @@ function studioEnv(renderer) {
     r.addColorStop(0, c); r.addColorStop(1, 'rgba(0,0,0,0)')
     g.fillStyle = r; g.fillRect(x, y, w, h)
   }
-  softbox(W * 0.06, H * 0.02, W * 0.30, H * 0.34, 'rgba(255,255,255,1)')
-  softbox(W * 0.62, H * 0.10, W * 0.26, H * 0.26, 'rgba(190,225,255,0.85)')
-  /* cold rim from behind - separates the mark from whatever sits behind it */
-  softbox(W * 0.40, H * 0.52, W * 0.34, H * 0.22, 'rgba(90,190,255,0.55)')
+  /* TWO TEMPERATURES, NOT ONE. Every reflection on the mark used to be the same
+     cold blue, which is why it read as flat black no matter how bright the lights
+     got: an object with one colour in its environment has one colour on its
+     surface. A warm key against a cold fill is the oldest trick in product
+     photography and it is what makes metal look like metal - the eye reads the
+     TEMPERATURE SHIFT across a curve as form. */
+  softbox(W * 0.04, H * 0.00, W * 0.34, H * 0.40, 'rgba(255,255,255,1)')      /* hard white key */
+  softbox(W * 0.20, H * 0.06, W * 0.24, H * 0.26, 'rgba(255,214,170,0.95)')   /* warm bounce beside it */
+  softbox(W * 0.63, H * 0.06, W * 0.28, H * 0.30, 'rgba(175,220,255,0.95)')   /* cold fill opposite */
+  softbox(W * 0.42, H * 0.48, W * 0.36, H * 0.24, 'rgba(90,190,255,0.70)')    /* cold rim from behind */
+  softbox(W * 0.86, H * 0.40, W * 0.20, H * 0.24, 'rgba(255,150,90,0.55)')    /* warm kicker, far side */
 
   const tex = new THREE.CanvasTexture(cv)
   tex.mapping = THREE.EquirectangularReflectionMapping
@@ -83,7 +90,7 @@ function studioEnv(renderer) {
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: !PHONE })
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2))
 renderer.toneMapping = THREE.ACESFilmicToneMapping   /* highlights roll off instead of clipping */
-renderer.toneMappingExposure = 1.08
+renderer.toneMappingExposure = 1.34
 renderer.outputColorSpace = THREE.SRGBColorSpace
 
 const scene = new THREE.Scene()
@@ -96,9 +103,10 @@ const root = new THREE.Group()
 scene.add(root)
 
 /* a key light on top of the environment, only to sharpen the bevel highlights */
-const key = new THREE.DirectionalLight(0xffffff, 1.6); key.position.set(-3, 4, 5)
-const rim = new THREE.DirectionalLight(0x7FD8FF, 2.2); rim.position.set(4, -1, -4)
-scene.add(key, rim)
+const key  = new THREE.DirectionalLight(0xfff1e0, 2.4); key.position.set(-3, 4, 5)   /* warm */
+const rim  = new THREE.DirectionalLight(0x7FD8FF, 3.0); rim.position.set(4, -1, -4)  /* cold */
+const kick = new THREE.DirectionalLight(0xff9a5c, 1.5); kick.position.set(5, 2, 2)   /* warm kicker */
+scene.add(key, rim, kick)
 
 const uniforms = {
   uDamage: { value: 0 },
@@ -115,21 +123,30 @@ const uniforms = {
    metal at all - it is emissive, and it is DIM until the piece it belongs to
    starts moving. Nothing glows while the mark is whole; the light is what the
    skin was hiding. */
-const skinMat = new THREE.MeshStandardMaterial({
-  color: 0x0d1418, metalness: 1.0, roughness: 0.19, envMapIntensity: 1.45,
+/* MeshPhysicalMaterial, and the clearcoat is the reason. A single glossy layer
+   gives one specular; clearcoat gives TWO - a tight bright one from the lacquer
+   sitting over a broader softer one from the metal underneath. That doubled
+   highlight is most of what separates a rendered product shot from a shiny shape.
+   Iridescence adds a thin-film colour shift at grazing angles, so the edges of
+   the letterforms pick up colour instead of dying into the background. */
+const skinMat = new THREE.MeshPhysicalMaterial({
+  color: 0x121b21, metalness: 1.0, roughness: 0.155, envMapIntensity: 2.1,
+  clearcoat: 1.0, clearcoatRoughness: 0.06,
+  iridescence: 0.42, iridescenceIOR: 1.9, iridescenceThicknessRange: [180, 520],
 })
-const coreMat = new THREE.MeshStandardMaterial({
-  color: 0x11364a, metalness: 0.55, roughness: 0.38,
-  emissive: 0x1d7fd0, emissiveIntensity: 1.0, envMapIntensity: 1.1,
+const coreMat = new THREE.MeshPhysicalMaterial({
+  color: 0x0a2334, metalness: 0.5, roughness: 0.28,
+  emissive: 0xffffff, emissiveIntensity: 1.0, envMapIntensity: 1.3,
+  clearcoat: 0.6, clearcoatRoughness: 0.25,
 })
 
 function patch(mat, isCore) {
   mat.onBeforeCompile = (sh) => {
     Object.assign(sh.uniforms, uniforms)
     sh.vertexShader = `
-      attribute vec3 aCenter; attribute vec3 aSeed;
+      attribute vec3 aCenter; attribute vec3 aSeed; attribute float aTone;
       uniform float uDamage, uMinY, uMaxY;
-      varying float vT;
+      varying float vT; varying float vTone; varying vec3 vLocalN;
       mat3 axisRot(vec3 a, float ang){
         float c=cos(ang), s=sin(ang), o=1.0-c;
         return mat3(c+a.x*a.x*o, a.x*a.y*o-a.z*s, a.x*a.z*o+a.y*s,
@@ -156,7 +173,7 @@ function patch(mat, isCore) {
 
     sh.vertexShader = sh.vertexShader.replace('#include <begin_vertex>', `
       float t = breakT(aCenter, uDamage, uMinY, uMaxY);
-      vT = t;
+      vT = t; vTone = aTone;
       mat3 R = axisRot(normalize(aSeed + vec3(0.001)), t * 1.5);
       /* Throw scaled to the MARK, not to a round number: 1.35 on an object 0.87
          wide flung every piece clean off screen, so the end of the scroll was an
@@ -170,18 +187,48 @@ function patch(mat, isCore) {
     sh.vertexShader = sh.vertexShader.replace('#include <beginnormal_vertex>', `
       float tn = breakT(aCenter, uDamage, uMinY, uMaxY);
       vec3 objectNormal = axisRot(normalize(aSeed + vec3(0.001)), tn * 1.5) * normal;
+      vLocalN = objectNormal;
     `)
 
-    sh.fragmentShader = 'varying float vT;\n' + sh.fragmentShader
+    sh.fragmentShader = 'varying float vT; varying float vTone; varying vec3 vLocalN;\n' + sh.fragmentShader
     if (isCore) {
       /* THE REVEAL: the interior is nearly dark while the mark is whole and lifts
          as its own piece separates. Squared, so it stays subtle through the first
          crack and only really burns once the piece is clear of the body. */
       sh.fragmentShader = sh.fragmentShader.replace('#include <emissivemap_fragment>', `
         #include <emissivemap_fragment>
-        totalEmissiveRadiance *= 0.06 + 1.35 * vT * vT;
+        /* EVERY FRAGMENT ITS OWN COLOUR. One flat blue interior is what made the
+           break read as a texture rather than as a material with depth: 78 pieces
+           all glowing the identical hue look printed. aTone walks each piece along
+           a three-stop ramp - deep teal, brand cyan, warm amber - so the swarm has
+           temperature variation the way real molten or lit material does, and the
+           warm pieces read as HOTTER, closer, more recently broken. */
+        vec3 cold = vec3(0.05, 0.42, 0.68);
+        vec3 mid  = vec3(0.18, 0.72, 1.00);
+        vec3 warm = vec3(1.00, 0.62, 0.26);
+        vec3 tone = vTone < 0.62
+          ? mix(cold, mid, smoothstep(0.0, 0.62, vTone))
+          : mix(mid, warm, smoothstep(0.62, 1.0, vTone));
+        /* held back from 1.7: at full strength the interiors blew out to a chalky pale and
+           read as painted ceramic. Glow has to stay darker than the highlight that sells
+           it, or there is nothing left for the specular to be brighter THAN. */
+        totalEmissiveRadiance *= tone * (0.04 + 0.95 * vT * vT);
       `)
     }
+  }
+  if (!isCore) {
+    /* A FRESNEL RIM. Near-black metal on a near-black background loses its own
+       silhouette - the shape was only readable where a highlight happened to land.
+       This lifts the grazing angles, which is where a real lacquered edge catches
+       the room, so the 101 keeps its outline even in the dark parts of the frame. */
+    mat.onBeforeCompile = ((prev) => (sh) => {
+      prev(sh)
+      sh.fragmentShader = sh.fragmentShader.replace('#include <dithering_fragment>', `
+        #include <dithering_fragment>
+        float fres = pow(1.0 - abs(dot(normalize(vLocalN), vec3(0.0, 0.0, 1.0))), 3.2);
+        gl_FragColor.rgb += fres * mix(vec3(0.10,0.34,0.52), vec3(0.34,0.20,0.10), vTone) * 0.9;
+      `)
+    })(mat.onBeforeCompile)
   }
   mat.customProgramCacheKey = () => (isCore ? 'core' : 'skin')
 }
@@ -198,6 +245,7 @@ function mergeBucket(list) {
   for (const e of list) n += e.g.attributes.position.count
   const pos = new Float32Array(n * 3), nor = new Float32Array(n * 3)
   const cen = new Float32Array(n * 3), sed = new Float32Array(n * 3)
+  const ton = new Float32Array(n)
   let o = 0
   for (const e of list) {
     const p = e.g.attributes.position.array, nm = e.g.attributes.normal.array
@@ -206,6 +254,7 @@ function mergeBucket(list) {
       nor[(o + i) * 3] = nm[i * 3]; nor[(o + i) * 3 + 1] = nm[i * 3 + 1]; nor[(o + i) * 3 + 2] = nm[i * 3 + 2]
       cen[(o + i) * 3] = e.c.x; cen[(o + i) * 3 + 1] = e.c.y; cen[(o + i) * 3 + 2] = e.c.z
       sed[(o + i) * 3] = e.s.x; sed[(o + i) * 3 + 1] = e.s.y; sed[(o + i) * 3 + 2] = e.s.z
+      ton[o + i] = e.t
     }
     o += e.g.attributes.position.count
   }
@@ -214,6 +263,7 @@ function mergeBucket(list) {
   g.setAttribute('normal', new THREE.BufferAttribute(nor, 3))
   g.setAttribute('aCenter', new THREE.BufferAttribute(cen, 3))
   g.setAttribute('aSeed', new THREE.BufferAttribute(sed, 3))
+  g.setAttribute('aTone', new THREE.BufferAttribute(ton, 1))
   return g
 }
 
@@ -253,6 +303,7 @@ new GLTFLoader().load('./logo101.glb', (gltf) => {
     const pb = new THREE.Box3()
     for (const m of meshes) pb.expandByObject(m)   /* still in import space; STAND applied below */
     const c = pb.getCenter(new THREE.Vector3()).applyMatrix4(STAND)
+    const tone = Math.random()
     const s = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1)
     if (s.lengthSq() < 1e-6) s.set(0, 1, 0)
     s.normalize()
@@ -266,7 +317,7 @@ new GLTFLoader().load('./logo101.glb', (gltf) => {
       g.applyMatrix4(STAND)
       if (!g.attributes.normal) g.computeVertexNormals()
       const name = (m.material?.name || '').toLowerCase()
-      ;(name.includes('core') ? core : skin).push({ g, c, s })
+      ;(name.includes('core') ? core : skin).push({ g, c, s, t: tone })
       count++
     }
   }
