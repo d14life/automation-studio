@@ -761,42 +761,19 @@ export default function V2() {
       const t2 = ((phase % 2) + 2) % 2
       pos = t2 <= 1 ? t2 : 2 - t2
 
-      /* THE MIRROR TURN - his idea, and the reason it now works is WHERE the turn happens.
-         The complaint all along: the return leg reads as a rewind. It does, and the cause is
-         the rotation - played backwards the strand visibly spins the other way. A horizontal
-         mirror flips perceived rotation, so a mirrored reverse leg spins the SAME way as the
-         forward leg and reads as the motion carrying on rather than rewinding.
+      /* NO FLIP OF ANY KIND right now, and the list of what was tried is worth keeping.
+         Mirroring reversed the diagonal, so the return leg read as a rewind. Rotating
+         180 fixed the diagonal but as an instant swap it was a hard cut. Animating that
+         rotation turned the whole frame, which swings the video's corners into view -
+         a rotating rectangle cannot fill a rectangle. A baked dissolve read as a fade
+         and a restart. Motion interpolation refused outright: asked to bridge a gap of
+         59.85 when a normal frame step is 8.6, it produced zero new frames, only exact
+         copies of the two ends.
 
-         The whole trick is that the flip is spent at the DESTROYED end, never at the intact
-         one. Measured pixel difference says the opposite - 24.6 at the intact end against 67.6
-         in the debris - and that number is a trap, the same one the crossfade fell into.
-         Mirroring a clean, recognisable helix is instantly obvious however few pixels move;
-         mirroring a cloud of flying debris is invisible however many do. Perception, not
-         pixel count, decides where an edit can hide.
-
-         So the state toggles only as pos passes 1, the destroyed turn. The intact end is
-         crossed with nothing happening at all. A 200ms blur rides the flip, which in a frame
-         already full of tumbling pieces reads as motion rather than as a cut.
-
-         transform and filter are compositor properties: this costs no decode and no paint. */
-      const nowMir = ((Math.floor(phase) % 2) + 2) % 2 === 1
-      if (!REDUCE && nowMir !== mirrored) {
-        /* THE TURN IS REAL MOTION, NOT A CUT AND NOT A DISSOLVE.
-
-           He asked why I was drawing frames onto a canvas when frames had already
-           been generated once. Fair - and the answer is that neither is right here.
-           A dissolve overlaps two frames without moving; baked frames cannot help
-           either, because there is no photographed in-between between a strand and
-           the same strand upside down. That frame was never filmed and cannot be
-           invented from the footage.
-
-           What CAN exist is the turn itself. The rotation is animated across 620ms
-           instead of snapping, so the strand visibly rolls over - which is motion the
-           eye can follow, and the only kind of continuity available. transform is
-           composited, so a half-second roll costs nothing and no frame is invented. */
-        mirrored = nowMir
-        el.classList.toggle('is-mir', mirrored)
-      }
+         What is left is his own idea and it is the right one: stop forcing the join at
+         293 -> 1 and find the two frames in the clip that genuinely match. Measured, the
+         best pair is 162 -> 1 at 26.29, which is 4.8x a normal step against the 8.4x
+         that 293 -> 1 costs. Better, not yet invisible - the search continues. */
 
       if (dbg) dbg.textContent =
         `pos ${pos.toFixed(3)}  phase ${phase.toFixed(2)}  dir ${dir}  dp ${dp.toFixed(4)}` +
