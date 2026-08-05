@@ -730,13 +730,12 @@ a.v2card:hover .v2card__win{color:var(--accent)}
    on. Measured at the turn as well: 59.7 against the mirror's 67.6.
    Spent at the destroyed end, where a frame full of debris hides the cut. transform is
    compositor-only, so the whole effect costs nothing. */
-/* THE ROLL. 620ms of real rotation instead of an instant swap - the strand turns
-   over in front of you rather than being replaced between two frames. Long enough to
-   read as motion, short enough that it never becomes the subject. */
-.v2bg video{transition:transform .62s cubic-bezier(.4,0,.2,1)}
+/* THE ROLL IS OUT. Animating the rotation turned the whole frame, which swings the
+   video's corners into view and shows the page background behind them - a rotating
+   rectangle cannot fill a rectangle. Reverted on sight. */
 /* the held outgoing frame: instant to full, then a slow fade that IS the dissolve */
 
-.v2bg video.is-mir{transform:rotate(180deg)}
+
 /* An OPACITY dip, not a blur. I wrote "transform and filter are compositor
    properties" in the tick that drives this, and that is wrong: filter is a PAINT
    operation, and this one was running a 10px blur across the largest element on
