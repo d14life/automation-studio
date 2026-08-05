@@ -919,7 +919,17 @@ export default function V2() {
       <section className="v2stage" ref={stageRef} style={{ height: `${RUNWAY * 100}svh` }}>
         <div className="v2pin">
           <div className="v2bg">
-            <video ref={nudge} src={SRC_H264} muted autoPlay playsInline preload="auto"
+            {/* THE POSTER IS WHY THE FIRST SCREEN IS NOT BLANK. The strand is a 40MB file and
+                nothing paints until enough of it has arrived to decode a frame - until then the
+                <video> is a transparent rectangle and the visitor sees the page background.
+                poster= is a 41KB JPEG of frame 0, which is exactly the frame pos=0 asks for,
+                so it is not a stand-in: it is the same picture, arriving 1000x sooner, and it
+                is replaced by the real frame with nothing moving.
+                It also needs no geometry of its own - poster obeys the element's object-fit and
+                object-position, so it lands pixel-aligned with the video. An <img> layer would
+                not, and that is the hard vertical seam that killed the canvas overlay. */}
+            <video ref={nudge} src={SRC_H264} poster="/dna-poster.jpg"
+                   muted autoPlay playsInline preload="auto"
                    aria-hidden="true" tabIndex={-1} />
           </div>
 
