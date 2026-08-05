@@ -42,6 +42,10 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none}
    gives contain less room and buys a visible black border. cover fills instead, at the cost of
    ~10% of the frame width at 1440x900, and object-position pulls the visible window DOWN the
    source so the composition sits lower. */
+/* Worth keeping in mind if anything is ever layered over this clip: it is NOT
+   object-fit:cover. It is `fill` at 100%+130px with a 62% focal offset, moved again
+   on phones. A second layer given its own geometry meets this one at a hard vertical
+   seam - that is exactly what the canvas overlay produced before it was removed. */
 .v2bg video{position:absolute;top:0;left:0;
   width:100%;height:calc(100% + 130px);max-width:none;max-height:none;
   object-fit:fill;object-position:center 62%;display:block;
@@ -726,7 +730,12 @@ a.v2card:hover .v2card__win{color:var(--accent)}
    on. Measured at the turn as well: 59.7 against the mirror's 67.6.
    Spent at the destroyed end, where a frame full of debris hides the cut. transform is
    compositor-only, so the whole effect costs nothing. */
-.v2bg video{transition:opacity .18s ease}
+/* THE ROLL. 620ms of real rotation instead of an instant swap - the strand turns
+   over in front of you rather than being replaced between two frames. Long enough to
+   read as motion, short enough that it never becomes the subject. */
+.v2bg video{transition:transform .62s cubic-bezier(.4,0,.2,1)}
+/* the held outgoing frame: instant to full, then a slow fade that IS the dissolve */
+
 .v2bg video.is-mir{transform:rotate(180deg)}
 /* An OPACITY dip, not a blur. I wrote "transform and filter are compositor
    properties" in the tick that drives this, and that is wrong: filter is a PAINT
@@ -734,8 +743,7 @@ a.v2card:hover .v2card__win{color:var(--accent)}
    the page every time the strand turned. Opacity is genuinely composited and
    masks the mirror flip nearly as well, because the flip is already spent in a
    frame full of debris. */
-.v2bg video.is-flip{opacity:.82}
-@media (prefers-reduced-motion:reduce){.v2bg video.is-flip{opacity:1}}
+
 
 
 /* PRESSED STATES - the page had none, and on touch that means every button, chip

@@ -781,11 +781,21 @@ export default function V2() {
          transform and filter are compositor properties: this costs no decode and no paint. */
       const nowMir = ((Math.floor(phase) % 2) + 2) % 2 === 1
       if (!REDUCE && nowMir !== mirrored) {
+        /* THE TURN IS REAL MOTION, NOT A CUT AND NOT A DISSOLVE.
+
+           He asked why I was drawing frames onto a canvas when frames had already
+           been generated once. Fair - and the answer is that neither is right here.
+           A dissolve overlaps two frames without moving; baked frames cannot help
+           either, because there is no photographed in-between between a strand and
+           the same strand upside down. That frame was never filmed and cannot be
+           invented from the footage.
+
+           What CAN exist is the turn itself. The rotation is animated across 620ms
+           instead of snapping, so the strand visibly rolls over - which is motion the
+           eye can follow, and the only kind of continuity available. transform is
+           composited, so a half-second roll costs nothing and no frame is invented. */
         mirrored = nowMir
         el.classList.toggle('is-mir', mirrored)
-        el.classList.add('is-flip')
-        clearTimeout(flipTimer)
-        flipTimer = setTimeout(() => el.classList.remove('is-flip'), 200)
       }
 
       if (dbg) dbg.textContent =
