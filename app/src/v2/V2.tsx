@@ -832,6 +832,7 @@ export default function V2() {
          The bell keeps the turn from being a corner - speed follows |sin| of the phase, which
          is zero exactly at the turnaround - and the 0.55 floor keeps it from dwelling there,
          which was the earlier "holds for half a second" complaint. */
+      const phaseWas = phase          /* rolled back below if the target frame is not here yet */
       phase += dp
       if (dp !== 0) dir = dp > 0 ? 1 : -1
       if (touching) quiet = 0; else quiet += dt
@@ -856,6 +857,27 @@ export default function V2() {
       if (!REDUCE) phase += dir * (Math.PI / (2 * el.duration)) * LOOP_SPEED * bell * dt * idle
       const t2 = ((phase % 2) + 2) % 2
       pos = (t2 <= 1 ? t2 : 2 - t2) * TURN_AT
+
+      /* NEVER SEEK INTO A PART OF THE FILE THAT HAS NOT ARRIVED. This is the whole of his
+         "I scrolled during the first two seconds and it froze and then took even longer".
+         A <video> downloads progressively, and writing currentTime to a byte range it does not
+         have ABORTS the request in flight and starts a new one at the new offset. This loop
+         writes currentTime up to fifty times a second, so scrolling during the load cancelled
+         and restarted the download fifty times a second - it could not finish, and the picture
+         had nothing new to show while it failed to.
+         It also explains the static two seconds with no scrolling at all: the idle loop walks
+         pos forward on its own, straight past the end of what has downloaded, and every one of
+         those seeks stalled the same way.
+         So: if the target frame is not in a buffered range, do not seek - and roll the phase
+         back, so the strand does not accumulate invisible progress and jump when data lands.
+         The strand now animates within whatever HAS arrived, from the first moment there is
+         anything, and its reach grows with the buffer instead of fighting it. */
+      const t = Math.round(pos * (el.duration - 0.05) * FPS) / FPS
+      let here = false
+      for (let i = 0; i < el.buffered.length; i++) {
+        if (t >= el.buffered.start(i) && t <= el.buffered.end(i)) { here = true; break }
+      }
+      if (!here) { phase = phaseWas; return }
 
       /* THE MIRROR TURN. Restored to exactly this, because this is the version he
          approved on sight: "now they going up and down, this is great".
@@ -888,8 +910,9 @@ export default function V2() {
         `  idle ${idle.toFixed(2)}  quiet ${quiet.toFixed(2)}  touch ${touching ? 1 : 0}` +
         `  off ${offscreen.current ? 1 : 0}  y ${Math.round(rawY.current)}`
 
+      /* t is computed above, with the buffered check - the throttle deliberately runs AFTER it
+         so a throttled tick still keeps its phase. Being early is not the same as being lost. */
       if (now - lastSeek < SEEK_MS) return
-      const t = Math.round(pos * (el.duration - 0.05) * FPS) / FPS
       if (Math.abs(el.currentTime - t) >= HALF_FRAME) { el.currentTime = t; lastSeek = now }
     }
 

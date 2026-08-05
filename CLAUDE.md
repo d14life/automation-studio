@@ -22,8 +22,28 @@ The v2 page (`app/src/v2/`) is a scroll-scrubbed DNA video header plus a content
 **Commit on `react` FIRST, then deploy.** The deploy is:
 
 ```bash
-git checkout main && git checkout react -- app docs && cd app && npm run build && cd .. && cp app/dist/v2.html app/dist/sw.js app/dist/dna-poster.jpg . && cp app/dist/assets/v2-* assets/ && git add -A && git commit -m "deploy: <what>" && git push origin main && git checkout react
+git checkout main && git checkout react -- app docs && rm -rf app/dist && cd app && npm run build && cd .. && cp app/dist/v2.html index.html && cp app/dist/v2.html app/dist/sw.js app/dist/dna-poster.jpg . && cp app/dist/assets/v2-* assets/ && rsync -a --delete app/dist/demo/ demo/ && git add -A && git commit -m "deploy: <what>" && git push origin main && git checkout react
 ```
+
+Three parts of that line are not optional, and each one has already gone wrong:
+
+- **`cp app/dist/v2.html index.html`** — v2 IS the homepage. It still also publishes to
+  `/v2.html` so old links keep working, but the root is the one visitors reach. Skip this
+  and the site silently keeps serving the old page while you believe you deployed. The
+  previous front page is kept at `/classic.html`.
+- **`rm -rf app/dist`** — `git checkout react -- app` only restores tracked files; it never
+  deletes. Demos removed upstream stay behind in `app/public/demo`, get swept into the next
+  build, and republish themselves. Three orphan folders (`ekran`, `storozh`, `theatre`) came
+  back this way and one was nearly redeployed after being deliberately removed.
+- **`rsync -a app/dist/demo/ demo/`** — `cp -r` merges unpredictably across nested asset
+  folders. Deliberately **without** `--delete`: `/demo/ekran/` and `/demo/storozh/` are
+  live pages that exist only on `main`, and `--delete` would silently unpublish them.
+  Removing a demo for real means deleting it from `app/public/demo` on `react` **and**
+  `demo/` on `main`, in that order.
+
+If a card 404s, the cause is the opposite of the above: the card shipped and the page did
+not. `/demo/theatre/` did exactly that. After any deploy, check every card resolves —
+`for d in $(ls demo); do curl -o /dev/null -w "$d %{http_code}\n" -sk https://solutions101.net/demo/$d/; done`
 
 `git checkout react -- app` on `main` has wiped uncommitted edits five times.
 **Never switch branches with unstaged work.** Commit or stash first, every time.
