@@ -55,6 +55,7 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none}
 .v2bg video{position:absolute;top:0;left:0;
   width:100%;height:calc(100% + 130px);max-width:none;max-height:none;
   object-fit:fill;object-position:center 62%;display:block;
+  --turn:0deg;transform:rotate(var(--turn));
   background:url(data:image/jpeg;base64,/9j//gAQTGF2YzYyLjI4LjEwMQD/2wBDAAgYGBwYHCEhISEhISckJygoKCcnJycoKCgrKyszMzMrKysoKCsrMDAzMzc5NzQ0MzQ5OTw8PEhIRUVUVFdnZ3z/xABgAAEBAQEBAQAAAAAAAAAAAAAEAwEHAgUBAQEBAAAAAAAAAAAAAAAAAAMCBBABAAIDAAICAwEAAAAAAAAAAQARAiExQRJRcZFhA7ERAQEBAAAAAAAAAAAAAAAAAAABEf/AABEIABIAIAMBIgACEQADEQD/2gAMAwEAAhEDEQA/AOTuuymC47qy67v8Tw20u719TccvXF0LdFvnw/M0MpOTe0cE+eMvj/Qt836tv67/AJCuYY+vSfOAx2S5cRgFtdYo2wUbj2AdrKEm9lCIN//Z) 0 0/100% 100% no-repeat;
   transition:filter .45s ease}
 /* THE LIGHT VERSION IS THE SAME CLIP. The donor's pale hero is not a second video, it is this
@@ -132,7 +133,13 @@ html.v2light .v2bg::after{
   .v2bg video{position:absolute;top:50%;left:50%;
     width:132lvh;height:100lvw;max-width:none;max-height:none;
     object-fit:fill;object-position:center center;
-    transform:translate(-50%,-50%) rotate(-90deg)}
+    /* THE TURN COMPOSES HERE, it does not replace this. .is-mir used to set `transform:
+       rotate(180deg)` outright, which on a phone threw away BOTH the -90 quarter turn and the
+       centring translate - measured at 375x812 the video's box went from (0,-130) 375x1072,
+       covering the screen, to (188,406) 1072x375, starting at the dead centre and running off
+       the right edge. That is the "behaves very weirdly on iPhone" report, and it fired on
+       every loop turn. Desktop never showed it because desktop has no transform to lose. */
+    transform:translate(-50%,-50%) rotate(-90deg) rotate(var(--turn))}
 }
 
 /* ---------- the page proper, below the header ----------
@@ -922,7 +929,7 @@ a.v2card:hover .v2card__win{color:var(--accent)}
    approved commit brought it back with it. A full 180 keeps the diagonal running the
    same way. Spent at the destroyed end, where the debris hides the cut. */
 .v2bg video{transition:filter .2s ease}
-.v2bg video.is-mir{transform:rotate(180deg)}
+.v2bg video.is-mir{--turn:180deg}
 .v2bg video.is-flip{filter:blur(10px)}
 @media (prefers-reduced-motion:reduce){.v2bg video.is-flip{filter:none}}
 
