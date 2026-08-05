@@ -19,11 +19,12 @@ from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 
 SEED      = 7
-PIECES    = 78          # chunks of deliberately mixed size, see CLUSTER below
+PIECES    = 500         # his call - measured below rather than guessed at
 CLUSTER   = 0.62        # 0 = evenly spread points (uniform chunks), 1 = heavily clustered
 EXTRUDE   = 0.085
 BEVEL     = 0.016
 OUT       = bpy.path.abspath("//logo101.glb")
+TARGETS   = bpy.path.abspath("//targets.json")
 
 random.seed(SEED)
 
@@ -175,3 +176,90 @@ bpy.ops.export_scene.gltf(filepath=OUT, export_format='GLB',
                           use_selection=True, export_apply=True,
                           export_yup=True)
 print(f"[101] wrote {OUT}")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# THE SECOND WORD. His idea: scrolling does not just break the mark, it rebuilds
+# it into "Solutions". The two words cannot morph as geometry - different letters
+# mean different topology, and nothing sensible interpolates between them. So the
+# PIECES stay the 101's pieces and simply fly to new homes: a point sampled inside
+# the Solutions lettering for each one. The swarm re-forms as the other word out
+# of the same debris, which is both cheaper and more honest than a shape morph.
+import json, mathutils
+
+bpy.ops.object.text_add()
+w = bpy.context.object
+w.data.body = "Solutions"
+w.data.align_x = 'CENTER'; w.data.align_y = 'CENTER'
+w.data.extrude = EXTRUDE * 0.8
+w.data.bevel_depth = BEVEL * 0.7
+w.data.bevel_resolution = 2
+try:
+    w.data.font = bpy.data.fonts.load("/System/Library/Fonts/Supplemental/Impact.ttf")
+except Exception:
+    pass
+bpy.ops.object.convert(target='MESH')
+word = bpy.context.object
+
+wb = [Vector(c) for c in word.bound_box]
+wlo = Vector((min(v.x for v in wb), min(v.y for v in wb), min(v.z for v in wb)))
+whi = Vector((max(v.x for v in wb), max(v.y for v in wb), max(v.z for v in wb)))
+# match the 101's height so the two states read at the same scale
+scale = (hi.y - lo.y) / max(whi.y - wlo.y, 1e-6)
+print(f"[101] second word span {whi.x-wlo.x:.3f} x {whi.y-wlo.y:.3f}, scale {scale:.3f}")
+
+# SAMPLE THE SURFACE, NOT THE VOLUME. The rejection test tried to decide "is this
+# point inside a letter?" by counting ray hits, and it accepted 70% of the bounding
+# box - the gaps between glyphs included - so 130 points landed in a rectangle
+# instead of a word. Picking a random face and a random point on it cannot make that
+# mistake: every sample is on the lettering by construction, no test required.
+word.data.calc_loop_triangles()
+tris = list(word.data.loop_triangles)
+areas = [t.area for t in tris]
+total = sum(areas)
+cum, acc = [], 0.0
+for a_ in areas:
+    acc += a_; cum.append(acc / total)
+
+random.seed(SEED + 1)
+def sample_surface():
+    r = random.random()
+    lo_i, hi_i = 0, len(cum) - 1
+    while lo_i < hi_i:                      # area-weighted pick, so big faces get more
+        mid = (lo_i + hi_i) // 2
+        if cum[mid] < r: lo_i = mid + 1
+        else: hi_i = mid
+    t = tris[lo_i]
+    v = [word.data.vertices[i].co for i in t.vertices]
+    u1, u2 = random.random(), random.random()
+    if u1 + u2 > 1.0: u1, u2 = 1.0 - u1, 1.0 - u2
+    return v[0] + (v[1] - v[0]) * u1 + (v[2] - v[0]) * u2
+
+targets = []
+for _ in range(len(pieces)):
+    pt = sample_surface()
+    targets.append([pt.x * scale, pt.y * scale, pt.z * scale])
+print(f"[101] sampled {len(targets)} landing points on {len(tris)} faces")
+
+# pair each piece with its nearest landing point so the swarm does not cross
+# itself on the way - unpaired travel looks like a shuffle, paired looks like a build
+homes = []
+for ob in pieces:
+    c = sum((ob.matrix_world @ v.co for v in ob.data.vertices), Vector()) / len(ob.data.vertices)
+    homes.append(c)
+used, order = set(), []
+for i, h in enumerate(homes):
+    best, bd = -1, 1e9
+    for j, t in enumerate(targets):
+        if j in used: continue
+        d = (h - Vector(t)).length_squared
+        if d < bd: bd, best = d, j
+    if best >= 0:
+        used.add(best); order.append(targets[best])
+    else:
+        order.append([h.x, h.y, h.z])
+
+json.dump({"scale": scale, "targets": order,
+           "names": [ob.name for ob in pieces]},
+          open(TARGETS, "w"))
+print(f"[101] wrote {TARGETS}")
