@@ -56,41 +56,16 @@ const RUNWAY = 3.85
    that is a ~76MB download, which is a separate decision for him rather than a silent one. */
 const SCROLL_GAIN = 1
 const LOOP_SPEED = 1
-const HOLD_FADE = 0.08
 
-/* WHERE THE STRAND TURNS AROUND, as a fraction of the clip. This is the one knob that
-   decides how visible the 180 flip is, and the trade is brutal because the footage is
-   one-way: the further along you turn, the more destruction you see and the more the
-   flip shows.
-
-   Measured - how different a frame is from itself rotated 180, against a normal frame
-   step of 4.71:
-     turn at 1.00 (frame 293, fully destroyed) = 12.5x   the flip is obvious
-     turn at 0.63 (frame 184)                  = 10.6x   barely better, not worth it
-     turn at 0.20 (frame  57)                  =  3.9x   nearly invisible, but the
-                                                          strand hardly comes apart
-
-   HIS CHOICE IS 0.9, and it is not the one the numbers point at. He looked at 0.63 and
-   said it turns too early - "I see what you can't see". He is right that the metric is
-   blind here: it measures how much the PIXELS differ between a frame and its rotation,
-   and says nothing about whether the strand's MOTION reads as carrying on. That is the
-   same blindness that made the crossfade score 0.56 and still look like a restart.
-   0.9 keeps almost all of the destruction and turns just before the frame where the
-   debris is at its most chaotic.
-
-   There is no middle: the symmetric frames are all clustered at 17-22% of the clip,
-   because that is where the helix is still whole enough to look the same upside down. */
-/* Overridable from the URL so all versions can be compared on the real site without a
-   deploy each time: ?turn=1 · ?turn=0.63 · ?turn=0.2 */
-const START_AT = (() => {
-  const q = parseFloat(new URLSearchParams(location.search).get('start') || '')
-  return Number.isFinite(q) && q >= 0 && q < 0.8 ? q : 0
-})()
-
+/* WHERE THE STRAND TURNS. 1 = the very last frame, which is a hard corner because the last
+   frames are the calmest in the clip and a reversal there has nothing to hide behind. 0.92 is
+   his call, made by watching ?turn= live. Overridable from the URL so the next comparison
+   costs a reload rather than a deploy. */
 const TURN_AT = (() => {
   const q = parseFloat(new URLSearchParams(location.search).get('turn') || '')
-  return Number.isFinite(q) && q > 0.05 && q <= 1 ? q : 0.9
+  return Number.isFinite(q) && q > 0.05 && q <= 1 ? q : 0.92
 })()
+const HOLD_FADE = 0.08
 /* Frame rate is per tier, so it is declared with the tier below - seeking finer than one frame
    just decodes the same picture again, and the grid has to be the grid the file actually has. */
 
@@ -795,25 +770,10 @@ export default function V2() {
          at each turnaround and the reversal has no corner in it. The 0.55 floor stops it
          dwelling there, which was an earlier "it holds for half a second" complaint. */
       const tri = ((phase % 2) + 2) % 2          /* 0..2, one full there-and-back */
-      /* THE EASING IS ONLY AT THE DESTROYED TURN NOW. The bell slowed the strand to a
-         crawl at BOTH ends, and at the intact end that is the worst possible thing: the
-         footage there moves at 3.77 per frame against 8.35 at the destroyed end, so it
-         is already the calmest, most recognisable part of the clip, and the bell then
-         held the strand still exactly while it changed direction. That is why the turn
-         "bounces away" there - the viewer is given a long, slow, well-lit look at a
-         reversal.
-         Past tri 1.5 and before 0.5 the factor is a flat 1, so the intact turn is taken
-         at full speed and is over before it can be read. It stays continuous: |sin| is
-         already 1 at both those points. The easing survives only around tri = 1, where
-         the flip happens and where softening the corner actually helps. */
-      const bell = (tri < 0.5 || tri > 1.5) ? 1
-        : Math.max(Math.abs(Math.sin(tri * Math.PI)), 0.55)
+      const bell = Math.max(Math.abs(Math.sin(tri * Math.PI)), 0.55)
       if (!REDUCE) phase += dir * (Math.PI / (2 * el.duration)) * LOOP_SPEED * bell * dt * idle
       const t2 = ((phase % 2) + 2) % 2
-      /* The strand now lives between START_AT and TURN_AT instead of 0..1, so both ends
-         of the swing can be trimmed - ?start=0.1 cuts the beginning the way ?turn cuts
-         the end. */
-      pos = START_AT + (t2 <= 1 ? t2 : 2 - t2) * (TURN_AT - START_AT)
+      pos = (t2 <= 1 ? t2 : 2 - t2) * TURN_AT
 
       /* THE MIRROR TURN. Restored to exactly this, because this is the version he
          approved on sight: "now they going up and down, this is great".
@@ -832,16 +792,7 @@ export default function V2() {
          the diagonal but cut harder; animating that rotation swung the corners into
          frame; a faster return read as a fault; the self-closing file read as a fade
          and a restart. */
-      /* FLIP ONLY AT THE DESTROYED END - and until now it was flipping at BOTH, which
-         is a bug I asserted was impossible in the comment above. floor(phase) changes at
-         EVERY integer, and both turns land on integers: the destroyed turn at odd ones,
-         the intact turn at even ones. So the clean, fully-recognisable helix was being
-         flipped too, which is the single worst place to spend an edit.
-         floor((phase+1)/2) changes only at ODD integers, so the turn in the debris flips
-         and the turn on the intact strand is crossed with nothing happening at all.
-         The orientation now alternates per cycle rather than returning each time, which
-         is fine: a 180 twice is the identity, so it comes back every second cycle. */
-      const nowMir = ((Math.floor((phase + 1) / 2) % 2) + 2) % 2 === 1
+      const nowMir = ((Math.floor(phase) % 2) + 2) % 2 === 1
       if (!REDUCE && nowMir !== mirrored) {
         mirrored = nowMir
         el.classList.toggle('is-mir', mirrored)
