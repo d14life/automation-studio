@@ -57,6 +57,27 @@ const RUNWAY = 3.85
 const SCROLL_GAIN = 1
 const LOOP_SPEED = 1
 const HOLD_FADE = 0.08
+
+/* WHERE THE STRAND TURNS AROUND, as a fraction of the clip. This is the one knob that
+   decides how visible the 180 flip is, and the trade is brutal because the footage is
+   one-way: the further along you turn, the more destruction you see and the more the
+   flip shows.
+
+   Measured - how different a frame is from itself rotated 180, against a normal frame
+   step of 4.71:
+     turn at 1.00 (frame 293, fully destroyed) = 12.5x   the flip is obvious
+     turn at 0.63 (frame 184)                  = 10.6x   barely better, not worth it
+     turn at 0.20 (frame  57)                  =  3.9x   nearly invisible, but the
+                                                          strand hardly comes apart
+
+   There is no middle: the symmetric frames are all clustered at 17-22% of the clip,
+   because that is where the helix is still whole enough to look the same upside down. */
+/* Overridable from the URL so all versions can be compared on the real site without a
+   deploy each time: ?turn=1 · ?turn=0.63 · ?turn=0.2 */
+const TURN_AT = (() => {
+  const q = parseFloat(new URLSearchParams(location.search).get('turn') || '')
+  return Number.isFinite(q) && q > 0.05 && q <= 1 ? q : 1
+})()
 /* Frame rate is per tier, so it is declared with the tier below - seeking finer than one frame
    just decodes the same picture again, and the grid has to be the grid the file actually has. */
 
@@ -764,7 +785,7 @@ export default function V2() {
       const bell = Math.max(Math.abs(Math.sin(tri * Math.PI)), 0.55)
       if (!REDUCE) phase += dir * (Math.PI / (2 * el.duration)) * LOOP_SPEED * bell * dt * idle
       const t2 = ((phase % 2) + 2) % 2
-      pos = t2 <= 1 ? t2 : 2 - t2
+      pos = (t2 <= 1 ? t2 : 2 - t2) * TURN_AT
 
       /* THE MIRROR TURN. Restored to exactly this, because this is the version he
          approved on sight: "now they going up and down, this is great".
