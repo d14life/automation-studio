@@ -373,7 +373,11 @@ const ICON={
 };
 const svg=(k,c="i")=>`<svg class="${c}" viewBox="0 0 24 24">${ICON[k]}</svg>`;
 
-let view="customers", sortKey="net", sortDir=-1, notes=[], agingSet="customers";
+/* OPENS ON THE DASHBOARD. It used to open on Покупатели - a table - so the дашборд existed,
+   was fully built, and nobody ever saw it: you had to already know it was in the sidebar. The
+   dashboard is the screen that answers "should I care about this software" in one look, and it
+   is also what the card on the site shows, since that card is a live frame of this page. */
+let view="dashboard", sortKey="net", sortDir=-1, notes=[], agingSet="customers";
 let chartData=null;
 let debtorsMode="all", debtorsAll=false;   // руководителю важен факт долга, а не отчёт
 let notesAll=false;
