@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Solutions101 — everything a fresh session needs — Solutions101</title>
+<style>
+  :root{--bg:#0e202d;--panel:#132937;--ink:#F2F7F5;--soft:rgba(242,247,245,.86);
+    --faint:rgba(242,247,245,.58);--acc:#7FD8FF;--rule:rgba(242,247,245,.13)}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:var(--acc);text-decoration:none} a:hover{text-decoration:underline}
+  a:focus-visible,button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+  header{position:sticky;top:0;z-index:9;background:var(--bg);border-bottom:1px solid var(--rule);
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:0 clamp(14px,3vw,28px);min-height:52px}
+  .eyebrow{font:600 12px/1 ui-monospace,monospace;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--faint)}
+  .back{display:inline-flex;align-items:center;min-height:44px;padding:0 8px;font-size:14px}
+  main{max-width:860px;margin:0 auto;padding:clamp(24px,4vw,52px) clamp(14px,3vw,28px) 96px}
+  h1{font:700 clamp(28px,4.4vw,44px)/1.08 system-ui;letter-spacing:-.02em;margin:0 0 24px}
+  h2{font:700 clamp(21px,2.6vw,29px)/1.15 system-ui;letter-spacing:-.015em;
+    margin:44px 0 14px;padding-top:22px;border-top:1px solid var(--rule)}
+  h3{font:700 clamp(17px,1.9vw,21px)/1.25 system-ui;margin:30px 0 10px}
+  h4{font:700 16px/1.3 system-ui;margin:22px 0 8px;color:var(--soft)}
+  p{margin:0 0 15px;font-size:16.5px;line-height:1.62;color:var(--soft);max-width:68ch}
+  ul,ol{margin:0 0 16px;padding-left:22px}
+  li{font-size:16.5px;line-height:1.62;color:var(--soft);margin:0 0 7px;max-width:66ch}
+  blockquote{margin:0 0 16px;padding:12px 0 12px 18px;border-left:2px solid var(--acc);
+    color:var(--ink);font-size:17px;line-height:1.55}
+  hr{border:0;border-top:1px solid var(--rule);margin:32px 0}
+  code{font:500 14px/1.4 ui-monospace,monospace;background:var(--panel);
+    padding:2px 6px;border-radius:6px;color:var(--acc)}
+  .code{position:relative;margin:0 0 22px}
+  .code pre{margin:0;background:var(--panel);border:1px solid var(--rule);border-radius:14px;
+    padding:44px 16px 16px;overflow-x:auto;font:500 13.5px/1.62 ui-monospace,monospace;
+    color:var(--ink);white-space:pre-wrap;word-break:break-word}
+  .copy{position:absolute;top:8px;right:8px;min-height:32px;padding:0 14px;border-radius:9px;
+    background:#1a3648;color:var(--ink);border:1px solid var(--rule);cursor:pointer;
+    font:600 13px/1 system-ui;transition:transform .12s ease,background .12s ease}
+  .copy:hover{background:#20455b} .copy:active{transform:scale(.96)}
+  .copy.done{background:#1c5a45;border-color:#2f8b6b}
+  .tw{overflow-x:auto;margin:0 0 20px}
+  table{border-collapse:collapse;width:100%;font-size:15px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--rule);vertical-align:top;
+    line-height:1.5;color:var(--soft)}
+  th{color:var(--ink);font-weight:600;white-space:nowrap}
+  .grp{margin:0 0 34px}
+  .grp h2{border:0;padding:0;margin:0 0 4px}
+  .grp .note{color:var(--faint);font-size:14.5px;margin:0 0 14px}
+  .list{display:grid;gap:10px}
+  .item{display:block;padding:15px 17px;background:var(--panel);border:1px solid var(--rule);
+    border-radius:14px;color:var(--ink);transition:border-color .15s}
+  .item:hover{border-color:var(--acc);text-decoration:none}
+  .item b{display:block;font-size:16.5px;margin-bottom:3px}
+  .item span{color:var(--faint);font-size:14px}
+  @media (prefers-contrast:more){:root{--faint:rgba(242,247,245,.82);--rule:rgba(242,247,245,.4)}}
+</style>
+<header>
+  <a class="eyebrow" href="/docs/" style="color:var(--faint)">Solutions101 · документы</a>
+  <a class="back" href="/docs/">← ко всем</a>
+</header>
+<main><h1>Solutions101 — everything a fresh session needs</h1>
+<p>Read this first. It is the whole project in one file: what it is, where the code lives, what is broken, and the traps that have each cost a full evening.</p>
+<hr>
+<h2>0. THERE ARE TWO PAGES. Know which one you are working on.</h2>
+<p>This is the single most confusing thing about the repo and it is not obvious from the file tree.</p>
+<div class="tw"><table><thead><tr><th></th><th><code>index.html</code> — the OLD page</th><th><code>v2.html</code> — the NEW page</th></tr></thead><tbody><tr><td>source</td><td><code>app/src/</code> (App, Projects, <code>anim3.js</code>…)</td><td><code>app/src/v2/</code> — <code>V2.tsx</code> + <code>v2.css</code>, two files</td></tr><tr><td>the hero</td><td>morphing liquid slogan, giant "101", WebGL ribbons, starfield</td><td>a scroll-scrubbed 3D DNA video</td></tr><tr><td>styling</td><td>Tailwind + <code>index.css</code></td><td>its own <code>v2.css</code>. <b>Deliberately does not load Tailwind</b></td></tr><tr><td>status</td><td>live, feature-complete, <b>not being worked on</b></td><td>where every hour since 4 Aug has gone</td></tr></tbody></table></div>
+<p><b>Everything in sections 2, 3, 4, 5.1–5.11, 6, 6b and 6c below is about the OLD page.</b> It is kept because it is hard-won and the old page is still live, but if you are here to build the site, it is history, not instructions. The current work is section 4c and traps 5.12–5.15.</p>
+<p>The two pages share a repo and a build but no code. Changing one cannot break the other, and a fix written for one will usually not apply to the other — <code>v2.css</code> in particular re-declares everything from scratch on purpose.</p>
+<hr>
+<h2>1. What this is</h2>
+<p><b>solutions101.net</b> — Russian-language landing page for Damir's one-man custom-software / automation studio. Sells built-to-order internal tools for Russian businesses.</p>
+<p>The page's entire value is its <b>first screen</b>: a morphing liquid slogan, a giant "101", moving light-ribbons and a starfield. That first screen IS the pitch — it demonstrates the craft the studio sells. Everything below it is ordinary marketing sections.</p>
+<p><b>Live:</b> http://solutions101.net (GitHub Pages, repo <code>d14life/automation-studio</code>, branch <code>main</code>, legacy build from repo root, <code>CNAME</code> file sets the domain).</p>
+<p><b>HTTPS does not work.</b> Certificate stuck in state <code>new</code>. Do not touch it unless Damir asks — a fix attempt on 4 Aug briefly unrouted the domain.</p>
+<hr>
+<h2>2. Stack and layout</h2>
+<p>Vite + React 19 + TypeScript (<code>verbatimModuleSyntax</code> — type imports must be <code>import type</code>). Tailwind is installed but used in only ~23 places; the real styling is <b>1027 lines of hand-written CSS</b> in one file.</p>
+<div class="code"><button class="copy" data-for="c0" type="button">Скопировать</button><pre id="c0">solutions101/
+  CNAME                     domain for GitHub Pages — never delete
+  index.html                the DEPLOYED page (built output lands here)
+  anim3.js  win.js          vendor scripts, loaded from /public copies
+  tubes1.min.js             775KB WebGL ribbon library, dynamic import only
+  tubes-loop.mp4            filmed ribbons, the mobile fallback
+  record-tubes.html         the tool that filmed the clip
+  docs/                     catalogue.md, software-types.md, feedback-rainur.md,
+                            tools-verdict.md, HANDOFF.md (this file)
+  app/                      the Vite project — ALL source edits happen here
+    index.html              dev entry + font loading + hero visibility gate
+    public/anim3.js         must stay identical to the root anim3.js
+    src/
+      App.tsx               65 lines — every section and hook, in order
+      site.css              1027 lines — the real stylesheet
+      components/
+        sections/           the page: TopBar, Hero, About, Numbers, Services,
+                            Projects, HowItWorks, SelfCheck, Team, RequestForm,
+                            Contacts, SiteFooter, AiPanel
+        fx/                 Starfield, TubeLayer
+        ui/                 21st.dev components, adapted (see §3)
+      hooks/                one hook per behaviour, all called from App.tsx</pre></div>
+<h3>The 21st.dev convention</h3>
+<p>Everything in <code>components/ui/</code> came from <b>21st.dev</b> and was adapted to this project. When Damir feeds a new 21st.dev component, it goes there.</p>
+<p>Adapting a 21st.dev drop means, every time:</p>
+<ol><li>Its Tailwind classes stay; the surrounding page uses <code>site.css</code> classes.</li></ol>
+<p>   Both work — do not convert one to the other.</p>
+<ol><li>Replace its palette with the project's: <code>ICE = ['#DFF6FF','#7FD8FF','#5C82C9']</code></li></ol>
+<p>   from <code>hooks/heroTuning.ts</code>. There is <b>no violet on this site</b> — Damir    removed it explicitly.</p>
+<ol><li>Strip any <code>framer-motion</code> dependency. This project animates with CSS and</li></ol>
+<p>   rAF only; adding a motion library for one component is not acceptable.</p>
+<ol><li>Check what it animates. See trap §5.1 — a component that animates a</li></ol>
+<p>   registered <code>@property</code> will cost more than every other effect combined.</p>
+<p>Current ui/ inventory, biggest first: <code>sparkles</code> (437), <code>border-beam-panel</code> (379), <code>liquid-metal-button</code> (355), <code>glowing-shadow</code> (294), <code>spotlight-card</code> (201), <code>traveling-beams</code> (188), <code>glow-effect</code> (155), <code>interactive-hover-button</code> (76), <code>gradient-button</code> (51), <code>shiny-button</code> (35), <code>edge-card</code> (31).</p>
+<hr>
+<h2>3. The header / hero — the part being worked on</h2>
+<p>Four pieces stacked in one viewport:</p>
+<div class="tw"><table><thead><tr><th>Layer</th><th>File</th><th>What it is</th></tr></thead><tbody><tr><td>Starfield</td><td><code>components/fx/Starfield.tsx</code> + <code>useStarfield.ts</code></td><td>canvas dots, time-based drift, capped</td></tr><tr><td>Ribbons</td><td><code>components/fx/TubeLayer.tsx</code> + <code>useTubeScene.ts</code></td><td>three.js tubes — OR a filmed mp4</td></tr><tr><td>Header bar</td><td><code>components/sections/TopBar.tsx</code></td><td>logo, nav pills with hover hints, burger under 700px</td></tr><tr><td>Hero</td><td><code>components/sections/Hero.tsx</code></td><td>two morph lines, the "101", a sliding switch of two actions</td></tr></tbody></table></div>
+<p><code>Hero.tsx</code> is only 26 lines. The behaviour is in <code>useLiquidSlogan.ts</code> (74) and the CSS.</p>
+<h3>The slogan</h3>
+<div class="code"><button class="copy" data-for="c1" type="button">Скопировать</button><pre id="c1">line 1: АВТОМАТИЗИРУЕМ · БЫСТРО · ТОЛЬКО ПРАКТИКА
+line 2: БИЗНЕС-ПРОЦЕССЫ · НЕ ЗНАЧИТ ПЛОХО · НОЛЬ ТЕОРИИ</pre></div>
+<p>Two <code>&lt;div class="morph"&gt;</code> hosts (<code>#liq1</code>, <code>#liq2</code>) driven by <code>window.LiquidText</code> from <code>anim3.js</code>. The melt shows <b>both</b> phrases simultaneously and fuses them with a heavy blur plus an SVG alpha threshold. That needs vertical room: at the desktop's 77px it reads as liquid; at a phone's ~31px it reads as a collision.</p>
+<p>Desktop: <code>morphTime 4.5s</code>, <code>cooldownTime 0.45s</code> — in transition 91% of the time. Touch: <code>morphTime 1.6s</code>, <code>cooldownTime 2.6s</code>, plus <code>simple</code> (sequential fade, not a crossfade), <code>flat</code> (no background-clip) and a <code>maxBlur</code> of half the measured font size.</p>
+<h3>The ribbons — live vs filmed</h3>
+<p>Damir's own idea and it was the right one: <b>film the WebGL scene once, play the clip on machines the live scene hurts.</b> Video decode runs on dedicated silicon, not the shader cores.</p>
+<ul><li>Phone/tablet → filmed from the start</li><li>Desktop → live scene, swaps to filmed if <code>usePerfGuard</code> measures under 46fps</li><li><code>record-tubes.html</code> is the tool that produced <code>tubes-loop.mp4</code></li></ul>
+<p>The ribbons do <b>not</b> follow the cursor on this site (switched off long ago), so the clip is not an approximation — it is the effect.</p>
+<h3>usePerfGuard</h3>
+<p>Waits 2.6s after load, samples 1.8s of real frame rate, and if under 46fps sets <code>document.documentElement.dataset.perf = 'low'</code> and fires a <code>perf-low</code> event. CSS drops expensive blurs from that attribute; both canvas systems listen. One shot, never upgrades back. Reads back as <code>window.__perfFps</code>.</p>
+<p>This exists because guessing "phone = weak, desktop = fine" was wrong: it lagged on Windows desktops with integrated graphics, which neither guess covers.</p>
+<hr>
+<h2>4. Current state</h2>
+<h3>Working and verified live</h3>
+<ul><li>Loads in <b>0.30s</b>, HTTP 200</li><li>Filmed-ribbon fallback</li><li>Parallax on the hero only — removed from every other section</li><li>Nunito self-hosted, subset to Cyrillic+Latin, 60KB, preloaded; font gate 500ms</li><li>Bundle 424KB (was 457 — liquid-metal shader split out)</li><li>Mobile hero uses the same layout as the Mac hero</li></ul>
+<h3>Broken / open</h3>
+<ol><li>~~The mobile slogan overlaps.~~ <b>Fixed 4 Aug, and it was never the melt.</b></li></ol>
+<p>   Both <code>.morph</code> hosts were flex items of <code>.stageui</code> whose only children are    <code>position:absolute</code> — so their min-content height is 0, <code>min-height:auto</code>    could not protect them, and when the phone column overflowed flex crushed    both to <code>height:0</code> at the same <code>top</code>. Two lines painted on the same y.    <code>flex:none</code> on <code>.morph</code>. Six fixes chased the animation; the animation was    working the whole time. See §6 for the method that found it. 1b. <b>The live phone ribbons need his own iPhone.</b> The scene now runs live on    phones (§3), but the iOS Simulator measured <b>33fps</b>, so <code>usePerfGuard</code>    fired and swapped to the clip. The simulator runs WebGL through a    translation layer on the Mac and is <b>not</b> a real iPhone GPU — that number    proves nothing either way. Check on the real phone before tuning anything.    If it is genuinely slow there, §6b is the way out.</p>
+<ol><li><b>HTTPS</b> — cert stuck. Leave alone.</li><li><b>iPad</b> — never tested. Three simulators available.</li><li><b>Rainur's feedback</b> — <code>docs/feedback-rainur.md</code>, items 3/4/6 ready to</li></ol>
+<p>   implement, two items blocked on Damir's answer. Written down deliberately;    do not implement unasked.</p>
+<ol><li><b>Projects section</b> contains invented company names and money figures</li></ol>
+<p>   (<code>Projects.tsx:94-105</code>). Two of four are labelled «· макет». Damir has    dismissed this as unimportant for now.</p>
+<hr>
+<h2>4c. THE V2 PAGE — the current work, state as of 2026-08-04 late evening</h2>
+<p>Two files: <code>app/src/v2/V2.tsx</code> (761 lines) and <code>app/src/v2/v2.css</code> (546). No other file in the repo affects it.</p>
+<h3>Verified working live</h3>
+<ul><li><b>The DNA header.</b> A 3D clip scrubbed by <code>currentTime</code>, on a <code>position:sticky</code></li></ul>
+<p>  runway. Scroll moves it; when you stop, it plays itself forward and backward   forever while the page stays put. Traps 5.12–5.13 explain the model; do not   re-derive it.</p>
+<ul><li><b>Four tiers of the clip</b>, chosen by DEVICE pixels (<code>innerWidth * devicePixelRatio</code>),</li></ul>
+<p>  not CSS pixels. All-intra (<code>-g 1 -bf 0</code>) so a seek costs exactly one decode.   H.264 only — see "HEVC" under Settled below.</p>
+<ul><li><b>Six pages</b> as hash routes (<code>PAGES</code> in <code>V2.tsx</code>): Главная · О нас · Услуги ·</li></ul>
+<p>  Инструменты · Работы · Контакты. Hash routing because GitHub Pages cannot   rewrite clean URLs. The strand renders on the home page only.</p>
+<ul><li><b>A persistent top bar</b> with a working theme toggle (light/dark), and three</li></ul>
+<p>  liquid-glass chapter cards over the video with an orbiting two-comet beam.</p>
+<h3>The four feel knobs — change these, not the tick</h3>
+<p>All at the top of <code>V2.tsx</code>. A "faster" or "slower" note from Damir is one number here and nothing else.</p>
+<div class="tw"><table><thead><tr><th>knob</th><th>now</th><th>what it does</th></tr></thead><tbody><tr><td><code>RUNWAY</code></td><td>4.6</td><td>screens of scroll the sticky header occupies</td></tr><tr><td><code>SCROLL_GAIN</code></td><td>1.8</td><td>clip covered per screen scrolled. 1 = a full runway is one pass</td></tr><tr><td><code>LOOP_SPEED</code></td><td>1.7</td><td>idle playback rate. 1 = real time</td></tr><tr><td><code>HOLD_FADE</code></td><td>0.16</td><td>fraction of a card's slice spent fading. <b>Smaller = card stays longer</b></td></tr></tbody></table></div>
+<p><code>RUNWAY</code> and <code>SCROLL_GAIN</code> pull against each other on purpose: the longer runway is what gives a card distance to be readable in, and the gain buys the strand's speed back on top.</p>
+<h3>Settled — do not reopen without a measurement</h3>
+<ul><li><b>HEVC is out.</b> It halved the file, but libx265 all-intra emits profile <code>Rext</code></li></ul>
+<p>  and Apple hardware decodes Main only. Switching to <code>hevc_videotoolbox</code> produced   a Main-profile file that still would not scrub on his real iPhone, so H.264 is   what ships. A <code>&lt;source&gt;</code> fallback does NOT rescue this: a codec that decodes and   then fails is not a codec the browser rejects.</p>
+<ul><li><b>Only 293 frames are real.</b> The 583-frame clip that arrived was those 293</li></ul>
+<p>  motion-interpolated — proven by PSNR (consecutive frames 29.3dB apart, every   SECOND frame 25.0dB, the master's true spacing). Everything ships from the 293,   AI-upscaled with Real-ESRGAN. Phones get 50fps (interpolated, invisible at that   size), laptops and 4K get real frames only at 25fps — Damir spotted the smearing   on a 1440p laptop unprompted.</p>
+<ul><li><b>The glass panels cost nothing.</b> A/B on the phone, video motion over 3s:</li></ul>
+<p>  28.85 with them, 27.82 with <code>?nopanel=1</code>. That switch is still in the CSS as a   measuring tool, not a feature.</p>
+<ul><li><b>Morph text is removed</b>, and the vendor scripts it needed are no longer</li></ul>
+<p>  fetched by v2. It made the whole page lag. Do not bring it back.</p>
+<h3>Open on v2</h3>
+<ol><li><b>Portrait phones stretch the clip.</b> The CSS fills a 9:19.5 screen with a 16:9</li></ol>
+<p>   source, so it is magnified ~3x vertically no matter which tier is served. The    real cure is a portrait-cropped encode, not a bigger landscape one.</p>
+<ol><li><b>Content.</b> The five non-home pages need real depth. Everything needed is in</li></ol>
+<p>   <code>docs/BRIEF.md</code>, <code>catalogue.md</code>, <code>software-types.md</code> — do not reinvent it.</p>
+<ol><li><b>Prices and contacts</b> are «указать» on purpose. Damir supplies them. Ask once.</li></ol>
+<hr>
+<h2>4b. What is already written down — the 62 offers</h2>
+<p>If Damir says <b>"remember those 62 prototypes we made"</b>, this is what he means. It is not lost, it is in <code>docs/</code> and it is verified.</p>
+<h3><code>docs/catalogue.md</code> — 36KB, 582 lines</h3>
+<p><b>60 numbered offers + 2 industry packages = 62.</b> Recovered verbatim from commit <code>90df847</code> (the first version of the site). Every offer has a title, who it is for, what it replaces and what it produces.</p>
+<p>Grouped as: Сбор данных и интеграции (01–07) · Бухгалтерия и финансы (08–14) · and on through to №55 «Обучение, документация и передача» and beyond. The two packages are <b>Для юридических фирм</b> and <b>Для строительных компаний</b>.</p>
+<h3><code>docs/software-types.md</code> — 38KB, 345 lines</h3>
+<p>The same 62 sorted into <b>12 kinds of software</b>, each offer assigned exactly once — verified by script, not by eye:</p>
+<p>Сборщик · Мост · Конвейер документов · Распознаватель · Рабочее приложение · Сторож · Экран правды · Отчёт по расписанию · Собеседник · Предсказатель · Публичная витрина · Генератор контента и рассылок</p>
+<p>Plus: one offer that does not fit the classification, the two industry packages, and a proposed <b>order of work for building the prototypes</b>.</p>
+<p><b>Why it matters:</b> the plan is to build a small number of clickable prototypes — one per software type, not one per offer — so a visitor can touch a real example of each kind. Rainur's verdict on the current animated placeholders was blunt and correct: they are not a demonstration of anything.</p>
+<h3>The other two</h3>
+<ul><li><code>docs/feedback-rainur.md</code> — his 7 points from 3 Aug, with the exact file and</li></ul>
+<p>  line each one touches, and the 2 decisions blocked on Damir.</p>
+<ul><li><code>docs/tools-verdict.md</code> — Figma vs Base44 vs Claude Code, re-verified against</li></ul>
+<p>  real documentation and reviews, including the five things stated wrongly the   first time. Bottom line: the site stays on Claude Code; Base44 is disqualified   for Russian clients by 152-ФЗ, no Russian data region, and Wix's blocking.</p>
+<hr>
+<h2>5. Traps — each of these cost a full evening</h2>
+<h3>5.1 Never animate a registered <code>@property</code></h3>
+<p>An animated custom property declared <code>inherits:true</code> makes the browser re-resolve inherited custom properties for the <b>whole document every frame</b>. One dead rule doing this cost <b>160 ms/s — half of all main-thread time</b>. Style recalc dropped 170 → 28 ms/s when it was deleted, with zero visual change. <code>transform</code> and <code>opacity</code> are free by comparison; the compositor handles them.</p>
+<h3>5.2 Bump the anim3 cache version on EVERY change</h3>
+<div class="code"><button class="copy" data-for="c2" type="button">Скопировать</button><pre id="c2">// hooks/useVendorScripts.ts
+export const VENDOR_SCRIPTS = ['/win.js?v=1', '/anim3.js?v=8'] as const</pre></div>
+<p>Three consecutive slogan fixes shipped and <b>none of them ran</b>, because the query string was never bumped and Safari served the cached copy. The file's own comment warned about this and it happened anyway. <b>Bump it, every time.</b></p>
+<p>Also: <code>anim3.js</code> exists <b>twice</b> — repo root and <code>app/public/</code>. Edit both.</p>
+<h3>5.3 Test the device predicate before trusting a device fix</h3>
+<p><code>matchMedia('(hover:none)')</code> and <code>(pointer:coarse)</code> both return <b>false in the iOS Simulator</b>, which is mouse-driven. Every phone-path fix was silently inactive on the exact screen being photographed while it got diagnosed as a phone bug. Use <code>isSmallDevice()</code> from <code>heroTuning.ts</code> — it ORs pointer, width (≤600px) and device memory. <b>Print which branch actually ran before believing any device-specific diagnosis.</b></p>
+<h3>5.4 iOS drops <code>background-clip:text</code> on a blurred layer</h3>
+<p>The travelling colour is painted as the span's <i>background</i> and cut to the glyphs. Blur that span on iOS and the clip is dropped — the background <b>rectangle</b> paints instead of the letters. That is the grey box Damir photographed. Touch uses <code>flat: true</code>, a plain text colour, instead.</p>
+<h3>5.5 A colour that only looks right over a video must not exist</h3>
+<p>The clip was filmed near-white and tinted by a <code>multiply</code> overlay inside an isolated group. Correct on paper. On iOS the video under that group never painted, the multiply had nothing to multiply against, and an <b>opaque pale-blue sheet was screened over the entire page</b>. The colour now lives inside the clip. Only one blend remains — <code>screen</code>, on the <code>&lt;video&gt;</code> element itself.</p>
+<h3>5.6 <code>object-fit: contain</code>, not <code>cover</code>, for the filmed ribbons</h3>
+<p>The clip is landscape 1280×695; a phone is portrait. <code>cover</code> scaled it until it covered 812px of height, blowing the sweep up to <b>541px where the live scene computes 124px</b>. <code>contain</code> fits it to the width, and because the sweep is a fixed fraction of the frame (0.362 of width), that reproduces the live geometry.</p>
+<h3>5.7 The CSS minifier eats prefixed/unprefixed pairs</h3>
+<p>It collapses them and keeps only the <code>-webkit-</code> version, which then loses to the base rule. <b>Write unprefixed only.</b></p>
+<h3>5.8 <code>backdrop-filter</code> — every function is a separate pass</h3>
+<p><code>backdrop-filter: blur() saturate() brightness()</code> is three full passes over the same region. Passes went 52 → 28 by merging and removing.</p>
+<h3>5.9 The preview pane cannot verify motion</h3>
+<p>It reports <code>document.hidden === true</code>, so scroll timelines return null and screenshots come back black. <b>Use the iOS Simulator instead</b> — <code>mcp__Claude_Code_iOS_Simulator__control</code>, <code>attach</code> first, then <code>screenshot</code>.</p>
+<hr>
+<h3>5.10 A shorthand on a <code>.wrap</code> element resets the gutter</h3>
+<p><code>.topbar</code> is <code>class="wrap topbar"</code>. <code>.wrap</code> sets <code>padding:0 24px</code>; <code>.topbar</code> then set <code>padding:22px 0</code>, a <b>shorthand</b>, which put the horizontal padding back to zero. The header had no side gutter at any width — invisible on desktop behind the 1180px max-width, and on a phone the logo sat at x=0. Use <code>padding-block</code> on anything that rides on <code>.wrap</code>.</p>
+<h3>5.10b The clip can never loop perfectly - the trails are not periodic</h3>
+<p>The PATH is: x=cos(t), y=sin(2t) comes home every 2*PI seconds, and a frame-by-frame scan of a take confirms the best match to frame 0 sits exactly at 4*PI. The RENDERED STATE does not: the tubes lag their target and their trails depend on history, so measured over a 13.7s take at 30fps:</p>
+<div class="tw"><table><thead><tr><th>comparison</th><th>mean abs diff (0-255 grey)</th></tr></thead><tbody><tr><td>adjacent frames, 1/30s apart</td><td><b>0.41</b>  &lt;- what seamless looks like</td></tr><tr><td>best loop found anywhere in the take</td><td><b>3.17</b>  (cut 1.333s -&gt; 13.733s)</td></tr><tr><td>frames 0.5s apart</td><td>4.86</td></tr><tr><td>two random frames</td><td>10.84</td></tr></tbody></table></div>
+<p>So no cut length is seamless, and picking one by theory (an integer number of path periods) does NOT beat searching the take frame by frame. Search it.</p>
+<p>The crossfade is what hides the residual, and it must be SHORT. An overlay crossfade blends content F seconds apart, so a long F is a long ghost of two different figures - which is exactly what "it teleports from one point to another" meant. 1.18s was very visible; 0.4s is not. If a seam is still visible the answer is a LONGER take, which gives the search more candidate loop points, not a longer fade.</p>
+<h3>5.11 A filmed clip cannot do two of the things the ribbons are for</h3>
+<p>The ribbons walk the ICE palette one step behind the slogan (<code>setColors</code> every frame), and their sweep is measured off the slogan's own ink whenever it changes. A clip has one fixed colour and the geometry of the screen it was filmed on. <code>record-tubes.html</code> knew this — its own note says the scene "records in near-white and <b>the page tints it live</b>". That live tint is what trap 5.5 deleted, so the clip has been stuck white ever since. If the clip ever has to carry the colour again, the tint must be a <code>filter</code> on the <code>&lt;video&gt;</code> element itself, never an overlay in an isolated group.</p>
+<h3>5.12 A scrubbed video must turn OFF the browser's scroll restoration</h3>
+<p>On reload the browser puts <code>scrollY</code> back where it was. For an ordinary page that is a kindness; for v2's DNA header it is a bug, because the scroll is restored and the video is not — it comes back at <code>currentTime</code> 0. Measured in the browser: reload at <code>scrollY 1800</code> gave <code>currentTime 0</code>, i.e. the page sat two thirds through the stage showing an intact strand.</p>
+<p>On iOS it is worse than a mismatch. A <code>&lt;video&gt;</code> there cannot be <b>seeked</b> until it has been allowed to play once, and a fresh load has had no gesture yet — so the picture freezes on whatever frame is painted and scrolling does nothing, then the first touch arms it and it snaps. That snap reads as "the page reloaded by itself and jumped back to the start".</p>
+<p><code>history.scrollRestoration = 'manual'</code> in <code>V2.tsx</code>, at <b>module scope</b> — not in an effect. The browser restores scroll as soon as the document is tall enough, which can be before React has mounted. Any future scroll-driven media on this site needs the same line.</p>
+<h3>5.13 The strand is ALIVE now — scroll is a delta, not a position</h3>
+<p>Since 2026-08-04 v2's clip is no longer an absolute function of scroll position. One virtual clock (<code>pos</code> in <code>V2.tsx</code>'s tick) is driven by two hands: the scroll DELTA scrubs from whatever frame is on screen, and when the measured scroll speed dies an idle loop plays the clip itself — forward, then backward, ping-ponging over the full range at 1x, while the page stays put.</p>
+<p><b>Corrected 2026-08-04, later the same evening.</b> The velocity blend and the anchors described in earlier drafts of this section are <b>deleted, and must not come back</b> — each was a second controller writing to the same <code>pos</code>, and each produced a bug he reported within minutes. The blend overpowered slow scrolling ("it goes down even though I go up"); the anchors dragged the strand to the destroyed end and would not let go, because <code>dp === 0</code> passes <code>dp &gt;= 0</code>.</p>
+<p>What survives is one unbounded <code>phase</code> and a triangle wave, ~24 lines: <code>pos = triangle(phase)</code>, no boundaries, no clamps, no reflection branch. Speed rides a bell so turnarounds are naturally soft. Input gating (<code>quiet</code>) holds the loop off while a finger or wheel is active, with a 0.22 floor so scroll start does not hitch.</p>
+<p>Two clamps, and confusing them cost several rounds: <code>scrollP</code> is pinned to [0,1] because the overlay and chapters fade along it. <b>The scrub must not read it</b> — when the runway runs out the delta becomes exactly zero, so the strand receives no input at all and freezes ("stuck at the end"). The scrub reads raw <code>scrollY</code> scaled by travel. Raw scroll distance never runs out.</p>
+<h3>5.13b THE BOUNCE IS THE OPTIMAL LOOP. Stop trying to remove it.</h3>
+<p>Asked over and over for a forward-continuous loop, and every alternative was built, measured and thrown away. The question was finally settled with the right method, which was his: take the END frame and find the frame that best continues it.</p>
+<div class="tw"><table><thead><tr><th>what to attach after frame 293</th><th>best frame</th><th>seam</th></tr></thead><tbody><tr><td><b>untransformed</b></td><td><b>292</b></td><td><b>1.2x a normal step</b></td></tr><tr><td>rotated 180</td><td>62</td><td>7.9x</td></tr><tr><td>mirrored horizontally</td><td>32</td><td>8.3x</td></tr><tr><td>mirrored vertically</td><td>64</td><td>8.4x</td></tr></tbody></table></div>
+<p><b>Frame 292 is the reverse.</b> The ping-pong is not a compromise - it is the mathematically closest continuation available, and it beats every alternative by about seven times. That is why mirror, rotation and dissolve all looked wrong.</p>
+<p>Also measured, so nobody repeats them: across ALL 293x293 frame pairs and three transforms the best cut point anywhere in the clip is 3.7x, and every good join lands on frame 1, because the footage is a ONE-WAY transformation - nothing near the destroyed end resembles anything else. Motion interpolation refuses the job outright: asked to bridge 59.85 against a normal step of 8.6 it produces zero new frames, only exact copies of both ends. Animating the rotation swings the video's corners into frame. A baked crossfade reads as fade-and-restart. A faster return leg reads as a fault, not as a rewind.</p>
+<p><b>The only way to a forward loop is different footage</b> - the 3D source re-rendered so its end flows into its start. No amount of code adds a frame that was never shot.</p>
+<h3>5.14 A <code>var()</code> inside a custom property is substituted where that property is DECLARED</h3>
+<p>This froze the glass panels' beam for its entire life and read as "the animation doesn't work". <code>--bm-ring</code> (the conic-gradient) is declared on <code>.v2glass</code>, so it is resolved <b>there</b>, with <code>--beam</code> at its <code>0deg</code> initial value — and what the pseudo-elements inherit is a finished string with the angle already baked in. Animating <code>--beam</code> on <code>::before</code> moved a variable that nothing was reading.</p>
+<p>Measured, old wiring: pseudo <code>--beam</code> ticking 0/90/180 while the gradient's own <code>from</code> angle stayed <code>0deg</code> at every sample. Fixed wiring: 0/90/180/270 on both the glow and the ring. <b>The animation must live on the element that owns the property containing the <code>var()</code></b> — here <code>.v2glass</code>, not its pseudos.</p>
+<p>Note this refines trap 5.1 rather than contradicting it. 5.1's cost came from an <code>inherits:true</code> registered property forcing a whole-document re-resolve every frame. <code>--beam</code> is <code>inherits:false</code> and scoped to the panel being read (<code>.v2ch.is-live</code>), so only that subtree recomputes. A/B on the phone, video motion over 3s as the proxy for a starved frame budget: <b>28.85 with the panels, 27.82 with them stripped</b> (<code>?nopanel=1</code>, still in the CSS as a measuring switch). That is noise. Verified on device: two untouched screenshots seconds apart show the comets ~90° further round AND the strand at a different frame, so the beam and the idle loop run together.</p>
+<h3>5.15 Every deploy makes every visitor refetch the 30MB video</h3>
+<p>GitHub Pages builds its <code>ETag</code> from the <b>deploy timestamp, not the file contents</b> — <code>ETag: "6a721503-1cfbcfa"</code>, where the prefix is the deploy time in hex. So pushing a two-line CSS change invalidates <code>dna-loop-hq.mp4</code> as well, and the browser pulls all 30.4MB again.</p>
+<p>The symptom is a flat <code>#0e202d</code> screen where the strand should be. That is <code>.v2bg</code>'s fallback colour showing through while the clip downloads, and it looks exactly like a broken video element. <b>It is not a bug.</b> Before diagnosing it as one, check <code>video.readyState</code> and <code>video.buffered</code> — a healthy live page reports <code>4</code> and the full 11.72s.</p>
+<hr>
+<h2>6. The method that finally worked</h2>
+<p>Print the facts into the page and photograph them. A <code>?diag=1</code> block that dumps <code>matchMedia</code> results, the anim3 URL actually requested, <code>host.style.filter</code> (empty ⇔ <code>simple</code> mode), every span's opacity, and the real <code>getBoundingClientRect</code> of both hosts. Six sessions inferred those values; the first one to <i>read</i> them found the bug in one screenshot, because <code>liq1 h=0.0</code> and <code>liq2 h=0.0</code> at the same <code>top</code> cannot be an animation bug.</p>
+<p>Two things that will waste an hour if not known:</p>
+<ul><li><b>Safari on the simulator cannot resolve <code>localhost</code>.</b> Use <code>127.0.0.1</code>. A</li></ul>
+<p>  <code>localhost</code> URL renders a blank white page with no error.</p>
+<ul><li>The page origin sits ~61pt below the screen top in Safari, so a tap at a</li></ul>
+<p>  page-space y misses. Add the offset.</p>
+<h2>6b. If the live phone ribbons are too slow on his real phone</h2>
+<p>Re-film, but the clip must be re-filmed <b>near-white</b> and tinted by a CSS <code>filter</code> on the <code>&lt;video&gt;</code> element (element-local, so trap 5.5 does not apply) — animating <code>hue-rotate</code> on the palette clock is what gives a clip a colour cycle at video cost. <code>record-tubes.html</code> records at the recording window's size and uses <code>SWEEP_X/SWEEP_Y</code> fractions measured off a 1470x797 desktop; a phone take needs a portrait window and the phone's taller <code>sleepRadiusY</code>. <b>The preview pane cannot run the recorder</b> — it reports <code>document.hidden</code> and the tool aborts on exactly that (trap 5.9). It needs a real foregrounded browser window for ~10s.</p>
+<h2>6c. The original slogan brief, kept for the record</h2>
+<p>Do <b>not</b> ship another speculative fix. Six have failed. The last screenshot contradicts the deployed code, which means the assumption about which code path runs is wrong. Establish facts in this order:</p>
+<ol><li>On the simulator, read back the actual values — <code>isSmallDevice()</code>,</li></ol>
+<p>   whether <code>simple</code> reached the library, and <code>window.__perfFps</code>. Print them    into the page or the console; do not infer them.</p>
+<ol><li>Confirm <b>which copy of <code>anim3.js</code> Safari executed</b> — check the query</li></ol>
+<p>   version actually requested in the network log, not the one in the source.</p>
+<ol><li>Only when 1 and 2 agree with the source, look at the rendering itself.</li></ol>
+<p>If <code>simple</code> is on and the fade is sequential, two phrases <b>cannot</b> both be legible at once — so if they are, one of 1 or 2 is lying. That is the crack.</p>
+<hr>
+<h2>7. How Damir works</h2>
+<ul><li><b>English only, TL;DR.</b> Lead with the answer in one or two lines. Site copy</li></ul>
+<p>  and client deliverables stay Russian — the rule is about talking to him.</p>
+<ul><li><b>Never claim without evidence.</b> Run the check, then report. <code>curl</code> the live</li></ul>
+<p>  bundle and grep for the change; do not assume a push landed.</p>
+<ul><li><b>Never build in <code>/tmp</code> or a scratchpad</b> — a full day's work was lost that</li></ul>
+<p>  way. Real work goes in <code>~/solutions101/</code>.</p>
+<ul><li><b>One section at a time.</b> His instruction, and it is right: finish the</li></ul>
+<p>  header, optimise it, then move on. Do not fire fixes at the whole page.</p>
+<ul><li><b>Finish one job before starting the next.</b> New prompts are a queue.</li><li><b>Decide technical calls yourself</b> — fix priority, branch, dispatch. Ask him</li></ul>
+<p>  only about pricing, feature names, business strategy.</p>
+<ul><li><b>Never automate QA.</b> His eyes on the result is how taste gets in. Offer 2–3</li></ul>
+<p>  options on anything visual.</p>
+<ul><li>Commit early, push often. Commit messages on this repo are a full sentence</li></ul>
+<p>  describing what was learned, not a label.</p>
+<h3>5.16 GitHub Pages resets every file's mtime on every deploy, so the 40MB video re-downloads</h3>
+<p>Measured 5 August. Pages builds its ETag as <code>"mtime-size"</code>, and a deploy rewrites the mtime of files it never touched:</p>
+<div class="tw"><table><thead><tr><th></th><th>ETag</th></tr></thead><tbody><tr><td>before a deploy that did not touch the video</td><td><code>"6a72a13a-2656316"</code></td></tr><tr><td>after it</td><td><code>"6a72a2da-2656316"</code></td></tr></tbody></table></div>
+<p>Same size, different mtime, therefore a different ETag, therefore the browser's HTTP cache is void and all 40MB come down again. <code>Cache-Control</code> is fixed at <code>max-age=600</code> and Pages does not let you change it, so <b>this cannot be fixed with configuration.</b></p>
+<p>The fix is <code>app/public/sw.js</code>: Cache Storage is keyed by URL alone, so a deploy cannot evict it. Three properties keep it safe on a root scope shared with <code>index.html</code> — it intercepts only <code>/dna-loop*.mp4</code>, a cache miss does not call <code>respondWith</code> at all (so a first visit behaves exactly as before), and the copy is taken only once the video has fully buffered, when the bytes are still in the HTTP cache and the worker's fetch is local rather than a second download. Kill switch is written at the top of the file.</p>
+<h3>5.17 The first screen was blank until 40MB arrived</h3>
+<p>A <code>&lt;video&gt;</code> paints nothing until it can decode a frame. Three layers now, cheapest first: a 300-byte inline JPEG of frame 0 as the video element's CSS background (no request, paints with the stylesheet), a 41KB <code>poster</code> preloaded from the <code>&lt;head&gt;</code>, then the real frame. The poster is on the element rather than in a layer of its own on purpose — <code>poster</code> obeys the element's <code>object-fit</code>/<code>object-position</code>, so it cannot produce the vertical seam that killed the canvas overlay (trap 5.5).</p>
+<h3>5.18 The video ref callback leaked three window listeners per navigation</h3>
+<p>The strand lives inside <code>{home &amp;&amp; ...}</code>, so every click into an inner page unmounts it and every click back mounts a new one. The ref callback added <code>touchstart</code>/<code>pointerdown</code>/<code>click</code> each time and removed them never — measured at nine added and zero removed after three round trips, each handler holding a detached <code>&lt;video&gt;</code> and calling <code>play()</code> on it on every click. Fixed by returning a cleanup from the ref callback (React 19). <b>Note the consequence:</b> once a ref callback returns a cleanup, React stops calling it with <code>null</code>, so clearing <code>videoRef.current</code> became the cleanup's job.</p></main>
+<script>
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('.copy'); if (!b) return;
+  const pre = document.getElementById(b.dataset.for); if (!pre) return;
+  navigator.clipboard.writeText(pre.textContent).then(() => {
+    b.textContent = 'Скопировано'; b.classList.add('done');
+    setTimeout(() => { b.textContent = 'Скопировать'; b.classList.remove('done') }, 1800);
+  }).catch(() => { b.textContent = 'Выделите вручную' });
+});
+</script>

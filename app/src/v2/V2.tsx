@@ -487,6 +487,32 @@ function usePage(): PageId {
   return page
 }
 
+/* THE EDGE STRIPS. His ask, in his words: a little grey area about a centimetre wide on each
+   side that pops up, so the whole site can be walked without going back to the bar. They are
+   the same six PAGES in the same order, so the strips and the top nav can never disagree.
+   Wrapping with a modulo rather than hiding the strip on the first and last page: a strip that
+   is sometimes dead is worse than no strip, because you learn not to trust it. From Главная,
+   left goes to Контакты, and that is the shortest path to the one page a visitor wants.
+   Only opacity moves. Width is fixed - animating it would be a paint on a full-height fixed
+   element on every hover, and the rule on this page is that anything that moves is a
+   compositor property. Hidden under 900px: 34px of a 390px screen is a tenth of the reading
+   width, and the left edge of a phone screen is the OS back gesture, not ours. */
+function EdgeNav({ page }: { page: PageId }) {
+  const i = PAGES.findIndex((p) => p.id === page)
+  const prev = PAGES[(i - 1 + PAGES.length) % PAGES.length]
+  const next = PAGES[(i + 1) % PAGES.length]
+  return (
+    <>
+      <a className="v2edge v2edge--l" href={`#/${prev.id}`} aria-label={`Предыдущая страница: ${prev.nav}`}>
+        <span aria-hidden="true">{prev.nav}</span>
+      </a>
+      <a className="v2edge v2edge--r" href={`#/${next.id}`} aria-label={`Следующая страница: ${next.nav}`}>
+        <span aria-hidden="true">{next.nav}</span>
+      </a>
+    </>
+  )
+}
+
 /* THE MORPHING SLOGAN, brought over from the live page - his ask, and the right one: the first
    thing a visitor meets should say what we are, and one static line says it once. These three
    pairs are the argument in order: the devise, then what we are not, then what we are.
@@ -956,6 +982,8 @@ export default function V2() {
         <a className="v2btn v2btn--go v2btn--sm" href="#/contacts">Оставить заявку</a>
       </header>
 
+      <EdgeNav page={page} />
+
       {/* The strand belongs to the front page. On the inner pages it would be three and a
           half screens of scrolling between the reader and the thing they clicked for. */}
       {home && (
@@ -1406,6 +1434,9 @@ export default function V2() {
               <p className="v2eyebrow">Контакты</p>
               <p className="v2foot__big">Solutions<b>101</b></p>
               <p className="v2note">Автоматизация бизнес-процессов</p>
+              {/* not in the nav: this is for us and for whoever picks the project up,
+                  not for a visitor. Findable, not advertised. */}
+              <p className="v2docs"><a href="/docs/">Документы проекта</a></p>
             </div>
             <ul className="v2contacts">
               <li><span>Telegram</span><a href="https://t.me/">указать</a></li>

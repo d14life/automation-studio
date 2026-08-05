@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Доска MVP: что построено, что строится, что брать дальше — Solutions101</title>
+<style>
+  :root{--bg:#0e202d;--panel:#132937;--ink:#F2F7F5;--soft:rgba(242,247,245,.86);
+    --faint:rgba(242,247,245,.58);--acc:#7FD8FF;--rule:rgba(242,247,245,.13)}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:var(--acc);text-decoration:none} a:hover{text-decoration:underline}
+  a:focus-visible,button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+  header{position:sticky;top:0;z-index:9;background:var(--bg);border-bottom:1px solid var(--rule);
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:0 clamp(14px,3vw,28px);min-height:52px}
+  .eyebrow{font:600 12px/1 ui-monospace,monospace;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--faint)}
+  .back{display:inline-flex;align-items:center;min-height:44px;padding:0 8px;font-size:14px}
+  main{max-width:860px;margin:0 auto;padding:clamp(24px,4vw,52px) clamp(14px,3vw,28px) 96px}
+  h1{font:700 clamp(28px,4.4vw,44px)/1.08 system-ui;letter-spacing:-.02em;margin:0 0 24px}
+  h2{font:700 clamp(21px,2.6vw,29px)/1.15 system-ui;letter-spacing:-.015em;
+    margin:44px 0 14px;padding-top:22px;border-top:1px solid var(--rule)}
+  h3{font:700 clamp(17px,1.9vw,21px)/1.25 system-ui;margin:30px 0 10px}
+  h4{font:700 16px/1.3 system-ui;margin:22px 0 8px;color:var(--soft)}
+  p{margin:0 0 15px;font-size:16.5px;line-height:1.62;color:var(--soft);max-width:68ch}
+  ul,ol{margin:0 0 16px;padding-left:22px}
+  li{font-size:16.5px;line-height:1.62;color:var(--soft);margin:0 0 7px;max-width:66ch}
+  blockquote{margin:0 0 16px;padding:12px 0 12px 18px;border-left:2px solid var(--acc);
+    color:var(--ink);font-size:17px;line-height:1.55}
+  hr{border:0;border-top:1px solid var(--rule);margin:32px 0}
+  code{font:500 14px/1.4 ui-monospace,monospace;background:var(--panel);
+    padding:2px 6px;border-radius:6px;color:var(--acc)}
+  .code{position:relative;margin:0 0 22px}
+  .code pre{margin:0;background:var(--panel);border:1px solid var(--rule);border-radius:14px;
+    padding:44px 16px 16px;overflow-x:auto;font:500 13.5px/1.62 ui-monospace,monospace;
+    color:var(--ink);white-space:pre-wrap;word-break:break-word}
+  .copy{position:absolute;top:8px;right:8px;min-height:32px;padding:0 14px;border-radius:9px;
+    background:#1a3648;color:var(--ink);border:1px solid var(--rule);cursor:pointer;
+    font:600 13px/1 system-ui;transition:transform .12s ease,background .12s ease}
+  .copy:hover{background:#20455b} .copy:active{transform:scale(.96)}
+  .copy.done{background:#1c5a45;border-color:#2f8b6b}
+  .tw{overflow-x:auto;margin:0 0 20px}
+  table{border-collapse:collapse;width:100%;font-size:15px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--rule);vertical-align:top;
+    line-height:1.5;color:var(--soft)}
+  th{color:var(--ink);font-weight:600;white-space:nowrap}
+  .grp{margin:0 0 34px}
+  .grp h2{border:0;padding:0;margin:0 0 4px}
+  .grp .note{color:var(--faint);font-size:14.5px;margin:0 0 14px}
+  .list{display:grid;gap:10px}
+  .item{display:block;padding:15px 17px;background:var(--panel);border:1px solid var(--rule);
+    border-radius:14px;color:var(--ink);transition:border-color .15s}
+  .item:hover{border-color:var(--acc);text-decoration:none}
+  .item b{display:block;font-size:16.5px;margin-bottom:3px}
+  .item span{color:var(--faint);font-size:14px}
+  @media (prefers-contrast:more){:root{--faint:rgba(242,247,245,.82);--rule:rgba(242,247,245,.4)}}
+</style>
+<header>
+  <a class="eyebrow" href="/docs/" style="color:var(--faint)">Solutions101 · документы</a>
+  <a class="back" href="/docs/">← ко всем</a>
+</header>
+<main><h1>Доска MVP: что построено, что строится, что брать дальше</h1>
+<p>Правило доски одно: <b>один тип софта — один MVP.</b> Не потому что красиво, а потому что два инструмента одной формы продают одно и то же, сколько бы разных отраслей они ни обслуживали. Типы — из <code>TYPES-12.md</code>.</p>
+<hr>
+<h2>Что есть на самом деле</h2>
+<p>Три системы. Не пять и не шесть — маленькие демо на десять секунд (<code>/demo/sborschik</code>, <code>/demo/bot</code>, <code>/demo/crm</code>, <code>/demo/otchet</code>, <code>/demo/raspoznavatel</code>) это витрина приёмов, а не продукты.</p>
+<div class="tw"><table><thead><tr><th>система</th><th>тип</th><th>для кого</th><th>состояние</th></tr></thead><tbody><tr><td><b>Взаиморасчёты</b> (Жаркын-БЖК, ₸, 1С)</td><td>Рабочее приложение</td><td>бизнес</td><td>построена, сверка с ОСВ ни разу не запускалась</td></tr><tr><td><b>Аукцион автозапчастей</b> (1С)</td><td>Публичная витрина</td><td><b>покупателя клиента</b></td><td>построена</td></tr><tr><td><b>Арендный парк</b> (<code>/demo/park/</code>)</td><td>Рабочее приложение</td><td>бизнес</td><td>построена, аудит пройден, счёт и акт починены</td></tr></tbody></table></div>
+<h2>Что собираются строить друзья</h2>
+<div class="tw"><table><thead><tr><th>задумано</th><th>какой это тип</th><th>вердикт</th></tr></thead><tbody><tr><td>Цветочный магазин</td><td>Публичная витрина</td><td><b>дубль</b> — аукцион уже эта форма</td></tr><tr><td>Ещё одна бухгалтерия</td><td>Рабочее приложение</td><td><b>дубль</b> — взаиморасчёты уже эта форма</td></tr><tr><td>Управление компаниями</td><td>Рабочее приложение</td><td><b>дубль третий раз</b></td></tr></tbody></table></div>
+<p>Шесть сборок, три формы, и обе формы уже заняты. Отрасль другая, разговор с клиентом — тот же самый. Именно так каталог из 62 офферов и оказался на три четверти одинаковым.</p>
+<hr>
+<h2>Свободные типы — здесь всё, что стоит строить</h2>
+<p>Ранжировано по тому, насколько быстро результат становится разговором о деньгах.</p>
+<h3>1. Сторож — свободен, ноль конкурентов</h3>
+<p>Молчит, пока правило не нарушено. <b>Продаётся быстрее всех</b>, потому что результат — это сумма, которую клиент терял и не видел. Экрана почти нет, значит и строить почти нечего: правила, история замеров, лента событий. Кандидат из каталога: <code>03. Мониторинг маркетплейсов</code> или <code>50. Оповещения и поиск отклонений</code>.</p>
+<h3>2. Мост — свободен, и это наша земля</h3>
+<p>Держит в согласии две системы. <b>Конкурента нет по определению</b>: коробки отвечают каждая за себя, за то, что между ними, не отвечает никто. Сверка 1С ↔ банк ↔ маркетплейс, расхождения в рублях на экране. Кандидат: <code>10. Сверка банковской выписки</code> + <code>06. Интеграции между системами</code>.</p>
+<h3>3. Экран правды — свободен</h3>
+<p>Висит на телевизоре в цехе, показывает, где работа стоит, и ничего не меняет. Форма, которую невозможно спутать с бухгалтерией: крупно, цветом, без ввода. Кандидат: <code>Для строительных компаний · Доска объекта</code>.</p>
+<h3>4. Собеседник — свободен как ПРОДУКТ</h3>
+<p>Маленькое демо бота есть, системы нет. Настоящий продукт здесь — конструктор сценария, разбор непонятых реплик и обучение руками. Кандидат: <code>31. Голосовой бот</code> — и <code>speechSynthesis</code> встроен в браузер, то есть демо действительно говорит.</p>
+<h3>5. Предсказатель — свободен</h3>
+<p>Считает то, чего ещё не было, и выдаёт очередь дел. Кандидат: <code>29. Прогноз спроса и запасов</code>. Осторожно с <code>14. Прогноз денежного потока</code> — это финансы, а от финансового запаха мы уходим.</p>
+<h3>6. Конвейер документов — свободен</h3>
+<p>Событие на входе, готовая бумага на выходе. Кандидат: <code>18. Генератор коммерческих предложений</code> — конфигуратор, из которого выходит фирменный PDF.</p>
+<h3>7. Распознаватель — свободен как продукт</h3>
+<p>Есть демо на десять секунд. Продукт — это очередь на проверку, уверенность по каждому полю и обучение правил. Кандидат: <code>26. Классификация документов</code>.</p>
+<p>Ещё свободны: <b>Сборщик</b>, <b>Генератор контента</b>, <b>Отчёт по расписанию</b> — но все три слабее как флагман: сборщик почти неотличим от моста на демо, генератор упирается в доверие к тексту, отчёт визуально скучен по своей природе.</p>
+<hr>
+<h2>Что предложить друзьям вместо дублей</h2>
+<p>Формулировка, которую можно переслать как есть.</p>
+<ul><li><b>Вместо цветочного магазина</b> → <b>онлайн-запись</b> (<code>38. Система онлайн-записи</code>).</li></ul>
+<p>  Тоже для покупателя клиента, тоже красиво, но форма другая — сетка слотов, а не   каталог с корзиной. И продаётся всем, у кого есть расписание: барберы, клиники,   автосервисы, аренда залов. Цветочный магазин — это аукцион ещё раз.</p>
+<ul><li><b>Вместо второй бухгалтерии</b> → <b>сверка</b> (Мост). Данные те же самые,</li></ul>
+<p>  бухгалтерские, но продукт другой: не «веди учёт», а «вот 340 000 ₽, которые у   тебя не сходятся». Директор понимает за пятнадцать секунд без объяснений.</p>
+<ul><li><b>Вместо «управления компаниями»</b> → <b>экран правды</b>. Если речь про контроль</li></ul>
+<p>  нескольких объектов или бригад — это доска на стену, а не ещё одна таблица.</p>
+<hr>
+<h2>Как решать про любую новую идею</h2>
+<p>Один вопрос, до всего остального: <b>какой это тип?</b></p>
+<p>Если ответ «Рабочее приложение» — стоп. Их уже два, и третье не расширит линейку, оно её повторит. Ту же задачу почти всегда можно поставить в другой форме, и от формы зависит и цена, и впечатление.</p>
+<p>Пример на одной задаче — контроль просроченной дебиторки:</p>
+<ul><li><b>Рабочее приложение</b> — таблица долгов с фильтрами. <i>Уже построено дважды.</i></li><li><b>Сторож</b> — молчит, пока долг не перешёл порог, потом одно сообщение.</li><li><b>Отчёт по расписанию</b> — приходит утром в списке проблем.</li><li><b>Предсказатель</b> — «через две недели кассовый разрыв, вот кому звонить сегодня».</li></ul>
+<p>Одна боль, четыре продукта, четыре разные цены.</p>
+<hr>
+<h2>Порядок сборки</h2>
+<div class="tw"><table><thead><tr><th>#</th><th>тип</th><th>что строим</th><th>почему в этом порядке</th></tr></thead><tbody><tr><td>1</td><td><b>Мост</b></td><td>сверка 1С ↔ банк</td><td>не конкурирует ни с чем, строится быстрее всех, результат — сумма в рублях</td></tr><tr><td>2</td><td><b>Сторож</b></td><td>мониторинг цен и отклонений</td><td>почти нет интерфейса, значит почти нечего строить</td></tr><tr><td>3</td><td><b>Экран правды</b></td><td>доска объекта на стену</td><td>визуально максимально далеко от бухгалтерии</td></tr><tr><td>4</td><td><b>Собеседник</b></td><td>голосовой бот</td><td>самый сильный эффект, самый долгий разговор про качество</td></tr><tr><td>5</td><td><b>Конвейер</b></td><td>генератор КП</td><td>закрывает «бумага на выходе»</td></tr></tbody></table></div>
+<p>После пяти закрыто восемь типов из двенадцати, и каждая страница «Услуг» на сайте получает свою анимацию — ровно то, что требовал Райнур.</p>
+<hr>
+<h2>Отдельно: что нужно самим системам, а не новым</h2>
+<p><b>Взаиморасчётам</b> — сверка с ОСВ. Критерий приёмки не запускался ни разу, потому что не с чем сверять. Пока он не пройден, это не «сходимость 0 ₸», а обещание.</p>
+<p><b>Арендному парку</b> — печатный ДОГОВОР. Акт и счёт есть и починены, но арендный бизнес живёт договором, и это первое, что спросит директор. Плюс выгрузка в CSV: «а в Excel это можно?» — второй вопрос, и сейчас ответа нет.</p>
+<p><b>Аукциону</b> — он вообще не описан ни в одном документе. Форма, которой в каталоге из 62 нет совсем (живые часы, встречные ставки, движущаяся цена), уже построена и забыта. Как минимум карточка в «Работах».</p></main>
+<script>
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('.copy'); if (!b) return;
+  const pre = document.getElementById(b.dataset.for); if (!pre) return;
+  navigator.clipboard.writeText(pre.textContent).then(() => {
+    b.textContent = 'Скопировано'; b.classList.add('done');
+    setTimeout(() => { b.textContent = 'Скопировать'; b.classList.remove('done') }, 1800);
+  }).catch(() => { b.textContent = 'Выделите вручную' });
+});
+</script>

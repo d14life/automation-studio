@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>SPEC — техническое задание на весь сайт — Solutions101</title>
+<style>
+  :root{--bg:#0e202d;--panel:#132937;--ink:#F2F7F5;--soft:rgba(242,247,245,.86);
+    --faint:rgba(242,247,245,.58);--acc:#7FD8FF;--rule:rgba(242,247,245,.13)}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:var(--acc);text-decoration:none} a:hover{text-decoration:underline}
+  a:focus-visible,button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+  header{position:sticky;top:0;z-index:9;background:var(--bg);border-bottom:1px solid var(--rule);
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:0 clamp(14px,3vw,28px);min-height:52px}
+  .eyebrow{font:600 12px/1 ui-monospace,monospace;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--faint)}
+  .back{display:inline-flex;align-items:center;min-height:44px;padding:0 8px;font-size:14px}
+  main{max-width:860px;margin:0 auto;padding:clamp(24px,4vw,52px) clamp(14px,3vw,28px) 96px}
+  h1{font:700 clamp(28px,4.4vw,44px)/1.08 system-ui;letter-spacing:-.02em;margin:0 0 24px}
+  h2{font:700 clamp(21px,2.6vw,29px)/1.15 system-ui;letter-spacing:-.015em;
+    margin:44px 0 14px;padding-top:22px;border-top:1px solid var(--rule)}
+  h3{font:700 clamp(17px,1.9vw,21px)/1.25 system-ui;margin:30px 0 10px}
+  h4{font:700 16px/1.3 system-ui;margin:22px 0 8px;color:var(--soft)}
+  p{margin:0 0 15px;font-size:16.5px;line-height:1.62;color:var(--soft);max-width:68ch}
+  ul,ol{margin:0 0 16px;padding-left:22px}
+  li{font-size:16.5px;line-height:1.62;color:var(--soft);margin:0 0 7px;max-width:66ch}
+  blockquote{margin:0 0 16px;padding:12px 0 12px 18px;border-left:2px solid var(--acc);
+    color:var(--ink);font-size:17px;line-height:1.55}
+  hr{border:0;border-top:1px solid var(--rule);margin:32px 0}
+  code{font:500 14px/1.4 ui-monospace,monospace;background:var(--panel);
+    padding:2px 6px;border-radius:6px;color:var(--acc)}
+  .code{position:relative;margin:0 0 22px}
+  .code pre{margin:0;background:var(--panel);border:1px solid var(--rule);border-radius:14px;
+    padding:44px 16px 16px;overflow-x:auto;font:500 13.5px/1.62 ui-monospace,monospace;
+    color:var(--ink);white-space:pre-wrap;word-break:break-word}
+  .copy{position:absolute;top:8px;right:8px;min-height:32px;padding:0 14px;border-radius:9px;
+    background:#1a3648;color:var(--ink);border:1px solid var(--rule);cursor:pointer;
+    font:600 13px/1 system-ui;transition:transform .12s ease,background .12s ease}
+  .copy:hover{background:#20455b} .copy:active{transform:scale(.96)}
+  .copy.done{background:#1c5a45;border-color:#2f8b6b}
+  .tw{overflow-x:auto;margin:0 0 20px}
+  table{border-collapse:collapse;width:100%;font-size:15px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--rule);vertical-align:top;
+    line-height:1.5;color:var(--soft)}
+  th{color:var(--ink);font-weight:600;white-space:nowrap}
+  .grp{margin:0 0 34px}
+  .grp h2{border:0;padding:0;margin:0 0 4px}
+  .grp .note{color:var(--faint);font-size:14.5px;margin:0 0 14px}
+  .list{display:grid;gap:10px}
+  .item{display:block;padding:15px 17px;background:var(--panel);border:1px solid var(--rule);
+    border-radius:14px;color:var(--ink);transition:border-color .15s}
+  .item:hover{border-color:var(--acc);text-decoration:none}
+  .item b{display:block;font-size:16.5px;margin-bottom:3px}
+  .item span{color:var(--faint);font-size:14px}
+  @media (prefers-contrast:more){:root{--faint:rgba(242,247,245,.82);--rule:rgba(242,247,245,.4)}}
+</style>
+<header>
+  <a class="eyebrow" href="/docs/" style="color:var(--faint)">Solutions101 · документы</a>
+  <a class="back" href="/docs/">← ко всем</a>
+</header>
+<main><h1>SPEC — техническое задание на весь сайт</h1>
+<p>Мастер-документ. Собирает всё, что есть: голосовые Райнура (<code>BRIEF.md</code>), доску, первую версию сайта (v1, 62 оффера с анимациями), вторую (v2, ДНК-шапка), и два референса. Тексты и раскладка по секциям — в <code>PAGES.md</code>; здесь — требования, источники и что откуда берём. Прототипы — в <code>PROTOTYPES.md</code>.</p>
+<hr>
+<h2>1. Источники и что из каждого берём</h2>
+<div class="tw"><table><thead><tr><th>источник</th><th>что берём</th><th>что НЕ берём</th></tr></thead><tbody><tr><td><b>v2 (текущая)</b></td><td>ДНК-шапку целиком, стеклянные карточки с лучом, тёмную палитру, хэш-роутинг, переливы</td><td>—</td></tr><tr><td><b>v1 (старый index.html)</b></td><td>наработки анимаций для офферов — идею «у каждой услуги своя анимация»; каталог из 62 позиций как содержание</td><td>морф-слоган (лагал), 62 фейковых прототипа как «работы» — Райнур прямо сказал, что это не демонстрация</td></tr><tr><td><b>mabk.pro</b></td><td>информационную архитектуру: плитки с цифрами под первым экраном, чёткое меню, логотипы клиентов</td><td>цвета, светлый стиль</td></tr><tr><td><b>gaiaintegratedsystems.co.uk</b></td><td>см. разбор ниже — нумерацию секций, аккордеон услуг, процесс из 5 шагов, «Small by design», форму с чипами</td><td>англоязычную сдержанность тона — у нас «максимально аишный», переливы и 3D</td></tr><tr><td><b>доска Райнура</b></td><td>список разделов, «форма должна быть ахуенной», ИИ-ассистент</td><td>—</td></tr><tr><td><b>голосовые</b></td><td>ноль воды · цифры · 100% практики · своя анимация на услугу · сайт = лицо компании</td><td>—</td></tr></tbody></table></div>
+<h3>Разбор GAIA (второй референс, добавлен 5 августа)</h3>
+<p>Что делает сайт «дорогим» и переносится к нам:</p>
+<ol><li><b>Сквозная нумерация секций</b> — <code>01 / ЧТО МЫ ДЕЛАЕМ</code>, <code>02 / ПРОЦЕСС</code>… Даёт</li></ol>
+<p>   ощущение структуры и «инженерности» бесплатно. У нас нумерация оправдана:    секции идут в реальной последовательности. Формат: моноширинный кегль    поверх заголовка, тем же шрифтом, что <code>v2eyebrow</code>.</p>
+<ol><li><b>Услуги аккордеоном</b> — раскрыт один пункт, остальные строкой. Решает</li></ol>
+<p>   «компактно, по логике» из ТЗ Райнура лучше, чем пять карточек в ряд.    У нас на раскрытии дополнительно играет анимация услуги (PAGES 1.3).</p>
+<ol><li><b>Процесс из пронумерованных шагов</b> — у GAIA пять, у нас три (прототип →</li></ol>
+<p>   50% → сдача). Их «no account managers, вы работаете с тем, кто строит» —    ровно наше «кто говорит с вами о задаче, тот её и делает» (уже в PAGES 2.2).</p>
+<ol><li><b>«Small by design»</b> — маленькая команда подана как преимущество, стрелки</li></ol>
+<p>   вместо буллетов. Берём для «О нас»: 3–4 человека — это фича, не слабость.</p>
+<ol><li><b>Форма с чипами</b> — тип проекта / бюджет / сроки выбираются кнопками, не</li></ol>
+<p>   выпадашками. Это и есть «ахуенная форма»: три клика и одно текстовое поле.    <b>Бюджетные чипы решают проблему вилок</b>: «до 150к · 150–400к · 400к–1млн ·    1млн+ · не знаю» — честно и без прайса на каждый чих.</p>
+<ol><li><b>Бегущая строка возможностей</b> в хиро (Web applications · Mobile apps · …) —</li></ol>
+<p>   у нас: CRM · Телефония · Боты · Сборщики · Пробив · Экосистемы.</p>
+<hr>
+<h2>2. Сайт-wide требования</h2>
+<h3>Палитра и типографика — как в v2, не изобретать заново</h3>
+<ul><li>Тёмная: <code>--bg:#0e202d</code>, <code>--ink:#F2F7F5</code>; светлая: <code>#f6e9e2</code>/<code>#141a1c</code>.</li></ul>
+<p>  Слоган-градиент уже задан (<code>--slogan</code>). Nunito, self-hosted, кириллица.</p>
+<ul><li>Акцент <code>101</code> в логотипе — уже сделано. Никаких новых шрифтов и цветов без</li></ul>
+<p>  причины, которую можно назвать вслух.</p>
+<h3>Эффекты — бюджет жёсткий</h3>
+<p>Правило одно, из-за него v1 лагал: <b>ничто не анимируется вне экрана</b>. Каждый эффект — из таблицы в <code>PAGES.md</code>. Новые эффекты добавляются только с измерением (метод: video motion за 3с, как A/B стеклянных панелей). Переливы между страницами — один <code>clip-path</code> на composite-слое.</p>
+<h3>Технически</h3>
+<ul><li>Всё в двух файлах v2 (<code>V2.tsx</code> + <code>v2.css</code>), пока не станет тесно; если</li></ul>
+<p>  страницы вырастут — по компоненту на страницу, но CSS остаётся один.</p>
+<ul><li>Хэш-роутинг (GitHub Pages), скролл к верху на смене страницы — уже есть.</li><li>Картинки — WebP, ленивая загрузка всего ниже первого экрана.</li><li>Форма: POST на Formspree или Telegram-бота — решить при постройке; валидация</li></ul>
+<p>  и защита от даблклика обязательны (PAGES 6.2).</p>
+<ul><li>ИИ-ассистент (доска): отдельный этап после контента. Кнопка в углу, знает</li></ul>
+<p>  каталог и цены, принимает заявку. Не строить, пока страницы не готовы.</p>
+<h3>Контент</h3>
+<ul><li>Всё, что утверждает цифру, берётся из проверенных: 62 сценария, 12 типов,</li></ul>
+<p>  3–4 человека, 0 ₽ прототип, 1 клиент (Негабарит-12). Список честности — в   <code>PAGES.md</code>. Выдуманных цифр на сайте нет.</p>
+<ul><li>Тексты — русские, «ноль воды». Каждое предложение переживает вопрос</li></ul>
+<p>  «что будет, если его удалить?».</p>
+<hr>
+<h2>3. Карта страниц</h2>
+<p>Раскладка и тексты каждой секции — <code>PAGES.md</code>. Сводно:</p>
+<div class="tw"><table><thead><tr><th>страница</th><th>секции</th><th>статус</th></tr></thead><tbody><tr><td>Главная</td><td>ДНК-шапка · бегущая строка · плитки цифр · услуги-аккордеон с анимациями · процесс 3 шага · «с нами работают» · форма</td><td>шапка готова</td></tr><tr><td>О нас</td><td>перелив-заставка · 100% практики · команда (Small by design) · отрасли</td><td>тексты готовы</td></tr><tr><td>Услуги</td><td>по типу клиента, липкие заголовки отраслей</td><td>тексты готовы</td></tr><tr><td>Инструменты</td><td>таблица с вилками · «прототип бесплатно»</td><td>ждёт вилок цен</td></tr><tr><td>Работы</td><td>сетка кейсов + <b>прототипы из PROTOTYPES.md</b></td><td>1 кейс + план на 15 демо</td></tr><tr><td>Контакты</td><td>контакты · форма с чипами</td><td>ждёт контактов</td></tr></tbody></table></div>
+<h3>Порядок постройки — вертикальными срезами</h3>
+<ol><li>Главная ниже шапки (плитки → аккордеон → процесс → форма) — каждая секция</li></ol>
+<p>   выкатывается отдельно и смотрится Дамиром.</p>
+<ol><li>О нас. 3. Услуги. 4. Инструменты (когда будут вилки). 5. Работы — по мере</li></ol>
+<p>   готовности прототипов. 6. Ассистент — последним.</p>
+<hr>
+<h2>4. Прототипы как контент</h2>
+<p>Решение (5 августа): вместо 62 фейковых анимаций — <b>~15 настоящих кликабельных демо</b>, по одному на тип софта из <code>software-types.md</code>. Каждое строится Клодом как отдельная React-страница, экспортируется и встраивается в «Работы» как живое демо + короткая запись экрана для карточки. Полный список, охват типов и порядок постройки — <b><code>PROTOTYPES.md</code></b>.</p>
+<p>Уже существует: аукцион автозапчастей с подключением к 1С (у Дамира). Он становится «Работой №2» рядом с Негабаритом и эталоном формата: задача → демо, которое можно потрогать → что изменилось.</p>
+<hr>
+<h2>5. Открытое (спросить один раз, потом не спрашивать)</h2>
+<ol><li>Вилки цен по инструментам — или прячем прайс за бюджетные чипы формы</li></ol>
+<p>   (вариант GAIA, снимает вопрос целиком — рекомендация).</p>
+<ol><li>Контакты: TG, WA, почта, телефон.</li><li>Команда: имена, роли, фото.</li></ol></main>
+<script>
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('.copy'); if (!b) return;
+  const pre = document.getElementById(b.dataset.for); if (!pre) return;
+  navigator.clipboard.writeText(pre.textContent).then(() => {
+    b.textContent = 'Скопировано'; b.classList.add('done');
+    setTimeout(() => { b.textContent = 'Скопировать'; b.classList.remove('done') }, 1800);
+  }).catch(() => { b.textContent = 'Выделите вручную' });
+});
+</script>

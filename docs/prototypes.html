@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>15 прототипов — что строим вместо 62 фейковых анимаций — Solutions101</title>
+<style>
+  :root{--bg:#0e202d;--panel:#132937;--ink:#F2F7F5;--soft:rgba(242,247,245,.86);
+    --faint:rgba(242,247,245,.58);--acc:#7FD8FF;--rule:rgba(242,247,245,.13)}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:var(--acc);text-decoration:none} a:hover{text-decoration:underline}
+  a:focus-visible,button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+  header{position:sticky;top:0;z-index:9;background:var(--bg);border-bottom:1px solid var(--rule);
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:0 clamp(14px,3vw,28px);min-height:52px}
+  .eyebrow{font:600 12px/1 ui-monospace,monospace;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--faint)}
+  .back{display:inline-flex;align-items:center;min-height:44px;padding:0 8px;font-size:14px}
+  main{max-width:860px;margin:0 auto;padding:clamp(24px,4vw,52px) clamp(14px,3vw,28px) 96px}
+  h1{font:700 clamp(28px,4.4vw,44px)/1.08 system-ui;letter-spacing:-.02em;margin:0 0 24px}
+  h2{font:700 clamp(21px,2.6vw,29px)/1.15 system-ui;letter-spacing:-.015em;
+    margin:44px 0 14px;padding-top:22px;border-top:1px solid var(--rule)}
+  h3{font:700 clamp(17px,1.9vw,21px)/1.25 system-ui;margin:30px 0 10px}
+  h4{font:700 16px/1.3 system-ui;margin:22px 0 8px;color:var(--soft)}
+  p{margin:0 0 15px;font-size:16.5px;line-height:1.62;color:var(--soft);max-width:68ch}
+  ul,ol{margin:0 0 16px;padding-left:22px}
+  li{font-size:16.5px;line-height:1.62;color:var(--soft);margin:0 0 7px;max-width:66ch}
+  blockquote{margin:0 0 16px;padding:12px 0 12px 18px;border-left:2px solid var(--acc);
+    color:var(--ink);font-size:17px;line-height:1.55}
+  hr{border:0;border-top:1px solid var(--rule);margin:32px 0}
+  code{font:500 14px/1.4 ui-monospace,monospace;background:var(--panel);
+    padding:2px 6px;border-radius:6px;color:var(--acc)}
+  .code{position:relative;margin:0 0 22px}
+  .code pre{margin:0;background:var(--panel);border:1px solid var(--rule);border-radius:14px;
+    padding:44px 16px 16px;overflow-x:auto;font:500 13.5px/1.62 ui-monospace,monospace;
+    color:var(--ink);white-space:pre-wrap;word-break:break-word}
+  .copy{position:absolute;top:8px;right:8px;min-height:32px;padding:0 14px;border-radius:9px;
+    background:#1a3648;color:var(--ink);border:1px solid var(--rule);cursor:pointer;
+    font:600 13px/1 system-ui;transition:transform .12s ease,background .12s ease}
+  .copy:hover{background:#20455b} .copy:active{transform:scale(.96)}
+  .copy.done{background:#1c5a45;border-color:#2f8b6b}
+  .tw{overflow-x:auto;margin:0 0 20px}
+  table{border-collapse:collapse;width:100%;font-size:15px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--rule);vertical-align:top;
+    line-height:1.5;color:var(--soft)}
+  th{color:var(--ink);font-weight:600;white-space:nowrap}
+  .grp{margin:0 0 34px}
+  .grp h2{border:0;padding:0;margin:0 0 4px}
+  .grp .note{color:var(--faint);font-size:14.5px;margin:0 0 14px}
+  .list{display:grid;gap:10px}
+  .item{display:block;padding:15px 17px;background:var(--panel);border:1px solid var(--rule);
+    border-radius:14px;color:var(--ink);transition:border-color .15s}
+  .item:hover{border-color:var(--acc);text-decoration:none}
+  .item b{display:block;font-size:16.5px;margin-bottom:3px}
+  .item span{color:var(--faint);font-size:14px}
+  @media (prefers-contrast:more){:root{--faint:rgba(242,247,245,.82);--rule:rgba(242,247,245,.4)}}
+</style>
+<header>
+  <a class="eyebrow" href="/docs/" style="color:var(--faint)">Solutions101 · документы</a>
+  <a class="back" href="/docs/">← ко всем</a>
+</header>
+<main><h1>15 прототипов — что строим вместо 62 фейковых анимаций</h1>
+<p>Райнур про старые плейсхолдеры сказал прямо: это не демонстрация ничего. Решение: <b>15 настоящих кликабельных демо</b> — по одному на каждый из 12 типов софта (<code>software-types.md</code>), плюс отраслевые. Посетитель не читает про «сборщика прайсов» — он нажимает кнопку и смотрит, как строки слетаются в таблицу.</p>
+<p><b>Формат каждого демо:</b> React-страница, строится Клодом по промпту, данные фейковые и подписаны «демо-данные» (выдуманные данные в интерфейсе — можно, выдуманные цифры о нас — нельзя). Встраивается в «Работы» как живая страница + 15-секундная запись экрана для карточки. Один промпт — один вечер — одно демо.</p>
+<p><b>Эталон уже есть:</b> аукцион автозапчастей с подключением к 1С (№1 ниже) — настоящий, рабочий, у Дамира. Он задаёт планку формата: задача → потрогать → что изменилось.</p>
+<hr>
+<div class="tw"><table><thead><tr><th>#</th><th>демо</th><th>тип из 12</th><th>кто узнаёт себя</th><th>что видно на экране</th></tr></thead><tbody><tr><td>1</td><td><b>Аукцион автозапчастей + 1С</b> <i>(есть, рабочий)</i></td><td>Рабочее приложение + Мост</td><td>автобизнес, опт</td><td>лоты, ставки в реальном времени, сделка уезжает в 1С</td></tr><tr><td>2</td><td><b>Сборщик прайсов</b></td><td>Сборщик</td><td>опт, снабжение</td><td>три прайса (почта, сайт, Excel) → кнопка → одна таблица с лучшей ценой по позиции</td></tr><tr><td>3</td><td><b>Бот-калькулятор</b></td><td>Собеседник</td><td>все, кто продаёт по прайсу</td><td>окно Telegram: клиент пишет «нужно 40 листов», бот считает по прайсу и выставляет счёт</td></tr><tr><td>4</td><td><b>Конвейер документов</b></td><td>Конвейер документов</td><td>юристы, стройка, услуги</td><td>форма сделки → кнопка → готовые счёт+договор+акт в PDF</td></tr><tr><td>5</td><td><b>Распознаватель накладных</b></td><td>Распознаватель</td><td>склад, бухгалтерия</td><td>фото мятой накладной → строки появляются в таблице с подсветкой уверенности</td></tr><tr><td>6</td><td><b>Сторож цен конкурентов</b></td><td>Сторож</td><td>розница, опт</td><td>список конкурентов, у одного цена упала — алерт в TG с разницей</td></tr><tr><td>7</td><td><b>Экран правды</b></td><td>Экран правды</td><td>производство, логистика</td><td>live-дашборд цеха: заказы по этапам, красное там, где стоит</td></tr><tr><td>8</td><td><b>Утренний отчёт владельцу</b></td><td>Отчёт по расписанию</td><td>владельцы</td><td>телефон 7:00, в TG приходит: выручка вчера, касса, долги, три проблемы</td></tr><tr><td>9</td><td><b>Предсказатель закупки</b></td><td>Предсказатель</td><td>опт, производство</td><td>график остатков, прогнозная линия, «заказать до 14-го, иначе разрыв 6 дней»</td></tr><tr><td>10</td><td><b>Витрина из 1С</b></td><td>Публичная витрина</td><td>опт с базой в 1С</td><td>каталог с фильтрами, остатки честные, кнопка «в заявку» — всё из учётки</td></tr><tr><td>11</td><td><b>Генератор рассылки</b></td><td>Генератор контента</td><td>все с базой клиентов</td><td>сегмент «молчат 90 дней» → кнопка → персональные письма, каждое своё</td></tr><tr><td>12</td><td><b>CRM логиста</b></td><td>Рабочее приложение</td><td>логистика</td><td>воронка заявка→машина→в пути→закрыто, звонок прикреплён к сделке</td></tr><tr><td>13</td><td><b>Пробив контрагента</b></td><td>Мост</td><td>все b2b</td><td>ИНН → карточка: реквизиты, суды, долги, светофор риска</td></tr><tr><td>14</td><td><b>Пакет юрфирмы</b></td><td>отраслевой (Конвейер+Сторож)</td><td>юристы</td><td>документы из шаблонов + мониторинг судов по клиентам в одном окне</td></tr><tr><td>15</td><td><b>Пакет стройки</b></td><td>отраслевой (Экран+Конвейер)</td><td>стройка</td><td>этапы объекта, фотоотчёты с телефона прораба, акты по кнопке</td></tr></tbody></table></div>
+<p>Покрытие: все 12 типов (№1–13) + два отраслевых пакета из каталога (№14–15).</p>
+<hr>
+<h2>Порядок постройки</h2>
+<p>Первыми — те, что видны в услугах главной (эффект узнавания сильнее всего): <b>2 сборщик → 3 бот → 12 CRM → 8 отчёт → 5 распознаватель</b>, дальше по таблице. №1 уже есть — его оформить кейсом первым, раньше всех демо.</p>
+<h2>Как строится одно демо (конвейер)</h2>
+<ol><li>Промпт Клоду: «одна React-страница, тёмная палитра v2 (<code>--bg:#0e202d</code>,</li></ol>
+<p>   <code>--ink:#F2F7F5</code>, Nunito), демо-данные подписаны, одна главная кнопка,    которая показывает магию за 10 секунд». Основа промпта — строка из таблицы.</p>
+<ol><li>Дамир смотрит, правит вкус (2–3 варианта на визуальные развилки).</li><li>Экспорт: статическая страница в <code>app/public/demo/&lt;имя&gt;/</code>, роут из «Работ».</li><li>Запись экрана 15с → карточка в «Работах» проигрывает её при наведении.</li></ol>
+<p>Правила: никакого бэкенда в демо — всё на фейковых данных в памяти; каждая страница самодостаточна (не тянет ничего из V2.tsx, кроме палитры); вес демо до 300KB, без библиотек анимации — CSS и SVG, как на остальном сайте.</p></main>
+<script>
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('.copy'); if (!b) return;
+  const pre = document.getElementById(b.dataset.for); if (!pre) return;
+  navigator.clipboard.writeText(pre.textContent).then(() => {
+    b.textContent = 'Скопировано'; b.classList.add('done');
+    setTimeout(() => { b.textContent = 'Скопировать'; b.classList.remove('done') }, 1800);
+  }).catch(() => { b.textContent = 'Выделите вручную' });
+});
+</script>
