@@ -108,7 +108,15 @@ const rim  = new THREE.DirectionalLight(0x7FD8FF, 3.0); rim.position.set(4, -1, 
 const kick = new THREE.DirectionalLight(0xff9a5c, 1.5); kick.position.set(5, 2, 2)   /* warm kicker */
 scene.add(key, rim, kick)
 
+/* REAL ROCK MAPS, projected triplanar. The fractured pieces have no UVs - bisect
+   makes new faces and there is nothing sensible to unwrap - so the texture is
+   projected from world position on all three axes and blended by the normal. That
+   is the standard answer for procedurally cut geometry and it costs three samples. */
+const texLoader = new THREE.TextureLoader()
+const rockTex = (f) => { const t = texLoader.load('./tex/' + f); t.wrapS = t.wrapT = THREE.RepeatWrapping; return t }
 const uniforms = {
+  uRock:  { value: rockTex('rock_color.jpg') },
+  uRough: { value: rockTex('rock_rough.jpg') },
   uDamage: { value: 0 },
   uMorph:  { value: 0 },   /* 0 = the mark is 101, 1 = the swarm has become Solutions */
   uSpin:   { value: 0 },
@@ -202,7 +210,7 @@ function patch(mat, isCore) {
       vLocalN = objectNormal;
     `)
 
-    sh.fragmentShader = 'varying float vT; varying float vTone; varying vec3 vLocalN; varying vec3 vWorld;\n' + sh.fragmentShader
+    sh.fragmentShader = 'uniform sampler2D uRock; uniform sampler2D uRough;\nvarying float vT; varying float vTone; varying vec3 vLocalN; varying vec3 vWorld;\n' + sh.fragmentShader
     if (isCore) {
       /* THE REVEAL: the interior is nearly dark while the mark is whole and lifts
          as its own piece separates. Squared, so it stays subtle through the first
@@ -240,6 +248,21 @@ function patch(mat, isCore) {
         float fres = pow(1.0 - abs(dot(normalize(vLocalN), vec3(0.0, 0.0, 1.0))), 3.2);
         gl_FragColor.rgb += fres * mix(vec3(0.10,0.34,0.52), vec3(0.34,0.20,0.10), vTone) * 0.9;
         /* GRAIN - smooth facets read as plastic; broken stone has microstructure */
+        /* triplanar: three projections, weighted by how much the face points each way */
+        vec3 bw = abs(normalize(vLocalN));
+        bw = pow(bw, vec3(4.0)); bw /= (bw.x + bw.y + bw.z);
+        vec2 uvX = vWorld.zy * 2.6, uvY = vWorld.xz * 2.6, uvZ = vWorld.xy * 2.6;
+        vec3 rock = texture2D(uRock, uvX).rgb * bw.x
+                  + texture2D(uRock, uvY).rgb * bw.y
+                  + texture2D(uRock, uvZ).rgb * bw.z;
+        float rgh = texture2D(uRough, uvX).r * bw.x
+                  + texture2D(uRough, uvY).r * bw.y
+                  + texture2D(uRough, uvZ).r * bw.z;
+        /* the photograph carries the detail; keep the lighting we already tuned by
+           modulating rather than replacing, and let rough areas eat the specular */
+        gl_FragColor.rgb *= 0.55 + 1.15 * rock;
+        gl_FragColor.rgb *= 1.0 - 0.35 * rgh;
+
         vec3 wp = vWorld * 26.0;
         float n1 = fract(sin(dot(floor(wp),     vec3(12.99,78.23,45.16))) * 43758.5453);
         float n2 = fract(sin(dot(floor(wp*2.7), vec3(19.43,61.77,31.09))) * 24634.6345);
