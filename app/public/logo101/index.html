@@ -174,17 +174,26 @@ function patch(mat, isCore) {
       void main() {`)
 
     sh.vertexShader = sh.vertexShader.replace('#include <begin_vertex>', `
+      /* ONE SCROLL, TWO WORDS - and THIS is the line the whole effect hung on.
+         aTarget was uploaded correctly for all 484 pieces and uMorph was reaching the
+         shader, but `transformed` was still built from aCenter alone, so every piece
+         flew outward and came straight back home. A ring.
+
+         home TRAVELS: 101 at one end, a point sampled on the letterforms of
+         "Solutions" at the other. The pieces cannot morph into the second word -
+         different letters mean different topology - so they simply relocate, and the
+         explosion rides on top of the journey rather than being the destination.
+
+         Throw scaled to the mark rather than to a round number: 1.35 flung every piece
+         off screen and ended the scroll on an empty frame. */
       float t = breakT(aCenter, uDamage, uMinY, uMaxY);
       vT = t; vTone = aTone;
-      mat3 R = axisRot(normalize(aSeed + vec3(0.001)), t * 1.5);
-      /* Throw scaled to the MARK, not to a round number: 1.35 on an object 0.87
-         wide flung every piece clean off screen, so the end of the scroll was an
-         empty frame. 0.42 keeps the swarm inside the crop and, more importantly,
-         keeps the 101 legible through the first half of the break - which is the
-         only half that sells anything. */
-      vec3 transformed = aCenter + R * (position - aCenter)
-                       + aSeed * t * 0.42
-                       + vec3(0.0, t * t * -0.14, 0.0);
+      vec3 home = mix(aCenter, aTarget, smoothstep(0.0, 1.0, uMorph));
+      float ang = t * 6.2 + uSpin * (0.6 + aTone * 1.4) * t;
+      mat3 R = axisRot(normalize(aSeed + vec3(0.001)), ang);
+      vec3 transformed = home + R * (position - aCenter)
+                       + aSeed * t * 0.62
+                       + vec3(0.0, t * t * -0.16, 0.0);
     `)
     sh.vertexShader = sh.vertexShader.replace('#include <beginnormal_vertex>', `
       float tn = breakT(aCenter, uDamage, uMinY, uMaxY);

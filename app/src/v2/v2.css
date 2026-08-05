@@ -791,10 +791,12 @@ a.v2card:hover .v2card__win{color:var(--accent)}
   clip-path:inset(50%);white-space:nowrap;border:0}
 
 
-/* THE MIRROR TURN - the version he approved. The reverse leg plays mirrored so the
-   strand keeps spinning the same way instead of visibly rewinding, and the flip is
-   spent at the destroyed end where a frame full of debris hides it. */
+/* THE TURN IS 180, NOT A MIRROR. scaleX(-1) flips the strand left to right, so an
+   arch peaking top-right comes back peaking top-LEFT - the diagonal reverses, and the
+   wrong angle is exactly the bug that was already found and fixed once. Restoring the
+   approved commit brought it back with it. A full 180 keeps the diagonal running the
+   same way. Spent at the destroyed end, where the debris hides the cut. */
 .v2bg video{transition:filter .2s ease}
-.v2bg video.is-mir{transform:scaleX(-1)}
+.v2bg video.is-mir{transform:rotate(180deg)}
 .v2bg video.is-flip{filter:blur(10px)}
 @media (prefers-reduced-motion:reduce){.v2bg video.is-flip{filter:none}}
