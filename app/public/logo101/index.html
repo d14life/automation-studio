@@ -1,0 +1,341 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>101 — раскол</title>
+<style>
+  html,body{margin:0;height:100%;background:#0e202d;overflow:hidden}
+  canvas{display:block;width:100%;height:100%}
+  #hud{position:fixed;left:10px;top:10px;z-index:9;display:flex;gap:8px;align-items:center;
+    font:600 12px/1 ui-monospace,monospace;color:#7FD8FF}
+  #hud span{background:#000A;padding:6px 9px;border-radius:7px}
+  #d{width:170px;accent-color:#7FD8FF}
+  #err{position:fixed;inset:0;display:none;place-items:center;color:#ff6b5e;
+    font:600 14px/1.5 ui-monospace,monospace;text-align:center;padding:24px}
+</style>
+
+<div id="hud"><span id="stat">загрузка…</span><input id="d" type="range" min="0" max="1" step="0.001" value="0"></div>
+<div id="err"></div>
+<canvas id="c"></canvas>
+
+<script type="importmap">
+{"imports":{
+  "three":"https://esm.sh/three@0.169.0",
+  "three/addons/":"https://esm.sh/three@0.169.0/examples/jsm/"
+}}
+</script>
+
+<script type="module">
+import * as THREE from 'three'
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
+
+const PHONE = innerWidth < 700
+const canvas = document.getElementById('c')
+const stat = document.getElementById('stat')
+const slider = document.getElementById('d')
+const errBox = document.getElementById('err')
+const fail = (m) => { errBox.style.display = 'grid'; errBox.textContent = m; console.error(m) }
+
+/* ── WHAT ACTUALLY MAKES REAL-TIME METAL LOOK EXPENSIVE ──────────────────────
+   Not polygons and not the material sliders. Metal has no colour of its own -
+   it is ONLY a reflection of its surroundings, so a metal object in an empty
+   scene renders as a dark smear no matter how the roughness is tuned. That is
+   precisely why the helix looked cheap: three lights and nothing to reflect.
+
+   So the environment is built here rather than downloaded: a small equirect
+   painted with a studio's worth of light - a bright soft ceiling, two hard strips
+   standing in for softboxes, a cool rim behind, a dark floor - run through
+   PMREMGenerator. 64x32 pixels of data buys the thing that was missing. */
+function studioEnv(renderer) {
+  const W = 256, H = 128
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H
+  const g = cv.getContext('2d')
+
+  const sky = g.createLinearGradient(0, 0, 0, H)
+  sky.addColorStop(0.00, '#cfe6f5')   /* ceiling bounce */
+  sky.addColorStop(0.42, '#4d6d84')
+  sky.addColorStop(0.55, '#16303f')
+  sky.addColorStop(1.00, '#050c12')   /* dark floor, so the underside stays weighty */
+  g.fillStyle = sky; g.fillRect(0, 0, W, H)
+
+  /* two hard sources: the specular streaks that draw the edges of the letterforms */
+  const softbox = (x, y, w, h, c) => {
+    const r = g.createRadialGradient(x + w / 2, y + h / 2, 0, x + w / 2, y + h / 2, Math.max(w, h) / 2)
+    r.addColorStop(0, c); r.addColorStop(1, 'rgba(0,0,0,0)')
+    g.fillStyle = r; g.fillRect(x, y, w, h)
+  }
+  softbox(W * 0.06, H * 0.02, W * 0.30, H * 0.34, 'rgba(255,255,255,1)')
+  softbox(W * 0.62, H * 0.10, W * 0.26, H * 0.26, 'rgba(190,225,255,0.85)')
+  /* cold rim from behind - separates the mark from whatever sits behind it */
+  softbox(W * 0.40, H * 0.52, W * 0.34, H * 0.22, 'rgba(90,190,255,0.55)')
+
+  const tex = new THREE.CanvasTexture(cv)
+  tex.mapping = THREE.EquirectangularReflectionMapping
+  tex.colorSpace = THREE.SRGBColorSpace
+  const pmrem = new THREE.PMREMGenerator(renderer)
+  const env = pmrem.fromEquirectangular(tex).texture
+  pmrem.dispose(); tex.dispose()
+  return env
+}
+
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: !PHONE })
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2))
+renderer.toneMapping = THREE.ACESFilmicToneMapping   /* highlights roll off instead of clipping */
+renderer.toneMappingExposure = 1.08
+renderer.outputColorSpace = THREE.SRGBColorSpace
+
+const scene = new THREE.Scene()
+scene.environment = studioEnv(renderer)
+/* no background yet, by his instruction - the object is what is being judged */
+scene.background = new THREE.Color(0x0e202d)
+
+const camera = new THREE.PerspectiveCamera(34, 1, 0.05, 60)
+const root = new THREE.Group()
+scene.add(root)
+
+/* a key light on top of the environment, only to sharpen the bevel highlights */
+const key = new THREE.DirectionalLight(0xffffff, 1.6); key.position.set(-3, 4, 5)
+const rim = new THREE.DirectionalLight(0x7FD8FF, 2.2); rim.position.set(4, -1, -4)
+scene.add(key, rim)
+
+const uniforms = {
+  uDamage: { value: 0 },
+  uMinY:   { value: -1 },
+  uMaxY:   { value: 1 },
+}
+
+/* ── THE SKIN AND WHAT IS UNDER IT ───────────────────────────────────────────
+   Blender marked every face: on the original surface = skin, created by a cut =
+   inside. That distinction is the whole idea, so the two get genuinely different
+   materials rather than two shades of the same one.
+
+   The skin is near-black metal that exists only as reflection. The core is not
+   metal at all - it is emissive, and it is DIM until the piece it belongs to
+   starts moving. Nothing glows while the mark is whole; the light is what the
+   skin was hiding. */
+const skinMat = new THREE.MeshStandardMaterial({
+  color: 0x0d1418, metalness: 1.0, roughness: 0.19, envMapIntensity: 1.45,
+})
+const coreMat = new THREE.MeshStandardMaterial({
+  color: 0x11364a, metalness: 0.55, roughness: 0.38,
+  emissive: 0x1d7fd0, emissiveIntensity: 1.0, envMapIntensity: 1.1,
+})
+
+function patch(mat, isCore) {
+  mat.onBeforeCompile = (sh) => {
+    Object.assign(sh.uniforms, uniforms)
+    sh.vertexShader = `
+      attribute vec3 aCenter; attribute vec3 aSeed;
+      uniform float uDamage, uMinY, uMaxY;
+      varying float vT;
+      mat3 axisRot(vec3 a, float ang){
+        float c=cos(ang), s=sin(ang), o=1.0-c;
+        return mat3(c+a.x*a.x*o, a.x*a.y*o-a.z*s, a.x*a.z*o+a.y*s,
+                    a.y*a.x*o+a.z*s, c+a.y*a.y*o, a.y*a.z*o-a.x*s,
+                    a.z*a.x*o-a.y*s, a.z*a.y*o+a.x*s, c+a.z*a.z*o);
+      }
+    ` + sh.vertexShader
+
+    /* THE BREAK TRAVELS: a piece's threshold falls with its height, so the mark
+       opens from the top instead of detonating all at once.
+
+       It lives in a FUNCTION, not in a snippet pasted twice. begin_vertex and
+       beginnormal_vertex are injected into the same GLSL scope, so two copies of
+       the same declarations is a redefinition error - which compiles to nothing
+       and renders a black screen while the page reports no error worth reading.
+       That cost the first run of this file. */
+    sh.vertexShader = sh.vertexShader.replace('void main() {', `
+      float breakT(vec3 c, float dmg, float lo, float hi){
+        float h = clamp((c.y - lo) / max(hi - lo, 0.0001), 0.0, 1.0);
+        float thr = (1.0 - h) * 0.5;
+        return smoothstep(thr, thr + 0.5, dmg);
+      }
+      void main() {`)
+
+    sh.vertexShader = sh.vertexShader.replace('#include <begin_vertex>', `
+      float t = breakT(aCenter, uDamage, uMinY, uMaxY);
+      vT = t;
+      mat3 R = axisRot(normalize(aSeed + vec3(0.001)), t * 1.5);
+      /* Throw scaled to the MARK, not to a round number: 1.35 on an object 0.87
+         wide flung every piece clean off screen, so the end of the scroll was an
+         empty frame. 0.42 keeps the swarm inside the crop and, more importantly,
+         keeps the 101 legible through the first half of the break - which is the
+         only half that sells anything. */
+      vec3 transformed = aCenter + R * (position - aCenter)
+                       + aSeed * t * 0.42
+                       + vec3(0.0, t * t * -0.14, 0.0);
+    `)
+    sh.vertexShader = sh.vertexShader.replace('#include <beginnormal_vertex>', `
+      float tn = breakT(aCenter, uDamage, uMinY, uMaxY);
+      vec3 objectNormal = axisRot(normalize(aSeed + vec3(0.001)), tn * 1.5) * normal;
+    `)
+
+    sh.fragmentShader = 'varying float vT;\n' + sh.fragmentShader
+    if (isCore) {
+      /* THE REVEAL: the interior is nearly dark while the mark is whole and lifts
+         as its own piece separates. Squared, so it stays subtle through the first
+         crack and only really burns once the piece is clear of the body. */
+      sh.fragmentShader = sh.fragmentShader.replace('#include <emissivemap_fragment>', `
+        #include <emissivemap_fragment>
+        totalEmissiveRadiance *= 0.06 + 1.35 * vT * vT;
+      `)
+    }
+  }
+  mat.customProgramCacheKey = () => (isCore ? 'core' : 'skin')
+}
+patch(skinMat, false)
+patch(coreMat, true)
+
+/* ── LOAD AND MERGE ──────────────────────────────────────────────────────────
+   78 objects would be 78 draw calls. They are merged into one buffer per
+   material, and each vertex keeps its own piece's centre and throw direction -
+   which is exactly the data the fracture produced and exactly what a naive merge
+   would destroy. Two draw calls for the whole mark. */
+function mergeBucket(list) {
+  let n = 0
+  for (const e of list) n += e.g.attributes.position.count
+  const pos = new Float32Array(n * 3), nor = new Float32Array(n * 3)
+  const cen = new Float32Array(n * 3), sed = new Float32Array(n * 3)
+  let o = 0
+  for (const e of list) {
+    const p = e.g.attributes.position.array, nm = e.g.attributes.normal.array
+    for (let i = 0; i < e.g.attributes.position.count; i++) {
+      pos[(o + i) * 3] = p[i * 3]; pos[(o + i) * 3 + 1] = p[i * 3 + 1]; pos[(o + i) * 3 + 2] = p[i * 3 + 2]
+      nor[(o + i) * 3] = nm[i * 3]; nor[(o + i) * 3 + 1] = nm[i * 3 + 1]; nor[(o + i) * 3 + 2] = nm[i * 3 + 2]
+      cen[(o + i) * 3] = e.c.x; cen[(o + i) * 3 + 1] = e.c.y; cen[(o + i) * 3 + 2] = e.c.z
+      sed[(o + i) * 3] = e.s.x; sed[(o + i) * 3 + 1] = e.s.y; sed[(o + i) * 3 + 2] = e.s.z
+    }
+    o += e.g.attributes.position.count
+  }
+  const g = new THREE.BufferGeometry()
+  g.setAttribute('position', new THREE.BufferAttribute(pos, 3))
+  g.setAttribute('normal', new THREE.BufferAttribute(nor, 3))
+  g.setAttribute('aCenter', new THREE.BufferAttribute(cen, 3))
+  g.setAttribute('aSeed', new THREE.BufferAttribute(sed, 3))
+  return g
+}
+
+let composer = null, bloom = null
+new GLTFLoader().load('./logo101.glb', (gltf) => {
+  const byPiece = new Map()
+  gltf.scene.updateMatrixWorld(true)
+  gltf.scene.traverse((o) => {
+    if (!o.isMesh) return
+    /* the exporter splits a piece into one primitive per material and renames them
+       piece012, piece012_1, piece012.001 - so the fragment id is the DIGITS. Get
+       this wrong and a fragment's shell flies one way while its interior flies
+       another, which is the single thing this effect cannot survive. */
+    let key = o
+    while (key.parent && !/piece\d+/.test(key.name)) key = key.parent
+    const mm = /piece(\d+)/.exec(key.name) || /piece(\d+)/.exec(o.name)
+    const id = mm ? mm[1] : o.uuid
+    if (!byPiece.has(id)) byPiece.set(id, [])
+    byPiece.get(id).push(o)
+  })
+
+  /* STAND IT UP. The exporter's Y-up conversion maps Blender (x,y,z) to three
+     (x,z,-y): the glyphs' HEIGHT axis was Blender Y, so it arrives pointing into
+     the screen and the mark lies flat like type printed on the floor. Every
+     previous screenshot was the edge of that. Rotating +90 about X sends -Z to
+     +Y and stands it up.
+     Baked into the geometry rather than set on the group, because the shader's
+     destruction wave runs along OBJECT-space Y - leave the rotation on the parent
+     and the wave would still sweep through the old, wrong axis. */
+  const STAND = new THREE.Matrix4().makeRotationX(Math.PI / 2)
+  const skin = [], core = []
+  let count = 0
+  const box = new THREE.Box3()
+  for (const [, meshes] of byPiece) {
+    /* one centre and one throw direction per PIECE, shared by its skin and its
+       interior - otherwise a fragment's outside and inside fly apart separately */
+    const pb = new THREE.Box3()
+    for (const m of meshes) pb.expandByObject(m)   /* still in import space; STAND applied below */
+    const c = pb.getCenter(new THREE.Vector3()).applyMatrix4(STAND)
+    const s = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1)
+    if (s.lengthSq() < 1e-6) s.set(0, 1, 0)
+    s.normalize()
+    /* bias the throw outward from the mark's own centre, so it opens rather than
+       stirs - pure randomness reads as a blender, not a break */
+    s.lerp(c.clone().normalize(), 0.55).normalize()
+    box.union(pb.applyMatrix4(STAND))
+    for (const m of meshes) {
+      const g = (m.geometry.index ? m.geometry.toNonIndexed() : m.geometry.clone())
+      g.applyMatrix4(m.matrixWorld)
+      g.applyMatrix4(STAND)
+      if (!g.attributes.normal) g.computeVertexNormals()
+      const name = (m.material?.name || '').toLowerCase()
+      ;(name.includes('core') ? core : skin).push({ g, c, s })
+      count++
+    }
+  }
+
+  const size = box.getSize(new THREE.Vector3())
+  uniforms.uMinY.value = box.min.y
+  uniforms.uMaxY.value = box.max.y
+
+  if (skin.length) root.add(new THREE.Mesh(mergeBucket(skin), skinMat))
+  if (core.length) root.add(new THREE.Mesh(mergeBucket(core), coreMat))
+
+  /* frame it by whichever axis binds, with air around it */
+  const fit = () => {
+    const w = canvas.clientWidth, h = canvas.clientHeight
+    renderer.setSize(w, h, false)
+    camera.aspect = w / h
+    const fov = THREE.MathUtils.degToRad(camera.fov)
+    const dh = (size.y * 1.55) / 2 / Math.tan(fov / 2)
+    const dw = (size.x * 1.35) / 2 / Math.tan(fov / 2) / Math.max(camera.aspect, 0.0001)
+    camera.position.set(0, 0, Math.max(dh, dw))
+    camera.lookAt(0, 0, 0)
+    camera.updateProjectionMatrix()
+    if (composer) composer.setSize(w, h)
+  }
+  addEventListener('resize', fit); fit()
+
+  if (!PHONE) {
+    composer = new EffectComposer(renderer)
+    composer.addPass(new RenderPass(scene, camera))
+    /* small radius, high threshold: only the exposed core blooms, never the whole
+       frame. Bloom that touches the metal is what makes real-time look like a
+       screensaver. */
+    bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.62, 0.42, 0.86)
+    composer.addPass(bloom)
+    composer.addPass(new OutputPass())
+    composer.setSize(canvas.clientWidth, canvas.clientHeight)
+  }
+
+  stat.textContent = `${byPiece.size} кусков · ${count} примитивов`
+  loop()
+}, undefined, (e) => fail('GLB не загрузился: ' + e))
+
+let damage = 0, target = 0, spin = 0, last = performance.now()
+slider.addEventListener('input', () => { target = parseFloat(slider.value) })
+addEventListener('wheel', (e) => {
+  target = Math.min(1, Math.max(0, target + e.deltaY * 0.0012))
+  slider.value = String(target)
+}, { passive: true })
+let ty = null
+addEventListener('touchstart', (e) => { ty = e.touches[0].clientY }, { passive: true })
+addEventListener('touchmove', (e) => {
+  if (ty === null) return
+  const y = e.touches[0].clientY
+  target = Math.min(1, Math.max(0, target + (ty - y) * 0.004))
+  slider.value = String(target); ty = y
+}, { passive: true })
+
+function loop() {
+  requestAnimationFrame(loop)
+  const now = performance.now(), dt = Math.min(0.05, (now - last) / 1000); last = now
+  damage += (target - damage) * Math.min(1, dt * 5)
+  uniforms.uDamage.value = damage
+  spin += dt * 0.22
+  /* A SLOW LOOK-AROUND, NOT A TURNTABLE - and the amplitude is small on purpose.
+     At +-0.55 rad the mark spent most of the loop edge-on, which is how a logo
+     stops being readable; the shape has to stay legible the whole time or the
+     effect is decoration rather than branding. */
+  root.rotation.y = Math.sin(spin) * 0.30
+  root.rotation.x = Math.sin(spin * 0.7) * 0.07
+  if (composer) composer.render(); else renderer.render(scene, camera)
+}
+</script>
