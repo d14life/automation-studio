@@ -158,7 +158,7 @@ function patch(mat, isCore) {
   mat.onBeforeCompile = (sh) => {
     Object.assign(sh.uniforms, uniforms)
     sh.vertexShader = `
-      attribute vec3 aCenter; attribute vec3 aSeed; attribute vec3 aPartner; attribute float aTone; attribute float aWord;
+      attribute vec3 aCenter; attribute vec3 aSeed; attribute vec3 aPartner; attribute float aTone; attribute float aWord; attribute float aH;
       uniform float uDamage, uMorph, uSpin, uMinY, uMaxY;
       varying float vT; varying float vTone; varying float vFade; varying vec3 vLocalN; varying vec3 vWorld;
       mat3 axisRot(vec3 a, float ang){
@@ -178,8 +178,7 @@ function patch(mat, isCore) {
        and renders a black screen while the page reports no error worth reading.
        That cost the first run of this file. */
     sh.vertexShader = sh.vertexShader.replace('void main() {', `
-      float breakT(vec3 c, float dmg, float lo, float hi){
-        float h = clamp((c.y - lo) / max(hi - lo, 0.0001), 0.0, 1.0);
+      float breakT(float h, float dmg){
         float thr = (1.0 - h) * 0.5;
         return smoothstep(thr, thr + 0.5, dmg);
       }
@@ -235,7 +234,7 @@ function patch(mat, isCore) {
          gives the shape the effect should have: a long stretch where the 101 is whole
          and only cracking, a brief shatter, and a long stretch where Solutions is
          readable and settling. */
-      float t = breakT(aCenter, smoothstep(0.26, 0.84, own), uMinY, uMaxY);
+      float t = breakT(aH, smoothstep(0.26, 0.84, own));
       vT = t; vTone = aTone;
       /* NO ALPHA. Fading one word out while the other faded in is what made the middle
          read as a transition between two unrelated objects sitting in different places.
@@ -272,8 +271,19 @@ function patch(mat, isCore) {
          the exact spot its partner is vacating, hidden among the rubble of the letter
          it came from, and what flies afterwards is a rock the viewer has already
          watched come off the 101. Nothing is ever created in open air. */
-      float lo = 0.10 + aTone * 0.24;
-      float kA = smoothstep(lo, lo + 0.12, g);
+      /* TRADE IN THE MIDDLE OF THE PILE, WHERE IT CANNOT BE SEEN. Equal counts fixed
+         rocks going missing wholesale, but not the last of it: a 101 cell and its
+         Solutions mate are the same in NUMBER, not in size. The 101 is a bigger, taller
+         word made of fewer, larger cells, so a fat rock shrinking while a smaller one
+         grows in its place still reads as a rock disappearing - and this window sat at
+         0.10-0.46, right up against the solid 101 where there is nothing to hide it.
+
+         The exchange belongs in the densest part of the rubble, halfway across, where
+         every rock is surrounded by hundreds of others and a change of size is just
+         more debris. lo staggers each pair inside that band, and because a mate
+         inherits its partner's aTone the pair still trades in the same instant. */
+      float lo = 0.40 + aTone * 0.12;
+      float kA = smoothstep(lo, lo + 0.10, g);
       float k = mix(kA, 1.0 - kA, aWord);
       float shrink = pow(1.0 - k, 0.3333);
       /* where the piece lives right now: its own word's slot, travelling to the slot
@@ -304,7 +314,7 @@ function patch(mat, isCore) {
     `)
     sh.vertexShader = sh.vertexShader.replace('#include <beginnormal_vertex>', `
       float gn = smoothstep(0.0, 1.0, uMorph);
-      float tn = breakT(aCenter, smoothstep(0.26, 0.84, mix(gn, 1.0 - gn, aWord)), uMinY, uMaxY);
+      float tn = breakT(aH, smoothstep(0.26, 0.84, mix(gn, 1.0 - gn, aWord)));
       float angn = pow(tn, 0.55) * (0.35 + aTone * 0.8);
       vec3 objectNormal = axisRot(normalize(aSeed + vec3(0.001)), angn) * normal;
       vLocalN = objectNormal;
@@ -346,7 +356,7 @@ function mergeBucket(list) {
   for (const e of list) n += e.g.attributes.position.count
   const pos = new Float32Array(n * 3), nor = new Float32Array(n * 3)
   const cen = new Float32Array(n * 3), sed = new Float32Array(n * 3), par = new Float32Array(n * 3)
-  const ton = new Float32Array(n), wrd = new Float32Array(n)
+  const ton = new Float32Array(n), wrd = new Float32Array(n), hgt = new Float32Array(n)
   let o = 0
   for (const e of list) {
     const p = e.g.attributes.position.array, nm = e.g.attributes.normal.array
@@ -356,7 +366,7 @@ function mergeBucket(list) {
       cen[(o + i) * 3] = e.c.x; cen[(o + i) * 3 + 1] = e.c.y; cen[(o + i) * 3 + 2] = e.c.z
       sed[(o + i) * 3] = e.s.x; sed[(o + i) * 3 + 1] = e.s.y; sed[(o + i) * 3 + 2] = e.s.z
       par[(o + i) * 3] = e.p.x; par[(o + i) * 3 + 1] = e.p.y; par[(o + i) * 3 + 2] = e.p.z
-      ton[o + i] = e.t; wrd[o + i] = e.w
+      ton[o + i] = e.t; wrd[o + i] = e.w; hgt[o + i] = e.h
     }
     o += e.g.attributes.position.count
   }
@@ -368,6 +378,7 @@ function mergeBucket(list) {
   g.setAttribute('aPartner', new THREE.BufferAttribute(par, 3))
   g.setAttribute('aTone', new THREE.BufferAttribute(ton, 1))
   g.setAttribute('aWord', new THREE.BufferAttribute(wrd, 1))
+  g.setAttribute('aH', new THREE.BufferAttribute(hgt, 1))
   return g
 }
 
@@ -457,6 +468,27 @@ const build = (gltf) => { try {
       ;(name.includes('core') ? core : skin).push({ g, c, s, t: tone, w, p })
       count++
     }
+  }
+
+  /* EACH WORD GETS ITS OWN VERTICAL SCALE, and this is why the two read so
+     differently. The break wave normalised a piece's height against the union box of
+     BOTH words - and the 101 is far taller than Solutions. Solutions' pieces therefore
+     all landed in a narrow middle band of that range and broke at nearly the same
+     moment, which reads as a word coming apart into its pieces. The 101's spanned the
+     whole range, so its base did not begin to move until the wave was half over: most
+     of the digit sat there as one solid slab while chips came off the top, and it never
+     looked like something made of rocks at all.
+
+     Measuring each piece against its OWN word's extent gives both the same relative
+     wave, so the 101 comes apart the way Solutions goes together. */
+  const yr = [[Infinity, -Infinity], [Infinity, -Infinity]]
+  for (const e of skin.concat(core)) {
+    yr[e.w][0] = Math.min(yr[e.w][0], e.c.y)
+    yr[e.w][1] = Math.max(yr[e.w][1], e.c.y)
+  }
+  for (const e of skin.concat(core)) {
+    const [lo, hi] = yr[e.w]
+    e.h = (e.c.y - lo) / Math.max(hi - lo, 1e-6)
   }
 
   const size = box.getSize(new THREE.Vector3())
