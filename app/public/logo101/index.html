@@ -261,6 +261,12 @@ function patch(mat, isCore) {
            it, or there is nothing left for the specular to be brighter THAN. */
         totalEmissiveRadiance *= tone * (0.0 + 0.85 * vT * vT);   /* dead dark until it actually breaks */
       `)
+      /* THE INTERIORS NEVER FADED. vFade was applied to the skin only, so when a word
+         finished its explosion the shells vanished and left every piece's glowing core
+         hanging in the frame - a cloud of pale shards under a solid 101, which is
+         exactly the mess in the screenshot. Both materials fade or neither does. */
+      sh.fragmentShader = sh.fragmentShader.replace('#include <dithering_fragment>',
+        '#include <dithering_fragment>\n        gl_FragColor.a *= vFade;')
     }
   }
   if (!isCore) {
