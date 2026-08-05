@@ -1,5 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { FormEvent, ReactNode, RefObject } from 'react'
+/* The fan and the tilt are the old page's, reused unchanged. They are behaviour, not style -
+   they read .projects/.proj and write CSS variables - so they carry none of site.css with them,
+   which is the whole reason v2 could take them without inheriting the stylesheet it was built
+   to escape. */
+import { useCardFan } from '@/hooks/useCardFan'
+import { useCardTilt } from '@/hooks/useCardTilt'
 import './v2.css'
 
 /* v2: the DNA strand is driven by the scroll wheel, not by playback.
@@ -491,17 +497,83 @@ function usePage(): PageId {
    demo gets added to one page and quietly missing from the other two - the same failure mode as
    the revert that 404'd every one of them. One const, three call sites, no way for them to
    disagree.
-   Order is deliberate: the three full systems a business can walk around in come first, because
-   they are the ones that answer "what would ours look like". The single-trick demos follow. */
+
+   ONLY THE REAL SYSTEMS ARE HERE NOW - his instruction. There were seven cards; five of them
+   were single-trick set pieces (a bot that quotes a price, a page that merges three spreadsheets)
+   and they were making the real work look like more of the same. A buyer deciding whether to
+   hand over his processes wants to see a system he can walk around in, and there are three of
+   those. The five files still exist under app/public/demo and nothing links to them, so putting
+   any of them back is one line. */
 const DEMOS = [
-  ['park', 'Аренда спецтехники', 'Полная система: календарь занятости, наработка по сменам, доходность каждой единицы и окупаемость парка. Договор, акт и счёт печатаются из тех же цифр.'],
+  ['park', 'Аренда спецтехники', 'Календарь занятости, наработка по сменам, доходность каждой единицы и окупаемость парка. Договор, акт и счёт печатаются из тех же цифр.'],
   ['zapchasti', 'Магазин автозапчастей', 'Подбор по VIN и по модели, каталог на 40 000 позиций, корзина. Клиент находит деталь сам, а не диктует номер по телефону.'],
-  ['crm', 'CRM логиста', 'Воронка перевозок: перетащите сделку — клиент получает статус, документы формируются.'],
-  ['sborschik', 'Сборщик прайсов', 'Три прайса поставщиков слетаются в одну таблицу с лучшей ценой по каждой позиции.'],
-  ['bot', 'Бот-калькулятор', 'Считает стоимость по прайсу компании и оформляет заявку — или зовёт человека.'],
-  ['raspoznavatel', 'Распознаватель накладных', 'Фото мятой накладной превращается в строки таблицы и уезжает в 1С.'],
-  ['otchet', 'Утренний отчёт владельцу', 'В 7:00 в Telegram приходит выручка, касса, долги и три проблемы — сам.'],
 ] as const
+
+/* THE DEMO DECK. His ask, off his own screenshot of the old page: the fan of tilted cards, but
+   with the REAL product rendered inside each one instead of a hand-drawn mock, so the page shows
+   the thing working without anybody having to click through first.
+
+   The card IS an iframe of the live demo. That is the whole idea and it is also why the mockups
+   this replaces were a liability: they were hand-built HTML that had to be re-drawn by hand every
+   time the product changed, and they drifted. This cannot drift - it is the product.
+
+   DESIGN_W is the width the demo is laid out for, and the shot is scaled down to the card by the
+   ratio between it and --cardw. The scale is read from --cardw rather than recomputed, because
+   useCardFan owns that number and two copies of the formula would disagree the first time one
+   changed. 1440 rather than the card's own width so the demo lays out as a desktop app and gets
+   shrunk, instead of rendering its own narrow mobile layout inside the card.
+
+   pointer-events:none on the frame is not laziness - without it the iframe swallows the cursor,
+   the fan never sees mouseenter, the tilt dies, and a click lands inside the demo instead of
+   opening it. The card is a link; the frame is a picture that happens to be alive. */
+const DESIGN_W = 1440
+
+function DemoDeck() {
+  useCardFan()
+  useCardTilt()
+
+  /* MEASURE THE CARD, NOT THE VARIABLE THAT DRIVES IT. The first version read --cardw, which
+     useCardFan owns - and useCardFan deliberately REMOVES that property below 820px, where the
+     cards become a plain column and CSS takes the layout back. The scale then computed from an
+     empty string, landed on 0, and every shot collapsed to nothing.
+     The card's own measured width is true under both regimes, so this no longer cares who is
+     doing the layout. Zero widths are skipped rather than written: a card that is mid-layout or
+     display:none reports 0, and writing that would blank the shot for real. */
+  useEffect(() => {
+    const wrap = document.querySelector<HTMLElement>('.projects')
+    const card = wrap?.querySelector<HTMLElement>('.proj')
+    if (!wrap || !card) return
+    const fit = () => {
+      const w = card.getBoundingClientRect().width
+      if (w > 0) wrap.style.setProperty('--shot-s', String(w / DESIGN_W))
+    }
+    const ro = new ResizeObserver(fit)
+    ro.observe(card)
+    fit()
+    return () => ro.disconnect()
+  }, [])
+
+  return (
+    <div className="projects">
+      {DEMOS.map(([slug, t, d]) => (
+        <a className="proj" href={`/demo/${slug}/`} key={slug}>
+          <span className="proj__shot">
+            {/* loading=lazy so three full applications are not fetched before the visitor has
+                scrolled anywhere near them. tabIndex -1 and aria-hidden keep the frame out of the
+                tab order and off the screen reader - the link around it carries the meaning. */}
+            <iframe src={`/demo/${slug}/`} title="" aria-hidden="true" tabIndex={-1}
+                    loading="lazy" scrolling="no" />
+          </span>
+          <span className="proj__body">
+            <b>{t}</b>
+            <em>{d}</em>
+            <span className="proj__go">Открыть демо →</span>
+          </span>
+        </a>
+      ))}
+    </div>
+  )
+}
 
 /* THE EDGE STRIPS. His ask, in his words: a little grey area about a centimetre wide on each
    side that pops up, so the whole site can be walked without going back to the bar. They are
@@ -1126,17 +1198,10 @@ export default function V2() {
         <section className="v2sec" id="demos"><div className="v2wrap">
           <p className="v2eyebrow">02 / Демо</p>
           <h2 className="v2h2">Потрогайте сами</h2>
-          <p className="v2lede">Не картинки, а работающие страницы на демо-данных. Вводите
-             своё, ломайте, перезагружайте — состояние сохраняется.</p>
-          <div className="v2grid">
-            {DEMOS.map(([slug, t, d]) => (
-              <a className="v2card v2card--demo" href={`/demo/${slug}/`} key={slug}>
-                <h3>{t}</h3>
-                <p>{d}</p>
-                <p className="v2card__win">Открыть демо →</p>
-              </a>
-            ))}
-          </div>
+          <p className="v2lede">В карточках — живые системы, а не скриншоты: они работают прямо
+             здесь, на демо-данных. Наведите, чтобы рассмотреть, откройте, чтобы поработать
+             внутри. Вводите своё, ломайте, перезагружайте — состояние сохраняется.</p>
+          <DemoDeck />
         </div></section>
 
         <section className="v2sec" id="clients"><div className="v2wrap">
@@ -1270,17 +1335,10 @@ export default function V2() {
         <section className="v2sec" id="demos"><div className="v2wrap">
           <p className="v2eyebrow">02 / Демо</p>
           <h2 className="v2h2">Потрогайте сами</h2>
-          <p className="v2lede">Не картинки, а работающие страницы на демо-данных. Вводите
-             своё, ломайте, перезагружайте — состояние сохраняется.</p>
-          <div className="v2grid">
-            {DEMOS.map(([slug, t, d]) => (
-              <a className="v2card v2card--demo" href={`/demo/${slug}/`} key={slug}>
-                <h3>{t}</h3>
-                <p>{d}</p>
-                <p className="v2card__win">Открыть демо →</p>
-              </a>
-            ))}
-          </div>
+          <p className="v2lede">В карточках — живые системы, а не скриншоты: они работают прямо
+             здесь, на демо-данных. Наведите, чтобы рассмотреть, откройте, чтобы поработать
+             внутри. Вводите своё, ломайте, перезагружайте — состояние сохраняется.</p>
+          <DemoDeck />
         </div></section>
 
         <section className="v2sec" id="clients"><div className="v2wrap">
