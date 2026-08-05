@@ -377,6 +377,20 @@ const build = (gltf) => {
     composer.setSize(canvas.clientWidth, canvas.clientHeight)
   }
 
+  /* prove what the SHADER got, not what the loader intended */
+  const dbg = root.children[0].geometry.attributes
+  const a = dbg.aTarget.array, b = dbg.aCenter.array
+  let tx0=1e9,tx1=-1e9,cx0=1e9,cx1=-1e9,same=0
+  for (let i=0;i<a.length;i+=3){
+    tx0=Math.min(tx0,a[i]); tx1=Math.max(tx1,a[i])
+    cx0=Math.min(cx0,b[i]); cx1=Math.max(cx1,b[i])
+    if (Math.abs(a[i]-b[i])<1e-6) same++
+  }
+  window.__dbg = { targetX:[+tx0.toFixed(3),+tx1.toFixed(3)],
+                   centerX:[+cx0.toFixed(3),+cx1.toFixed(3)],
+                   identicalVerts: same, totalVerts: a.length/3,
+                   targetsLoaded: !!(TARGETS && TARGETS.targets && TARGETS.targets.length),
+                   u: uniforms }
   stat.textContent = `${byPiece.size} кусков · ${count} примитивов`
   loop()
 }
