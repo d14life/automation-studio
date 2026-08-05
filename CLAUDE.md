@@ -22,7 +22,7 @@ The v2 page (`app/src/v2/`) is a scroll-scrubbed DNA video header plus a content
 **Commit on `react` FIRST, then deploy.** The deploy is:
 
 ```bash
-git checkout main && git checkout react -- app docs && cd app && npm run build && cd .. && cp app/dist/v2.html . && cp app/dist/assets/v2-* assets/ && git add -A && git commit -m "deploy: <what>" && git push origin main && git checkout react
+git checkout main && git checkout react -- app docs && cd app && npm run build && cd .. && cp app/dist/v2.html app/dist/sw.js app/dist/dna-poster.jpg . && cp app/dist/assets/v2-* assets/ && git add -A && git commit -m "deploy: <what>" && git push origin main && git checkout react
 ```
 
 `git checkout react -- app` on `main` has wiped uncommitted edits five times.

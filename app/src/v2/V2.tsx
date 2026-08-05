@@ -604,6 +604,31 @@ export default function V2() {
     addEventListener('touchstart', arm, { passive: true })
     addEventListener('pointerdown', arm, { passive: true })
     addEventListener('click', arm)
+
+    /* KEEPING THE STRAND ACROSS DEPLOYS. Measured 5 August: GitHub Pages rebuilds every file's
+       mtime on every deploy and its ETag is "mtime-size", so the video's ETag changed on a
+       deploy that never touched it - and a changed ETag means all 40MB again. Pages serves
+       fixed headers, so the only storage a deploy cannot reach is Cache Storage, which is
+       keyed by URL. sw.js explains the rest.
+       THE COPY IS TAKEN ONLY ONCE THE FILE IS FULLY BUFFERED, and that timing is the whole
+       trick: at that moment the bytes are still fresh in the browser's own HTTP cache, so the
+       worker's fetch is served locally instead of pulling the file down a second time. Asking
+       any earlier would turn a caching win into a doubled download. */
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(() => { /* http:, private mode - fine */ })
+      const keep = () => {
+        if (!el.duration || Number.isNaN(el.duration)) return
+        const whole = el.buffered.length === 1
+          && el.buffered.start(0) <= 0.01
+          && el.buffered.end(0) >= el.duration - 0.05
+        if (!whole) return
+        el.removeEventListener('progress', keep)
+        navigator.serviceWorker.ready
+          .then(r => r.active?.postMessage({ cache: new URL(el.currentSrc, location.href).href }))
+          .catch(() => {})
+      }
+      el.addEventListener('progress', keep)
+    }
   }, [])
 
   useEffect(() => {
