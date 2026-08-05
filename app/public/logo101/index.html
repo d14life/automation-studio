@@ -154,10 +154,6 @@ const skinMat = new THREE.MeshPhysicalMaterial({
   color: 0x6d757a, metalness: 0.0, roughness: 1.0, envMapIntensity: 0.55,
   transparent: true,
 })
-const coreMat = new THREE.MeshPhysicalMaterial({
-  color: 0x2b3238, metalness: 0.0, roughness: 0.85, transparent: true,
-  emissive: 0xffffff, emissiveIntensity: 1.0, envMapIntensity: 0.55,
-})
 
 function patch(mat, isCore) {
   mat.onBeforeCompile = (sh) => {
@@ -235,7 +231,7 @@ function patch(mat, isCore) {
       float ang = fly * (0.35 + aTone * 0.8);
       mat3 R = axisRot(normalize(aSeed + vec3(0.001)), ang);
       vec3 transformed = home + R * (position - aCenter)
-                       + aSeed * fly * 0.34
+                       + aSeed * fly * 0.20
                        + vec3(0.0, t * t * -0.32, 0.0);   /* gravity accelerates */
       /* vWorld was DECLARED in both shaders and NEVER ASSIGNED. Every triplanar
          lookup therefore sampled the same single texel, and the whole rock pack
@@ -251,44 +247,12 @@ function patch(mat, isCore) {
       vLocalN = objectNormal;
     `)
 
-    sh.fragmentShader = 'uniform sampler2D uRock; uniform sampler2D uRough; uniform sampler2D uNormal;\nvarying float vT; varying float vTone; varying float vFade; varying vec3 vLocalN; varying vec3 vWorld;\nvec3 tri(sampler2D s, vec3 p, vec3 n){ vec3 b=pow(abs(n),vec3(4.0)); b/=(b.x+b.y+b.z+0.0001); return texture2D(s,p.zy*2.6).rgb*b.x + texture2D(s,p.xz*2.6).rgb*b.y + texture2D(s,p.xy*2.6).rgb*b.z; }\n' + sh.fragmentShader
-    if (isCore) {
-      /* THE REVEAL: the interior is nearly dark while the mark is whole and lifts
-         as its own piece separates. Squared, so it stays subtle through the first
-         crack and only really burns once the piece is clear of the body. */
-      sh.fragmentShader = sh.fragmentShader.replace('#include <emissivemap_fragment>', `
-        #include <emissivemap_fragment>
-        /* EVERY FRAGMENT ITS OWN COLOUR. One flat blue interior is what made the
-           break read as a texture rather than as a material with depth: 78 pieces
-           all glowing the identical hue look printed. aTone walks each piece along
-           a three-stop ramp - deep teal, brand cyan, warm amber - so the swarm has
-           temperature variation the way real molten or lit material does, and the
-           warm pieces read as HOTTER, closer, more recently broken. */
-        vec3 cold = vec3(0.05, 0.42, 0.68);
-        vec3 mid  = vec3(0.18, 0.72, 1.00);
-        vec3 warm = vec3(1.00, 0.62, 0.26);
-        vec3 tone = vTone < 0.62
-          ? mix(cold, mid, smoothstep(0.0, 0.62, vTone))
-          : mix(mid, warm, smoothstep(0.62, 1.0, vTone));
-        /* held back from 1.7: at full strength the interiors blew out to a chalky pale and
-           read as painted ceramic. Glow has to stay darker than the highlight that sells
-           it, or there is nothing left for the specular to be brighter THAN. */
-        totalEmissiveRadiance *= tone * (0.0 + 0.85 * vT * vT);   /* dead dark until it actually breaks */
-      `)
-      /* THE INTERIORS NEVER FADED. vFade was applied to the skin only, so when a word
-         finished its explosion the shells vanished and left every piece's glowing core
-         hanging in the frame - a cloud of pale shards under a solid 101, which is
-         exactly the mess in the screenshot. Both materials fade or neither does. */
-      sh.fragmentShader = sh.fragmentShader.replace('#include <dithering_fragment>',
-        '#include <dithering_fragment>\n        gl_FragColor.a *= vFade;')
-    }
-    /* BOTH MATERIALS GET THE ROCK. Blender's skin/interior split is decided by a
-       distance threshold scaled to each word's extrusion, and Solutions is extruded
-       shallower than 101 - so on the smaller word a lot of genuine surface got filed
-       as interior. Skin-only rock maps turned every one of those faces into a flat
-       blue hole punched through an otherwise solid word. Give the interior the same
-       stone and let the EMISSIVE do the reveal, which is what actually distinguishes
-       them anyway: same rock, lit from inside once it breaks. */
+    sh.fragmentShader = 'uniform sampler2D uRock; uniform sampler2D uRough; uniform sampler2D uNormal;\nvarying float vT; varying float vTone; varying float vFade; varying vec3 vLocalN; varying vec3 vWorld;\nvec3 tri(sampler2D s, vec3 p, vec3 n){ vec3 b=pow(abs(n),vec3(2.0)); b/=(b.x+b.y+b.z+0.0001); return texture2D(s,p.zy*2.6).rgb*b.x + texture2D(s,p.xz*2.6).rgb*b.y + texture2D(s,p.xy*2.6).rgb*b.z; }\n' + sh.fragmentShader
+    /* NO SECOND MATERIAL. The interior used to be its own emissive blue with a
+       three-stop colour ramp, so a stone that split showed coloured light inside -
+       which is a video-game crystal, not a rock. Rock that breaks reveals more rock.
+       One material for the shell, the interior and every fragment, and the only thing
+       Blender's skin/interior split still buys us is nothing, so it is ignored. */
       const T = 'tri(uRock, vWorld, normalize(vLocalN))'
       sh.fragmentShader = sh.fragmentShader
         .replace('#include <map_fragment>', 'diffuseColor.rgb *= ' + T + ' * 1.5;')
@@ -296,32 +260,18 @@ function patch(mat, isCore) {
                  'float roughnessFactor = roughness * (0.60 + 0.45 * tri(uRough, vWorld, normalize(vLocalN)).r);')
         .replace('#include <normal_fragment_maps>',
                  'vec3 nrm = tri(uNormal, vWorld, normalize(vLocalN)) * 2.0 - 1.0; normal = normalize(normal + vec3(nrm.xy, 0.0) * 1.3);')
-  }
-  if (!isCore) {
-    /* A FRESNEL RIM. Near-black metal on a near-black background loses its own
-       silhouette - the shape was only readable where a highlight happened to land.
-       This lifts the grazing angles, which is where a real lacquered edge catches
-       the room, so the 101 keeps its outline even in the dark parts of the frame. */
-    mat.onBeforeCompile = ((prev) => (sh) => {
-      prev(sh)
       sh.fragmentShader = sh.fragmentShader.replace('#include <dithering_fragment>', `
         #include <dithering_fragment>
+        /* a soft rim so near-black stone keeps its silhouette against a near-black
+           background - colourless now, it was tinting the edges teal and amber */
         float fres = pow(1.0 - abs(dot(normalize(vLocalN), vec3(0.0, 0.0, 1.0))), 3.2);
-        gl_FragColor.rgb += fres * mix(vec3(0.10,0.34,0.52), vec3(0.34,0.20,0.10), vTone) * 0.26;
+        gl_FragColor.rgb += fres * vec3(0.10, 0.13, 0.15);
         gl_FragColor.a *= vFade;
       `)
-      /* A TEXTURE HAS TO LIGHT, NOT TINT. Multiplying the finished pixel by the
-         photograph only darkens it: the specular, the shadow terminator and the env
-         reflection all still belong to a smooth ball, so the piece stays a shiny bead
-         wearing a rock picture. Albedo, roughness and NORMAL go into the PBR chunks
-         instead, so the lights graze real relief. The hand-rolled hash grain goes with
-         it - the photograph carries more microstructure than three sines ever did. */
-    })(mat.onBeforeCompile)
   }
-  mat.customProgramCacheKey = () => (isCore ? 'core' : 'skin')
+  mat.customProgramCacheKey = () => 'stone'
 }
 patch(skinMat, false)
-patch(coreMat, true)
 
 /* ── LOAD AND MERGE ──────────────────────────────────────────────────────────
    78 objects would be 78 draw calls. They are merged into one buffer per
@@ -398,7 +348,7 @@ const build = (gltf) => { try {
     s.normalize()
     /* bias the throw outward from the mark's own centre, so it opens rather than
        stirs - pure randomness reads as a blender, not a break */
-    s.lerp(c.clone().normalize(), 0.55).normalize()
+    s.lerp(c.clone().normalize(), 0.28).normalize()
     /* the landing point inside "Solutions". No STAND here: the exporter's Y-up
        conversion and STAND compose to the identity, so targets sampled straight from
        Blender are already in the right space - applying STAND alone tips the word. */
@@ -419,8 +369,7 @@ const build = (gltf) => { try {
   uniforms.uMinY.value = box.min.y
   uniforms.uMaxY.value = box.max.y
 
-  if (skin.length) root.add(new THREE.Mesh(mergeBucket(skin), skinMat))
-  if (core.length) root.add(new THREE.Mesh(mergeBucket(core), coreMat))
+  root.add(new THREE.Mesh(mergeBucket(skin.concat(core)), skinMat))
 
   /* frame it by whichever axis binds, with air around it */
   const fit = () => {
