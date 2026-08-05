@@ -795,7 +795,19 @@ export default function V2() {
          at each turnaround and the reversal has no corner in it. The 0.55 floor stops it
          dwelling there, which was an earlier "it holds for half a second" complaint. */
       const tri = ((phase % 2) + 2) % 2          /* 0..2, one full there-and-back */
-      const bell = Math.max(Math.abs(Math.sin(tri * Math.PI)), 0.55)
+      /* THE EASING IS ONLY AT THE DESTROYED TURN NOW. The bell slowed the strand to a
+         crawl at BOTH ends, and at the intact end that is the worst possible thing: the
+         footage there moves at 3.77 per frame against 8.35 at the destroyed end, so it
+         is already the calmest, most recognisable part of the clip, and the bell then
+         held the strand still exactly while it changed direction. That is why the turn
+         "bounces away" there - the viewer is given a long, slow, well-lit look at a
+         reversal.
+         Past tri 1.5 and before 0.5 the factor is a flat 1, so the intact turn is taken
+         at full speed and is over before it can be read. It stays continuous: |sin| is
+         already 1 at both those points. The easing survives only around tri = 1, where
+         the flip happens and where softening the corner actually helps. */
+      const bell = (tri < 0.5 || tri > 1.5) ? 1
+        : Math.max(Math.abs(Math.sin(tri * Math.PI)), 0.55)
       if (!REDUCE) phase += dir * (Math.PI / (2 * el.duration)) * LOOP_SPEED * bell * dt * idle
       const t2 = ((phase % 2) + 2) % 2
       /* The strand now lives between START_AT and TURN_AT instead of 0..1, so both ends

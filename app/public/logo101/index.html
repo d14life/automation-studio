@@ -90,7 +90,7 @@ function studioEnv(renderer) {
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: !PHONE })
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2))
 renderer.toneMapping = THREE.ACESFilmicToneMapping   /* highlights roll off instead of clipping */
-renderer.toneMappingExposure = 1.34
+renderer.toneMappingExposure = 1.06
 renderer.outputColorSpace = THREE.SRGBColorSpace
 
 const scene = new THREE.Scene()
@@ -140,12 +140,12 @@ const uniforms = {
    Iridescence adds a thin-film colour shift at grazing angles, so the edges of
    the letterforms pick up colour instead of dying into the background. */
 const skinMat = new THREE.MeshPhysicalMaterial({
-  color: 0x121b21, metalness: 1.0, roughness: 0.155, envMapIntensity: 2.1,
-  clearcoat: 1.0, clearcoatRoughness: 0.06,
+  color: 0x1a232a, metalness: 0.38, roughness: 0.70, envMapIntensity: 0.82,
+  clearcoat: 0.16, clearcoatRoughness: 0.45, transparent: true,
   iridescence: 0.42, iridescenceIOR: 1.9, iridescenceThicknessRange: [180, 520],
 })
 const coreMat = new THREE.MeshPhysicalMaterial({
-  color: 0x0a2334, metalness: 0.5, roughness: 0.28,
+  color: 0x123246, metalness: 0.3, roughness: 0.55, transparent: true,
   emissive: 0xffffff, emissiveIntensity: 1.0, envMapIntensity: 1.3,
   clearcoat: 0.6, clearcoatRoughness: 0.25,
 })
@@ -154,9 +154,9 @@ function patch(mat, isCore) {
   mat.onBeforeCompile = (sh) => {
     Object.assign(sh.uniforms, uniforms)
     sh.vertexShader = `
-      attribute vec3 aCenter; attribute vec3 aTarget; attribute vec3 aSeed; attribute float aTone;
+      attribute vec3 aCenter; attribute vec3 aSeed; attribute float aTone; attribute float aWord;
       uniform float uDamage, uMorph, uSpin, uMinY, uMaxY;
-      varying float vT; varying float vTone; varying vec3 vLocalN; varying vec3 vWorld;
+      varying float vT; varying float vTone; varying float vFade; varying vec3 vLocalN; varying vec3 vWorld;
       mat3 axisRot(vec3 a, float ang){
         float c=cos(ang), s=sin(ang), o=1.0-c;
         return mat3(c+a.x*a.x*o, a.x*a.y*o-a.z*s, a.x*a.z*o+a.y*s,
@@ -194,9 +194,13 @@ function patch(mat, isCore) {
 
          Throw scaled to the mark rather than to a round number: 1.35 flung every piece
          off screen and ended the scroll on an empty frame. */
-      float t = breakT(aCenter, uDamage, uMinY, uMaxY);
-      vT = t; vTone = aTone;
-      vec3 home = mix(aCenter, aTarget, smoothstep(0.0, 1.0, uMorph));
+      /* aWord: 0 for the 101's pieces, 1 for Solutions'. Each word runs its OWN
+         explosion - the 101 forward with the scroll, Solutions in reverse - so both
+         ends are a genuinely solid fractured word, not a cloud shaped like one. */
+      float own = mix(uMorph, 1.0 - uMorph, aWord);
+      float t = breakT(aCenter, clamp(own * 1.4, 0.0, 1.0), uMinY, uMaxY);
+      vT = t; vTone = aTone; vFade = 1.0 - smoothstep(0.62, 1.0, own);
+      vec3 home = aCenter;
       float ang = t * 6.2 + uSpin * (0.6 + aTone * 1.4) * t;
       mat3 R = axisRot(normalize(aSeed + vec3(0.001)), ang);
       vec3 transformed = home + R * (position - aCenter)
@@ -204,13 +208,13 @@ function patch(mat, isCore) {
                        + vec3(0.0, t * t * -0.16, 0.0);
     `)
     sh.vertexShader = sh.vertexShader.replace('#include <beginnormal_vertex>', `
-      float tn = breakT(aCenter, uDamage, uMinY, uMaxY);
+      float tn = breakT(aCenter, clamp(mix(uMorph,1.0-uMorph,aWord)*1.4,0.0,1.0), uMinY, uMaxY);
       float angn = tn * 6.2 + uSpin * (0.6 + aTone * 1.4) * tn;
       vec3 objectNormal = axisRot(normalize(aSeed + vec3(0.001)), angn) * normal;
       vLocalN = objectNormal;
     `)
 
-    sh.fragmentShader = 'uniform sampler2D uRock; uniform sampler2D uRough;\nvarying float vT; varying float vTone; varying vec3 vLocalN; varying vec3 vWorld;\n' + sh.fragmentShader
+    sh.fragmentShader = 'uniform sampler2D uRock; uniform sampler2D uRough;\nvarying float vT; varying float vTone; varying float vFade; varying vec3 vLocalN; varying vec3 vWorld;\n' + sh.fragmentShader
     if (isCore) {
       /* THE REVEAL: the interior is nearly dark while the mark is whole and lifts
          as its own piece separates. Squared, so it stays subtle through the first
@@ -232,7 +236,7 @@ function patch(mat, isCore) {
         /* held back from 1.7: at full strength the interiors blew out to a chalky pale and
            read as painted ceramic. Glow has to stay darker than the highlight that sells
            it, or there is nothing left for the specular to be brighter THAN. */
-        totalEmissiveRadiance *= tone * (0.04 + 0.95 * vT * vT);
+        totalEmissiveRadiance *= tone * (0.0 + 0.85 * vT * vT);   /* dead dark until it actually breaks */
       `)
     }
   }
@@ -269,6 +273,7 @@ function patch(mat, isCore) {
         float n3 = fract(sin(dot(floor(wp*7.1), vec3(27.11,53.37,88.21))) * 15731.7431);
         float grain = (n1 * 0.55 + n2 * 0.31 + n3 * 0.14) - 0.5;
         gl_FragColor.rgb *= 1.0 + grain * 0.34;
+        gl_FragColor.a *= vFade;
       `)
     })(mat.onBeforeCompile)
   }
@@ -287,8 +292,7 @@ function mergeBucket(list) {
   for (const e of list) n += e.g.attributes.position.count
   const pos = new Float32Array(n * 3), nor = new Float32Array(n * 3)
   const cen = new Float32Array(n * 3), sed = new Float32Array(n * 3)
-  const tgt = new Float32Array(n * 3)
-  const ton = new Float32Array(n)
+  const ton = new Float32Array(n), wrd = new Float32Array(n)
   let o = 0
   for (const e of list) {
     const p = e.g.attributes.position.array, nm = e.g.attributes.normal.array
@@ -296,9 +300,8 @@ function mergeBucket(list) {
       pos[(o + i) * 3] = p[i * 3]; pos[(o + i) * 3 + 1] = p[i * 3 + 1]; pos[(o + i) * 3 + 2] = p[i * 3 + 2]
       nor[(o + i) * 3] = nm[i * 3]; nor[(o + i) * 3 + 1] = nm[i * 3 + 1]; nor[(o + i) * 3 + 2] = nm[i * 3 + 2]
       cen[(o + i) * 3] = e.c.x; cen[(o + i) * 3 + 1] = e.c.y; cen[(o + i) * 3 + 2] = e.c.z
-      tgt[(o + i) * 3] = e.g2.x; tgt[(o + i) * 3 + 1] = e.g2.y; tgt[(o + i) * 3 + 2] = e.g2.z
       sed[(o + i) * 3] = e.s.x; sed[(o + i) * 3 + 1] = e.s.y; sed[(o + i) * 3 + 2] = e.s.z
-      ton[o + i] = e.t
+      ton[o + i] = e.t; wrd[o + i] = e.w
     }
     o += e.g.attributes.position.count
   }
@@ -307,8 +310,8 @@ function mergeBucket(list) {
   g.setAttribute('normal', new THREE.BufferAttribute(nor, 3))
   g.setAttribute('aCenter', new THREE.BufferAttribute(cen, 3))
   g.setAttribute('aSeed', new THREE.BufferAttribute(sed, 3))
-  g.setAttribute('aTarget', new THREE.BufferAttribute(tgt, 3))
   g.setAttribute('aTone', new THREE.BufferAttribute(ton, 1))
+  g.setAttribute('aWord', new THREE.BufferAttribute(wrd, 1))
   return g
 }
 
@@ -324,9 +327,9 @@ const build = (gltf) => { try {
        this wrong and a fragment's shell flies one way while its interior flies
        another, which is the single thing this effect cannot survive. */
     let key = o
-    while (key.parent && !/piece\d+/.test(key.name)) key = key.parent
-    const mm = /piece(\d+)/.exec(key.name) || /piece(\d+)/.exec(o.name)
-    const id = mm ? mm[1] : o.uuid
+    while (key.parent && !/^[ab]\d+/.test(key.name)) key = key.parent
+    const mm = /^([ab])(\d+)/.exec(key.name) || /^([ab])(\d+)/.exec(o.name)
+    const id = mm ? mm[1] + mm[2] : o.uuid
     if (!byPiece.has(id)) byPiece.set(id, [])
     byPiece.get(id).push(o)
   })
@@ -341,10 +344,9 @@ const build = (gltf) => { try {
      and the wave would still sweep through the old, wrong axis. */
   const STAND = new THREE.Matrix4().makeRotationX(Math.PI / 2)
   const skin = [], core = []
-  let pieceIndex = 0
   let count = 0
   const box = new THREE.Box3()
-  for (const [, meshes] of byPiece) {
+  for (const [pid, meshes] of byPiece) {
     /* one centre and one throw direction per PIECE, shared by its skin and its
        interior - otherwise a fragment's outside and inside fly apart separately */
     const pb = new THREE.Box3()
@@ -360,8 +362,7 @@ const build = (gltf) => { try {
     /* the landing point inside "Solutions". No STAND here: the exporter's Y-up
        conversion and STAND compose to the identity, so targets sampled straight from
        Blender are already in the right space - applying STAND alone tips the word. */
-    const tv = TARGETS && TARGETS.targets && TARGETS.targets[pieceIndex++]
-    const g2 = tv ? new THREE.Vector3(tv[0], tv[1], tv[2]) : c.clone()
+    const w = /^b/.test(String(pid)) ? 1 : 0
     box.union(pb.applyMatrix4(STAND))
     for (const m of meshes) {
       const g = (m.geometry.index ? m.geometry.toNonIndexed() : m.geometry.clone())
@@ -369,7 +370,7 @@ const build = (gltf) => { try {
       g.applyMatrix4(STAND)
       if (!g.attributes.normal) g.computeVertexNormals()
       const name = (m.material?.name || '').toLowerCase()
-      ;(name.includes('core') ? core : skin).push({ g, c, s, t: tone, g2 })
+      ;(name.includes('core') ? core : skin).push({ g, c, s, t: tone, w })
       count++
     }
   }
@@ -403,7 +404,11 @@ const build = (gltf) => { try {
     /* small radius, high threshold: only the exposed core blooms, never the whole
        frame. Bloom that touches the metal is what makes real-time look like a
        screensaver. */
-    bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.62, 0.42, 0.86)
+    /* Bloom down hard. At 0.62 strength with a 0.86 threshold every little fracture
+       facet caught a specular hot enough to bloom, so the mark grew headlights - which
+       is exactly what stone must not do. 0.22 past a 0.97 threshold means only the
+       exposed core can bloom, never the skin. */
+    bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.22, 0.55, 0.97)
     composer.addPass(bloom)
     composer.addPass(new OutputPass())
     composer.setSize(canvas.clientWidth, canvas.clientHeight)
@@ -428,7 +433,7 @@ const build = (gltf) => { try {
 } catch (e) { fail('build: ' + (e && e.message ? e.message : e)) } }
 fetch('./targets.json').then(r => r.json()).then(j => { TARGETS = j })
   .catch(() => { TARGETS = null })
-  .finally(() => new GLTFLoader().load('./logo101.glb', build, undefined,
+  .finally(() => new GLTFLoader().load('./words.glb', build, undefined,
                                        (e) => fail('GLB не загрузился: ' + e)))
 
 let damage = 0, target = 0, spin = 0, last = performance.now()
