@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Prompt: MVP #4 — «Складской сканер» (offer 37) — Solutions101</title>
+<style>
+  :root{--bg:#0e202d;--panel:#132937;--ink:#F2F7F5;--soft:rgba(242,247,245,.86);
+    --faint:rgba(242,247,245,.58);--acc:#7FD8FF;--rule:rgba(242,247,245,.13)}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:var(--acc);text-decoration:none} a:hover{text-decoration:underline}
+  a:focus-visible,button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+  header{position:sticky;top:0;z-index:9;background:var(--bg);border-bottom:1px solid var(--rule);
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:0 clamp(14px,3vw,28px);min-height:52px}
+  .eyebrow{font:600 12px/1 ui-monospace,monospace;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--faint)}
+  .back{display:inline-flex;align-items:center;min-height:44px;padding:0 8px;font-size:14px}
+  main{max-width:860px;margin:0 auto;padding:clamp(24px,4vw,52px) clamp(14px,3vw,28px) 96px}
+  h1{font:700 clamp(28px,4.4vw,44px)/1.08 system-ui;letter-spacing:-.02em;margin:0 0 24px}
+  h2{font:700 clamp(21px,2.6vw,29px)/1.15 system-ui;letter-spacing:-.015em;
+    margin:44px 0 14px;padding-top:22px;border-top:1px solid var(--rule)}
+  h3{font:700 clamp(17px,1.9vw,21px)/1.25 system-ui;margin:30px 0 10px}
+  h4{font:700 16px/1.3 system-ui;margin:22px 0 8px;color:var(--soft)}
+  p{margin:0 0 15px;font-size:16.5px;line-height:1.62;color:var(--soft);max-width:68ch}
+  ul,ol{margin:0 0 16px;padding-left:22px}
+  li{font-size:16.5px;line-height:1.62;color:var(--soft);margin:0 0 7px;max-width:66ch}
+  blockquote{margin:0 0 16px;padding:12px 0 12px 18px;border-left:2px solid var(--acc);
+    color:var(--ink);font-size:17px;line-height:1.55}
+  hr{border:0;border-top:1px solid var(--rule);margin:32px 0}
+  code{font:500 14px/1.4 ui-monospace,monospace;background:var(--panel);
+    padding:2px 6px;border-radius:6px;color:var(--acc)}
+  .code{position:relative;margin:0 0 22px}
+  .code pre{margin:0;background:var(--panel);border:1px solid var(--rule);border-radius:14px;
+    padding:44px 16px 16px;overflow-x:auto;font:500 13.5px/1.62 ui-monospace,monospace;
+    color:var(--ink);white-space:pre-wrap;word-break:break-word}
+  .copy{position:absolute;top:8px;right:8px;min-height:32px;padding:0 14px;border-radius:9px;
+    background:#1a3648;color:var(--ink);border:1px solid var(--rule);cursor:pointer;
+    font:600 13px/1 system-ui;transition:transform .12s ease,background .12s ease}
+  .copy:hover{background:#20455b} .copy:active{transform:scale(.96)}
+  .copy.done{background:#1c5a45;border-color:#2f8b6b}
+  .tw{overflow-x:auto;margin:0 0 20px}
+  table{border-collapse:collapse;width:100%;font-size:15px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--rule);vertical-align:top;
+    line-height:1.5;color:var(--soft)}
+  th{color:var(--ink);font-weight:600;white-space:nowrap}
+  .grp{margin:0 0 34px}
+  .grp h2{border:0;padding:0;margin:0 0 4px}
+  .grp .note{color:var(--faint);font-size:14.5px;margin:0 0 14px}
+  .list{display:grid;gap:10px}
+  .item{display:block;padding:15px 17px;background:var(--panel);border:1px solid var(--rule);
+    border-radius:14px;color:var(--ink);transition:border-color .15s}
+  .item:hover{border-color:var(--acc);text-decoration:none}
+  .item b{display:block;font-size:16.5px;margin-bottom:3px}
+  .item span{color:var(--faint);font-size:14px}
+  @media (prefers-contrast:more){:root{--faint:rgba(242,247,245,.82);--rule:rgba(242,247,245,.4)}}
+</style>
+<header>
+  <a class="eyebrow" href="/docs/" style="color:var(--faint)">Solutions101 · документы</a>
+  <a class="back" href="/docs/">← ко всем</a>
+</header>
+<main><h1>Prompt: MVP #4 — «Складской сканер» (offer 37)</h1>
+<p>Paste everything inside the fence into a fresh Claude session. It is written to be self-contained: it assumes the reader has never seen this repo.</p>
+<p><b>Why this one.</b> The three demos already live are a storefront (<code>zapchasti</code>), a financial ledger (<code>vzaimoraschety</code>) and an asset-ops dashboard (<code>park</code>). All three are desktop applications made of tables, cards and a calendar. A warehouse terminal is the first shape whose <i>interaction</i> is different, not just its industry: one task at a time, driven by a scan, operated with a thumb by someone wearing gloves. It cannot be mistaken for the others even in a thumbnail — which is the whole point of a fourth card on the site.</p>
+<p>It is offer <b>37</b> in <code>docs/catalogue.md</code>, where the demo is already named <code>Складской сканер</code>.</p>
+<hr>
+<div class="code"><button class="copy" data-for="c0" type="button">Скопировать</button><pre id="c0">Build a working, self-contained prototype of a warehouse management system for a Russian-
+speaking B2B audience. It is a sales demo: a business owner opens it, plays for two minutes,
+and understands what their own warehouse would look like running on it.
+
+THE PRODUCT
+
+«Складской сканер» — приёмка, размещение, отбор, перемещение и инвентаризация по штрихкоду,
+с адресным хранением. Two surfaces in one file:
+
+1. ТЕРМИНАЛ (the hero, opens first) — what the picker holds. A phone-shaped panel, one task
+   on screen at a time, driven by "scanning". Since there is no real scanner, typing a code
+   and pressing Enter IS a scan, and there is a visible list of sample barcodes to click.
+   Every scan resolves to a real reaction: correct item, wrong item, wrong cell, quantity
+   mismatch. Big touch targets, big numerals, unmistakable success/error states.
+
+2. ОФИС (a tab away) — the supervisor's view. Остатки по ячейкам, карта склада, документы,
+   расхождения, история движений.
+
+FUNCTIONAL DEPTH — it has to survive being poked at
+
+- Адресное хранение: зона → стеллаж → ярус → ячейка (e.g. A-03-2-04). A visual КАРТА СКЛАДА
+  showing occupancy per cell — this is the second thing that makes the demo look unlike a
+  normal CRUD app, so give it real care.
+- Приёмка: приходный ордер → сканируешь товар → система предлагает ячейку размещения
+  (правило: свободная ячейка в зоне хранения этого товара, ближайшая к зоне приёмки) →
+  подтверждаешь или выбираешь другую.
+- Отбор: заказ на отбор → маршрут по ячейкам, отсортированный так, чтобы не ходить назад →
+  скан ячейки, скан товара, ввод количества. Неверный скан — явная ошибка, не тихий сбой.
+- Перемещение и подпитка: из ячейки в ячейку, с проверкой остатка.
+- Инвентаризация: пересчёт по ячейкам, лист расхождений (учёт vs факт), акт списания/
+  оприходования.
+- Партии и сроки годности: FEFO при отборе — если у товара есть срок, система обязана
+  предложить партию, которая истекает раньше. Показывайте это в интерфейсе.
+- Остатки: свободно / зарезервировано / в отборе — три разных числа, а не одно.
+- Документы, печатаемые на месте (window.print, вёрстка A4): приходный ордер, отборочный
+  лист, акт инвентаризации, накладная на перемещение. Их содержимое обязано совпадать с тем,
+  что реально считает система — не заглушки.
+- Выгрузка в CSV: точка с запятой + UTF-8 BOM (иначе русский Excel открывает одну серую
+  колонку из мусора).
+
+VISUAL DIRECTION — it must NOT look like a SaaS dashboard
+
+Промышленный терминал, а не админка. Reference points: industrial HMI panels, airport gate
+displays, Bloomberg-style density where it earns it. Concretely:
+- Very dark, near-black base; ONE loud functional accent (safety yellow / lime) used only for
+  the active task and confirmations; red used only for genuine errors. No pastel, no glass,
+  no soft gradients on everything.
+- Huge type where the eye needs it: quantities, cell addresses, item codes in a monospace
+  face at sizes that read at arm's length. Small type everywhere else.
+- Chunky hit targets (min 56px) on the terminal surface. Thumb-first.
+- Success and error are unmistakable at a glance: a full-panel colour flash, a large tick or
+  cross, and a short text line. Add sound via the Web Audio API (a short beep for ok, a lower
+  buzz for error) and navigator.vibrate where available — with a mute toggle that persists.
+- Motion is functional only: the scan feedback, the route advancing. Nothing decorative.
+- It must look correct in a 300px-wide card on a website, because that is how it will first be
+  seen — check the top-left 1440x1000 region reads clearly when scaled to ~0.28.
+
+DATA — the demo has to be full, and full of the right problems
+
+Generate synthetic data with a SEEDED generator (so it is reproducible), covering at least:
+~40 SKU across a few категории, ~180 ячеек across 3 зоны, партии со сроками годности, ~25
+приходов and ~60 заказов на отбор spread over a real history, and deliberate imperfections
+the demo can show off:
+- одна ячейка с пересортицей (учёт не сходится с фактом)
+- один товар с истекающим сроком, который FEFO обязан вытолкнуть первым
+- один переполненный стеллаж, из-за которого размещение уходит в дальнюю зону
+- один заказ, который нельзя собрать целиком — не хватает остатка
+Russian names for goods, zones and staff. Invent every company name; never use a real one.
+
+HARD RULES
+
+- ONE self-contained .html file. No build step, no framework, no CDN, no external font, no
+  network request of any kind. It must run when opened from a memory stick.
+- Vanilla JS. Do not add a chart library — if you draw a chart, hand-roll the SVG.
+- State persists in localStorage under a namespaced key, and the app SEEDS ITSELF on a first
+  ever visit. An empty demo is a broken demo: nobody will find a "load sample data" button,
+  and inside a card on the website the page is a picture that cannot be clicked at all.
+  Guard the seed on "nothing is stored", not on "the data looks empty", so a visitor who
+  wiped it or is entering their own goods does not get fake stock growing back.
+- NO login screen. A demo that asks for a password loses the visitor.
+- It opens on the screen that sells: the ТЕРМИНАЛ mid-task, not a settings page.
+- Keep input validation and error handling. Every number a user types is checked, and a
+  refusal says why in plain Russian.
+- Everything the user reads is Russian. Comments in the code may be English.
+
+VERIFY BEFORE YOU CALL IT DONE — and report the actual output, not a claim
+
+1. Extract the inline &lt;script&gt; and run `node --check` on it. A duplicate `const` in one big
+   inline script is a PARSE error: no console message, every function undefined, blank page.
+2. Serve the folder and load it in a real browser. Confirm zero console errors.
+3. Walk one full отбор end to end and state the numbers: остаток before, остаток after,
+   which партия FEFO chose and why.
+4. Trigger a wrong-item scan and a wrong-cell scan; confirm each is refused visibly.
+5. Run an инвентаризация on the deliberately-wrong cell; confirm the лист расхождений shows
+   the difference and the акт matches it.
+6. Confirm zero network requests leave the page.
+7. Print each document and confirm its figures equal what the system computed.
+
+If something cannot be built honestly, say so plainly instead of faking it with hardcoded
+output. A demo that lies is worse than a demo that is smaller.</pre></div>
+<hr>
+<h2>Note for whoever picks this up</h2>
+<p><code>docs/catalogue.md</code> has the italic English subtitles shifted by one from offer 32 onward — #36 reads <i>"Shift scheduling and rostering"</i> over the field-service text, #37 reads <i>"Field service and mobile crew app"</i> over the warehouse text. The Russian is correct; the English line is off by one. Not fixed here because it is outside this job.</p></main>
+<script>
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('.copy'); if (!b) return;
+  const pre = document.getElementById(b.dataset.for); if (!pre) return;
+  navigator.clipboard.writeText(pre.textContent).then(() => {
+    b.textContent = 'Скопировано'; b.classList.add('done');
+    setTimeout(() => { b.textContent = 'Скопировать'; b.classList.remove('done') }, 1800);
+  }).catch(() => { b.textContent = 'Выделите вручную' });
+});
+</script>

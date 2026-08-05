@@ -420,7 +420,15 @@ const ico=(k,sz)=>'<svg width="'+(sz||16)+'" height="'+(sz||16)+'" viewBox="0 0 
   (I8.has(k)?'<g transform="scale(.5)">'+I[k]+'</g>':I[k])+'</svg>';
 /* ═══════════ 1. Хранилище, версия, миграция ═══════════ */
 const KEY='arendapark';
-const BLANK=()=>({version:1,demo:false,units:[],clients:[],contracts:[],shifts:[],maint:[],payments:[],ui:{}});
+/* ВЕРСИЯ ДЕМО-ДАННЫХ, отдельная от версии формата. Формат не менялся - менялся сам набор:
+   истории стало два года вместо девяти месяцев. Без этой версии человек, открывавший демо
+   раньше, навсегда остаётся со старым набором, потому что засев срабатывает только когда в
+   хранилище пусто. Именно поэтому «9 месяцев» и «С начала данных» продолжали показывать
+   одно и то же уже после того, как данные удлинили: у браузера лежал прежний засев.
+   Пересевается ТОЛЬКО демо-набор (db.demo). Данные, введённые руками, не трогаются никогда -
+   иначе обновление демо стирало бы чужую работу. */
+const DEMO_VER=2;
+const BLANK=()=>({version:1,demo:false,demoVer:0,units:[],clients:[],contracts:[],shifts:[],maint:[],payments:[],ui:{}});
 let db=BLANK();
 
 function migrate(raw){
@@ -435,7 +443,7 @@ function migrate(raw){
   const b=BLANK();
   for(const k of ['units','clients','contracts','shifts','maint','payments'])
     b[k]=Array.isArray(d[k])?d[k]:[];
-  b.demo=!!d.demo; b.ui=(d.ui&&typeof d.ui==='object')?d.ui:{};
+  b.demo=!!d.demo; b.demoVer=+d.demoVer||0; b.ui=(d.ui&&typeof d.ui==='object')?d.ui:{};
   // добора полей по умолчанию (форвард-совместимость)
   b.units.forEach(u=>{u.archived=!!u.archived;u.toInterval=u.toInterval||250;u.meter0=u.meter0||0;});
   b.clients.forEach(c=>{c.archived=!!c.archived;c.defer=c.defer==null?0:c.defer;});
@@ -722,7 +730,7 @@ function genDemo(){
   const rnd=mulberry32(7734211);
   const pick=a=>a[Math.floor(rnd()*a.length)];
   const ri=(a,b)=>a+Math.floor(rnd()*(b-a+1));
-  const d=BLANK(); d.demo=true;
+  const d=BLANK(); d.demo=true; d.demoVer=DEMO_VER;
   /* TWO YEARS, NOT NINE MONTHS. The history used to be exactly 273 days - which is exactly the
      «9 месяцев» preset - so «9 месяцев» and «С начала данных» were the same window and returned
      the same numbers to the kopeck. Switching between them looked broken, and it may as well
@@ -1359,7 +1367,7 @@ function tryDelete(coll,o,label){
   removeWithUndo(coll,[o],'Удалено: '+esc(label));
 }
 /* ═══════════ 10. Период и общие блоки ═══════════ */
-const PRESETS=[['m','Текущий месяц'],['m3','3 месяца'],['m9','9 месяцев'],['all','С начала данных'],['c','Свой период']];
+const PRESETS=[['m','Текущий месяц'],['m3','3 месяца'],['m6','6 месяцев'],['m9','9 месяцев'],['y1','Год'],['all','С начала данных'],['c','Свой период']];
 /* OPENS ON NINE MONTHS, not three. The whole argument of this product is "two of your
    twelve machines are not paying for themselves" - and on a three-month window only one
    unit went red and the кран, the single best story in the data, showed a flat zero. The
@@ -1370,7 +1378,9 @@ function applyPreset(p){
   const t=today();
   if(p==='m'){periodFrom=monthStart(t);periodTo=monthEnd(t)>t?t:monthEnd(t);}
   if(p==='m3'){periodFrom=monthStart(addDays(t,-89));periodTo=t;}
+  if(p==='m6'){periodFrom=monthStart(addDays(t,-181));periodTo=t;}
   if(p==='m9'){periodFrom=monthStart(addDays(t,-273));periodTo=t;}
+  if(p==='y1'){periodFrom=monthStart(addDays(t,-364));periodTo=t;}
   if(p==='all'){
     const all=db.shifts.map(s=>s.date).concat(db.contracts.map(c=>c.from),db.maint.map(m=>m.date));
     periodFrom=all.length?all.reduce((a,b)=>a<b?a:b):monthStart(t); periodTo=t;
@@ -2202,7 +2212,11 @@ load();
    Guarded on there being nothing stored, not on the db looking empty: someone who deliberately
    wiped the demo, or who is part-way through entering their own units, must not have it grow
    fake ones back under them on the next reload. */
+/* два случая, и второй — это тот, из-за которого «С начала данных» у вернувшегося посетителя
+   не менялось: пусто → сеем; лежит УСТАРЕВШИЙ демо-набор → пересеваем. Введённое руками
+   (db.demo === false) не трогаем ни при каких условиях. */
 if(localStorage.getItem(KEY)===null){ db=genDemo(); save(); }
+else if(db.demo && (db.demoVer||0)<DEMO_VER){ db=genDemo(); save(); }
 applyPreset('m3');
 histUI();
 HIST.push({v:route.v,id:route.id}); HI=0;
