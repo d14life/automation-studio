@@ -206,9 +206,24 @@ function patch(mat, isCore) {
       /* aWord: 0 for the 101's pieces, 1 for Solutions'. Each word runs its OWN
          explosion - the 101 forward with the scroll, Solutions in reverse - so both
          ends are a genuinely solid fractured word, not a cloud shaped like one. */
-      float own = mix(uMorph, 1.0 - uMorph, aWord);
-      float t = breakT(aCenter, clamp(own * 1.4, 0.0, 1.0), uMinY, uMaxY);
-      vT = t; vTone = aTone; vFade = 1.0 - smoothstep(0.62, 1.0, own);
+      /* HALF THE SCROLL EACH, AND NO PLATEAU. Both words used to run their whole
+         explosion across the whole scroll, which caused both faults at once: they
+         were on screen together the entire time - so the 101's debris hung over the
+         Solutions - and dmg was own*1.4, so past own 0.71 every piece was already
+         fully broken and the remaining third of the scroll changed nothing. Just a
+         big ring sitting there.
+
+         Now 101 breaks over the FIRST half and is gone by the midpoint; Solutions
+         assembles over the SECOND half from nothing. They never share the frame, and
+         every scroll pixel moves something. */
+      /* 1.61, not 2.0. At exactly 2.0 the two halves meet edge to edge: 101 finishes
+         its explosion on the same frame Solutions starts, both sit at own=1, both are
+         faded out, and the middle of the scroll is a blank screen. 1.61 stretches each
+         word over ~62% of the travel so they OVERLAP in the middle third - the last of
+         the 101 is still in the air while the first of Solutions arrives. */
+      float own = min(mix(uMorph, 1.0 - uMorph, aWord) * 1.61, 1.0);
+      float t = breakT(aCenter, own, uMinY, uMaxY);
+      vT = t; vTone = aTone; vFade = 1.0 - smoothstep(0.55, 1.0, own);
       vec3 home = aCenter;
       /* PHYSICS, NOT A BLENDER. The spin was t*6.2 plus a term driven by the global
          clock, so every fragment tumbled forever at speed - which reads as a special
@@ -220,8 +235,8 @@ function patch(mat, isCore) {
       float ang = fly * (0.35 + aTone * 0.8);
       mat3 R = axisRot(normalize(aSeed + vec3(0.001)), ang);
       vec3 transformed = home + R * (position - aCenter)
-                       + aSeed * fly * 0.62
-                       + vec3(0.0, t * t * -0.55, 0.0);   /* gravity accelerates */
+                       + aSeed * fly * 0.34
+                       + vec3(0.0, t * t * -0.32, 0.0);   /* gravity accelerates */
       /* vWorld was DECLARED in both shaders and NEVER ASSIGNED. Every triplanar
          lookup therefore sampled the same single texel, and the whole rock pack
          resolved to one flat colour multiply - which is why the surface still had
@@ -230,7 +245,7 @@ function patch(mat, isCore) {
       vWorld = position;
     `)
     sh.vertexShader = sh.vertexShader.replace('#include <beginnormal_vertex>', `
-      float tn = breakT(aCenter, clamp(mix(uMorph,1.0-uMorph,aWord)*1.4,0.0,1.0), uMinY, uMaxY);
+      float tn = breakT(aCenter, min(mix(uMorph,1.0-uMorph,aWord)*1.61,1.0), uMinY, uMaxY);
       float angn = pow(tn, 0.55) * (0.35 + aTone * 0.8);
       vec3 objectNormal = axisRot(normalize(aSeed + vec3(0.001)), angn) * normal;
       vLocalN = objectNormal;
