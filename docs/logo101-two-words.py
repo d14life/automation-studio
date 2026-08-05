@@ -18,8 +18,8 @@ from mathutils.bvhtree import BVHTree
 
 SEED   = 7
 FONT   = "/System/Library/Fonts/Supplemental/Impact.ttf"
-OUT    = bpy.path.abspath("//words.glb")
-META   = bpy.path.abspath("//words.json")
+OUT    = bpy.path.abspath("//words330.glb")
+META   = bpy.path.abspath("//words330.json")
 
 bpy.ops.wm.read_factory_settings(use_empty=True)
 
@@ -122,7 +122,7 @@ def build_word(body, pieces, prefix, extrude, target_h):
 
 
 random.seed(SEED)
-a = build_word("101",       230, "a", 0.085, 0.58)
+a = build_word("101",       330, "a", 0.085, 0.58)
 random.seed(SEED + 11)
 b = build_word("Solutions", 330, "b", 0.060, 0.40)
 
