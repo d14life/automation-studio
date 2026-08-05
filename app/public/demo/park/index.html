@@ -1008,7 +1008,15 @@ function renderCal(){
   $$('#view .gbar[data-k]').forEach(el=>el.onclick=ev=>{ev.preventDefault();ev.stopPropagation();openContract(el.dataset.k)});
   $$('#view [data-track]').forEach(tr=>tr.onclick=ev=>{
     const r=tr.getBoundingClientRect();
-    const i=clamp(Math.floor((ev.clientX-r.left)/(r.width/n)),0,n-1);
+    /* THE COLUMN WIDTH IS --cw, NOT r.width/n. .gwrap uses min-width, so on a wide
+       screen the track stretches past its drawn grid: at 1440px the bars are painted
+       every 34px while r.width/n works out to 36.5, and a click on the last day of the
+       month landed two days earlier. It was correct on a phone only because the track
+       overflows there. Read the real column width from the custom property the bars
+       themselves are positioned with, and the click can no longer disagree with the
+       picture. */
+    const cw=parseFloat(getComputedStyle(tr).getPropertyValue('--cw'))||(r.width/n);
+    const i=clamp(Math.floor((ev.clientX-r.left)/cw),0,n-1);
     contractForm(null,{unitId:tr.dataset.track,from:days[i],to:addDays(days[i],6)});
   });
 }
@@ -1519,7 +1527,7 @@ function renderContract(){
   const ov=contractOverdue(c), due=contractDue(c), cl=client(c.clientId);
   head('<button class="x" id="bk" style="vertical-align:-3px">'+ico('back',18)+'</button> Договор '+esc(c.no||''),uName(c.unitId)+' · '+cName(c.clientId),
     '<button class="btn" id="ed">Изменить</button><button class="btn" id="ash">'+ico('plus',14)+' Смена</button><button class="btn" id="apay">'+ico('money',14)+' Платёж</button>'+
-    '<button class="btn" id="pact">'+ico('print',14)+' Акт</button><button class="btn" id="pinv">'+ico('print',14)+' Счёт</button>'+
+    '<button class="btn" id="pdog">'+ico('print',14)+' Договор</button><button class="btn" id="pact">'+ico('print',14)+' Акт</button><button class="btn" id="pinv">'+ico('print',14)+' Счёт</button>'+
     (c.status==='active'?'<button class="btn term" id="cl">Закрыть договор</button>':''));
   $('#view').innerHTML=
    kpi([['Начислено',money(accr),sh.length+' '+plural(sh.length,['смена','смены','смен'])+' · '+fmt(contractHours(c.id),1)+' ч'],
@@ -1548,7 +1556,7 @@ function renderContract(){
   $('#bk').onclick=()=>go('contracts'); $('#ed').onclick=()=>contractForm(c.id);
   $('#ash').onclick=()=>shiftForm(null,{contractId:c.id,date:clamp2(today(),c.from,c.to)});
   $('#apay').onclick=()=>paymentForm(null,{clientId:c.clientId,contractId:c.id,amount:Math.max(0,debt),kind:'аренда'});
-  $('#pact').onclick=()=>printAct(c.id); $('#pinv').onclick=()=>printInvoice(c.id);
+  $('#pdog').onclick=()=>printDogovor(c.id); $('#pact').onclick=()=>printAct(c.id); $('#pinv').onclick=()=>printInvoice(c.id);
   const b=$('#cl'); if(b)b.onclick=()=>closeForm(c.id);
   $$('#view [data-s]').forEach(tr=>tr.onclick=()=>shiftForm(tr.dataset.s));
   $$('#view [data-p]').forEach(tr=>tr.onclick=()=>paymentForm(tr.dataset.p));
@@ -1761,7 +1769,7 @@ function renderData(){
   $('#view').innerHTML=
    '<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(320px,1fr))">'+
    '<div class="card"><h3>Экспорт и импорт</h3><p class="muted" style="font-size:13px;margin-top:0">Вся база — один JSON-файл: техника, клиенты, договоры, смены, обслуживание, платежи. Импорт проверяет структуру и ссылки и отказывается загружать посторонний файл.</p>'+
-     '<div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn pri" id="exp">'+ico('dl',14)+' Экспорт JSON</button><button class="btn" id="imp">Импорт JSON</button><input type="file" id="file" accept=".json,application/json" hidden></div>'+
+     '<div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn pri" id="exp">'+ico('dl',14)+' Экспорт JSON</button><button class="btn" id="csv">'+ico('dl',14)+' Выгрузка в Excel</button><button class="btn" id="imp">Импорт JSON</button><input type="file" id="file" accept=".json,application/json" hidden></div>'+
      '<div class="hint">Размер базы: '+fmt(raw.length/1024,1)+' КБ · ключ хранения <span class="mono">'+KEY+'</span></div></div>'+
    '<div class="card"><h3>Состав базы</h3><table><tbody>'+
      [['Техника','units'],['Клиенты','clients'],['Договоры','contracts'],['Смены','shifts'],['Обслуживание','maint'],['Платежи','payments']]
@@ -1782,6 +1790,30 @@ function renderData(){
    '<div class="card"><h3>Опасная зона</h3><p class="muted" style="font-size:13px;margin-top:0">Полная очистка удаляет все записи из этого браузера без возможности вернуть. Сначала выгрузите JSON.</p>'+
      '<button class="btn dgr" id="clr">Очистить всё</button></div>'+
    '</div>';
+  /* CSV, because "а в Excel это можно?" is the second question every director asks and
+     until now there was no answer. Semicolon-separated with a UTF-8 BOM: Excel on a
+     Russian Windows opens semicolon files into columns and needs the BOM to read
+     Cyrillic, and a comma-separated UTF-8 file without one lands as a single grey column
+     of mojibake - which looks like the export is broken rather than the locale. */
+  $('#csv').onclick=()=>{
+    const esc2=v=>{const t=String(v==null?'':v);return /[";\n]/.test(t)?'"'+t.replace(/"/g,'""')+'"':t};
+    const rows=[['Договор','Статус','Клиент','ИНН','Техника','Инв. №','С','По','Тариф','Ставка',
+                 'Смен','Начислено','Оплачено','Долг','Просрочено','Залог внесён']];
+    db.contracts.forEach(c=>{
+      const u=unit(c.unitId), cl=client(c.clientId), sh=cShifts(c.id);
+      rows.push([c.no||c.id, c.status==='closed'?'закрыт':'активен', cl?cl.name:'', cl?cl.inn||'':'',
+        u?u.name:'', u?u.inv||'':'', c.from, c.to,
+        c.rateMode==='hour'?'час':(c.rateMode==='shift'?'смена':'сутки'), r2(c.rate),
+        sh.length, r2(contractAccrued(c)), r2(contractPaid(c)), r2(contractDebt(c)),
+        r2(contractOverdue(c)), r2(depositPaid(c))]);
+    });
+    const csv='\ufeff'+rows.map(r=>r.map(esc2).join(';')).join('\r\n');
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+    a.download='dogovory-'+today()+'.csv'; a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+    toast('Выгружено договоров: '+db.contracts.length);
+  };
   $('#exp').onclick=()=>{
     const blob=new Blob([JSON.stringify(db,null,1)],{type:'application/json'});
     const a=document.createElement('a');
@@ -1841,6 +1873,49 @@ function doPrint(html){
   window.print();
   setTimeout(()=>{$('#print').innerHTML=''},1200);
 }
+/* THE CONTRACT ITSELF. Акт and счёт existed; договор did not - and a rental business
+   lives on the contract, so it is the first document a director asks to see. Built from
+   the same data the screen already holds: no new fields, no new state, and the terms it
+   prints are the terms the system actually bills by. If the rate mode says hour, the
+   contract says hour, and the minimum shift and overtime multiplier that appear in the
+   text are the same numbers shiftAmount() uses. */
+function printDogovor(id){
+  const c=contract(id); if(!c)return;
+  const u=unit(c.unitId), cl=client(c.clientId), o=db.ui.org||{};
+  const unitName=c.rateMode==='hour'?'машино-час':(c.rateMode==='shift'?'смену':'сутки');
+  const days=Math.max(1,dayDiff(c.from,c.to)+1);
+  const terms=[];
+  if(c.rateMode==='hour'&&c.minShift) terms.push('минимальная оплачиваемая смена — '+fmt(c.minShift,1)+' ч');
+  if((c.otMult||1)>1) terms.push('переработка сверх '+(c.rateMode==='hour'?fmt(c.otAfter||0,1)+' ч':'нормы')+' оплачивается с коэффициентом '+fmt(c.otMult,2));
+  if(c.deposit>0) terms.push('обеспечительный платёж (залог) — '+fmt(c.deposit,2)+' ₽');
+  if(cl&&cl.defer) terms.push('оплата в течение '+cl.defer+' календарных дней с даты акта');
+  doPrint('<div class="doc"><h1>Договор аренды техники № '+esc(c.no||c.id)+'</h1>'+
+   '<div class="meta" style="text-align:right">от '+dlong(c.from)+'</div><hr>'+
+   '<div class="meta"><b>Арендодатель:</b> '+esc(orgLine())+'</div>'+
+   '<div class="meta"><b>Арендатор:</b> '+esc(clientLine(cl))+'</div>'+
+   '<h2>1. Предмет договора</h2>'+
+   '<div class="meta">Арендодатель передаёт, а Арендатор принимает во временное владение и пользование '+
+     esc(u?u.name:'технику')+(u&&u.inv?', инвентарный № '+esc(u.inv):'')+(u&&u.reg?', гос. номер '+esc(u.reg):'')+
+     ', далее — Техника.</div>'+
+   '<h2>2. Срок аренды</h2>'+
+   '<div class="meta">С '+dlong(c.from)+' по '+dlong(c.to)+' включительно ('+days+' дн.).</div>'+
+   '<h2>3. Стоимость и порядок расчётов</h2>'+
+   '<div class="meta">Ставка аренды — <b>'+fmt(c.rate,2)+' ₽</b> за '+unitName+'.'+
+     (terms.length?' Дополнительные условия: '+terms.join('; ')+'.':'')+
+     ' Фактическая наработка подтверждается сменными рапортами и актом.</div>'+
+   '<h2>4. Обязанности сторон</h2>'+
+   '<div class="meta">Арендодатель передаёт Технику в исправном состоянии. Арендатор использует '+
+     'Технику по назначению, обеспечивает допущенного к управлению оператора и возвращает Технику '+
+     'в исправном состоянии с учётом нормального износа.</div>'+
+   '<h2>5. Реквизиты и подписи</h2>'+
+   '<table><thead><tr><th>Арендодатель</th><th>Арендатор</th></tr></thead><tbody><tr>'+
+   '<td>'+esc(orgLine())+(o.acc?'<br>Р/с '+esc(o.acc):'')+'<br><br>_______________ / подпись</td>'+
+   '<td>'+esc(clientLine(cl))+'<br><br>_______________ / подпись</td>'+
+   '</tr></tbody></table>'+
+   '<div class="meta" style="margin-top:14px;opacity:.7">Демонстрационный документ, сформирован из данных системы.</div>'+
+   '</div>');
+}
+
 function printAct(id){
   const c=contract(id); if(!c)return;
   const u=unit(c.unitId), cl=client(c.clientId);

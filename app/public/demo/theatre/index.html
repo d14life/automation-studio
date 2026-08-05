@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Театр легаси-интерфейса — Solutions101</title>
+<!--
+  Ported from the Claude Design project «Театр легаси-интерфейса» (демо #52 из
+  docs/SYSTEM-PROMPT-demos.md — «Автоматизация старой настольной программы»).
+
+  The original is a .dc.html component: <x-dc>, DCLogic, React.createRef and {{ }}
+  bindings, all of which need Claude Design's runtime. Everything here is the same
+  scene rewritten as one self-contained page - no framework, no build, no external
+  request - because that is the rule every demo on this site follows.
+
+  The simulation logic is kept faithfully: the operator makes a typo on every third
+  record and backspaces to fix it, which is the detail that makes the left window
+  read as a person rather than as a slower script.
+-->
+<style>
+  :root{
+    --bg:#0e202d; --panel:#132937; --ink:#F2F7F5; --soft:rgba(242,247,245,.72);
+    --faint:rgba(242,247,245,.58); --acc:#7FD8FF; --warn:#E6B450; --ok:#5ED6A0;
+    --rule:rgba(242,247,245,.13);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:var(--acc);text-decoration:none}
+  a:hover{color:var(--ink)}
+  a:focus-visible,button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+
+  header.top{position:sticky;top:0;z-index:20;background:var(--bg);
+    border-bottom:1px solid var(--rule);display:flex;align-items:center;
+    justify-content:space-between;gap:16px;padding:0 clamp(12px,3vw,28px);min-height:52px}
+  .eyebrow{font:600 12px/1 ui-monospace,monospace;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--faint)}
+  .back{display:inline-flex;align-items:center;min-height:44px;padding:0 8px;
+    font-size:14px;border-radius:12px}
+
+  main{max-width:1240px;margin:0 auto;
+    padding:clamp(22px,4vw,54px) clamp(12px,3vw,28px) 80px;
+    display:flex;flex-direction:column;gap:clamp(26px,4vw,44px)}
+  .intro{display:flex;flex-direction:column;gap:14px;max-width:820px}
+  .form-tag{font:600 12px/1 ui-monospace,monospace;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--acc)}
+  h1{margin:0;font-size:clamp(27px,4.4vw,50px);line-height:1.06;
+    letter-spacing:-.02em;font-weight:600;text-wrap:pretty}
+  .lede{margin:0;font-size:clamp(15px,1.5vw,18px);line-height:1.5;color:var(--faint);
+    text-wrap:pretty;max-width:62ch}
+
+  .stage{display:flex;flex-direction:column;gap:clamp(16px,2.4vw,24px)}
+  .pair{display:flex;flex-wrap:wrap;gap:clamp(16px,2.4vw,26px)}
+  .side{flex:1 1 320px;min-width:0;display:flex;flex-direction:column;gap:10px}
+  .side-head{display:flex;flex-wrap:wrap;align-items:baseline;
+    justify-content:space-between;gap:8px}
+  .who{display:flex;align-items:center;gap:8px;font:600 12px/1 ui-monospace,monospace;
+    letter-spacing:.14em;text-transform:uppercase}
+  .dot{width:8px;height:8px;border-radius:50%}
+  .note{font-size:13px;line-height:1.5;color:var(--faint);font-variant-numeric:tabular-nums}
+
+  /* ── the 1998 window. Deliberately ugly: that contrast IS the argument. ── */
+  .win{position:relative;overflow:hidden;background:#d4d0c8;color:#000;
+    font-family:Tahoma,Verdana,system-ui,sans-serif;
+    border-top:2px solid #fff;border-left:2px solid #fff;
+    border-right:2px solid #4a4a4a;border-bottom:2px solid #4a4a4a;
+    box-shadow:0 20px 46px rgba(0,0,0,.5)}
+  .cursor{position:absolute;left:0;top:0;z-index:5;pointer-events:none;
+    transform:translate3d(60px,180px,0)}
+  .title{display:flex;align-items:center;justify-content:space-between;gap:8px;
+    background:#000080;color:#fff;font-size:12px;font-weight:700;padding:4px 4px 4px 8px}
+  .btns{display:flex;gap:2px}
+  .btns span{width:18px;height:16px;display:flex;align-items:center;justify-content:center;
+    font-size:10px;color:#000;background:#d4d0c8;
+    border-top:1px solid #fff;border-left:1px solid #fff;
+    border-right:1px solid #4a4a4a;border-bottom:1px solid #4a4a4a}
+  .menu{display:flex;gap:14px;padding:3px 9px;font-size:11px;
+    border-bottom:1px solid #9a958c;color:#000}
+  .body{padding:12px 12px 10px}
+  .grid{display:grid;grid-template-columns:minmax(74px,88px) minmax(0,1fr);
+    gap:7px 9px;align-items:center;font-size:12px}
+  .grid input{width:100%;min-width:0;font:inherit;font-size:12px;background:#fff;color:#000;
+    padding:3px 5px;border-top:1px solid #808080;border-left:1px solid #808080;
+    border-right:1px solid #fff;border-bottom:1px solid #fff}
+  .row{display:flex;align-items:center;gap:8px;margin-top:13px}
+  .btn98{padding:5px 15px;font-size:12px;background:#d4d0c8;
+    border-top:1px solid #fff;border-left:1px solid #fff;
+    border-right:1px solid #4a4a4a;border-bottom:1px solid #4a4a4a}
+  .flash{margin-left:auto;font-size:11px;color:#0a5c2a;opacity:0}
+  .bar{flex:1 1 auto;min-width:0;height:14px;overflow:hidden;background:#b9b3a9;
+    border-top:1px solid #808080;border-left:1px solid #808080;
+    border-right:1px solid #fff;border-bottom:1px solid #fff}
+  .fill{height:100%;width:100%;transform:translate3d(-100%,0,0);
+    background-image:repeating-linear-gradient(90deg,#000080 0 9px,#b9b3a9 9px 11px)}
+  .status{display:flex;font-size:11px;border-top:1px solid #9a958c;
+    font-variant-numeric:tabular-nums}
+  .status span{padding:4px 7px;border-top:1px solid #808080;border-left:1px solid #808080;
+    border-right:1px solid #fff;border-bottom:1px solid #fff}
+  .status .grow{flex:1 1 auto;min-width:0}
+
+  .controls{display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px}
+  .ctl{min-height:44px;min-width:44px;padding:0 20px;border-radius:12px;
+    background:var(--panel);color:var(--ink);border:1px solid var(--rule);
+    font:inherit;font-size:15px;cursor:pointer;transition:transform .12s ease,background .12s ease}
+  .ctl.ghost{background:transparent}
+  .ctl:hover{background:#1a3648}
+  .ctl:active{transform:scale(.97)}
+
+  .warnbox{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;
+    border:1px solid rgba(230,180,80,.5);border-radius:14px;background:#16242b}
+  .warnbox p{margin:0;font-size:14px;line-height:1.5;text-wrap:pretty}
+  .split{display:flex;flex-wrap:wrap;gap:clamp(20px,4vw,48px);
+    border-top:1px solid var(--rule);padding-top:clamp(24px,3.5vw,40px)}
+  blockquote{flex:1 1 300px;min-width:0;margin:0;
+    font-size:clamp(21px,2.6vw,31px);line-height:1.15;letter-spacing:-.015em;text-wrap:pretty}
+  .prose{flex:1 1 340px;min-width:0;display:flex;flex-direction:column;gap:14px;
+    font-size:15px;line-height:1.5;color:rgba(242,247,245,.9)}
+  .prose p{margin:0;text-wrap:pretty;max-width:60ch}
+  .card{display:flex;flex-direction:column;gap:16px;background:var(--panel);
+    border:1px solid var(--rule);border-radius:16px;padding:clamp(18px,2.6vw,28px)}
+  .card h2{margin:0;font-size:clamp(18px,2vw,23px);line-height:1.1;font-weight:600}
+  .three{display:flex;flex-wrap:wrap;gap:16px 32px}
+  .three p{flex:1 1 260px;min-width:0;margin:0;font-size:14px;line-height:1.5;
+    color:rgba(242,247,245,.9);text-wrap:pretty}
+  footer{border-top:1px solid var(--rule);padding:20px clamp(12px,3vw,28px);
+    display:flex;flex-wrap:wrap;gap:8px 16px;justify-content:space-between}
+
+  @media (prefers-reduced-transparency:reduce){ .warnbox{background:#1b2b33} }
+  @media (prefers-contrast:more){
+    :root{--faint:rgba(242,247,245,.82);--rule:rgba(242,247,245,.42)}
+  }
+</style>
+
+<header class="top">
+  <span class="eyebrow">Solutions101 · демо</span>
+  <a class="back" href="/v2.html">← на сайт</a>
+</header>
+
+<main>
+  <div class="intro">
+    <span class="form-tag">форма: театр</span>
+    <h1>Скрипт садится за ту же программу, что и оператор</h1>
+    <p class="lede">Слева — как это делает человек. Справа — как это делает скрипт.
+      Обе сцены идут в реальном времени, с одной и той же формой ввода.</p>
+  </div>
+
+  <div class="stage" id="stage">
+    <div class="pair" id="pair"></div>
+
+    <div class="controls">
+      <button type="button" class="ctl" id="toggle">Пауза</button>
+      <button type="button" class="ctl ghost" id="restart">С начала</button>
+      <span class="note">Сцена повторяется. Скрипт заканчивает — оператор продолжает.</span>
+    </div>
+
+    <div class="warnbox" role="note">
+      <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true" style="flex:none;margin-top:1px">
+        <path d="M10 2.6 L18.4 17 H1.6 Z" fill="none" stroke="#E6B450" stroke-width="1.4" stroke-linejoin="round"/>
+        <path d="M10 7.6 V11.8" stroke="#E6B450" stroke-width="1.4" stroke-linecap="round"/>
+        <path d="M10 14.1 V14.2" stroke="#E6B450" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      <p><span style="color:var(--warn)">Демонстрационные данные.</span> Компания «Ветромаш»,
+        её накладные, суммы и счётчики выдуманы для этого примера. Это воспроизведение сцены,
+        а не работающий скрипт и не отчёт по чьей-либо работе.</p>
+    </div>
+  </div>
+
+  <div class="split">
+    <blockquote>«Некрасиво, эффективно и часто единственный путь»</blockquote>
+    <div class="prose">
+      <p>Программа в окне выше — не наша и не новая. Такие стоят у клиентов годами: без API,
+        без выгрузки, с лицензией, которую никто не станет менять ради удобства. Переписать
+        её — проект на год. Автоматизировать ввод в неё — работа на несколько дней.</p>
+      <p>Поэтому скрипт ничего не «интегрирует». Он делает то же, что человек: открывает форму,
+        заполняет поля, нажимает «Сохранить». Разница в темпе и в том, что к четырёхсотой
+        накладной он не устаёт и не путает контрагента.</p>
+      <p>«Некрасиво» здесь про внешний вид способа, а не про качество результата. Записи
+        получаются те же, а оператор уходит с ввода на работу, где нужен человек.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Что здесь настоящее, а что нет</h2>
+    <div class="three">
+      <p>Страница в браузере не может подключиться к 1С, к реестру или к почтовому ящику.
+        Мы этого и не изображаем: выше — сцена на голом CSS, все значения в полях заданы
+        в коде страницы.</p>
+      <p>Настоящий скрипт запускается на том компьютере, где стоит программа. Вход в него —
+        то, что можно передать честно: CSV, вставленный текст, ручной ввод. Обещать
+        интеграцию там, где её нет, мы не будем.</p>
+      <p>У студии один реальный клиент — «Негабарит-12», логистика. Своих цифр — количества
+        проектов, процентов роста, сэкономленных часов — на этой странице нет, и это
+        не случайно.</p>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <span class="eyebrow">Solutions101 · демо формы «театр»</span>
+  <a class="back" href="/v2.html">← на сайт</a>
+</footer>
+
+<script>
+'use strict';
+
+const TOTAL = 400;         /* записей в партии */
+const HUMAN_SEC = 8;       /* оператор: секунд на запись */
+const SCRIPT_RPS = 5.3;    /* скрипт: записей в секунду */
+const LOOP = true;
+
+const RECORDS = [
+  ['ВН-10428','14.03.2025','Ветромаш','Труба 57×3,5 ст.20','1 240','84 130,00'],
+  ['ВН-10429','14.03.2025','Ветромаш','Уголок 50×50×5','860','41 280,00'],
+  ['ВН-10430','15.03.2025','Ветромаш','Швеллер 12П','2 105','137 460,00'],
+  ['ВН-10431','15.03.2025','Ветромаш','Лист 4 мм ст.3','740','52 910,00'],
+  ['ВН-10432','16.03.2025','Ветромаш','Круг 20 ст.45','315','19 740,00'],
+  ['ВН-10433','16.03.2025','Ветромаш','Труба 89×4 ст.20','1 980','142 300,00'],
+  ['ВН-10434','17.03.2025','Ветромаш','Полоса 40×4','450','23 615,00'],
+  ['ВН-10435','17.03.2025','Ветромаш','Балка 20Б1','3 220','258 940,00'],
+];
+const FIELDS = ['Накладная №','Дата','Контрагент','Позиция','Кол-во, кг','Сумма, руб'];
+
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const ease = (t) => t < .5 ? 2*t*t : 1 - Math.pow(-2*t+2,2)/2;
+const clock = (s) => {
+  const m = Math.floor(s/60), r = Math.floor(s%60);
+  return (m<10?'0':'')+m+':'+(r<10?'0':'')+r;
+};
+
+/* ── one window, built in code so both sides are provably identical ────────── */
+function buildWindow(mode) {
+  const side = document.createElement('div');
+  side.className = 'side';
+  const human = mode === 'human';
+  const hMin = Math.round(TOTAL * HUMAN_SEC / 60);
+  const bSec = Math.round(TOTAL / SCRIPT_RPS);
+  const note = human
+    ? TOTAL + ' накладных ≈ ' + hMin + ' мин'
+    : TOTAL + ' накладных ≈ ' + (bSec >= 60 ? Math.floor(bSec/60)+' мин '+(bSec%60)+' с' : bSec+' с');
+
+  side.innerHTML = `
+    <div class="side-head">
+      <span class="who"><span class="dot" style="background:${human?'rgba(242,247,245,.5)':'var(--acc)'}"></span>${human?'оператор':'скрипт'}</span>
+      <span class="note" data-r="note">${note}</span>
+    </div>
+    <div class="win" data-r="win">
+      <div class="cursor" data-r="cursor">
+        <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M2.5 1.6 L2.5 15.2 L6.3 11.6 L8.9 17.6 L11.4 16.5 L8.8 10.6 L13.9 10.6 Z" fill="#fff" stroke="#000" stroke-width="1.2" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="title"><span>Складъ 4.2 — Ввод накладной</span>
+        <span class="btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
+      <div class="menu" aria-hidden="true"><span>Файл</span><span>Правка</span><span>Документ</span><span>Справка</span></div>
+      <div class="body">
+        <div class="grid">
+          ${FIELDS.map((l,i)=>`<label for="${mode}-${i}">${l}</label><input id="${mode}-${i}" data-field="${i}" readonly tabindex="-1" value="">`).join('')}
+        </div>
+        <div class="row">
+          <span class="btn98" data-r="save" aria-hidden="true">Сохранить</span>
+          <span class="btn98" aria-hidden="true">Отмена</span>
+          <span class="flash" data-r="flash">Запись сохранена</span>
+        </div>
+        <div class="row">
+          <span style="font-size:11px">Обработано</span>
+          <div class="bar"><div class="fill" data-r="fill"></div></div>
+          <span style="font-size:11px;font-variant-numeric:tabular-nums"><span data-r="pct">0</span>%</span>
+        </div>
+      </div>
+      <div class="status">
+        <span class="grow">Записей: <span data-r="count">0</span> / ${TOTAL}</span>
+        <span>Время: <span data-r="clock">00:00</span></span>
+        <span data-r="eta">осталось ≈ ${human ? hMin+' мин' : clock(bSec)}</span>
+      </div>
+    </div>`;
+  return side;
+}
+
+function makeRunner(scope, mode) {
+  const q = (n) => scope.querySelector('[data-r="'+n+'"]');
+  const win = q('win'), cursor = q('cursor'), save = q('save'), fill = q('fill'), flash = q('flash');
+  const out = { count:q('count'), pct:q('pct'), cl:q('clock'), eta:q('eta') };
+  const fields = [...scope.querySelectorAll('[data-field]')];
+  const S = { t:0, i:0, acts:[], ai:0, at:0, pos:{x:0,y:0}, from:{x:0,y:0}, to:{x:0,y:0},
+              pts:[], savePt:{x:0,y:0}, bufs:['','','','','',''], lens:[0,0,0,0,0,0],
+              lastCommit:-9, finished:false, pressed:false, started:false };
+
+  const point = (el, frac) => {
+    if (!el || !win) return {x:0,y:0};
+    const r = el.getBoundingClientRect(), c = win.getBoundingClientRect();
+    return { x: r.left - c.left + Math.min(22, r.width*(frac||.25)), y: r.top - c.top + r.height/2 };
+  };
+  const setCursor = () => {
+    cursor.style.transform = 'translate3d('+Math.round(S.pos.x-2)+'px,'+Math.round(S.pos.y-2)+'px,0)'
+      + (S.pressed ? ' scale(.86)' : '');
+  };
+  const measure = () => {
+    S.pts = fields.map((el) => point(el, .25));
+    S.savePt = point(save, .5);
+    if (!S.started) S.pos = { x: win.clientWidth*.62, y: win.clientHeight*.82 };
+    setCursor();
+  };
+  const setField = (f) => { fields[f].value = S.bufs[f].slice(0, Math.max(0, S.lens[f])); };
+  const focusField = (f) => {
+    fields.forEach((el,i) => { el.style.outline = i === f ? '1px dotted #000' : 'none'; });
+  };
+
+  /* THE TYPO IS THE WHOLE POINT of the left window. Without it the operator is
+     just a slower script; with it he is a person, and the eye believes the scene. */
+  const build = (idx) => {
+    const human = mode === 'human';
+    const vals = RECORDS[idx % RECORDS.length];
+    const A = [];
+    const cps = human ? 16 : 900;
+    if (human) A.push({k:'wait', d:.42});
+    for (let f = 0; f < vals.length; f++) {
+      A.push({k:'move', f, d: human ? (f === 0 ? .40 : .32) : .012});
+      const v = vals[f];
+      if (human && f === 2 && idx % 3 === 1) {
+        const wrong = v.slice(0, v.length-1) + 'ы';
+        A.push({k:'edit', f, buf:wrong, to:wrong.length, d: wrong.length/cps});
+        A.push({k:'wait', d:.26});                       /* он замечает */
+        A.push({k:'edit', f, to: wrong.length-2, d:.12}); /* backspace */
+        A.push({k:'edit', f, buf:v, to:v.length, d: 2/cps});
+      } else {
+        A.push({k:'edit', f, buf:v, to:v.length, d: v.length/cps});
+      }
+      if (human) A.push({k:'wait', d:.10});
+    }
+    A.push({k:'move', f:-1, d: human ? .42 : .016});
+    A.push({k:'press',  d: human ? .16 : .022});
+    A.push({k:'commit', d: human ? .24 : .014});
+    /* normalise the whole record to the declared pace, so the numbers in the
+       status bar and the motion on screen can never disagree */
+    const sum = A.reduce((s,a) => s + a.d, 0);
+    const target = human ? HUMAN_SEC : 1/SCRIPT_RPS;
+    const k = sum > 0 ? target/sum : 1;
+    A.forEach((a) => { a.d *= k; });
+    return A;
+  };
+
+  const start = (a) => {
+    if (a.k === 'move') {
+      S.from = {...S.pos};
+      S.to = a.f >= 0 ? (S.pts[a.f] || S.pos) : S.savePt;
+      if (REDUCED) { S.pos = {...S.to}; setCursor(); }
+      if (a.f >= 0) focusField(a.f);
+    } else if (a.k === 'edit') {
+      if (a.buf != null) S.bufs[a.f] = a.buf;
+      a.fromLen = S.lens[a.f];
+      focusField(a.f);
+    } else if (a.k === 'press') {
+      S.pressed = true; setCursor();
+      save.style.borderTopColor = '#4a4a4a'; save.style.borderLeftColor = '#4a4a4a';
+      save.style.borderRightColor = '#fff';  save.style.borderBottomColor = '#fff';
+      focusField(-1);
+    } else if (a.k === 'commit') {
+      S.i += 1; S.lastCommit = S.t;
+      for (let f = 0; f < fields.length; f++) { S.lens[f] = 0; S.bufs[f] = ''; setField(f); }
+      const p = Math.min(1, S.i / TOTAL);
+      fill.style.transform = 'translate3d('+(-100 + 100*p).toFixed(2)+'%,0,0)';
+      out.pct.textContent = Math.round(p*100);
+      out.count.textContent = S.i;
+      if (S.i >= TOTAL) { S.finished = true; out.eta.textContent = 'готово'; out.eta.style.color = '#0a5c2a'; }
+    }
+  };
+  const apply = (a, p) => {
+    if (a.k === 'move' && !REDUCED) {
+      const e = ease(p);
+      S.pos = { x: S.from.x + (S.to.x - S.from.x)*e, y: S.from.y + (S.to.y - S.from.y)*e };
+      setCursor();
+    } else if (a.k === 'edit') {
+      const len = Math.round(a.fromLen + (a.to - a.fromLen) * (REDUCED ? 1 : p));
+      if (len !== S.lens[a.f]) { S.lens[a.f] = len; setField(a.f); }
+    }
+  };
+  const end = (a) => {
+    if (a.k === 'press') {
+      S.pressed = false; setCursor();
+      save.style.borderTopColor = '#fff'; save.style.borderLeftColor = '#fff';
+      save.style.borderRightColor = '#4a4a4a'; save.style.borderBottomColor = '#4a4a4a';
+    } else if (a.k === 'edit') { S.lens[a.f] = a.to; setField(a.f); }
+  };
+
+  const readouts = () => {
+    out.cl.textContent = clock(S.t);
+    const fade = Math.max(0, 1 - (S.t - S.lastCommit)/1.1);
+    flash.style.opacity = S.finished ? 1 : fade.toFixed(2);
+    if (S.finished) return;
+    const left = Math.max(0, TOTAL - S.i);
+    out.eta.textContent = mode === 'human'
+      ? 'осталось ≈ ' + Math.max(1, Math.round(left * HUMAN_SEC / 60)) + ' мин'
+      : 'осталось ≈ ' + clock(left / SCRIPT_RPS);
+  };
+
+  const tick = (dt) => {
+    if (S.finished) { readouts(); return; }
+    S.started = true;
+    S.t += dt;
+    let left = dt, guard = 0;
+    while (left > 0 && !S.finished && guard++ < 600) {
+      if (S.ai >= S.acts.length) { S.acts = build(S.i); S.ai = 0; S.at = 0; }
+      const a = S.acts[S.ai];
+      if (S.at === 0) start(a);
+      if (S.finished) break;
+      const use = Math.min(left, Math.max(0, a.d - S.at));
+      S.at += use; left -= use;
+      apply(a, a.d > 0 ? Math.min(1, S.at/a.d) : 1);
+      if (S.at >= a.d - 1e-9) { end(a); S.ai++; S.at = 0; }
+    }
+    readouts();
+  };
+
+  const reset = () => {
+    Object.assign(S, { t:0, i:0, acts:[], ai:0, at:0, lastCommit:-9,
+      finished:false, pressed:false, lens:[0,0,0,0,0,0], bufs:['','','','','',''], started:false });
+    fields.forEach((_,f) => setField(f));
+    focusField(-1);
+    out.count.textContent = '0'; out.pct.textContent = '0'; out.cl.textContent = '00:00';
+    out.eta.style.color = ''; flash.style.opacity = 0;
+    fill.style.transform = 'translate3d(-100%,0,0)';
+    measure(); S.started = true;
+  };
+
+  measure();
+  return { tick, reset, measure, state: S };
+}
+
+/* ── the scene ─────────────────────────────────────────────────────────────── */
+const pair = document.getElementById('pair');
+const humanSide = buildWindow('human');
+const botSide = buildWindow('bot');
+pair.append(humanSide, botSide);
+
+const runners = [makeRunner(humanSide, 'human'), makeRunner(botSide, 'bot')];
+let paused = false, raf = 0, last = null, holdT = 0, visible = false;
+
+const toggle = document.getElementById('toggle');
+toggle.addEventListener('click', () => {
+  paused = !paused;
+  toggle.textContent = paused ? 'Продолжить' : 'Пауза';
+});
+document.getElementById('restart').addEventListener('click', () => {
+  runners.forEach((r) => r.reset()); holdT = 0;
+});
+
+const measureAll = () => runners.forEach((r) => r.measure());
+requestAnimationFrame(() => requestAnimationFrame(measureAll));
+if (window.ResizeObserver) new ResizeObserver(measureAll).observe(pair);
+
+function frame(now) {
+  raf = requestAnimationFrame(frame);
+  if (last == null) last = now;
+  let dt = (now - last)/1000; last = now;
+  dt = Math.min(Math.max(dt, 0), .25);
+  if (paused) return;
+  runners.forEach((r) => r.tick(dt));
+  /* the script finishes first and waits; then both restart together, which is
+     the comparison stated once more without a word of copy */
+  if (runners[1].state.finished) {
+    holdT += dt;
+    if (holdT > 4 && LOOP) { holdT = 0; runners.forEach((r) => r.reset()); }
+  }
+}
+
+/* Nothing runs offscreen or in a hidden tab - the rule every page here follows. */
+const pump = () => {
+  const run = visible && !document.hidden;
+  if (run && !raf) { last = null; raf = requestAnimationFrame(frame); }
+  if (!run && raf) { cancelAnimationFrame(raf); raf = 0; }
+};
+new IntersectionObserver(([e]) => { visible = e.isIntersecting; pump(); }, {threshold:.05})
+  .observe(document.getElementById('stage'));
+document.addEventListener('visibilitychange', pump);
+</script>
