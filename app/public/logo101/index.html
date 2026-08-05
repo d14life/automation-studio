@@ -103,9 +103,14 @@ const root = new THREE.Group()
 scene.add(root)
 
 /* a key light on top of the environment, only to sharpen the bevel highlights */
-const key  = new THREE.DirectionalLight(0xfff1e0, 2.4); key.position.set(-3, 4, 5)   /* warm */
-const rim  = new THREE.DirectionalLight(0x7FD8FF, 3.0); rim.position.set(4, -1, -4)  /* cold */
-const kick = new THREE.DirectionalLight(0xff9a5c, 1.5); kick.position.set(5, 2, 2)   /* warm kicker */
+/* SOFT. Three directionals at 2.4/3.0/1.5 put a hard mirror highlight on every
+   one of the ~500 fracture facets, and a surface covered in mirror highlights is
+   the definition of shiny. Rock is lit mostly by the room; the directionals are
+   now shaping light, not the light. */
+const key  = new THREE.DirectionalLight(0xfff1e0, 1.05); key.position.set(-3, 4, 5)
+const rim  = new THREE.DirectionalLight(0x7FD8FF, 0.85); rim.position.set(4, -1, -4)
+const kick = new THREE.DirectionalLight(0xff9a5c, 0.30); kick.position.set(5, 2, 2)
+scene.add(new THREE.HemisphereLight(0x9fc6dd, 0x0b1a24, 1.25))
 scene.add(key, rim, kick)
 
 /* REAL ROCK MAPS, projected triplanar. The fractured pieces have no UVs - bisect
@@ -117,6 +122,7 @@ const rockTex = (f) => { const t = texLoader.load('./tex/' + f); t.wrapS = t.wra
 const uniforms = {
   uRock:  { value: rockTex('rock_color.jpg') },
   uRough: { value: rockTex('rock_rough.jpg') },
+  uNormal:{ value: rockTex('rock_normal.jpg') },   /* was on the server, never loaded */
   uDamage: { value: 0 },
   uMorph:  { value: 0 },   /* 0 = the mark is 101, 1 = the swarm has become Solutions */
   uSpin:   { value: 0 },
@@ -140,21 +146,19 @@ const uniforms = {
    Iridescence adds a thin-film colour shift at grazing angles, so the edges of
    the letterforms pick up colour instead of dying into the background. */
 const skinMat = new THREE.MeshPhysicalMaterial({
-  color: 0x1a232a, metalness: 0.38, roughness: 0.70, envMapIntensity: 0.82,
-  clearcoat: 0.16, clearcoatRoughness: 0.45, transparent: true,
-  iridescence: 0.42, iridescenceIOR: 1.9, iridescenceThicknessRange: [180, 520],
-})
-const coreMat = new THREE.MeshPhysicalMaterial({
-  color: 0x123246, metalness: 0.3, roughness: 0.55, transparent: true,
-  emissive: 0xffffff, emissiveIntensity: 1.0, envMapIntensity: 1.3,
-  clearcoat: 0.6, clearcoatRoughness: 0.25,
+  /* STONE IS A DIELECTRIC. metalness plus clearcoat plus thin-film iridescence is
+     the recipe for a polished glass bead, which is exactly what it looked like: no
+     metal in rock, no lacquer on it, no oil-slick colour shift at its edges. And the
+     base colour was near-black, so an albedo map multiplied into it had nothing to
+     show. Mid grey, roughness fully driven by the map. */
+  color: 0x6d757a, metalness: 0.0, roughness: 1.0, envMapIntensity: 0.55,
 })
 
 function patch(mat, isCore) {
   mat.onBeforeCompile = (sh) => {
     Object.assign(sh.uniforms, uniforms)
     sh.vertexShader = `
-      attribute vec3 aCenter; attribute vec3 aSeed; attribute float aTone; attribute float aWord;
+      attribute vec3 aCenter; attribute vec3 aSeed; attribute vec3 aPartner; attribute float aTone; attribute float aWord;
       uniform float uDamage, uMorph, uSpin, uMinY, uMaxY;
       varying float vT; varying float vTone; varying float vFade; varying vec3 vLocalN; varying vec3 vWorld;
       mat3 axisRot(vec3 a, float ang){
@@ -197,10 +201,55 @@ function patch(mat, isCore) {
       /* aWord: 0 for the 101's pieces, 1 for Solutions'. Each word runs its OWN
          explosion - the 101 forward with the scroll, Solutions in reverse - so both
          ends are a genuinely solid fractured word, not a cloud shaped like one. */
-      float own = mix(uMorph, 1.0 - uMorph, aWord);
-      float t = breakT(aCenter, clamp(own * 1.4, 0.0, 1.0), uMinY, uMaxY);
-      vT = t; vTone = aTone; vFade = 1.0 - smoothstep(0.62, 1.0, own);
-      vec3 home = aCenter;
+      /* HALF THE SCROLL EACH, AND NO PLATEAU. Both words used to run their whole
+         explosion across the whole scroll, which caused both faults at once: they
+         were on screen together the entire time - so the 101's debris hung over the
+         Solutions - and dmg was own*1.4, so past own 0.71 every piece was already
+         fully broken and the remaining third of the scroll changed nothing. Just a
+         big ring sitting there.
+
+         Now 101 breaks over the FIRST half and is gone by the midpoint; Solutions
+         assembles over the SECOND half from nothing. They never share the frame, and
+         every scroll pixel moves something. */
+      /* 1.61, not 2.0. At exactly 2.0 the two halves meet edge to edge: 101 finishes
+         its explosion on the same frame Solutions starts, both sit at own=1, both are
+         faded out, and the middle of the scroll is a blank screen. 1.61 stretches each
+         word over ~62% of the travel so they OVERLAP in the middle third - the last of
+         the 101 is still in the air while the first of Solutions arrives. */
+      float own = min(mix(uMorph, 1.0 - uMorph, aWord) * 1.61, 1.0);
+      float t = breakT(aCenter, own, uMinY, uMaxY);
+      vT = t; vTone = aTone;
+      /* NO ALPHA. Fading one word out while the other faded in is what made the middle
+         read as a transition between two unrelated objects sitting in different places.
+         A fragment now SHRINKS to nothing on the spot where the other word needs it,
+         and grows from nothing on the spot the first word left - so the rubble is one
+         continuous stream, not two piles. It also drops the material back to opaque,
+         which is what was letting far fragments blend over near ones and look like
+         slabs floating in front of the letters. */
+      vFade = 1.0;
+      /* THE MATE'S SCALE IS THE COMPLEMENT OF ITS PARTNER'S - that is the whole trick,
+         and driving both off their own progress was the bug. Each word's own runs 0->1
+         over its half, so at the crossover BOTH mates were deep into their swap and
+         both shrank to nothing at the same moment: the frame emptied out however the
+         curve was shaped, because two things going to zero together cannot conserve
+         anything.
+
+         k is now computed ONCE from the global scroll and word B takes 1-k. Volume is
+         (1-k) for one and k for the other, which sums to exactly 1 at every point in
+         the scroll - there is never a frame with less rock than the frame before it.
+         The cube root is what makes that true in volume rather than in width: scale is
+         a length, and a rock at half scale is an EIGHTH of a rock.
+
+         lo staggers the moment each pair trades, and because a mate inherits its
+         partner's aTone the pair shares one lo - so one shrinks exactly as the other
+         grows, in the same place, in the same instant. */
+      float lo = 0.30 + aTone * 0.40;
+      float kA = smoothstep(lo, lo + 0.14, uMorph);
+      float k = mix(kA, 1.0 - kA, aWord);
+      float shrink = pow(1.0 - k, 0.3333);
+      /* where the piece lives right now: its own word's slot, travelling to the slot
+         the other word needs filled */
+      vec3 home = mix(aCenter, aPartner, smoothstep(0.12, 1.0, t));
       /* PHYSICS, NOT A BLENDER. The spin was t*6.2 plus a term driven by the global
          clock, so every fragment tumbled forever at speed - which reads as a special
          effect, not as something breaking. Real debris does three things: it bursts
@@ -210,84 +259,52 @@ function patch(mat, isCore) {
       float fly = pow(t, 0.55);
       float ang = fly * (0.35 + aTone * 0.8);
       mat3 R = axisRot(normalize(aSeed + vec3(0.001)), ang);
-      vec3 transformed = home + R * (position - aCenter)
-                       + aSeed * fly * 0.62
-                       + vec3(0.0, t * t * -0.55, 0.0);   /* gravity accelerates */
+      /* NO GRAVITY. A falling fragment is correct physics for rubble that is going
+         to land, and wrong for rubble that is being handed to the other word: it made
+         every piece sink out of frame as it shrank, so the effect read as "these fall
+         away and different ones appear" instead of as a transfer. The pieces drift on
+         their own axis and trade in place. */
+      vec3 transformed = home + R * (position - aCenter) * shrink
+                       + aSeed * fly * 0.11;
+      /* vWorld was DECLARED in both shaders and NEVER ASSIGNED. Every triplanar
+         lookup therefore sampled the same single texel, and the whole rock pack
+         resolved to one flat colour multiply - which is why the surface still had
+         no texture on it. Locked to the UNDEFORMED position so the grain is baked
+         into the stone and does not swim while the piece flies. */
+      vWorld = position;
     `)
     sh.vertexShader = sh.vertexShader.replace('#include <beginnormal_vertex>', `
-      float tn = breakT(aCenter, clamp(mix(uMorph,1.0-uMorph,aWord)*1.4,0.0,1.0), uMinY, uMaxY);
+      float tn = breakT(aCenter, min(mix(uMorph,1.0-uMorph,aWord)*1.61,1.0), uMinY, uMaxY);
       float angn = pow(tn, 0.55) * (0.35 + aTone * 0.8);
       vec3 objectNormal = axisRot(normalize(aSeed + vec3(0.001)), angn) * normal;
       vLocalN = objectNormal;
     `)
 
-    sh.fragmentShader = 'uniform sampler2D uRock; uniform sampler2D uRough;\nvarying float vT; varying float vTone; varying float vFade; varying vec3 vLocalN; varying vec3 vWorld;\n' + sh.fragmentShader
-    if (isCore) {
-      /* THE REVEAL: the interior is nearly dark while the mark is whole and lifts
-         as its own piece separates. Squared, so it stays subtle through the first
-         crack and only really burns once the piece is clear of the body. */
-      sh.fragmentShader = sh.fragmentShader.replace('#include <emissivemap_fragment>', `
-        #include <emissivemap_fragment>
-        /* EVERY FRAGMENT ITS OWN COLOUR. One flat blue interior is what made the
-           break read as a texture rather than as a material with depth: 78 pieces
-           all glowing the identical hue look printed. aTone walks each piece along
-           a three-stop ramp - deep teal, brand cyan, warm amber - so the swarm has
-           temperature variation the way real molten or lit material does, and the
-           warm pieces read as HOTTER, closer, more recently broken. */
-        vec3 cold = vec3(0.05, 0.42, 0.68);
-        vec3 mid  = vec3(0.18, 0.72, 1.00);
-        vec3 warm = vec3(1.00, 0.62, 0.26);
-        vec3 tone = vTone < 0.62
-          ? mix(cold, mid, smoothstep(0.0, 0.62, vTone))
-          : mix(mid, warm, smoothstep(0.62, 1.0, vTone));
-        /* held back from 1.7: at full strength the interiors blew out to a chalky pale and
-           read as painted ceramic. Glow has to stay darker than the highlight that sells
-           it, or there is nothing left for the specular to be brighter THAN. */
-        totalEmissiveRadiance *= tone * (0.0 + 0.85 * vT * vT);   /* dead dark until it actually breaks */
-      `)
-    }
-  }
-  if (!isCore) {
-    /* A FRESNEL RIM. Near-black metal on a near-black background loses its own
-       silhouette - the shape was only readable where a highlight happened to land.
-       This lifts the grazing angles, which is where a real lacquered edge catches
-       the room, so the 101 keeps its outline even in the dark parts of the frame. */
-    mat.onBeforeCompile = ((prev) => (sh) => {
-      prev(sh)
+    sh.fragmentShader = 'uniform sampler2D uRock; uniform sampler2D uRough; uniform sampler2D uNormal;\nvarying float vT; varying float vTone; varying float vFade; varying vec3 vLocalN; varying vec3 vWorld;\nvec3 tri(sampler2D s, vec3 p, vec3 n){ vec3 b=pow(abs(n),vec3(2.0)); b/=(b.x+b.y+b.z+0.0001); return texture2D(s,p.zy*2.6).rgb*b.x + texture2D(s,p.xz*2.6).rgb*b.y + texture2D(s,p.xy*2.6).rgb*b.z; }\n' + sh.fragmentShader
+    /* NO SECOND MATERIAL. The interior used to be its own emissive blue with a
+       three-stop colour ramp, so a stone that split showed coloured light inside -
+       which is a video-game crystal, not a rock. Rock that breaks reveals more rock.
+       One material for the shell, the interior and every fragment, and the only thing
+       Blender's skin/interior split still buys us is nothing, so it is ignored. */
+      const T = 'tri(uRock, vWorld, normalize(vLocalN))'
+      sh.fragmentShader = sh.fragmentShader
+        .replace('#include <map_fragment>', 'diffuseColor.rgb *= ' + T + ' * 1.5;')
+        .replace('#include <roughnessmap_fragment>',
+                 'float roughnessFactor = roughness * (0.60 + 0.45 * tri(uRough, vWorld, normalize(vLocalN)).r);')
+        .replace('#include <normal_fragment_maps>',
+                 'vec3 nrm = tri(uNormal, vWorld, normalize(vLocalN)) * 2.0 - 1.0; normal = normalize(normal + vec3(nrm.xy, 0.0) * 1.3);')
       sh.fragmentShader = sh.fragmentShader.replace('#include <dithering_fragment>', `
         #include <dithering_fragment>
+        /* a soft rim so near-black stone keeps its silhouette against a near-black
+           background - colourless now, it was tinting the edges teal and amber */
         float fres = pow(1.0 - abs(dot(normalize(vLocalN), vec3(0.0, 0.0, 1.0))), 3.2);
-        gl_FragColor.rgb += fres * mix(vec3(0.10,0.34,0.52), vec3(0.34,0.20,0.10), vTone) * 0.9;
-        /* GRAIN - smooth facets read as plastic; broken stone has microstructure */
-        /* triplanar: three projections, weighted by how much the face points each way */
-        vec3 bw = abs(normalize(vLocalN));
-        bw = pow(bw, vec3(4.0)); bw /= (bw.x + bw.y + bw.z);
-        vec2 uvX = vWorld.zy * 2.6, uvY = vWorld.xz * 2.6, uvZ = vWorld.xy * 2.6;
-        vec3 rock = texture2D(uRock, uvX).rgb * bw.x
-                  + texture2D(uRock, uvY).rgb * bw.y
-                  + texture2D(uRock, uvZ).rgb * bw.z;
-        float rgh = texture2D(uRough, uvX).r * bw.x
-                  + texture2D(uRough, uvY).r * bw.y
-                  + texture2D(uRough, uvZ).r * bw.z;
-        /* the photograph carries the detail; keep the lighting we already tuned by
-           modulating rather than replacing, and let rough areas eat the specular */
-        gl_FragColor.rgb *= 0.55 + 1.15 * rock;
-        gl_FragColor.rgb *= 1.0 - 0.35 * rgh;
-
-        vec3 wp = vWorld * 26.0;
-        float n1 = fract(sin(dot(floor(wp),     vec3(12.99,78.23,45.16))) * 43758.5453);
-        float n2 = fract(sin(dot(floor(wp*2.7), vec3(19.43,61.77,31.09))) * 24634.6345);
-        float n3 = fract(sin(dot(floor(wp*7.1), vec3(27.11,53.37,88.21))) * 15731.7431);
-        float grain = (n1 * 0.55 + n2 * 0.31 + n3 * 0.14) - 0.5;
-        gl_FragColor.rgb *= 1.0 + grain * 0.34;
+        gl_FragColor.rgb += fres * vec3(0.10, 0.13, 0.15);
         gl_FragColor.a *= vFade;
       `)
-    })(mat.onBeforeCompile)
   }
-  mat.customProgramCacheKey = () => (isCore ? 'core' : 'skin')
+  mat.customProgramCacheKey = () => 'stone'
 }
 patch(skinMat, false)
-patch(coreMat, true)
 
 /* ── LOAD AND MERGE ──────────────────────────────────────────────────────────
    78 objects would be 78 draw calls. They are merged into one buffer per
@@ -298,7 +315,7 @@ function mergeBucket(list) {
   let n = 0
   for (const e of list) n += e.g.attributes.position.count
   const pos = new Float32Array(n * 3), nor = new Float32Array(n * 3)
-  const cen = new Float32Array(n * 3), sed = new Float32Array(n * 3)
+  const cen = new Float32Array(n * 3), sed = new Float32Array(n * 3), par = new Float32Array(n * 3)
   const ton = new Float32Array(n), wrd = new Float32Array(n)
   let o = 0
   for (const e of list) {
@@ -308,6 +325,7 @@ function mergeBucket(list) {
       nor[(o + i) * 3] = nm[i * 3]; nor[(o + i) * 3 + 1] = nm[i * 3 + 1]; nor[(o + i) * 3 + 2] = nm[i * 3 + 2]
       cen[(o + i) * 3] = e.c.x; cen[(o + i) * 3 + 1] = e.c.y; cen[(o + i) * 3 + 2] = e.c.z
       sed[(o + i) * 3] = e.s.x; sed[(o + i) * 3 + 1] = e.s.y; sed[(o + i) * 3 + 2] = e.s.z
+      par[(o + i) * 3] = e.p.x; par[(o + i) * 3 + 1] = e.p.y; par[(o + i) * 3 + 2] = e.p.z
       ton[o + i] = e.t; wrd[o + i] = e.w
     }
     o += e.g.attributes.position.count
@@ -317,13 +335,13 @@ function mergeBucket(list) {
   g.setAttribute('normal', new THREE.BufferAttribute(nor, 3))
   g.setAttribute('aCenter', new THREE.BufferAttribute(cen, 3))
   g.setAttribute('aSeed', new THREE.BufferAttribute(sed, 3))
+  g.setAttribute('aPartner', new THREE.BufferAttribute(par, 3))
   g.setAttribute('aTone', new THREE.BufferAttribute(ton, 1))
   g.setAttribute('aWord', new THREE.BufferAttribute(wrd, 1))
   return g
 }
 
 let composer = null, bloom = null
-let TARGETS = null
 const build = (gltf) => { try {
   const byPiece = new Map()
   gltf.scene.updateMatrixWorld(true)
@@ -353,31 +371,52 @@ const build = (gltf) => { try {
   const skin = [], core = []
   let count = 0
   const box = new THREE.Box3()
+  /* TWO PASSES, because a piece cannot know where it is going until every piece on
+     the other side has been placed. Pass one measures each piece; pass two pairs
+     each 101 fragment with a Solutions fragment and vice versa. That pairing is what
+     makes the handoff continuous: the rubble does not fade out here and fade in over
+     there, it flies from where it was to where the other word needs it. */
+  const meta = []
   for (const [pid, meshes] of byPiece) {
-    /* one centre and one throw direction per PIECE, shared by its skin and its
-       interior - otherwise a fragment's outside and inside fly apart separately */
     const pb = new THREE.Box3()
-    for (const m of meshes) pb.expandByObject(m)   /* still in import space; STAND applied below */
-    const c = pb.getCenter(new THREE.Vector3()).applyMatrix4(STAND)
-    const tone = Math.random()
-    const s = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1)
-    if (s.lengthSq() < 1e-6) s.set(0, 1, 0)
-    s.normalize()
-    /* bias the throw outward from the mark's own centre, so it opens rather than
-       stirs - pure randomness reads as a blender, not a break */
-    s.lerp(c.clone().normalize(), 0.55).normalize()
-    /* the landing point inside "Solutions". No STAND here: the exporter's Y-up
-       conversion and STAND compose to the identity, so targets sampled straight from
-       Blender are already in the right space - applying STAND alone tips the word. */
-    const w = /^b/.test(String(pid)) ? 1 : 0
-    box.union(pb.applyMatrix4(STAND))
+    for (const m of meshes) pb.expandByObject(m)
+    meta.push({ pid, meshes, pb, c: pb.getCenter(new THREE.Vector3()).applyMatrix4(STAND),
+                w: /^b/.test(String(pid)) ? 1 : 0 })
+  }
+  /* THE SWAP HAS TO BE MUTUAL. The pairing used to be two independent walks, so a
+     101 fragment shrank away at one place while some unrelated Solutions fragment
+     grew somewhere else - which is why it read as things vanishing and other things
+     appearing rather than as rock being re-used.
+
+     Now the mapping is symmetric: A[i] and B[i] are each other's mate. One shrinks to
+     nothing exactly where the other grows from nothing, at the same moment, spinning
+     on the same axis at the same rate - because the mate inherits its partner's seed
+     and tone rather than rolling its own. Two draw calls' worth of geometry, but on
+     screen it is one rock that keeps going. 228 against 328 means the last hundred
+     Solutions cells share a mate; at the instant they trade, both are microscopic. */
+  const A = meta.filter(m => m.w === 0), B = meta.filter(m => m.w === 1)
+  const dir = () => {
+    const v = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1)
+    return v.lengthSq() < 1e-6 ? new THREE.Vector3(0, 1, 0) : v.normalize()
+  }
+  A.forEach((m) => { m.s = dir(); m.t = Math.random() })
+  A.forEach((m, i) => { m.mate = B[Math.floor(i * B.length / A.length)] })
+  B.forEach((m, i) => {
+    const a = A[Math.floor(i * A.length / B.length)]
+    m.mate = a; m.s = a.s.clone(); m.t = a.t
+  })
+  for (const m of meta) m.p = m.mate.c
+
+  for (const { pid, meshes, pb, c, w, p, s, t: tone } of meta) {
+
+    box.union(pb.clone().applyMatrix4(STAND))
     for (const m of meshes) {
       const g = (m.geometry.index ? m.geometry.toNonIndexed() : m.geometry.clone())
       g.applyMatrix4(m.matrixWorld)
       g.applyMatrix4(STAND)
       if (!g.attributes.normal) g.computeVertexNormals()
       const name = (m.material?.name || '').toLowerCase()
-      ;(name.includes('core') ? core : skin).push({ g, c, s, t: tone, w })
+      ;(name.includes('core') ? core : skin).push({ g, c, s, t: tone, w, p })
       count++
     }
   }
@@ -386,8 +425,7 @@ const build = (gltf) => { try {
   uniforms.uMinY.value = box.min.y
   uniforms.uMaxY.value = box.max.y
 
-  if (skin.length) root.add(new THREE.Mesh(mergeBucket(skin), skinMat))
-  if (core.length) root.add(new THREE.Mesh(mergeBucket(core), coreMat))
+  root.add(new THREE.Mesh(mergeBucket(skin.concat(core)), skinMat))
 
   /* frame it by whichever axis binds, with air around it */
   const fit = () => {
@@ -395,9 +433,12 @@ const build = (gltf) => { try {
     renderer.setSize(w, h, false)
     camera.aspect = w / h
     const fov = THREE.MathUtils.degToRad(camera.fov)
-    const dh = (size.y * 1.55) / 2 / Math.tan(fov / 2)
-    /* framed for the WIDER word - Solutions is three times the width of 101 */
-    const dw = (size.x * 3.05) / 2 / Math.tan(fov / 2) / Math.max(camera.aspect, 0.0001)
+    const dh = (size.y * 1.5) / 2 / Math.tan(fov / 2)
+    /* size is ALREADY the union box of both words, so Solutions' width is in it -
+       multiplying by 3.05 on top of that pushed the camera three times further back
+       than needed and rendered the whole mark at a third of the frame. 1.2 is the
+       margin, not the word count. */
+    const dw = (size.x * 1.2) / 2 / Math.tan(fov / 2) / Math.max(camera.aspect, 0.0001)
     camera.position.set(0, 0, Math.max(dh, dw))
     camera.lookAt(0, 0, 0)
     camera.updateProjectionMatrix()
@@ -421,27 +462,14 @@ const build = (gltf) => { try {
     composer.setSize(canvas.clientWidth, canvas.clientHeight)
   }
 
-  /* prove what the SHADER got, not what the loader intended */
-  const dbg = root.children[0].geometry.attributes
-  const a = dbg.aTarget.array, b = dbg.aCenter.array
-  let tx0=1e9,tx1=-1e9,cx0=1e9,cx1=-1e9,same=0
-  for (let i=0;i<a.length;i+=3){
-    tx0=Math.min(tx0,a[i]); tx1=Math.max(tx1,a[i])
-    cx0=Math.min(cx0,b[i]); cx1=Math.max(cx1,b[i])
-    if (Math.abs(a[i]-b[i])<1e-6) same++
-  }
-  window.__dbg = { targetX:[+tx0.toFixed(3),+tx1.toFixed(3)],
-                   centerX:[+cx0.toFixed(3),+cx1.toFixed(3)],
-                   identicalVerts: same, totalVerts: a.length/3,
-                   targetsLoaded: !!(TARGETS && TARGETS.targets && TARGETS.targets.length),
-                   u: uniforms }
+  /* aTarget died with the sampled-cloud approach. This block still read it, so
+     build() threw a TypeError before loop() was ever called - the deployed page
+     rendered nothing and every screenshot of it was a stale cached build. */
+  window.__dbg = { pieces: byPiece.size, u: uniforms }
   stat.textContent = `${byPiece.size} кусков · ${count} примитивов`
   loop()
 } catch (e) { fail('build: ' + (e && e.message ? e.message : e)) } }
-fetch('./targets.json').then(r => r.json()).then(j => { TARGETS = j })
-  .catch(() => { TARGETS = null })
-  .finally(() => new GLTFLoader().load('./words.glb', build, undefined,
-                                       (e) => fail('GLB не загрузился: ' + e)))
+new GLTFLoader().load('./words.glb', build, undefined, (e) => fail('GLB не загрузился: ' + e))
 
 let damage = 0, target = 0, spin = 0, last = performance.now()
 slider.addEventListener('input', () => { target = parseFloat(slider.value) })

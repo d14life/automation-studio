@@ -227,7 +227,26 @@ function patch(mat, isCore) {
          which is what was letting far fragments blend over near ones and look like
          slabs floating in front of the letters. */
       vFade = 1.0;
-      float shrink = 1.0 - smoothstep(0.68, 1.0, t);
+      /* THE MATE'S SCALE IS THE COMPLEMENT OF ITS PARTNER'S - that is the whole trick,
+         and driving both off their own progress was the bug. Each word's own runs 0->1
+         over its half, so at the crossover BOTH mates were deep into their swap and
+         both shrank to nothing at the same moment: the frame emptied out however the
+         curve was shaped, because two things going to zero together cannot conserve
+         anything.
+
+         k is now computed ONCE from the global scroll and word B takes 1-k. Volume is
+         (1-k) for one and k for the other, which sums to exactly 1 at every point in
+         the scroll - there is never a frame with less rock than the frame before it.
+         The cube root is what makes that true in volume rather than in width: scale is
+         a length, and a rock at half scale is an EIGHTH of a rock.
+
+         lo staggers the moment each pair trades, and because a mate inherits its
+         partner's aTone the pair shares one lo - so one shrinks exactly as the other
+         grows, in the same place, in the same instant. */
+      float lo = 0.30 + aTone * 0.40;
+      float kA = smoothstep(lo, lo + 0.14, uMorph);
+      float k = mix(kA, 1.0 - kA, aWord);
+      float shrink = pow(1.0 - k, 0.3333);
       /* where the piece lives right now: its own word's slot, travelling to the slot
          the other word needs filled */
       vec3 home = mix(aCenter, aPartner, smoothstep(0.12, 1.0, t));
@@ -246,7 +265,7 @@ function patch(mat, isCore) {
          away and different ones appear" instead of as a transfer. The pieces drift on
          their own axis and trade in place. */
       vec3 transformed = home + R * (position - aCenter) * shrink
-                       + aSeed * fly * 0.20;
+                       + aSeed * fly * 0.11;
       /* vWorld was DECLARED in both shaders and NEVER ASSIGNED. Every triplanar
          lookup therefore sampled the same single texel, and the whole rock pack
          resolved to one flat colour multiply - which is why the surface still had
@@ -380,8 +399,12 @@ const build = (gltf) => { try {
     const v = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1)
     return v.lengthSq() < 1e-6 ? new THREE.Vector3(0, 1, 0) : v.normalize()
   }
-  A.forEach((m, i) => { m.mate = B[i % B.length]; m.s = dir(); m.t = Math.random() })
-  B.forEach((m, i) => { const a = A[i % A.length]; m.mate = a; m.s = a.s.clone(); m.t = a.t })
+  A.forEach((m) => { m.s = dir(); m.t = Math.random() })
+  A.forEach((m, i) => { m.mate = B[Math.floor(i * B.length / A.length)] })
+  B.forEach((m, i) => {
+    const a = A[Math.floor(i * A.length / B.length)]
+    m.mate = a; m.s = a.s.clone(); m.t = a.t
+  })
   for (const m of meta) m.p = m.mate.c
 
   for (const { pid, meshes, pb, c, w, p, s, t: tone } of meta) {
