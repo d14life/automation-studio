@@ -31,8 +31,8 @@ from mathutils.bvhtree import BVHTree
 SEED   = 7
 FONT_A = "/System/Library/Fonts/Supplemental/Arial Black.ttf"   # heavy, open counters
 FONT_B = "/System/Library/Fonts/Supplemental/Impact.ttf"
-OUT    = bpy.path.abspath("//words_v8.glb")
-META   = bpy.path.abspath("//words_v8.json")
+OUT    = bpy.path.abspath("//words_v10.glb")
+META   = bpy.path.abspath("//words_v10.json")
 
 bpy.ops.wm.read_factory_settings(use_empty=True)
 
@@ -130,7 +130,7 @@ def build_word(body, pieces, prefix, extrude, target_h, font, spacing=1.0, bold=
             hit = bvh.find_nearest(f.center)
             d = hit[3] if hit and hit[3] is not None else 9e9
             f.material_index = 0 if d < extrude * 0.14 else 1
-        roughen(me, extrude * 0.20)
+        roughen(me, extrude * 0.20, cuts=0)
         out.append(ob)
 
     bpy.data.objects.remove(src, do_unlink=True)
@@ -153,6 +153,11 @@ def roughen(me, amp, cuts=1):
     bm = bmesh.new(); bm.from_mesh(me)
     if cuts:
         bmesh.ops.subdivide_edges(bm, edges=bm.edges[:], cuts=cuts, use_grid_fill=True)
+    # cuts=0 now. The subdivision existed to give a SMOOTH noise field something to
+    # bend, and it tripled the mesh - which is the lag. cell_vector needs no such
+    # thing: it only needs a cell's vertices to fall in different lattice cells, so
+    # raising the frequency past the size of a fragment does the same job on the
+    # original vertices at a quarter of the geometry.
     # cell_vector, NOT noise. Smooth noise moves neighbouring vertices by nearly the
     # same amount, so the surface rolls - which is a wrinkled sponge, not a stone.
     # cell_vector is constant inside each cell of a lattice and jumps at the borders,
@@ -161,8 +166,8 @@ def roughen(me, amp, cuts=1):
     # broken rock actually is. Two frequencies: big planes, then small chips on them.
     for v in bm.verts:
         p = v.co.copy()
-        big = mnoise.cell_vector(p * 7.0)
-        chip = mnoise.cell_vector(p * 16.0)
+        big = mnoise.cell_vector(p * 42.0)
+        chip = mnoise.cell_vector(p * 95.0)
         v.co = p + big * amp + chip * (amp * 0.22)
     bm.normal_update()
     bm.to_mesh(me); bm.free()
