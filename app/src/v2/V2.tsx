@@ -213,7 +213,6 @@ const SRC_H264 =
 
    So: one file, both themes, one compositor filter. If a light version is ever wanted for real
    it is a re-render on a light set, not a grade and not a second download. */
-const SRC_LIGHT = SRC_H264
 
 /* RELOAD MUST START THE STRAND OVER. The browser restores scrollY on reload, which for an
    ordinary page is a kindness and for this one is a bug: the scroll is restored but the video
@@ -558,18 +557,13 @@ export default function V2() {
 
   const videoRef = useRef<HTMLVideoElement | null>(null)
 
-  useEffect(() => {
-    const el = videoRef.current
-    if (!el) return
-    const want = light ? SRC_LIGHT : SRC_H264
-    if (el.getAttribute('src') === want) return
-    const at = el.currentTime
-    el.setAttribute('src', want)
-    el.load()
-    /* the new file starts at 0; put it back where the strand was */
-    const restore = () => { try { el.currentTime = at } catch { /* not seekable yet */ } }
-    el.addEventListener('loadedmetadata', restore, { once: true })
-  }, [light])
+  /* THE THEME NO LONGER SWAPS THE FILE, and the machinery that used to is gone rather than
+     left dormant. SRC_LIGHT was defined as SRC_H264, so this effect compared the element's src
+     against the src it already had and returned on every single run - eleven lines that could
+     not fire. Dormant is not harmless here: had anyone ever pointed SRC_LIGHT at a real file,
+     a theme toggle would have called load() and thrown away both the scrub position and the
+     cached copy, which is exactly the download-on-toggle problem that killed the light file in
+     the first place. The reasoning for one file, both themes stays written above SRC_H264. */
   const stageRef = useRef<HTMLElement | null>(null)
   const scrollP = useRef(0)      /* progress through the runway, 0..1 */
   const offscreen = useRef(false) /* header fully scrolled away - stop burning battery */
@@ -628,6 +622,26 @@ export default function V2() {
           .catch(() => {})
       }
       el.addEventListener('progress', keep)
+    }
+
+    /* THE REF HANDS BACK A CLEANUP, and without it this function leaked. The strand is inside
+       {home && ...}, so every click into an inner page unmounts the <video> and every click
+       back mounts a new one - and the three window listeners above were added each time and
+       removed never. Measured before the fix: three round trips through the nav added nine
+       handlers and removed zero, each one holding a dead element and calling play() on it on
+       every subsequent click. Nothing looked broken; it just got heavier all evening, which is
+       the shape of a bug that shows up as "it was fine earlier".
+       React 19 lets a ref callback return its own teardown, so the listeners now live and die
+       with the element that needs them. The el.* listeners are collected with the element and
+       need no help. */
+    return () => {
+      removeEventListener('touchstart', arm)
+      removeEventListener('pointerdown', arm)
+      removeEventListener('click', arm)
+      /* React stops calling a ref with null once it has a cleanup to call instead, so clearing
+         the ref is now this function's job. Leaving it set would hand the scrub loop a detached
+         element to seek on. */
+      videoRef.current = null
     }
   }, [])
 
@@ -709,9 +723,10 @@ export default function V2() {
        actually scrolling there ((1 - idle) weight). At rest the anchors let go, so the loop
        plays even on the untouched hero: land at the top, the strand settles intact, then
        quietly starts building and unbuilding on its own. */
-    const DIAG = location.search.includes('loop=diag')
-    let reversed = false
-    let turnTimer = 0 as unknown as ReturnType<typeof setTimeout>
+    /* ?loop=diag is gone. It was the diagonal-continuation experiment, and when the turn was
+       rebuilt around the phase model its three variables were left behind reading a query
+       string nothing acted on - dead switches are worse than no switch, because the next
+       person to read this file spends ten minutes working out that the flag does nothing. */
     /* REDUCED MOTION HAS TO REACH THE IDLE LOOP, and until now it did not. The CSS
        collapses the scroll runway, which stops the SCRUB - but the strand also plays
        itself, and that loop runs off its own clock, not off scroll. A visitor who has
@@ -867,6 +882,9 @@ export default function V2() {
     return () => {
       alive = false
       cancelAnimationFrame(raf)
+      /* the blur is cleared by a timer, so an unmount mid-turn used to leave one in flight,
+         firing 200ms later against an element React had already taken away */
+      clearTimeout(flipTimer)
       removeEventListener('scroll', onScroll)
       removeEventListener('resize', onScroll)
       removeEventListener('touchstart', down)

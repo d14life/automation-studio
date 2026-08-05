@@ -566,3 +566,43 @@ legible at once — so if they are, one of 1 or 2 is lying. That is the crack.
   options on anything visual.
 - Commit early, push often. Commit messages on this repo are a full sentence
   describing what was learned, not a label.
+
+### 5.16 GitHub Pages resets every file's mtime on every deploy, so the 40MB video re-downloads
+
+Measured 5 August. Pages builds its ETag as `"mtime-size"`, and a deploy rewrites the mtime of
+files it never touched:
+
+| | ETag |
+|---|---|
+| before a deploy that did not touch the video | `"6a72a13a-2656316"` |
+| after it | `"6a72a2da-2656316"` |
+
+Same size, different mtime, therefore a different ETag, therefore the browser's HTTP cache is
+void and all 40MB come down again. `Cache-Control` is fixed at `max-age=600` and Pages does not
+let you change it, so **this cannot be fixed with configuration.**
+
+The fix is `app/public/sw.js`: Cache Storage is keyed by URL alone, so a deploy cannot evict it.
+Three properties keep it safe on a root scope shared with `index.html` — it intercepts only
+`/dna-loop*.mp4`, a cache miss does not call `respondWith` at all (so a first visit behaves
+exactly as before), and the copy is taken only once the video has fully buffered, when the bytes
+are still in the HTTP cache and the worker's fetch is local rather than a second download.
+Kill switch is written at the top of the file.
+
+### 5.17 The first screen was blank until 40MB arrived
+
+A `<video>` paints nothing until it can decode a frame. Three layers now, cheapest first: a
+300-byte inline JPEG of frame 0 as the video element's CSS background (no request, paints with
+the stylesheet), a 41KB `poster` preloaded from the `<head>`, then the real frame. The poster is
+on the element rather than in a layer of its own on purpose — `poster` obeys the element's
+`object-fit`/`object-position`, so it cannot produce the vertical seam that killed the canvas
+overlay (trap 5.5).
+
+### 5.18 The video ref callback leaked three window listeners per navigation
+
+The strand lives inside `{home && ...}`, so every click into an inner page unmounts it and every
+click back mounts a new one. The ref callback added `touchstart`/`pointerdown`/`click` each time
+and removed them never — measured at nine added and zero removed after three round trips, each
+handler holding a detached `<video>` and calling `play()` on it on every click. Fixed by
+returning a cleanup from the ref callback (React 19). **Note the consequence:** once a ref
+callback returns a cleanup, React stops calling it with `null`, so clearing `videoRef.current`
+became the cleanup's job.

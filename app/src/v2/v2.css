@@ -723,12 +723,6 @@ a.v2card{display:block;text-decoration:none;color:inherit;transition:border-colo
 a.v2card:hover{border-color:var(--accent)}
 a.v2card:hover .v2card__win{color:var(--accent)}
 
-/* ?loop=diag - his idea, off unless asked for. The return leg is turned 180 so the strand's
-   diagonal keeps travelling instead of visibly rewinding, and the one jump this creates is
-   masked by a short blur at the turn - fired only there, where the strand is already in pieces.
-   Both are compositor properties, so the experiment costs nothing to leave in. */
-.v2bg video.is-rev{transform:rotate(180deg)}
-
 /* THE TURN IS A 180 ROTATION, NOT A MIRROR - and the difference is the diagonal.
    scaleX(-1) flips the strand left-to-right, so an arch peaking top-right comes back
    peaking top-LEFT: the diagonal reverses and the eye reads it as the clip being
