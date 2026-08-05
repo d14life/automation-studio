@@ -325,6 +325,61 @@ html.v2light{--slogan:linear-gradient(100deg,#8A7261,#5C4536 46%,#33241A)}
   transform-origin:top;transform:scaleY(0);will-change:transform}
 .v2curtain.is-down{transform:scaleY(1)}
 
+/* ---------- the edge strips ----------
+   A centimetre of grey down each side that pops up on approach and walks the six pages.
+   34px is the centimetre: 96dpi CSS reckons 1cm at 37.8px, and 34 sits just inside it so the
+   strip reads as a margin rather than a column.
+
+   z-index 8 is deliberate and it is the whole reason the top-right theme switch still works:
+   the strips are full-height and the right one runs straight under the switch, which sits at
+   z-index 10. Below it, the click falls through to the switch. Above it, the switch would be
+   unreachable on every page - the same mistake the chapters made at z-index 20, and that one
+   cost an evening to find.
+
+   Only opacity transitions. The strip's width and the label's position are fixed; the label
+   fades and slides on a transform, which is a compositor property. A width transition here
+   would repaint a full-height fixed element on every mouse approach, over the top of a video
+   that is already the expensive thing on the page.
+
+   .28 at rest is not decoration - it is the affordance. Fully invisible and nobody ever finds
+   it; fully opaque and it competes with the strand for the first screen. */
+.v2edge{position:fixed;top:0;bottom:0;width:34px;z-index:8;
+  display:grid;place-items:center;text-decoration:none;
+  background:color-mix(in srgb, var(--ink) 7%, transparent);
+  opacity:.28;transition:opacity .3s cubic-bezier(.4,0,.2,1)}
+.v2edge--l{left:0;border-right:1px solid color-mix(in srgb, var(--ink) 10%, transparent)}
+.v2edge--r{right:0;border-left:1px solid color-mix(in srgb, var(--ink) 10%, transparent)}
+.v2edge:hover,.v2edge:focus-visible{opacity:1}
+.v2edge:focus-visible{outline:2px solid var(--ink);outline-offset:-4px}
+.v2edge:active{opacity:.7}
+
+/* The label reads bottom-to-top on the left and top-to-bottom on the right, so both run
+   towards the page rather than away from it. */
+.v2edge span{writing-mode:vertical-rl;color:var(--ink-soft);
+  font-size:11px;letter-spacing:.16em;text-transform:uppercase;white-space:nowrap;
+  opacity:0;transform:translateY(10px);
+  transition:opacity .3s cubic-bezier(.4,0,.2,1),transform .3s cubic-bezier(.4,0,.2,1)}
+.v2edge--l span{rotate:180deg}
+.v2edge:hover span,.v2edge:focus-visible span{opacity:1;transform:none}
+
+/* THE STRIPS HAVE TO BE GIVEN THEIR ROOM, or they lie on the text. .v2wrap pads by
+   clamp(16px,3vw,54px), and 3vw only clears the 34px strip above 1134px wide - at 1000px it is
+   30px and the strip covers the first four pixels of every heading, swallowing clicks on them.
+   Measured at 1280: text starts at 38px, 4px of clearance. So from 900px, where the strips
+   appear, the floor goes to 44px and the clearance is guaranteed at every width they exist at. */
+@media (min-width:900px){.v2wrap{padding-inline:clamp(44px,3vw,54px)}}
+
+/* Under 900px the strips go. 34px of a 390px screen is a tenth of the reading width, and the
+   left edge of a phone is the OS back gesture - ours would be fighting it on every swipe. */
+@media (max-width:900px){.v2edge{display:none}}
+
+/* Reduced motion keeps the strips, drops the slide - they are navigation, not an effect, so
+   removing them entirely would take away a way through the site. */
+@media (prefers-reduced-motion:reduce){
+  .v2edge,.v2edge span{transition:none}
+  .v2edge span{transform:none}
+}
+
 /* ---------- the sky toggle ----------
    His reference component, ported from styled-components to plain CSS. The markup and every
    number are the donor's; only the delivery changes, because this project animates with CSS
