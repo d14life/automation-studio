@@ -22,11 +22,16 @@ The v2 page (`app/src/v2/`) is a scroll-scrubbed DNA video header plus a content
 **Commit on `react` FIRST, then deploy.** The deploy is:
 
 ```bash
-git checkout main && git checkout react -- app docs && rm -rf app/dist && cd app && npm run build && cd .. && cp app/dist/v2.html index.html && cp app/dist/v2.html app/dist/sw.js app/dist/dna-poster.jpg . && cp app/dist/assets/v2-* assets/ && rsync -a --delete app/dist/demo/ demo/ && git add -A && git commit -m "deploy: <what>" && git push origin main && git checkout react
+git checkout main && git checkout react -- app docs && rm -rf app/dist && cd app && npm run build && cd .. && cp app/dist/v2.html index.html && cp app/dist/v2.html app/dist/sw.js app/dist/dna-poster.jpg . && cp app/dist/assets/* assets/ && rsync -a --delete app/dist/demo/ demo/ && git add -A && git commit -m "deploy: <what>" && git push origin main && git checkout react
 ```
 
-Three parts of that line are not optional, and each one has already gone wrong:
+Four parts of that line are not optional, and each one has already gone wrong:
 
+- **`cp app/dist/assets/* assets/`, never `assets/v2-*`** — that glob assumed the build
+  emits exactly one chunk. The moment anything is code-split the new chunk has its own name,
+  the glob skips it, and it 404s. `useCardTilt-IMDPqn_b.js` did exactly this: the module
+  import failed, React never mounted, and **the whole site went blank** while every check
+  that looked at `v2-*` passed. Copy everything the build emits.
 - **`cp app/dist/v2.html index.html`** — v2 IS the homepage. It still also publishes to
   `/v2.html` so old links keep working, but the root is the one visitors reach. Skip this
   and the site silently keeps serving the old page while you believe you deployed. The
