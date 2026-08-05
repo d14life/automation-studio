@@ -195,8 +195,25 @@ const SEEK_MS = 1000 / FPS
    hands back a sharp 1440p instead of a 47MB 4K file nobody should download. Every device ends
    up with real frames and a sane download, and Windows and Android are never asked for a codec
    they do not have. */
+/* ?bg=c and ?bg=e - a live A/B for the laptop tier, up while he judges it on the Windows
+   machine that lags. The clip that ships today is 2560x1440 all-intra at 27.6 Mbps, and that
+   number is the whole complaint: all-intra means the decoder rebuilds a FULL 1440p keyframe for
+   every seek, fifty times a second, and a laptop without the headroom this Mac has cannot keep
+   up. It is also 38MB to download before any of it moves.
+
+     measured here, same source, same encoder     size   decode     SSIM vs live
+     live    2560x1440                            38MB   303 fps    -
+     c       1920x1080                            22MB   647 fps    0.9924
+     e       1600x900                             15MB   757 fps    0.9900
+
+   Resolution buys more than bitrate does: c is 42% smaller AND decodes 2.1x faster. Both are
+   SSIM 0.99+ against the current file, which says the numbers cannot separate them - so his
+   eye does, on the machine that has the problem. Delete the loser and its file once chosen. */
+const BG = new URLSearchParams(location.search).get('bg')
 const SRC_H264 =
-  TIER === 'sm' ? '/dna-loop-sm.mp4?v=9'
+  BG === 'c' ? '/dna-loop-c.mp4'
+  : BG === 'e' ? '/dna-loop-e.mp4'
+  : TIER === 'sm' ? '/dna-loop-sm.mp4?v=9'
   : TIER === 'md' ? '/dna-loop.mp4?v=9'
   : '/dna-loop-hq.mp4?v=10'
 
