@@ -789,3 +789,12 @@ a.v2card:hover .v2card__win{color:var(--accent)}
 /* visually hidden but present for assistive tech and for focus */
 .v2sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
   clip-path:inset(50%);white-space:nowrap;border:0}
+
+
+/* THE MIRROR TURN - the version he approved. The reverse leg plays mirrored so the
+   strand keeps spinning the same way instead of visibly rewinding, and the flip is
+   spent at the destroyed end where a frame full of debris hides it. */
+.v2bg video{transition:filter .2s ease}
+.v2bg video.is-mir{transform:scaleX(-1)}
+.v2bg video.is-flip{filter:blur(10px)}
+@media (prefers-reduced-motion:reduce){.v2bg video.is-flip{filter:none}}

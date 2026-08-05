@@ -181,9 +181,9 @@ const SEEK_MS = 1000 / FPS
    up with real frames and a sane download, and Windows and Android are never asked for a codec
    they do not have. */
 const SRC_H264 =
-  TIER === 'sm' ? '/dna-loop-sm.mp4?v=12'
-  : TIER === 'md' ? '/dna-loop.mp4?v=12'
-  : '/dna-loop-hq.mp4?v=12'
+  TIER === 'sm' ? '/dna-loop-sm.mp4?v=9'
+  : TIER === 'md' ? '/dna-loop.mp4?v=9'
+  : '/dna-loop-hq.mp4?v=10'
 
 /* The light theme's own file, same tier, same 50fps, cut from the same 4K masters and graded
    for cream rather than inverted at runtime. Only ever downloaded if the visitor switches. */
@@ -686,6 +686,8 @@ export default function V2() {
        direct response to their own input, which is not what the setting is about);
        the self-playing loop does not. */
     const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches
+    let mirrored = false
+    let flipTimer = 0 as unknown as ReturnType<typeof setTimeout>
     let pos = 0      /* the frame on screen, 0..1 - DERIVED from phase, never set directly */
     let phase = 0    /* unbounded; pos is a triangle wave of it, so there is no boundary */
     let dir = 1    /* idle playback direction; scrubbing re-aims it so release carries on */
@@ -755,47 +757,40 @@ export default function V2() {
 
       /* No bell. It only ever existed to soften a turnaround, and there is no
          turnaround left - the strand never reverses. */
-      /* THE RETURN IS FAST, and that is the last honest option before new footage.
-         The clip cannot be cut into a loop: searching all 293x293 frame pairs across
-         three transforms, the best join anywhere is 3.7x a normal frame step, and every
-         good join lands on frame 1 - because this is a ONE-WAY transformation and
-         nothing near the destroyed end ever resembles anything else. There is no
-         invisible cut in this footage. That is measured, not assumed.
+      /* The speed bell: the loop rides |sin| of the phase, so it is naturally slowest
+         at each turnaround and the reversal has no corner in it. The 0.55 floor stops it
+         dwelling there, which was an earlier "it holds for half a second" complaint. */
+      const tri = ((phase % 2) + 2) % 2          /* 0..2, one full there-and-back */
+      const bell = Math.max(Math.abs(Math.sin(tri * Math.PI)), 0.55)
+      if (!REDUCE) phase += dir * (Math.PI / (2 * el.duration)) * LOOP_SPEED * bell * dt * idle
+      const t2 = ((phase % 2) + 2) % 2
+      pos = t2 <= 1 ? t2 : 2 - t2
 
-         So the reversal stays, but stops pretending to be forward motion. It runs at
-         2.6x on the way back, which is the visual language of a rewind rather than a
-         bounce: the strand snaps together quickly and then comes apart slowly again.
-         A cycle with a fast return reads as intentional; a slow one reads as a mistake. */
-      if (!REDUCE) phase += dir * (1 / el.duration) * LOOP_SPEED * dt * idle
-      /* NO BOUNCE. His call, and it decides which of two flawed things we live with.
-         The strand cannot both run forward forever AND avoid an edit: the footage is a
-         one-way take, so the only continuation that matches frame 293 is frame 292,
-         which IS the reverse. Choosing forward means accepting a join.
+      /* THE MIRROR TURN. Restored to exactly this, because this is the version he
+         approved on sight: "now they going up and down, this is great".
 
-         So the join was moved off the screen and into the FILE: 22 frames dissolve the
-         destroyed end back into the intact start, and the sequence closes on itself.
-         Measured after encoding, decoded live in a browser: the wrap is 1.8 against
-         ordinary frame steps of 0.96 and 2.13 - it sits BETWEEN two normal steps.
+         The return leg reads as a rewind because the strand visibly spins the other
+         way. A horizontal mirror flips perceived rotation, so a mirrored reverse leg
+         spins the SAME way as the forward leg and reads as the motion carrying on.
 
-         pos is simply the fractional part of phase now. The strand assembles, comes
-         apart, and flows back into itself forever, never reversing. dir still follows
-         the finger, so scrolling up runs the cycle backwards - equally seamless, since
-         a closed loop has no preferred direction. */
-      pos = ((phase % 1) + 1) % 1
+         The flip is spent at the DESTROYED end, never at the intact one. Measured
+         pixel difference argues the opposite - 24.6 at the intact end against 67.6 in
+         the debris - and that number is a trap: mirroring a clean recognisable helix is
+         instantly obvious however few pixels move, mirroring a cloud of debris is
+         invisible however many do.
 
-      /* NO FLIP OF ANY KIND right now, and the list of what was tried is worth keeping.
-         Mirroring reversed the diagonal, so the return leg read as a rewind. Rotating
-         180 fixed the diagonal but as an instant swap it was a hard cut. Animating that
-         rotation turned the whole frame, which swings the video's corners into view -
-         a rotating rectangle cannot fill a rectangle. A baked dissolve read as a fade
-         and a restart. Motion interpolation refused outright: asked to bridge a gap of
-         59.85 when a normal frame step is 8.6, it produced zero new frames, only exact
-         copies of the two ends.
-
-         What is left is his own idea and it is the right one: stop forcing the join at
-         293 -> 1 and find the two frames in the clip that genuinely match. Measured, the
-         best pair is 162 -> 1 at 26.29, which is 4.8x a normal step against the 8.4x
-         that 293 -> 1 costs. Better, not yet invisible - the search continues. */
+         Everything tried after this was worse and is not coming back: rotate 180 fixed
+         the diagonal but cut harder; animating that rotation swung the corners into
+         frame; a faster return read as a fault; the self-closing file read as a fade
+         and a restart. */
+      const nowMir = ((Math.floor(phase) % 2) + 2) % 2 === 1
+      if (!REDUCE && nowMir !== mirrored) {
+        mirrored = nowMir
+        el.classList.toggle('is-mir', mirrored)
+        el.classList.add('is-flip')
+        clearTimeout(flipTimer)
+        flipTimer = setTimeout(() => el.classList.remove('is-flip'), 200)
+      }
 
       if (dbg) dbg.textContent =
         `pos ${pos.toFixed(3)}  phase ${phase.toFixed(2)}  dir ${dir}  dp ${dp.toFixed(4)}` +
