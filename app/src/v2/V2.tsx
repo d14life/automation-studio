@@ -769,7 +769,11 @@ export default function V2() {
          bounce: the strand snaps together quickly and then comes apart slowly again.
          A cycle with a fast return reads as intentional; a slow one reads as a mistake. */
       const onReturn = (((phase % 2) + 2) % 2) > 1
-      const RETURN_SPEED = onReturn ? 2.6 : 1
+      /* 1, not 2.6. Speeding the return up was meant to read as a rewind; he saw it as
+         the strand "going quick and slow for some reason", which is the correct reading -
+         uneven speed with no cause on screen looks like a fault, not a device. Even
+         speed is the honest default. */
+      const RETURN_SPEED = onReturn ? 1 : 1
       if (!REDUCE) phase += dir * (Math.PI / (2 * el.duration)) * LOOP_SPEED * RETURN_SPEED * bell * dt * idle
       const t2 = ((phase % 2) + 2) % 2
       pos = t2 <= 1 ? t2 : 2 - t2
