@@ -213,6 +213,16 @@ const BG = new URLSearchParams(location.search).get('bg')
 const SRC_H264 =
   BG === 'c' ? '/dna-loop-c.mp4'
   : BG === 'e' ? '/dna-loop-e.mp4'
+  /* ?bg=g keeps the full 2560x1440 and every one of the 583 frames at the same crf 20, and is
+     18MB instead of 38 - the only change is a keyframe every 10 frames instead of every frame.
+     THE RISK IS REVERSE SCRUBBING, and it is the reason all-intra was picked originally: to
+     show frame n on an all-intra file the decoder does one decode, always. On a GOP file it
+     must start at the last keyframe and decode forward, so going BACKWARDS costs up to ten
+     decodes per frame shown - and this strand plays backwards half the time. Sequential decode
+     measures 25% FASTER than the live file (844 fps against 677), so if reversing does not
+     stutter on his machine this is the best trade on the table. That is a thing you feel, not
+     a thing a metric shows, which is why it ships as an option rather than a decision. */
+  : BG === 'g' ? '/dna-loop-g.mp4'
   : TIER === 'sm' ? '/dna-loop-sm.mp4?v=9'
   : TIER === 'md' ? '/dna-loop.mp4?v=9'
   : '/dna-loop-hq.mp4?v=10'
