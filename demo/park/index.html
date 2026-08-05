@@ -2004,6 +2004,14 @@ function printInvoice(id){
 $('#search').addEventListener('input',e=>{q=e.target.value.trim().toLowerCase();render();$('#search').focus();$('#search').value=e.target.value;});
 $('#search').addEventListener('keydown',e=>{if(e.key==='Escape'){e.target.value='';q='';render();}});
 load();
+/* AN EMPTY DEMO IS A BAD DEMO. A first-time visitor used to land on «Пока нет ни техники, ни
+   клиентов» and had to find a button before the product did anything - and inside the card on
+   the site, where the page is a picture, there is no way to press it at all. So the first ever
+   visit seeds itself.
+   Guarded on there being nothing stored, not on the db looking empty: someone who deliberately
+   wiped the demo, or who is part-way through entering their own units, must not have it grow
+   fake ones back under them on the next reload. */
+if(localStorage.getItem(KEY)===null){ db=genDemo(); save(); }
 applyPreset('m3');
 histUI();
 HIST.push({v:route.v,id:route.id}); HI=0;
