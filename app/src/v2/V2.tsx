@@ -181,9 +181,9 @@ const SEEK_MS = 1000 / FPS
    up with real frames and a sane download, and Windows and Android are never asked for a codec
    they do not have. */
 const SRC_H264 =
-  TIER === 'sm' ? '/dna-loop-sm.mp4?v=9'
-  : TIER === 'md' ? '/dna-loop.mp4?v=9'
-  : '/dna-loop-hq.mp4?v=10'
+  TIER === 'sm' ? '/dna-loop-sm.mp4?v=12'
+  : TIER === 'md' ? '/dna-loop.mp4?v=12'
+  : '/dna-loop-hq.mp4?v=12'
 
 /* The light theme's own file, same tier, same 50fps, cut from the same 4K masters and graded
    for cream rather than inverted at runtime. Only ever downloaded if the visitor switches. */
@@ -686,8 +686,6 @@ export default function V2() {
        direct response to their own input, which is not what the setting is about);
        the self-playing loop does not. */
     const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches
-    let mirrored = false
-    let flipTimer = 0 as unknown as ReturnType<typeof setTimeout>
     let pos = 0      /* the frame on screen, 0..1 - DERIVED from phase, never set directly */
     let phase = 0    /* unbounded; pos is a triangle wave of it, so there is no boundary */
     let dir = 1    /* idle playback direction; scrubbing re-aims it so release carries on */
@@ -755,8 +753,8 @@ export default function V2() {
          up" failure is structurally impossible in the phase model. */
       const idle = Math.max(0.22, Math.min(1, Math.max(0, (quiet - 0.02) / 0.12)))
 
-      const tri = ((phase % 2) + 2) % 2          /* 0..2, one full there-and-back */
-      const bell = Math.max(Math.abs(Math.sin(tri * Math.PI)), 0.55)
+      /* No bell. It only ever existed to soften a turnaround, and there is no
+         turnaround left - the strand never reverses. */
       /* THE RETURN IS FAST, and that is the last honest option before new footage.
          The clip cannot be cut into a loop: searching all 293x293 frame pairs across
          three transforms, the best join anywhere is 3.7x a normal frame step, and every
@@ -768,15 +766,22 @@ export default function V2() {
          2.6x on the way back, which is the visual language of a rewind rather than a
          bounce: the strand snaps together quickly and then comes apart slowly again.
          A cycle with a fast return reads as intentional; a slow one reads as a mistake. */
-      const onReturn = (((phase % 2) + 2) % 2) > 1
-      /* 1, not 2.6. Speeding the return up was meant to read as a rewind; he saw it as
-         the strand "going quick and slow for some reason", which is the correct reading -
-         uneven speed with no cause on screen looks like a fault, not a device. Even
-         speed is the honest default. */
-      const RETURN_SPEED = onReturn ? 1 : 1
-      if (!REDUCE) phase += dir * (Math.PI / (2 * el.duration)) * LOOP_SPEED * RETURN_SPEED * bell * dt * idle
-      const t2 = ((phase % 2) + 2) % 2
-      pos = t2 <= 1 ? t2 : 2 - t2
+      if (!REDUCE) phase += dir * (1 / el.duration) * LOOP_SPEED * dt * idle
+      /* NO BOUNCE. His call, and it decides which of two flawed things we live with.
+         The strand cannot both run forward forever AND avoid an edit: the footage is a
+         one-way take, so the only continuation that matches frame 293 is frame 292,
+         which IS the reverse. Choosing forward means accepting a join.
+
+         So the join was moved off the screen and into the FILE: 22 frames dissolve the
+         destroyed end back into the intact start, and the sequence closes on itself.
+         Measured after encoding, decoded live in a browser: the wrap is 1.8 against
+         ordinary frame steps of 0.96 and 2.13 - it sits BETWEEN two normal steps.
+
+         pos is simply the fractional part of phase now. The strand assembles, comes
+         apart, and flows back into itself forever, never reversing. dir still follows
+         the finger, so scrolling up runs the cycle backwards - equally seamless, since
+         a closed loop has no preferred direction. */
+      pos = ((phase % 1) + 1) % 1
 
       /* NO FLIP OF ANY KIND right now, and the list of what was tried is worth keeping.
          Mirroring reversed the diagonal, so the return leg read as a rewind. Rotating

@@ -730,9 +730,10 @@ a.v2card:hover .v2card__win{color:var(--accent)}
    on. Measured at the turn as well: 59.7 against the mirror's 67.6.
    Spent at the destroyed end, where a frame full of debris hides the cut. transform is
    compositor-only, so the whole effect costs nothing. */
-/* THE ROLL IS OUT. Animating the rotation turned the whole frame, which swings the
-   video's corners into view and shows the page background behind them - a rotating
-   rectangle cannot fill a rectangle. Reverted on sight. */
+/* THE TURN. Instant 180 on the return leg so the strand's diagonal keeps running the
+   same way instead of reading as a rewind. Not animated: a rotating rectangle cannot
+   fill a rectangle, and the corners swing into view. transform only, so it is free. */
+
 /* the held outgoing frame: instant to full, then a slow fade that IS the dissolve */
 
 

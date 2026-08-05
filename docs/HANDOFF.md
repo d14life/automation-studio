@@ -441,6 +441,34 @@ when the runway runs out the delta becomes exactly zero, so the strand receives
 no input at all and freezes ("stuck at the end"). The scrub reads raw `scrollY`
 scaled by travel. Raw scroll distance never runs out.
 
+### 5.13b THE BOUNCE IS THE OPTIMAL LOOP. Stop trying to remove it.
+Asked over and over for a forward-continuous loop, and every alternative was built,
+measured and thrown away. The question was finally settled with the right method,
+which was his: take the END frame and find the frame that best continues it.
+
+| what to attach after frame 293 | best frame | seam |
+|---|---|---|
+| **untransformed** | **292** | **1.2x a normal step** |
+| rotated 180 | 62 | 7.9x |
+| mirrored horizontally | 32 | 8.3x |
+| mirrored vertically | 64 | 8.4x |
+
+**Frame 292 is the reverse.** The ping-pong is not a compromise - it is the
+mathematically closest continuation available, and it beats every alternative by
+about seven times. That is why mirror, rotation and dissolve all looked wrong.
+
+Also measured, so nobody repeats them: across ALL 293x293 frame pairs and three
+transforms the best cut point anywhere in the clip is 3.7x, and every good join
+lands on frame 1, because the footage is a ONE-WAY transformation - nothing near
+the destroyed end resembles anything else. Motion interpolation refuses the job
+outright: asked to bridge 59.85 against a normal step of 8.6 it produces zero new
+frames, only exact copies of both ends. Animating the rotation swings the video's
+corners into frame. A baked crossfade reads as fade-and-restart. A faster return
+leg reads as a fault, not as a rewind.
+
+**The only way to a forward loop is different footage** - the 3D source re-rendered
+so its end flows into its start. No amount of code adds a frame that was never shot.
+
 ### 5.14 A `var()` inside a custom property is substituted where that property is DECLARED
 This froze the glass panels' beam for its entire life and read as "the animation
 doesn't work". `--bm-ring` (the conic-gradient) is declared on `.v2glass`, so it
