@@ -1,25 +1,37 @@
 """Fracture BOTH words and export them as one GLB.
 
-Run:  blender -b --python two_words.py
+Run:  blender -b --python two_words_v2.py
 
-Why this replaces the previous approach: scattering the 101's fragments onto
-points sampled from the Solutions surface produces a CLOUD, not a word. A cloud
-of debris arranged word-shaped still reads as debris - he saw it immediately.
+Two fixes over the previous version.
 
-The fix is that both ends must be real solid geometry. So "Solutions" is
-fractured exactly the way "101" is, and the page holds two meshes: the 101
-assembles at one end of the scroll and blows apart toward the middle, while
-Solutions arrives from its own explosion and assembles at the other end. Each
-word is genuinely solid because each is genuinely a fractured solid.
+THE COUNTS MUST MATCH. The 101 was fracturing into fewer cells than Solutions
+(271 against 327), and the page pairs one rock with one rock. Scrolling back
+toward the 101 every Solutions fragment shrinks, but there were not enough 101
+fragments to grow in their place, so the surplus simply vanished - which is
+exactly what it looked like. Solutions assembled perfectly because that
+direction IS one-to-one. Asking Blender for a number is only a request: cells
+whose seed lands in empty space between glyphs produce nothing and are dropped,
+and a wider-set word drops more of them. So instead of guessing the request,
+both words are fractured generously and then the longer list is MERGED down -
+the smallest cell is joined into its nearest neighbour, repeatedly, until the
+two counts are identical. Merging rather than deleting, because deleting a cell
+leaves a hole in a word that has to read as solid.
+
+BOLDNESS COMES FROM THE FONT, NOT FROM AN OFFSET. Fattening the outline with
+TextCurve.offset thickens the strokes but expands them INWARD as well, and it
+sealed the counter of the 0 into a hairline slit. Arial Black is genuinely
+heavy and its counters are drawn open, so the 101 gets weight without losing
+the hole.
 """
 import bpy, bmesh, random, json
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 
 SEED   = 7
-FONT   = "/System/Library/Fonts/Supplemental/Impact.ttf"
-OUT    = bpy.path.abspath("//words_flat.glb")
-META   = bpy.path.abspath("//words_flat.json")
+FONT_A = "/System/Library/Fonts/Supplemental/Arial Black.ttf"   # heavy, open counters
+FONT_B = "/System/Library/Fonts/Supplemental/Impact.ttf"
+OUT    = bpy.path.abspath("//words_v3.glb")
+META   = bpy.path.abspath("//words_v3.json")
 
 bpy.ops.wm.read_factory_settings(use_empty=True)
 
@@ -38,20 +50,25 @@ SKIN = mat("skin", (0.055, 0.075, 0.09, 1), 0.95, 0.24)
 CORE = mat("core", (0.10, 0.55, 0.85, 1), 0.25, 0.42, (0.30, 0.78, 1.0, 1), 2.6)
 
 
-def build_word(body, pieces, prefix, extrude, target_h):
-    """Extrude the text, fracture it into `pieces` Voronoi cells, return the objects."""
+def build_word(body, pieces, prefix, extrude, target_h, font, spacing=1.0, bold=0.0):
+    """Extrude the text, fracture it into Voronoi cells, return the objects."""
     bpy.ops.object.text_add()
     t = bpy.context.object
     t.data.body = body
     t.data.align_x = 'CENTER'; t.data.align_y = 'CENTER'
+    t.data.extrude = extrude
     # ANGULAR, NOT ROUND. A rounded bevel and 12-segment curves give fragments with
     # smooth curved faces, which read as pebbles. Real fractured stone is flat planes
     # meeting at sharp edges - so no bevel at all, and the glyph outlines are coarse
     # polygons rather than smooth curves.
     t.data.resolution_u = 2
-    t.data.extrude = extrude
+    t.data.space_character = spacing
+    # a little extra weight ON TOP of an already-heavy face. Safe here in a way it
+    # was not with Impact: Arial Black draws its counters wide enough that 0.018 of
+    # inward growth still leaves the 0 with a clear hole.
+    t.data.offset = bold
     try:
-        t.data.font = bpy.data.fonts.load(FONT)
+        t.data.font = bpy.data.fonts.load(font)
     except Exception:
         pass
     bpy.ops.object.convert(target='MESH')
@@ -114,20 +131,71 @@ def build_word(body, pieces, prefix, extrude, target_h):
         out.append(ob)
 
     bpy.data.objects.remove(src, do_unlink=True)
-
-    # centre the word on the origin
-    allv = [ob.matrix_world @ v.co for ob in out for v in ob.data.vertices]
-    c = sum(allv, Vector()) / len(allv)
-    for ob in out:
-        ob.location -= c
-    print(f"[words] {body}: {len(out)} pieces")
+    print(f"[words] {body}: {len(out)} raw cells")
     return out
 
 
+def centre_of(ob):
+    bb = [Vector(c) for c in ob.bound_box]
+    return sum(bb, Vector()) / len(bb)
+
+
+def bbox_volume(ob):
+    bb = [Vector(c) for c in ob.bound_box]
+    d = [max(v[i] for v in bb) - min(v[i] for v in bb) for i in range(3)]
+    return max(d[0], 1e-6) * max(d[1], 1e-6) * max(d[2], 1e-6)
+
+
+def merge_into_nearest(lst):
+    """Join the smallest cell into its nearest neighbour. One fewer piece, same solid."""
+    lst.sort(key=bbox_volume)
+    small = lst[0]
+    c0 = centre_of(small)
+    rest = lst[1:]
+    tgt = min(rest, key=lambda o: (centre_of(o) - c0).length_squared)
+    # every cell was created at the origin in word space, so the meshes share a frame
+    # and from_mesh APPENDS - no transform juggling needed
+    bm = bmesh.new()
+    bm.from_mesh(tgt.data)
+    bm.from_mesh(small.data)
+    bm.to_mesh(tgt.data)
+    bm.free()
+    bpy.data.objects.remove(small, do_unlink=True)
+    return rest
+
+
+def equalise(a, b):
+    """Merge the longer list down until both hold the same number of pieces."""
+    while len(a) != len(b):
+        if len(a) > len(b):
+            a = merge_into_nearest(a)
+        else:
+            b = merge_into_nearest(b)
+    print(f"[words] equalised to {len(a)} pieces each")
+    return a, b
+
+
+def recentre(objs):
+    allv = [ob.matrix_world @ v.co for ob in objs for v in ob.data.vertices]
+    c = sum(allv, Vector()) / len(allv)
+    for ob in objs:
+        ob.location -= c
+
+
 random.seed(SEED)
-a = build_word("101",       330, "a", 0.085, 0.58)
+a = build_word("101",       440, "a", 0.085, 0.62, FONT_A, spacing=1.06, bold=0.018)
 random.seed(SEED + 11)
-b = build_word("Solutions", 330, "b", 0.060, 0.40)
+b = build_word("Solutions", 330, "b", 0.060, 0.40, FONT_B)
+
+a, b = equalise(a, b)
+recentre(a); recentre(b)
+
+# the exporter takes names from the objects, and the page reads the a/b prefix off
+# them to tell the two words apart - so renumber after the merge or the ids collide
+for i, ob in enumerate(a):
+    ob.name = f"a{i:03d}"; ob.data.name = ob.name
+for i, ob in enumerate(b):
+    ob.name = f"b{i:03d}"; ob.data.name = ob.name
 
 for ob in a + b:
     ob.select_set(True)
