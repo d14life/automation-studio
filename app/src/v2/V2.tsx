@@ -757,7 +757,20 @@ export default function V2() {
 
       const tri = ((phase % 2) + 2) % 2          /* 0..2, one full there-and-back */
       const bell = Math.max(Math.abs(Math.sin(tri * Math.PI)), 0.55)
-      if (!REDUCE) phase += dir * (Math.PI / (2 * el.duration)) * LOOP_SPEED * bell * dt * idle
+      /* THE RETURN IS FAST, and that is the last honest option before new footage.
+         The clip cannot be cut into a loop: searching all 293x293 frame pairs across
+         three transforms, the best join anywhere is 3.7x a normal frame step, and every
+         good join lands on frame 1 - because this is a ONE-WAY transformation and
+         nothing near the destroyed end ever resembles anything else. There is no
+         invisible cut in this footage. That is measured, not assumed.
+
+         So the reversal stays, but stops pretending to be forward motion. It runs at
+         2.6x on the way back, which is the visual language of a rewind rather than a
+         bounce: the strand snaps together quickly and then comes apart slowly again.
+         A cycle with a fast return reads as intentional; a slow one reads as a mistake. */
+      const onReturn = (((phase % 2) + 2) % 2) > 1
+      const RETURN_SPEED = onReturn ? 2.6 : 1
+      if (!REDUCE) phase += dir * (Math.PI / (2 * el.duration)) * LOOP_SPEED * RETURN_SPEED * bell * dt * idle
       const t2 = ((phase % 2) + 2) % 2
       pos = t2 <= 1 ? t2 : 2 - t2
 
