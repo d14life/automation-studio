@@ -227,7 +227,12 @@ function patch(mat, isCore) {
          settles Solutions into place slowly instead of snapping shut. Density no longer
          depends on the two words overlapping - the mate's complement conserves the rock
          on its own - so there is nothing left to pay for the extra length. */
-      float g = smoothstep(0.0, 1.0, uMorph);
+      /* TWO EASES WERE STACKING. smoothstep here flattens both ends of the scroll AND
+         steepens the middle, and the break band below eases again inside that - so the
+         solid word held for ages and then the whole shatter was crammed into the fast
+         part. A third of a smoothstep keeps the gentle start that stops it firing on
+         the first pixel, without stealing the middle from the break. */
+      float g = mix(uMorph, smoothstep(0.0, 1.0, uMorph), 0.35);
       float own = mix(g, 1.0 - g, aWord);
       /* THE RUBBLE IS THE SHORTEST PART, NOT THE LONGEST. Feeding own straight into
          breakT spread the break across the entire scroll, so most of the travel was
@@ -235,7 +240,7 @@ function patch(mat, isCore) {
          gives the shape the effect should have: a long stretch where the 101 is whole
          and only cracking, a brief shatter, and a long stretch where Solutions is
          readable and settling. */
-      float t = breakT(aCenter, smoothstep(0.26, 0.84, own), uMinY, uMaxY);
+      float t = breakT(aCenter, smoothstep(0.12, 0.95, own), uMinY, uMaxY);
       vT = t; vTone = aTone;
       /* NO ALPHA. Fading one word out while the other faded in is what made the middle
          read as a transition between two unrelated objects sitting in different places.
@@ -285,7 +290,7 @@ function patch(mat, isCore) {
          base, early at the top, in step with the crack travelling down the letterform.
          Nothing is uncovered before the stone above it has moved out of the way. */
       vec3 hostC = mix(aCenter, aPartner, aWord);
-      float hostT = breakT(hostC, smoothstep(0.26, 0.84, g), uMinY, uMaxY);
+      float hostT = breakT(hostC, smoothstep(0.12, 0.95, g), uMinY, uMaxY);
       float lo = 0.10 + aTone * 0.16;
       float kA = smoothstep(lo, lo + 0.26, hostT);
       float k = mix(kA, 1.0 - kA, aWord);
@@ -317,8 +322,8 @@ function patch(mat, isCore) {
       vWorld = position;
     `)
     sh.vertexShader = sh.vertexShader.replace('#include <beginnormal_vertex>', `
-      float gn = smoothstep(0.0, 1.0, uMorph);
-      float tn = breakT(aCenter, smoothstep(0.26, 0.84, mix(gn, 1.0 - gn, aWord)), uMinY, uMaxY);
+      float gn = mix(uMorph, smoothstep(0.0, 1.0, uMorph), 0.35);
+      float tn = breakT(aCenter, smoothstep(0.12, 0.95, mix(gn, 1.0 - gn, aWord)), uMinY, uMaxY);
       float angn = pow(tn, 0.55) * (0.35 + aTone * 0.8);
       vec3 objectNormal = axisRot(normalize(aSeed + vec3(0.001)), angn) * normal;
       vLocalN = objectNormal;
