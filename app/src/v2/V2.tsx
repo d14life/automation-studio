@@ -389,21 +389,23 @@ function Enquiry() {
   const [contact, setContact] = useState('')
   const [pain, setPain] = useState('')
   const [err, setErr] = useState('')
+  const [bad, setBad] = useState<'' | 'name' | 'contact' | 'pain'>('')
   const [sent, setSent] = useState(false)
   const submit = (e: FormEvent) => {
     e.preventDefault()
     if (sent) return
-    if (!name.trim()) { setErr('Как к вам обращаться?'); return }
-    if (!/@|\+?\d{6,}|t\.me|^@?[a-zA-Z]\w{3,}$/.test(contact.trim())) { setErr('Оставьте телефон, почту или ник в Telegram — иначе мы не сможем ответить.'); return }
-    if (!pain.trim()) { setErr('Одной фразы достаточно — что отнимает время?'); return }
-    setErr('')
+    if (!name.trim()) { setErr('Как к вам обращаться?'); setBad('name'); return }
+    if (!/@|\+?\d{6,}|t\.me|^@?[a-zA-Z]\w{3,}$/.test(contact.trim())) { setErr('Оставьте телефон, почту или ник в Telegram — иначе мы не сможем ответить.'); setBad('contact'); return }
+    if (!pain.trim()) { setErr('Одной фразы достаточно — что отнимает время?'); setBad('pain'); return }
+    setErr(''); setBad('')
     const text = `Заявка с solutions101.net\nИмя: ${name}\nСвязь: ${contact}\nЧто нужно: ${what || '—'}\nБюджет: ${budget || '—'}\nСроки: ${when || '—'}\nЗадача: ${pain}`
     navigator.clipboard?.writeText(text).catch(() => {})
     setSent(true)
   }
   const chips = (list: string[], cur: string, set: (v: string) => void) => (
     <div className="v2chips">{list.map((c) => (
-      <button type="button" key={c} className={cur === c ? 'is-on' : ''} onClick={() => set(cur === c ? '' : c)}>{c}</button>
+      <button type="button" key={c} aria-pressed={cur === c}
+              className={cur === c ? 'is-on' : ''} onClick={() => set(cur === c ? '' : c)}>{c}</button>
     ))}</div>
   )
   if (sent) return (
@@ -418,13 +420,25 @@ function Enquiry() {
       <label className="v2form__l">Что нужно{chips(CHIP.what, what, setWhat)}</label>
       <label className="v2form__l">Бюджет{chips(CHIP.budget, budget, setBudget)}</label>
       <label className="v2form__l">Сроки{chips(CHIP.when, when, setWhen)}</label>
+      {/* A placeholder is not a label: it vanishes the moment typing starts and screen
+          readers treat it as a hint, not a name. Real labels, visually hidden, plus the
+          error tied to the field that actually failed rather than floating under the form. */}
       <div className="v2form__row">
-        <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Имя" autoComplete="name" />
-        <input value={contact} onChange={(e) => setContact(e.target.value)} placeholder="Телефон, почта или @telegram" autoComplete="tel" />
+        <label className="v2sr" htmlFor="v2-name">Имя</label>
+        <input id="v2-name" value={name} onChange={(e) => setName(e.target.value)}
+               placeholder="Имя" autoComplete="name" aria-required="true"
+               aria-invalid={bad === 'name'} aria-describedby={bad === 'name' ? 'v2-err' : undefined} />
+        <label className="v2sr" htmlFor="v2-contact">Телефон, почта или Telegram</label>
+        <input id="v2-contact" value={contact} onChange={(e) => setContact(e.target.value)}
+               placeholder="Телефон, почта или @telegram" autoComplete="tel" aria-required="true"
+               aria-invalid={bad === 'contact'} aria-describedby={bad === 'contact' ? 'v2-err' : undefined} />
       </div>
-      <textarea value={pain} onChange={(e) => setPain(e.target.value)} rows={3}
+      <label className="v2sr" htmlFor="v2-pain">Что делается руками</label>
+      <textarea id="v2-pain" value={pain} onChange={(e) => setPain(e.target.value)} rows={3}
+        aria-required="true" aria-invalid={bad === 'pain'}
+        aria-describedby={bad === 'pain' ? 'v2-err' : undefined}
         placeholder="Что делается руками? Например: «менеджер каждое утро сводит прайсы четырёх поставщиков в Excel»" />
-      {err && <p className="v2form__err" role="alert">{err}</p>}
+      {err && <p className="v2form__err" id="v2-err" role="alert">{err}</p>}
       <button className="v2btn v2btn--go" type="submit">Собрать заявку</button>
     </form>
   )
@@ -664,6 +678,14 @@ export default function V2() {
     const DIAG = location.search.includes('loop=diag')
     let reversed = false
     let turnTimer = 0 as unknown as ReturnType<typeof setTimeout>
+    /* REDUCED MOTION HAS TO REACH THE IDLE LOOP, and until now it did not. The CSS
+       collapses the scroll runway, which stops the SCRUB - but the strand also plays
+       itself, and that loop runs off its own clock, not off scroll. A visitor who has
+       asked the system for less motion was still handed a full-viewport video
+       animating on its own the moment the page opened. The scrub stays (it is a
+       direct response to their own input, which is not what the setting is about);
+       the self-playing loop does not. */
+    const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches
     let mirrored = false
     let flipTimer = 0 as unknown as ReturnType<typeof setTimeout>
     let pos = 0      /* the frame on screen, 0..1 - DERIVED from phase, never set directly */
@@ -735,7 +757,7 @@ export default function V2() {
 
       const tri = ((phase % 2) + 2) % 2          /* 0..2, one full there-and-back */
       const bell = Math.max(Math.abs(Math.sin(tri * Math.PI)), 0.55)
-      phase += dir * (Math.PI / (2 * el.duration)) * LOOP_SPEED * bell * dt * idle
+      if (!REDUCE) phase += dir * (Math.PI / (2 * el.duration)) * LOOP_SPEED * bell * dt * idle
       const t2 = ((phase % 2) + 2) % 2
       pos = t2 <= 1 ? t2 : 2 - t2
 
@@ -758,7 +780,7 @@ export default function V2() {
 
          transform and filter are compositor properties: this costs no decode and no paint. */
       const nowMir = ((Math.floor(phase) % 2) + 2) % 2 === 1
-      if (nowMir !== mirrored) {
+      if (!REDUCE && nowMir !== mirrored) {
         mirrored = nowMir
         el.classList.toggle('is-mir', mirrored)
         el.classList.add('is-flip')
@@ -836,6 +858,7 @@ export default function V2() {
 
       <label className="theme-switch">
         <input type="checkbox" className="theme-switch__checkbox"
+               aria-label="Светлая тема"
                checked={light} onChange={(e) => switchTheme(e.target.checked)} />
         <div className="theme-switch__container">
           <div className="theme-switch__clouds" />
@@ -883,7 +906,8 @@ export default function V2() {
       <section className="v2stage" ref={stageRef} style={{ height: `${RUNWAY * 100}svh` }}>
         <div className="v2pin">
           <div className="v2bg">
-            <video ref={nudge} src={SRC_H264} muted autoPlay playsInline preload="auto" />
+            <video ref={nudge} src={SRC_H264} muted autoPlay playsInline preload="auto"
+                   aria-hidden="true" tabIndex={-1} />
           </div>
 
           <div className="v2scrim" aria-hidden="true" />
@@ -979,7 +1003,7 @@ export default function V2() {
         {page === 'about' && <>
         <section className="v2sec" id="about"><div className="v2wrap">
           <p className="v2eyebrow">01 / Кто мы</p>
-          <h2 className="v2h2">Не консультируем. Делаем.</h2>
+          <h1 className="v2h2">Не консультируем. Делаем.</h1>
           <div className="v2two">
             <p>У конкурентов 30% практики и 70% теории. У нас — 100% практики: мы не продаём
                курсы и не пишем стратегии. Мы отдаём работающий инструмент, настроенный под
@@ -1015,7 +1039,7 @@ export default function V2() {
         {page === 'services' && (
         <section className="v2sec" id="services"><div className="v2wrap">
           <p className="v2eyebrow">01 / Услуги</p>
-          <h2 className="v2h2">По типу клиента, а не по технологии</h2>
+          <h1 className="v2h2">По типу клиента, а не по технологии</h1>
           <p className="v2lede">Найдите свою отрасль — задачи в ней мы уже решали или решаем.</p>
           {INDUSTRIES.map((ind) => (
             <div className="v2branch" key={ind.t}>
@@ -1033,7 +1057,7 @@ export default function V2() {
         {page === 'tools' && <>
         <section className="v2sec" id="tools"><div className="v2wrap">
           <p className="v2eyebrow">01 / Инструменты</p>
-          <h2 className="v2h2">Что можно взять по отдельности</h2>
+          <h1 className="v2h2">Что можно взять по отдельности</h1>
           <p className="v2lede">Каждый инструмент ставится сам по себе и работает без
              остальных. Цена зависит от объёма, поэтому она — вилка, а не «от»: бот на три
              сценария и бот, считающий по прайсу из 4000 позиций, — разные работы.</p>
@@ -1056,7 +1080,7 @@ export default function V2() {
         {page === 'works' && <>
         <section className="v2sec" id="works"><div className="v2wrap">
           <p className="v2eyebrow">01 / Работы</p>
-          <h2 className="v2h2">Что уже стоит и работает</h2>
+          <h1 className="v2h2">Что уже стоит и работает</h1>
           <div className="v2grid">
             <article className="v2card">
               <h3>Аукцион автозапчастей</h3>
@@ -1216,7 +1240,7 @@ export default function V2() {
         {page === 'contacts' && (
         <section className="v2sec" id="request"><div className="v2wrap">
           <p className="v2eyebrow">01 / Заявка</p>
-          <h2 className="v2h2">Расскажите, что делается руками</h2>
+          <h1 className="v2h2">Расскажите, что делается руками</h1>
           <p className="v2lede">Ответим в течение рабочего дня. Первый разговор — час,
              бесплатно, без обязательств.</p>
           <Enquiry />
