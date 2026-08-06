@@ -13,116 +13,6 @@
   @font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:400 700;font-display:swap;
     src:url(/fonts/jbmono-cyrillic.woff2) format('woff2')}
 
-/* ═══ ПОЛИТИКА АКЦЕНТА ════════════════════════════════════════════════════════
-   Янтарь делал семь работ одновременно - CTA, активная вкладка, серия столбиков, рампа
-   теплокарты, брусок брони, ховер строки и микрополоса загрузки. Семь работ = ноль сигнала.
-   Разрешён ТОЛЬКО на: заливке главной кнопки, активном состоянии навигации/сегмента и
-   линии «сегодня». Данные рисует плоская сталь. */
-tbody tr:hover{background:rgba(255,255,255,.035)}
-html.light tbody tr:hover{background:rgba(0,0,0,.035)}
-
-/* БОКОВЫЕ ПОЛОСКИ УБРАНЫ. На 17 карточках подряд цветная полоска слева - это уже обои,
-   а не сигнал: она стояла и на каждом KPI, и на каждом алерте. */
-.kpi .k::before,.note::before{display:none}
-.note{padding-left:var(--s3)}
-
-/* НАДЗАГОЛОВКИ БЕЗ КАПСА. Капс по-русски читается заметно хуже - «КОМПРЕССОР 5 М³/МИН»
-   тому доказательство - и остаётся только на микроподписях в 11px. */
-.caps{text-transform:none;letter-spacing:0;font:600 12px/1.45 var(--ui);color:var(--dim)}
-
-/* РАДИУС: одна политика на весь файл, переопределяет всё, что накопилось раньше */
-.card,.kpi,.modal>div,.seg,.btn,input,select,textarea,.f input,.f select,.f textarea{border-radius:var(--r-panel)}
-.chip,.badge,.tag,table.heat td i,.lg{border-radius:var(--r-mark)}
-.btn{min-height:38px}
-.dot,.avatar{border-radius:999px}
-
-/* ГЛУБИНА ТОНОМ, А НЕ ЛИНИЕЙ - три ступени поверхности, границ почти нет.
-   Референс: тональные почти-чёрные поверхности, глубина тоном, а не тенью. */
-.card,.kpi{background:var(--panel);border:1px solid transparent;box-shadow:none}
-html.light .card,html.light .kpi{border-color:var(--lc)}
-
-
-/* ПЕРЕКЛЮЧАТЕЛЬ ТЕМЫ. Светлой темы не было вообще - только @media print, где акцент
-   вычищался в чёрный, то есть бренд исчезал ровно на том листе, который клиент уносит. */
-.thm{display:inline-flex;align-items:center;gap:6px;background:var(--panel2);border:var(--line);
-  border-radius:var(--r-panel);padding:3px;flex:none}
-.thm button{border:0;background:transparent;color:var(--dim);padding:5px 10px;border-radius:var(--r-mark);
-  cursor:pointer;font:500 12px/1 var(--ui)}
-.thm button[aria-pressed="true"]{background:var(--acc);color:var(--on-acc);font-weight:600}
-
-/* ── графики: марки данных, а не украшения ─────────────────────────────────── */
-:root{--cost:#3A3D31}          /* расходы: тёмный нейтральный, читается как «съедено» */
-html.light{--cost:#C4CBD1}
-.chart .gl{stroke:var(--lc)}
-.chart .gz{stroke:var(--dim);stroke-width:1}
-.chart .ax.pt{fill:var(--dim);font-size:11px}
-.lgn{color:var(--dim);margin-left:16px;font-size:12px}
-.chart .bl{fill:var(--text);font:600 13px/1 var(--mono);font-variant-numeric:tabular-nums}
-.chart .bm{fill:var(--dim);font:500 11px/1 var(--ui)}
-.chnote{color:var(--dim);font-size:12px;padding:2px 2px 6px}
-/* ЗАЛИВКА СТОЛБИКА ПЛОСКАЯ. Была linear-gradient(180deg,#F5A524,rgba(245,165,36,.3)) -
-   низ растворялся ровно там, где глаз меряет высоту, то есть градиент стоял против
-   единственной задачи столбика. */
-/* ── графики (наследие) ──────────────────────────────────────────────────────────────
-   preserveAspectRatio="none" on the SVG means the viewBox stretches to whatever width the card
-   has, so a fixed aspect-ratio here is what stops it squashing to a stripe on a wide screen. */
-.chart{padding:var(--s4) var(--s4) var(--s2)}
-.chart svg{display:block;width:100%;height:auto;aspect-ratio:1000/250;overflow:visible}
-.chart svg text{font-family:var(--ui);letter-spacing:0}
-.chart .ax{fill:var(--dim);font-size:12px}
-.chart .dnum{fill:var(--text);font-size:26px;font-weight:600;font-family:var(--mono)}
-/* полоса-цель во всю высоту: попасть в неё курсором легче, чем в столбик шириной 8px */
-.hz{cursor:crosshair}
-.hz:hover{fill:var(--tint)}
-.crosshair{opacity:0;transition:opacity .12s ease}
-.chart svg:hover .crosshair{opacity:1}
-.lgs{display:flex;align-items:center;color:var(--dim);font-size:12.5px}
-.lg{display:inline-block;width:11px;height:11px;border-radius:3px;margin:0 6px 0 16px;
-  vertical-align:-1px}
-.lg--dot{width:9px;height:9px;border-radius:50%}
-.lg--ramp{width:74px;height:9px;border-radius:5px;margin:0 8px;
-  background:linear-gradient(90deg,var(--tint),rgba(245,165,36,.35),#F5A524)}
-
-/* донат: пропорция за один взгляд, точные числа - в легенде справа и в таблице ниже */
-.chart--mix{display:flex;gap:26px;align-items:center;flex-wrap:wrap}
-.chart--mix svg{flex:0 0 260px;width:260px;aspect-ratio:1}
-.chart--mix .sl{transition:opacity .16s ease}
-.chart--mix svg:hover .sl{opacity:.45}
-.chart--mix svg .sl:hover{opacity:1}
-.lgd{flex:1 1 260px;min-width:240px;display:flex;flex-direction:column;gap:9px}
-.lrow{display:flex;align-items:center;gap:9px;font-size:13px}
-.lrow i{width:11px;height:11px;border-radius:3px;flex:0 0 auto}
-.lrow .lt{flex:1 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.lrow b{flex:0 0 42px;text-align:right}
-.lrow .dim{flex:0 0 108px;text-align:right;font-size:12px}
-
-/* теплокарта: одна ячейка = единица за период. Сетка, а не 300 отдельных SVG. */
-.chart--heat{overflow-x:auto}
-/* table-layout:fixed - иначе колонки с подписью месяца становятся шире соседних, и решётка
-   выглядит рваной: ширину задаёт содержимое заголовка, а не данные */
-table.heat{border-collapse:separate;border-spacing:2px;width:100%;min-width:520px;
-  table-layout:fixed}
-table.heat th:first-child,table.heat td:first-child{width:168px}
-table.heat th{font-weight:400;color:var(--dim);font-size:11px;text-align:center;padding:0}
-table.heat tbody th{text-align:left;white-space:nowrap;padding-right:10px;font-size:12px;
-  max-width:170px;overflow:hidden;text-overflow:ellipsis}
-table.heat td{padding:0}
-table.heat td i{display:block;height:20px;border-radius:3px;min-width:9px}
-table.heat td i:hover{outline:2px solid var(--text);outline-offset:-1px}
-
-/* одна подсказка на все графики: 300 ячеек с нативным title - это 300 узлов и задержка
-   браузера в секунду перед показом */
-#tip{position:fixed;z-index:90;pointer-events:none;opacity:0;transform:translate(-50%,-140%);
-  background:var(--panel2);border:var(--line);border-radius:var(--r-panel);padding:7px 10px;font-size:12.5px;
-  color:var(--text);box-shadow:0 10px 30px rgba(0,0,0,.55);white-space:nowrap;
-  transition:opacity .1s ease}
-#tip.on{opacity:1}
-
-/* теплокарта заменила полосу загрузки: та показывала парк одним числом за период, а вопрос
-   владельца - какая ИМЕННО единица простаивает. */
-@media (prefers-reduced-motion:reduce){
-  .crosshair,.chart--mix .sl,#tip{transition:none}
-}
 </style>
 
 <meta charset="utf-8">
@@ -420,6 +310,182 @@ tr.clk:hover td:first-child{box-shadow:inset 2px 0 0 var(--acc)}
   .doc .meta{font-size:10pt;margin:1mm 0}
   .doc hr{border:0;border-top:2px solid #000;margin:3mm 0}
   .pb{page-break-after:always}
+}
+/* ═══ ПОЛИТИКА АКЦЕНТА ════════════════════════════════════════════════════════
+   Янтарь делал семь работ одновременно - CTA, активная вкладка, серия столбиков, рампа
+   теплокарты, брусок брони, ховер строки и микрополоса загрузки. Семь работ = ноль сигнала.
+   Разрешён ТОЛЬКО на: заливке главной кнопки, активном состоянии навигации/сегмента и
+   линии «сегодня». Данные рисует плоская сталь. */
+tbody tr:hover{background:rgba(255,255,255,.035)}
+html.light tbody tr:hover{background:rgba(0,0,0,.035)}
+
+/* БОКОВЫЕ ПОЛОСКИ УБРАНЫ. На 17 карточках подряд цветная полоска слева - это уже обои,
+   а не сигнал: она стояла и на каждом KPI, и на каждом алерте. */
+.kpi .k::before,.note::before{display:none}
+.note{padding-left:var(--s3)}
+
+/* НАДЗАГОЛОВКИ БЕЗ КАПСА. Капс по-русски читается заметно хуже - «КОМПРЕССОР 5 М³/МИН»
+   тому доказательство - и остаётся только на микроподписях в 11px. */
+.caps{text-transform:none;letter-spacing:0;font:600 12px/1.45 var(--ui);color:var(--dim)}
+
+/* РАДИУС: одна политика на весь файл, переопределяет всё, что накопилось раньше */
+.card,.kpi,.modal>div,.seg,.btn,input,select,textarea,.f input,.f select,.f textarea{border-radius:var(--r-panel)}
+.chip,.badge,.tag,table.heat td i,.lg{border-radius:var(--r-mark)}
+.btn{min-height:38px}
+.dot,.avatar{border-radius:999px}
+
+/* ГЛУБИНА ТОНОМ, А НЕ ЛИНИЕЙ - три ступени поверхности, границ почти нет.
+   Референс: тональные почти-чёрные поверхности, глубина тоном, а не тенью. */
+.card,.kpi{background:var(--panel);border:1px solid transparent;box-shadow:none}
+html.light .card,html.light .kpi{border-color:var(--lc)}
+
+
+/* ПЕРЕКЛЮЧАТЕЛЬ ТЕМЫ. Светлой темы не было вообще - только @media print, где акцент
+   вычищался в чёрный, то есть бренд исчезал ровно на том листе, который клиент уносит. */
+.thm{display:inline-flex;align-items:center;gap:6px;background:var(--panel2);border:var(--line);
+  border-radius:var(--r-panel);padding:3px;flex:none}
+.thm button{border:0;background:transparent;color:var(--dim);padding:5px 10px;border-radius:var(--r-mark);
+  cursor:pointer;font:500 12px/1 var(--ui)}
+.thm button[aria-pressed="true"]{background:var(--acc);color:var(--on-acc);font-weight:600}
+
+/* ═══ A+B · ДОСКА И ПРИБОРКА ══════════════════════════════════════════════════
+   Структура взята из направления A, ГОЛОС - нет. Мокап A нарисован моноширинным и
+   капсом на нейтральном чёрном с сигнальным жёлтым - это ровно пять признаков
+   складского сканера, который стоит на соседнем демо. Здесь та же доска говорит
+   на Golos, обычным регистром, по тёплому графиту: моноширинный оставлен цифрам. */
+.foot4{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--lc);
+  border:var(--line);border-radius:var(--r-panel);overflow:hidden;margin-top:var(--s4)}
+.foot4>div{background:var(--panel);padding:var(--s3) var(--s4)}
+.foot4 s{display:block;text-decoration:none;font:500 12px/1.45 var(--ui);color:var(--dim);margin-bottom:2px}
+.foot4 b{font:600 19px/1.25 var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.foot4 b.dgr{color:var(--danger)}
+@media(max-width:720px){.foot4{grid-template-columns:repeat(2,1fr)}}
+
+.clusection{margin-top:var(--s5)}
+.clu{border:var(--line);border-radius:var(--r-panel);background:var(--panel);overflow:hidden}
+/* ОДНО ЧИСЛО ВО ВЕСЬ БЛОК - это и есть ДНК приборки: читается за полсекунды, всё
+   остальное вторично и набрано мельче. 25px - верхняя ступень шкалы, здесь она
+   единственный раз выходит за неё, потому что это главный прибор экрана. */
+.clu__main{padding:var(--s5) var(--s4) var(--s4);text-align:center}
+.clu__big{font:600 44px/1 var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.02em;color:var(--acc)}
+.clu__big s{text-decoration:none;font:500 15px/1 var(--ui);color:var(--dim);margin-left:8px}
+.clu__sub{font:500 13px/1.5 var(--ui);color:var(--dim);margin-top:var(--s2)}
+.clu__arc{height:8px;margin:var(--s4) auto 0;max-width:520px;background:var(--inset);
+  border-radius:999px;overflow:hidden}
+.clu__arc i{display:block;height:100%;background:var(--steel);border-radius:999px;
+  transition:width .25s cubic-bezier(.2,.8,.2,1)}
+.clu__scale{display:flex;justify-content:space-between;max-width:520px;margin:6px auto 0;
+  font:500 11px/1.4 var(--ui);color:var(--dim)}
+.clu__gau{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--lc);
+  border-top:var(--line)}
+.clu__gau>div{background:var(--panel);padding:var(--s3) var(--s4)}
+.clu__gau s{display:block;text-decoration:none;font:500 12px/1.45 var(--ui);color:var(--dim);margin-bottom:2px}
+.clu__gau b{font:600 17px/1.3 var(--mono);font-variant-numeric:tabular-nums}
+.clu__gau b.dgr{color:var(--danger)}
+@media(max-width:720px){.clu__gau{grid-template-columns:repeat(2,1fr)}.clu__big{font-size:34px}}
+.clu__warn{display:flex;align-items:center;gap:var(--s3);flex-wrap:wrap;
+  padding:var(--s3) var(--s4);border-top:var(--line)}
+/* СТАТУС НИКОГДА НЕ ОДНИМ ЦВЕТОМ - иконка и текст рядом, иначе дальтоник читает пустоту */
+.cw{display:inline-flex;align-items:center;gap:6px;font:500 13px/1.4 var(--ui)}
+.cw svg{flex:none}
+.cw--ok{color:var(--dim)}
+.cw--soon{color:var(--warn)}
+.cw--due{color:var(--danger)}
+.clu__warn .btn{margin-left:auto}
+
+/* ВЫБРАННАЯ ДОРОЖКА. Янтарь по политике акцента разрешён на активном состоянии - это оно. */
+.grow.is-sel .gname{box-shadow:inset 3px 0 0 0 var(--acc)}
+.grow.is-sel{background:var(--tint)}
+.gname .un a{cursor:pointer}
+@media (prefers-reduced-motion:reduce){.clu__arc i{transition:none}}
+
+/* ДОСКА ЧИТАЕТСЯ, А НЕ УГАДЫВАЕТСЯ. Брусок брони стоял на var(--panel3) с янтарной
+   кромкой: на тёмном фоне это почти сама панель, и дорожка выглядела пустой даже там,
+   где машина работает. Янтарь при этом делал седьмую работу подряд, вопреки политике.
+   Теперь занятость - статус: работает / завершено / ремонт, каждый со своим тоном и
+   подписью, а янтарь остаётся кнопке, активной дорожке и линии «сегодня». */
+.gbar{background:color-mix(in oklab,var(--ok) 26%,var(--panel));
+  box-shadow:inset 0 0 0 1px color-mix(in oklab,var(--ok) 42%,transparent),
+             inset 3px 0 0 0 var(--ok);border-radius:var(--r-mark)}
+.gbar:hover{background:color-mix(in oklab,var(--ok) 38%,var(--panel))}
+.gbar.past{background:var(--inset);color:var(--muted);
+  box-shadow:inset 0 0 0 1px var(--tint2),inset 3px 0 0 0 var(--steel)}
+.gbar.clash{box-shadow:inset 0 0 0 1px var(--danger),inset 3px 0 0 0 var(--danger)}
+/* микрополоса загрузки - сталь, не янтарь: это данные, а не действие */
+.um i,.um b+div>i,.gname .um i{background:var(--steel)!important}
+
+/* ── графики: марки данных, а не украшения ─────────────────────────────────── */
+:root{--cost:#3A3D31}          /* расходы: тёмный нейтральный, читается как «съедено» */
+html.light{--cost:#C4CBD1}
+.chart .gl{stroke:var(--lc)}
+.chart .gz{stroke:var(--dim);stroke-width:1}
+.chart .ax.pt{fill:var(--dim);font-size:11px}
+.lgn{color:var(--dim);margin-left:16px;font-size:12px}
+.chart .bl{fill:var(--text);font:600 13px/1 var(--mono);font-variant-numeric:tabular-nums}
+.chart .bm{fill:var(--dim);font:500 11px/1 var(--ui)}
+.chnote{color:var(--dim);font-size:12px;padding:2px 2px 6px}
+/* ЗАЛИВКА СТОЛБИКА ПЛОСКАЯ. Была linear-gradient(180deg,#F5A524,rgba(245,165,36,.3)) -
+   низ растворялся ровно там, где глаз меряет высоту, то есть градиент стоял против
+   единственной задачи столбика. */
+/* ── графики (наследие) ──────────────────────────────────────────────────────────────
+   preserveAspectRatio="none" on the SVG means the viewBox stretches to whatever width the card
+   has, so a fixed aspect-ratio here is what stops it squashing to a stripe on a wide screen. */
+.chart{padding:var(--s4) var(--s4) var(--s2)}
+.chart svg{display:block;width:100%;height:auto;aspect-ratio:1000/250;overflow:visible}
+.chart svg text{font-family:var(--ui);letter-spacing:0}
+.chart .ax{fill:var(--dim);font-size:12px}
+.chart .dnum{fill:var(--text);font-size:26px;font-weight:600;font-family:var(--mono)}
+/* полоса-цель во всю высоту: попасть в неё курсором легче, чем в столбик шириной 8px */
+.hz{cursor:crosshair}
+.hz:hover{fill:var(--tint)}
+.crosshair{opacity:0;transition:opacity .12s ease}
+.chart svg:hover .crosshair{opacity:1}
+.lgs{display:flex;align-items:center;color:var(--dim);font-size:12.5px}
+.lg{display:inline-block;width:11px;height:11px;border-radius:3px;margin:0 6px 0 16px;
+  vertical-align:-1px}
+.lg--dot{width:9px;height:9px;border-radius:50%}
+.lg--ramp{width:74px;height:9px;border-radius:5px;margin:0 8px;
+  background:linear-gradient(90deg,var(--tint),rgba(245,165,36,.35),#F5A524)}
+
+/* донат: пропорция за один взгляд, точные числа - в легенде справа и в таблице ниже */
+.chart--mix{display:flex;gap:26px;align-items:center;flex-wrap:wrap}
+.chart--mix svg{flex:0 0 260px;width:260px;aspect-ratio:1}
+.chart--mix .sl{transition:opacity .16s ease}
+.chart--mix svg:hover .sl{opacity:.45}
+.chart--mix svg .sl:hover{opacity:1}
+.lgd{flex:1 1 260px;min-width:240px;display:flex;flex-direction:column;gap:9px}
+.lrow{display:flex;align-items:center;gap:9px;font-size:13px}
+.lrow i{width:11px;height:11px;border-radius:3px;flex:0 0 auto}
+.lrow .lt{flex:1 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lrow b{flex:0 0 42px;text-align:right}
+.lrow .dim{flex:0 0 108px;text-align:right;font-size:12px}
+
+/* теплокарта: одна ячейка = единица за период. Сетка, а не 300 отдельных SVG. */
+.chart--heat{overflow-x:auto}
+/* table-layout:fixed - иначе колонки с подписью месяца становятся шире соседних, и решётка
+   выглядит рваной: ширину задаёт содержимое заголовка, а не данные */
+table.heat{border-collapse:separate;border-spacing:2px;width:100%;min-width:520px;
+  table-layout:fixed}
+table.heat th:first-child,table.heat td:first-child{width:168px}
+table.heat th{font-weight:400;color:var(--dim);font-size:11px;text-align:center;padding:0}
+table.heat tbody th{text-align:left;white-space:nowrap;padding-right:10px;font-size:12px;
+  max-width:170px;overflow:hidden;text-overflow:ellipsis}
+table.heat td{padding:0}
+table.heat td i{display:block;height:20px;border-radius:3px;min-width:9px}
+table.heat td i:hover{outline:2px solid var(--text);outline-offset:-1px}
+
+/* одна подсказка на все графики: 300 ячеек с нативным title - это 300 узлов и задержка
+   браузера в секунду перед показом */
+#tip{position:fixed;z-index:90;pointer-events:none;opacity:0;transform:translate(-50%,-140%);
+  background:var(--panel2);border:var(--line);border-radius:var(--r-panel);padding:7px 10px;font-size:12.5px;
+  color:var(--text);box-shadow:0 10px 30px rgba(0,0,0,.55);white-space:nowrap;
+  transition:opacity .1s ease}
+#tip.on{opacity:1}
+
+/* теплокарта заменила полосу загрузки: та показывала парк одним числом за период, а вопрос
+   владельца - какая ИМЕННО единица простаивает. */
+@media (prefers-reduced-motion:reduce){
+  .crosshair,.chart--mix .sl,#tip{transition:none}
 }
 </style>
 </head>
@@ -1052,7 +1118,10 @@ function loadDemo(){
    only three that matter in the first ten seconds - what did the park earn, how hard is it
    working, and what is on fire - and it is also what the card on the site now shows, because
    that card is a live frame of this page. */
-let route={v:'analytics'};
+/* ГЕРОЙ ЭКРАНА - ЗАНЯТОСТЬ ПО ДНЯМ, а не строка KPI. Демо открывалось на аналитике, то
+   есть на шести числах в рамках; 20% загрузки в строке KPI надо осмыслить, те же 20%
+   дырявыми дорожками бьют сразу. Направление A. */
+let route={v:'cal'};
 let q='';
 let calMonth=monthStart(today());
 let periodFrom=monthStart(addDays(today(),-60)), periodTo=today();
@@ -1122,6 +1191,62 @@ function dayRuns(set){
   arr.forEach(d=>{const l=out[out.length-1]; if(l&&addDays(l[1],1)===d)l[1]=d; else out.push([d,d]);});
   return out;
 }
+/* ── B · ПРИБОРНАЯ ПАНЕЛЬ ВЫБРАННОЙ ЕДИНИЦЫ ────────────────────────────────
+   ДНК приборки самой машины: одно число во весь блок, шкала под ним, три вторичных
+   прибора и строка предупреждений. Клик по дорожке доски меняет её - доска отвечает
+   «где всё стоит», приборка «а что с этой». Всё считается теми же unitEcon/toStatus,
+   которыми живут остальные экраны, поэтому разойтись в цифрах они не могут. */
+let selUnit=null;
+function cluster(from,to){
+  const live=db.units.filter(u=>!u.archived);
+  if(!live.length) return '';
+  if(!selUnit||!live.some(u=>u.id===selUnit)) selUnit=live[0].id;
+  const u=unit(selUnit), e=unitEcon(selUnit,from,to), ts=toStatus(selUnit);
+  const hrs=unitHoursIn(selUnit,from,to);
+  const k=Math.max(0,Math.min(1,e.ut.k));
+  /* шкала - доля периода, которую машина отработала; она же объясняет число над ней */
+  const warn=[];
+  if(ts.due) warn.push({t:'ТО просрочено на '+Math.abs(ts.left)+' м/ч',lvl:'due'});
+  else if(ts.soon) warn.push({t:'ТО через '+ts.left+' м/ч'+(ts.etaDate?' — ориентировочно '+dmy(ts.etaDate):''),lvl:'soon'});
+  else warn.push({t:'ТО через '+ts.left+' м/ч',lvl:'ok'});
+  if(u.insTo) warn.push({t:'страховка до '+dmy(u.insTo),lvl:u.insTo<today()?'due':'ok'});
+  return '<div class="hd"><h2>Приборная панель</h2><span class="lgn">'+esc(u.name)+' · выбирается кликом по дорожке</span></div>'+
+  '<div class="clu">'+
+    '<div class="clu__main">'+
+      '<div class="clu__big"><b>'+fmt(hrs,1)+'</b><s>м/ч</s></div>'+
+      '<div class="clu__sub">наработка за период · '+esc(u.type||'—')+'</div>'+
+      '<div class="clu__arc" role="img" aria-label="Загрузка '+Math.round(k*100)+' процентов"><i style="width:'+(k*100).toFixed(1)+'%"></i></div>'+
+      '<div class="clu__scale"><span>0%</span><span>загрузка '+Math.round(k*100)+'%</span><span>100%</span></div>'+
+    '</div>'+
+    '<div class="clu__gau">'+
+      '<div><s>Выручка за период</s><b>'+money(e.rev,0)+'</b></div>'+
+      '<div><s>Результат</s><b class="'+(e.net<0?'dgr':'')+'">'+money(e.net,0)+'</b></div>'+
+      '<div><s>Расходы</s><b>'+money(e.service+e.repair,0)+'</b></div>'+
+      '<div><s>Простой</s><b>'+e.ut.idle+' дн.</b></div>'+
+    '</div>'+
+    '<div class="clu__warn">'+warn.map(w=>'<span class="cw cw--'+w.lvl+'">'+
+       ico(w.lvl==='ok'?'check':'warn',13)+esc(w.t)+'</span>').join('')+
+      '<a class="btn sm" href="#" data-open-unit="'+u.id+'">Карточка единицы</a>'+
+    '</div>'+
+  '</div>';
+}
+
+/* ПОДВАЛ ДОСКИ - четыре числа под ней, как в направлении A. Это не замена аналитике:
+   это те же величины, что диспетчер держит в голове, посчитанные за ВИДИМЫЙ месяц, а не
+   за произвольный период, поэтому они всегда согласованы с тем, что нарисовано выше. */
+function footStrip(list,from,to){
+  if(!list.length) return '';
+  let rev=0,net=0,rent=0,avail=0,idle=0;
+  list.forEach(u=>{const e=unitEcon(u.id,from,to); if(!e)return;
+    rev+=e.rev; net+=e.net; rent+=e.ut.rent; avail+=e.ut.avail; idle+=e.ut.idle;});
+  const k=avail?rent/avail:0;
+  return '<div class="foot4">'+
+    '<div><s>Загрузка</s><b>'+Math.round(k*100)+'%</b></div>'+
+    '<div><s>Выручка</s><b>'+money(r2(rev),0)+'</b></div>'+
+    '<div><s>Результат</s><b class="'+(net<0?'dgr':'')+'">'+money(r2(net),0)+'</b></div>'+
+    '<div><s>Простой</s><b>'+idle+' дн.</b></div></div>';
+}
+
 function renderCal(){
   const from=monthStart(calMonth), to=monthEnd(calMonth), days=[];
   eachDay(from,to,d=>days.push(d));
@@ -1153,7 +1278,7 @@ function renderCal(){
       bars+='<div class="gbar mnt" style="'+pos(off,len)+'" title="'+esc('Ремонт / ТО: '+dmy(s)+'—'+dmy(e))+'">'+(len>=4?'<span>ремонт</span>':'')+'</div>';
     });
     return '<div class="grow"><div class="gname"><div class="un"><a href="#" data-u="'+u.id+'">'+esc(u.name)+'</a></div>'+
-      '<div class="um"><b>'+Math.round(ut.k*100)+'%</b>'+bar(ut.k,ut.k<0.4?'var(--warn)':'var(--acc)')+'</div></div>'+
+      '<div class="um"><b>'+Math.round(ut.k*100)+'%</b>'+bar(ut.k,ut.k<0.4?'var(--steel)':'var(--ok)')+'</div></div>'+
       '<div class="gtrack" data-track="'+u.id+'">'+bars+'</div></div>';
   }).join('');
   const ti=days.indexOf(today());
@@ -1165,12 +1290,20 @@ function renderCal(){
       days.map((d,i)=>'<span class="gd'+(isWeekend(d)?' we':'')+(d===today()?' td':'')+'" style="left:calc(var(--cw)*'+i+')">'+(+d.slice(8,10))+'<s>'+WDS[dow(d)]+'</s></span>').join('')+
     '</div></div>'+(list.length?rows:'<div class="grow"><div class="gname"></div><div class="gtrack" style="display:grid;place-items:center;cursor:default"><span class="dim" style="font-size:12px">Ничего не нашлось по запросу</span></div></div>')+
    '</div></div>'+
-   '<div class="legend"><span><i class="sw" style="background:var(--panel3);box-shadow:inset 0 0 0 1px var(--tint2),inset 3px 0 0 0 #F5A524"></i>в аренде</span>'+
-   '<span><i class="sw" style="background:var(--tint);box-shadow:inset 0 0 0 1px var(--tint2),inset 3px 0 0 0 #616B77"></i>завершённые</span>'+
+   '<div class="legend"><span><i class="sw" style="background:color-mix(in oklab,var(--ok) 26%,var(--panel));box-shadow:inset 0 0 0 1px var(--tint2),inset 3px 0 0 0 var(--ok)"></i>в аренде</span>'+
+   '<span><i class="sw" style="background:var(--tint);box-shadow:inset 0 0 0 1px var(--tint2),inset 3px 0 0 0 var(--steel)"></i>завершённые</span>'+
    '<span><i class="sw" style="background:repeating-linear-gradient(135deg,rgba(216,167,46,.9) 0 4px,var(--panel2) 4px 8px)"></i>ремонт и ТО</span>'+
-   '<span class="dim">клик по свободному дню — новая бронь · клик по полосе — договор</span></div>';
+   '<span class="dim">клик по свободному дню — новая бронь · клик по полосе — договор · клик по названию — приборка</span></div>'+
+   footStrip(list,from,to)+
+   '<section class="clusection">'+cluster(from,to)+'</section>';
   bindCalNav();
-  $$('#view [data-u]').forEach(el=>el.onclick=ev=>{ev.preventDefault();ev.stopPropagation();openUnit(el.dataset.u)});
+  /* КЛИК ПО НАЗВАНИЮ МЕНЯЕТ ПРИБОРКУ, а не уводит со страницы. Уход на карточку единицы
+     ломал бы весь смысл сборки A+B: доска и приборка должны стоять рядом. Карточка
+     осталась - кнопкой в самой приборке. */
+  $$('#view [data-u]').forEach(el=>el.onclick=ev=>{ev.preventDefault();ev.stopPropagation();
+    selUnit=el.dataset.u; render(); });
+  $$('#view [data-open-unit]').forEach(el=>el.onclick=ev=>{ev.preventDefault();ev.stopPropagation();openUnit(el.dataset.openUnit)});
+  $$('#view [data-u]').forEach(el=>{ if(el.dataset.u===selUnit) el.closest('.grow').classList.add('is-sel'); });
   $$('#view .gbar[data-k]').forEach(el=>el.onclick=ev=>{ev.preventDefault();ev.stopPropagation();openContract(el.dataset.k)});
   $$('#view [data-track]').forEach(tr=>tr.onclick=ev=>{
     const r=tr.getBoundingClientRect();
@@ -1542,7 +1675,8 @@ function bindPeriod(){
 const m0=n=>money(n,0);
 const mB=n=>Math.abs(n)>=1e7?fmt(n/1e6,1)+'\u2009млн\u2009₽':money(n,0);
 const kpi=arr=>'<div class="kpi">'+arr.map(([l,v,n,c])=>'<div class="k'+(c?' k-'+c:'')+'"><div class="lbl">'+l+'</div><div class="val'+(c?' '+c:'')+'">'+v+'</div>'+(n?'<div class="nt">'+n+'</div>':'')+'</div>').join('')+'</div>';
-const bar=(k,c)=>'<div class="bar"><i style="width:'+clamp(k*100,0,100)+'%;background:'+(c||'var(--acc)')+'"></i></div>';
+/* по умолчанию сталь, а не янтарь: полоса показывает величину, а не зовёт нажать */
+const bar=(k,c)=>'<div class="bar"><i style="width:'+clamp(k*100,0,100)+'%;background:'+(c||'var(--steel)')+'"></i></div>';
 
 /* ═══════════ график: выручка, результат и загрузка по периоду ═══════════
    Hand-rolled SVG on purpose. A chart library is 60-200KB for one picture in a file whose whole
