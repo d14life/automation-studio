@@ -51,5 +51,47 @@
   </head>
   <body>
     <div id="root"></div>
+    <!-- THE STALE PAGE GUARD. 6 August: he reported the strand "laggy again, like someone took
+         the low frames version". Nothing had changed - the scrub code in the live bundle was
+         character-for-character the build he signed off. What he was running was an OLD bundle,
+         reached through a cached copy of THIS file.
+
+         That is not a bug we can fix at the source. GitHub Pages serves fixed headers -
+         `cache-control: max-age=600` on every HTML response - and a page kept in a tab or held
+         by a proxy goes on loading whatever `assets/v2-*.js` it was born with. Every old build
+         is still sitting in assets/, so the stale page finds its stale bundle and loads it
+         happily. I hit it myself: one fetch of the live root came back pointing at the 03:21
+         build, ten seconds later the same URL served the current one.
+
+         So the page checks itself. One 4KB no-store fetch of its own URL after load, compare
+         the bundle the server is handing out now against the one actually running, reload if
+         they differ. A reload revalidates the document, so the second load gets the new HTML.
+
+         THE GUARD ON THE GUARD IS THE IMPORTANT PART. A reload loop on the homepage is a far
+         worse bug than the one being fixed, so the build we reloaded away from is written to
+         sessionStorage first: if the refresh somehow lands on the same stale bundle again, the
+         check has already spent its one shot and stops. At most one extra load, ever. -->
+    <script>
+      addEventListener('load', function () {
+        try {
+          if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') return
+          var tag = document.querySelector('script[src*="/assets/v2-"]')
+          if (!tag) return
+          var mine = tag.src.split('/').pop()
+          if (sessionStorage.getItem('s101-stale') === mine) return
+          fetch(location.pathname + '?fresh=' + Date.now(), { cache: 'no-store' })
+            .then(function (r) { return r.ok ? r.text() : '' })
+            .then(function (html) {
+              var m = html.match(/assets\/v2-[A-Za-z0-9_-]+\.js/)
+              if (!m) return
+              var live = m[0].split('/').pop()
+              if (live === mine) return
+              sessionStorage.setItem('s101-stale', mine)
+              location.reload()
+            })
+            .catch(function () {})
+        } catch (e) {}
+      })
+    </script>
   </body>
 </html>

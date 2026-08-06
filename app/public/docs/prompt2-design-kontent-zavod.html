@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Промпт 2 для Claude Design: переделать направления «Контент-Завода» — Solutions101</title>
+<style>
+  :root{--bg:#0e202d;--panel:#132937;--ink:#F2F7F5;--soft:rgba(242,247,245,.86);
+    --faint:rgba(242,247,245,.58);--acc:#7FD8FF;--rule:rgba(242,247,245,.13)}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:var(--acc);text-decoration:none} a:hover{text-decoration:underline}
+  a:focus-visible,button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+  header{position:sticky;top:0;z-index:9;background:var(--bg);border-bottom:1px solid var(--rule);
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:0 clamp(14px,3vw,28px);min-height:52px}
+  .eyebrow{font:600 12px/1 ui-monospace,monospace;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--faint)}
+  .back{display:inline-flex;align-items:center;min-height:44px;padding:0 8px;font-size:14px}
+  main{max-width:860px;margin:0 auto;padding:clamp(24px,4vw,52px) clamp(14px,3vw,28px) 96px}
+  h1{font:700 clamp(28px,4.4vw,44px)/1.08 system-ui;letter-spacing:-.02em;margin:0 0 24px}
+  h2{font:700 clamp(21px,2.6vw,29px)/1.15 system-ui;letter-spacing:-.015em;
+    margin:44px 0 14px;padding-top:22px;border-top:1px solid var(--rule)}
+  h3{font:700 clamp(17px,1.9vw,21px)/1.25 system-ui;margin:30px 0 10px}
+  h4{font:700 16px/1.3 system-ui;margin:22px 0 8px;color:var(--soft)}
+  p{margin:0 0 15px;font-size:16.5px;line-height:1.62;color:var(--soft);max-width:68ch}
+  ul,ol{margin:0 0 16px;padding-left:22px}
+  li{font-size:16.5px;line-height:1.62;color:var(--soft);margin:0 0 7px;max-width:66ch}
+  blockquote{margin:0 0 16px;padding:12px 0 12px 18px;border-left:2px solid var(--acc);
+    color:var(--ink);font-size:17px;line-height:1.55}
+  hr{border:0;border-top:1px solid var(--rule);margin:32px 0}
+  code{font:500 14px/1.4 ui-monospace,monospace;background:var(--panel);
+    padding:2px 6px;border-radius:6px;color:var(--acc)}
+  .code{position:relative;margin:0 0 22px}
+  .code pre{margin:0;background:var(--panel);border:1px solid var(--rule);border-radius:14px;
+    padding:44px 16px 16px;overflow-x:auto;font:500 13.5px/1.62 ui-monospace,monospace;
+    color:var(--ink);white-space:pre-wrap;word-break:break-word}
+  .copy{position:absolute;top:8px;right:8px;min-height:32px;padding:0 14px;border-radius:9px;
+    background:#1a3648;color:var(--ink);border:1px solid var(--rule);cursor:pointer;
+    font:600 13px/1 system-ui;transition:transform .12s ease,background .12s ease}
+  .copy:hover{background:#20455b} .copy:active{transform:scale(.96)}
+  .copy.done{background:#1c5a45;border-color:#2f8b6b}
+  .tw{overflow-x:auto;margin:0 0 20px}
+  table{border-collapse:collapse;width:100%;font-size:15px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--rule);vertical-align:top;
+    line-height:1.5;color:var(--soft)}
+  th{color:var(--ink);font-weight:600;white-space:nowrap}
+  .grp{margin:0 0 34px}
+  .grp h2{border:0;padding:0;margin:0 0 4px}
+  .grp .note{color:var(--faint);font-size:14.5px;margin:0 0 14px}
+  .list{display:grid;gap:10px}
+  .item{display:block;padding:15px 17px;background:var(--panel);border:1px solid var(--rule);
+    border-radius:14px;color:var(--ink);transition:border-color .15s}
+  .item:hover{border-color:var(--acc);text-decoration:none}
+  .item b{display:block;font-size:16.5px;margin-bottom:3px}
+  .item span{color:var(--faint);font-size:14px}
+  @media (prefers-contrast:more){:root{--faint:rgba(242,247,245,.82);--rule:rgba(242,247,245,.4)}}
+</style>
+<header>
+  <a class="eyebrow" href="/docs/" style="color:var(--faint)">Solutions101 · документы</a>
+  <a class="back" href="/docs/">← ко всем</a>
+</header>
+<main><h1>Промпт 2 для Claude Design: переделать направления «Контент-Завода»</h1>
+<p>Вставь целиком в тот же проект Claude Design, где лежит <code>Направления.dc.html</code>.</p>
+<hr>
+<p>Содержание я принимаю: терминология из ТЗ на месте, данные честные («Каналы 0/4», «Автопостинг на паузе — каналы не подключены», «Канал не подключён — уйдёт в буфер», девять опубликованных постов), эмодзи вместо иконок нет, градиентов нет, Inter нет. Это всё правильно, не теряй.</p>
+<p><b>Дизайн нужно переделать.</b> Ниже — что именно не так, с проверяемыми фактами, и что сделать вместо.</p>
+<h2>1. Это не пять направлений, это одна раскладка в четырёх обложках</h2>
+<p>1a, 1b, 1c и 1d — один и тот же экран: боковая навигация или шапка, строка из пяти плиток-метрик, таблица с одинаковыми колонками (Канал · Рубрика/Продукт · Заголовок · Тональность · Дата · Статус · Действия). Отличаются они цветом сайдбара, шрифтом заголовка и радиусом.</p>
+<p>Проверка, которую надо пройти: <b>распечатай все пять в чёрно-белом варианте.</b> Если по силуэту их нельзя различить — это одно направление, а не пять.</p>
+<p>Различие должно быть в том, <b>как устроен экран</b>, а не в том, как он покрашен:</p>
+<ul><li><b>A · Очередь как список задач.</b> Никакой таблицы. Одна колонка карточек-строк, каждая</li></ul>
+<p>  показывает пост целиком: канал, заголовок, тональность, время, статус, действия. Как почтовый   ящик. Фильтры слева узкой колонкой.</p>
+<ul><li><b>B · Доска по статусам (канбан).</b> Колонки = статусы: Черновик · На согласовании · Одобрен ·</li></ul>
+<p>  Запланировано · Опубликовано · Ошибка. Пост — карточка, движется слева направо. Сразу видно,   где затор.</p>
+<ul><li><b>C · Календарь как главный экран.</b> Не список вообще. Неделя или месяц, строки = каналы,</li></ul>
+<p>  ячейки = слоты публикации. Очередь читается как расписание, пустые слоты — это то, что надо   заполнить.</p>
+<ul><li><b>D · Двухпанельный разбор.</b> Слева узкий плотный реестр (только заголовок + статус), справа —</li></ul>
+<p>  открытый пост целиком с превью под канал. Работа идёт справа, список — навигация. Как почтовый   клиент или IDE.</p>
+<ul><li><b>E · Плотная таблица оператора.</b> Вот здесь — таблица, но настоящая: 40+ строк без прокрутки,</li></ul>
+<p>  залипающая шапка, сортировка по любой колонке, множественный выбор, групповые действия,   клавиатурная навигация. Это единственное направление, где таблица оправдана.</p>
+<p>Каждое направление — <b>два экрана</b>: главный (очередь в своей форме) и <b>карточка упоминания ORM</b>.</p>
+<h2>2. Тёмной темы нет вообще</h2>
+<p>Проверил: <code>data-theme</code> в файле встречается <b>0 раз</b>. Тёмная тема была в требованиях. То, что каждое направление покрашено в свой цвет, — это не «светлая и тёмная», это пять светлых.</p>
+<p>Сделай так: <b>токены на <code>:root</code> и <code>:root[data-theme="dark"]</code></b>, переключатель в шапке, и покажи каждое направление в обеих темах. Контраст считать в обеих отдельно — тёмная тема не наследует контраст светлой.</p>
+<p>Порог: <b>4.5:1</b> для основного текста, <b>3:1</b> для крупного текста и границ элементов. Посчитай, не прикидывай на глаз.</p>
+<h2>3. Плотность сейчас — это теснота, а не плотность</h2>
+<p>Строки около 26 px, текст мелкий и серый, всё одного размера. Плотный интерфейс — это не «уменьшить всё», это <b>разная величина у разного по важности</b>.</p>
+<p>Правила, по которым это чинится:</p>
+<ul><li>Шкала кегля, шесть ступеней, и не отступать от неё: <b>12 · 13 · 15 · 18 · 24 · 32</b>.</li></ul>
+<p>  Тело не мельче 13 px.</p>
+<ul><li>Междустрочный 1.5 для текста, 1.3 для строк таблицы.</li><li>Шкала отступов 4/8: <b>4 · 8 · 12 · 16 · 24 · 32 · 48</b>. Любой зазор — из неё.</li><li><b>Второстепенное гасить, а не главное усиливать.</b> Сейчас всё серое одинаково; должно быть</li></ul>
+<p>  одно чёрное и остальное серое.</p>
+<ul><li><b>Табличные цифры</b> на всех числах в колонку.</li><li>Строка таблицы — минимум <b>36 px</b> высотой, иначе по ней невозможно попасть и невозможно</li></ul>
+<p>  вести глазом.</p>
+<h2>4. Четыре цветовые оси дерутся между собой</h2>
+<p>Статус, Канал, Тональность, Рубрика/Продукт — это четыре независимых измерения, и сейчас все четыре нарисованы одинаковыми мелкими бейджами в одной строке. Глазу не за что зацепиться.</p>
+<p>Разведи их разными средствами, а не разными оттенками:</p>
+<ul><li><b>Статус</b> — единственная, кому можно цвет заливки. Это то, ради чего открывают экран.</li><li><b>Канал</b> — форма или позиция: цветная полоса слева от строки, или монохромная метка.</li><li><b>Тональность</b> — только текст, без плашки.</li><li><b>Рубрика / продукт</b> — контурная метка, без заливки.</li></ul>
+<p>И <b>одно исключение под красный</b>: он означает «нужно действие сейчас» — ошибка публикации и просрочка по SLA 30 минут. Больше нигде.</p>
+<h2>5. Самое важное число на экране выглядит как все остальные</h2>
+<p><b>«Каналы Фазы 1 — 0 из 4»</b> значит, что система не подключена ни к чему и не может опубликовать ни один пост. Это главный факт про состояние продукта, а нарисован он как ещё одна плитка.</p>
+<p>Такие состояния — «ничего не подключено», «автопостинг на паузе» — должны читаться первыми. Не тревожно, но заметно.</p>
+<h2>6. Состояний нет</h2>
+<p>Ни одно направление не показывает: пустой список, загрузку, ошибку загрузки, отказ публикации, права «только просмотр». Для этого продукта пустое состояние — не редкость, а стартовая точка: каналы не подключены, база знаний не заполнена, упоминаний ноль.</p>
+<p>Покажи в каждом направлении хотя бы <b>пустое состояние очереди</b> и <b>ошибку публикации</b> — с причиной и с тем, что делать дальше, а не «Что-то пошло не так».</p>
+<h2>7. Типографика и палитра — опора</h2>
+<p>По классу продукта (плотная операционная панель) обоснованный выбор:</p>
+<ul><li><b>Шрифты:</b> заголовки и цифры — <b>Fira Code</b>, текст — <b>Fira Sans</b>. Обе с полноценной</li></ul>
+<p>  кириллицей, обе бесплатные, обе рассчитаны на данные. Если возьмёшь другую пару — назови   причину и проверь кириллицу: половина модных гротесков её не имеет.</p>
+<ul><li><b>Палитра, отправная точка</b> (проверена на контраст):</li></ul>
+<p>  <code>--primary #1E40AF</code> · <code>--secondary #3B82F6</code> · <code>--accent #D97706</code> ·   <code>--bg #F8FAFC</code> · <code>--fg #1E3A8A</code> · <code>--muted #E9EEF6</code> · <code>--border #DBEAFE</code> · <code>--destructive #DC2626</code></p>
+<ul><li>Но <b>фирменные цвета заказчика обязательны</b>: синий, оранжевый, чёрный —</li></ul>
+<p>  <code>#0072CE</code>, <code>#FF6B00</code>, <code>#0A192F</code>. Развей их в шкалы по 9–11 ступеней, не бери один хекс.</p>
+<ul><li>Нейтральные тонируй в сторону синего. Чистый серый читается как «не выбирали».</li></ul>
+<h2>8. Чего не должно быть</h2>
+<p>Всё из прошлого промпта в силе, плюс по итогам этой итерации:</p>
+<ul><li><b>Пяти вариантов одной раскладки.</b> Это главная правка.</li><li><b>Плиток-метрик, повторяющихся в каждом направлении.</b> Если метрики нужны — пусть в разных</li></ul>
+<p>  направлениях они живут по-разному: строкой, в сайдбаре, в шапке, или вообще не на этом экране.</p>
+<ul><li><b>Мелкого серого текста как основного приёма.</b> Иерархия строится размером и весом.</li><li><b>Оранжевого сайдбара во всю высоту</b> (1b). Это самая яркая плоскость экрана, отданная</li></ul>
+<p>  навигации, которой пользуются раз в полчаса. Бренд-цвет тратится один раз и на действие.</p>
+<h2>9. Что вернуть</h2>
+<p>Пять направлений, <b>каждое в двух темах</b>, по два экрана в каждом: очередь в своей форме плюс карточка упоминания ORM. Плюс одна страница с токенами: цветовые шкалы, шкала кегля, шкала отступов, состояния компонентов, посчитанные контрасты.</p>
+<p>Данные оставь те же — они честные и это ценно.</p></main>
+<script>
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('.copy'); if (!b) return;
+  const pre = document.getElementById(b.dataset.for); if (!pre) return;
+  navigator.clipboard.writeText(pre.textContent).then(() => {
+    b.textContent = 'Скопировано'; b.classList.add('done');
+    setTimeout(() => { b.textContent = 'Скопировать'; b.classList.remove('done') }, 1800);
+  }).catch(() => { b.textContent = 'Выделите вручную' });
+});
+</script>
