@@ -503,7 +503,9 @@ html.v2light{--slogan:linear-gradient(100deg,#8A7261,#5C4536 46%,#33241A)}
 .proj__body b{display:block;color:var(--ink);font-size:clamp(15px,1.15vw,18px);letter-spacing:-.01em}
 .proj__body em{display:block;margin-top:5px;color:var(--ink-soft);font-style:normal;
   font-size:clamp(12px,.86vw,13.5px);line-height:1.45;
-  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  /* two lines, not three. The caption sits ON the shot, so every line it takes is a line of the
+     product it hides - and the donut on park's card was landing exactly under the third one. */
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .proj__go{display:inline-block;margin-top:9px;color:var(--accent);
   font-size:12.5px;letter-spacing:.01em}
 
