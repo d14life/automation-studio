@@ -1740,6 +1740,11 @@ function trendBuckets(from,to){
    mistake, it is a blank app. */
 const minStr=(a,b)=>a<b?a:b, maxStr=(a,b)=>a>b?a:b;
 
+/* ВЫБРАННЫЙ СТОЛБИК. Хранится ДАТОЙ НАЧАЛА корзины, а не её номером: номер живёт только
+   внутри одного набора корзин, и после смены периода «третий столбик» указал бы на другой
+   месяц. Дата либо находится среди корзин, либо нет - и выбор сбрасывается сам. */
+let selBk=null;
+
 function trendChart(from,to){
   const units=db.units.filter(u=>!u.archived);
   const buckets=trendBuckets(from,to);
@@ -2563,6 +2568,19 @@ load();
 if(localStorage.getItem(KEY)===null){ db=genDemo(); save(); }
 else if(db.demo && (db.demoVer||0)<DEMO_VER){ db=genDemo(); save(); }
 applyPreset('m3');
+/* ?view=analytics — a deep link to one screen, and the reason it exists is the card on the
+   front page. That card is a screenshot taken by app/tools/shots.sh, and shots.sh can only
+   open a URL: without this the capture always lands on whatever the demo boots into, so
+   "make the card show the analytics screen" would be true once and quietly untrue after the
+   next re-shoot. A query the screenshot can ask for makes the card reproducible.
+   Whitelisted against NAV so a bad value cannot route the demo into a screen that is not
+   there - an unknown view renders nothing at all. */
+const QS = new URLSearchParams(location.search)
+const WANT = QS.get('view')
+if (WANT && NAV.some(n => n[0] === WANT)) route = { v: WANT }
+/* the period the analytics screen opens on, same reason and the same whitelist */
+const PER = QS.get('period')
+if (['m','m3','m6','m9','y1','all'].includes(PER)) applyPreset(PER)
 histUI();
 HIST.push({v:route.v,id:route.id}); HI=0;
 render(); histSync();
