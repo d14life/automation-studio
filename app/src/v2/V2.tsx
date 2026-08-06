@@ -541,56 +541,41 @@ const DEMOS = [
    with the REAL product rendered inside each one instead of a hand-drawn mock, so the page shows
    the thing working without anybody having to click through first.
 
-   The card IS an iframe of the live demo. That is the whole idea and it is also why the mockups
-   this replaces were a liability: they were hand-built HTML that had to be re-drawn by hand every
-   time the product changed, and they drifted. This cannot drift - it is the product.
+   The card WAS an iframe of the live demo, and that was the wrong reading of "real". His words:
+   "it should show our products, not full page loaded". A landing page that boots three complete
+   desktop applications to illustrate three cards is paying an application's price for a
+   thumbnail - and it showed, as a page that crawled beside this section.
 
-   DESIGN_W is the width the demo is laid out for, and the shot is scaled down to the card by the
-   ratio between it and --cardw. The scale is read from --cardw rather than recomputed, because
-   useCardFan owns that number and two copies of the formula would disagree the first time one
-   changed. 1440 rather than the card's own width so the demo lays out as a desktop app and gets
-   shrunk, instead of rendering its own narrow mobile layout inside the card.
+   So the card carries a CAPTURE of the running demo: 1120x780, taken from the real product by
+   app/tools/shots.sh, not drawn by hand. That keeps the property that made the iframe worth
+   trying - nobody redraws a mockup when the product changes, the picture is regenerated from the
+   product - while costing a JPEG instead of a browsing context. It is also steadier: the card
+   looks the same whether the demo is warm, cold, or mid-deploy.
 
-   pointer-events:none on the frame is not laziness - without it the iframe swallows the cursor,
-   the fan never sees mouseenter, the tilt dies, and a click lands inside the demo instead of
-   opening it. The card is a link; the frame is a picture that happens to be alive. */
-const DESIGN_W = 1440
+   RE-SHOOT AFTER A DEMO CHANGES, or the card drifts, which is the one failure mode the iframe
+   did not have. `bash app/tools/shots.sh` re-takes all three against the dev server.
 
+   pointer-events:none stays. Without it the picture swallows the cursor, the fan never sees
+   mouseenter and the tilt dies. The card is a link; the shot is scenery. */
 function DemoDeck() {
   useCardFan()
   useCardTilt()
 
-  /* MEASURE THE CARD, NOT THE VARIABLE THAT DRIVES IT. The first version read --cardw, which
-     useCardFan owns - and useCardFan deliberately REMOVES that property below 820px, where the
-     cards become a plain column and CSS takes the layout back. The scale then computed from an
-     empty string, landed on 0, and every shot collapsed to nothing.
-     The card's own measured width is true under both regimes, so this no longer cares who is
-     doing the layout. Zero widths are skipped rather than written: a card that is mid-layout or
-     display:none reports 0, and writing that would blank the shot for real. */
-  useEffect(() => {
-    const wrap = document.querySelector<HTMLElement>('.projects')
-    const card = wrap?.querySelector<HTMLElement>('.proj')
-    if (!wrap || !card) return
-    const fit = () => {
-      const w = card.getBoundingClientRect().width
-      if (w > 0) wrap.style.setProperty('--shot-s', String(w / DESIGN_W))
-    }
-    const ro = new ResizeObserver(fit)
-    ro.observe(card)
-    fit()
-    return () => ro.disconnect()
-  }, [])
+  /* The ResizeObserver that used to live here is gone with the iframes. It existed only to
+     compute the scale factor that shrank a 1440px-wide document into a 300px-wide card; an
+     <img> with width:100% needs no arithmetic and no observer. */
 
   return (
     <div className="projects">
       {DEMOS.map(([slug, t, d]) => (
         <a className="proj" href={`/demo/${slug}/`} key={slug}>
           <span className="proj__shot">
-            {/* loading=lazy so three full applications are not fetched before the visitor has
-                scrolled anywhere near them. tabIndex -1 and aria-hidden keep the frame out of the
-                tab order and off the screen reader - the link around it carries the meaning. */}
-            <iframe src={`/demo/${slug}/`} title="" aria-hidden="true" tabIndex={-1}
-                    loading="lazy" scrolling="no" />
+            {/* A CAPTURE, NOT A LIVE FRAME. alt is empty and aria-hidden set because the link
+                already carries the name and the description - a screen reader announcing the
+                picture too would say everything twice. width/height are the real pixels of the
+                file so the card reserves its space before the image lands. */}
+            <img src={`/shots/${slug}.jpg`} alt="" aria-hidden="true"
+                 width={1120} height={780} loading="lazy" decoding="async" />
           </span>
           <span className="proj__body">
             <b>{t}</b>
@@ -711,6 +696,13 @@ export default function V2() {
   const offscreen = useRef(false) /* header fully scrolled away - stop burning battery */
   const rawY = useRef(0)          /* unclamped scroll position - what the SCRUB reads */
   const travelPx = useRef(1)      /* runway length, so a full pass is still one pass */
+
+  /* The stage is display:none on an inner page rather than unmounted, so onScroll - which is
+     what normally maintains this flag - has nothing to measure there and would leave the last
+     value from the home page behind. Left at false, the idle loop would keep seeking a hidden
+     video for the whole visit. One line, and it needs no other machinery: coming home sets it
+     back to false and the next real scroll takes over again. */
+  useEffect(() => { offscreen.current = !home }, [home])
 
   const nudge = useCallback((el: HTMLVideoElement | null) => {
     videoRef.current = el
@@ -1125,8 +1117,17 @@ export default function V2() {
 
       {/* The strand belongs to the front page. On the inner pages it would be three and a
           half screens of scrolling between the reader and the thing they clicked for. */}
-      {home && (
-      <section className="v2stage" ref={stageRef} style={{ height: `${RUNWAY * 100}svh` }}>
+      {/* HIDDEN, NOT UNMOUNTED. His report: "loads very long every time I get off the page."
+          This used to be {home && <section>}, so a click into an inner page destroyed the
+          <video> and a click back built a new one - and a new element means the 38MB strand is
+          fetched, demuxed and buffered from scratch before a single frame can be seeked. The
+          service worker makes the bytes local but not free: the worker still reads the whole
+          file into an ArrayBuffer to answer the first range request.
+          display:none keeps the element, its media resource and its buffered ranges alive, so
+          coming back is instant. A none'd <section> is out of layout entirely, so it costs the
+          inner pages nothing - and the scrub loop already no-ops when the stage measures zero. */}
+      <section className="v2stage" ref={stageRef}
+               style={{ height: `${RUNWAY * 100}svh`, display: home ? undefined : 'none' }}>
         <div className="v2pin">
           <div className="v2bg">
             {/* THE POSTER IS WHY THE FIRST SCREEN IS NOT BLANK. The strand is a 40MB file and
@@ -1194,7 +1195,6 @@ export default function V2() {
           </div>
         </div>
       </section>
-      )}
 
       {/* and the real page begins. Each page is its own composition now - PAGES.md built.
           Sections carry GAIA-style numbering: real sequence, monospace eyebrow. */}
@@ -1226,9 +1226,13 @@ export default function V2() {
         <section className="v2sec" id="demos"><div className="v2wrap">
           <p className="v2eyebrow">02 / Демо</p>
           <h2 className="v2h2">Потрогайте сами</h2>
-          <p className="v2lede">В карточках — живые системы, а не скриншоты: они работают прямо
-             здесь, на демо-данных. Наведите, чтобы рассмотреть, откройте, чтобы поработать
-             внутри. Вводите своё, ломайте, перезагружайте — состояние сохраняется.</p>
+          {/* THE COPY FOLLOWED THE CARDS. It used to promise «живые системы, а не скриншоты»,
+              which stopped being true the moment the cards became captures - and a landing page
+              that describes itself wrongly is worse than one that says less. The systems are
+              still live; they are one click away instead of running inside the card. */}
+          <p className="v2lede">На карточке — снимок экрана, за ней живая система: открывается в
+             отдельной вкладке и работает на демо-данных. Вводите своё, ломайте,
+             перезагружайте — состояние сохраняется.</p>
           <DemoDeck />
         </div></section>
 
@@ -1363,9 +1367,13 @@ export default function V2() {
         <section className="v2sec" id="demos"><div className="v2wrap">
           <p className="v2eyebrow">02 / Демо</p>
           <h2 className="v2h2">Потрогайте сами</h2>
-          <p className="v2lede">В карточках — живые системы, а не скриншоты: они работают прямо
-             здесь, на демо-данных. Наведите, чтобы рассмотреть, откройте, чтобы поработать
-             внутри. Вводите своё, ломайте, перезагружайте — состояние сохраняется.</p>
+          {/* THE COPY FOLLOWED THE CARDS. It used to promise «живые системы, а не скриншоты»,
+              which stopped being true the moment the cards became captures - and a landing page
+              that describes itself wrongly is worse than one that says less. The systems are
+              still live; they are one click away instead of running inside the card. */}
+          <p className="v2lede">На карточке — снимок экрана, за ней живая система: открывается в
+             отдельной вкладке и работает на демо-данных. Вводите своё, ломайте,
+             перезагружайте — состояние сохраняется.</p>
           <DemoDeck />
         </div></section>
 
