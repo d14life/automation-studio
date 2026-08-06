@@ -178,16 +178,37 @@ const TIER =
    benchmarks at 610fps sequential decode. */
 const FPS = 50
 const HALF_FRAME = 0.5 / FPS
-/* THE SEEK CAP IS THE FILE'S OWN FRAME INTERVAL, not a hand-picked 30Hz. 33ms was chosen when
-   the phone was still on 1080p H.264 and stuttering, and it has been throttling the 50fps
-   files ever since - 30 updates a second out of 50 available, throwing away two frames in
-   five. Deriving it removes the guess: seeking faster than the clip has frames only decodes
-   the same picture twice, seeking slower discards frames that were paid for.
-   So the 50fps tiers now run at 50Hz and the 25fps tiers at 25Hz - which is actually LESS work
-   than before for laptops and 4K, where 33ms was over-seeking a 40ms grid. The extra cost
-   lands only on phone and tablet, and lands on 720p/1080p HEVC that Apple decodes in hardware,
-   which is the cheapest seek in the whole matrix. */
-const SEEK_MS = 1000 / FPS
+/* THE SEEK CAP IS 33ms OR THE FILE'S FRAME INTERVAL, WHICHEVER IS SLOWER - and the 33 is back
+   because it was measured, not guessed.
+
+   The version this replaces derived the cap from FPS alone, on the argument that "seeking
+   faster than the clip has frames only decodes the same picture twice" and that the file
+   benchmarks at 610fps sequential decode, so 50 a second is free. The first half is true. The
+   second half is the mistake: a random seek is not a sequential decode. Sequential decoding
+   streams through a file the decoder is already positioned in; a seek re-positions it, and the
+   scrub does nothing but re-position.
+
+   Measured in Chrome on this machine, hq (2560x1440, 38MB), 40 seeks per figure after a
+   warm-up pass, timed from writing currentTime to the 'seeked' event:
+
+       one frame at a time      median 10.1ms   p95 10.5ms
+       30 frames at a time      median 10.1ms   p95 11.5ms
+       a fifth of the clip      median 10.0ms   p95 13.0ms
+       same test on 1600x900    median  8.0ms   p95  9.8ms
+
+   Resolution barely matters and jump distance barely matters - all-intra means every frame
+   costs a full keyframe decode wherever you land. What matters is HOW OFTEN we ask. At a 20ms
+   cadence a 10ms seek is a 50% duty cycle: half of every second spent decoding one 1440p frame
+   after another, on the same thread as React, the card fan and the scroll handler. At 33ms it
+   is 30%. That gap is what he is feeling on a fast scroll.
+
+   Two honest caveats. These timings were taken with the tab in the background, so they exclude
+   compositing the 2560x1440 texture to a 2x display - the real foreground cost is higher, not
+   lower, which only strengthens the case. And 30Hz is not a downgrade anybody can see: film
+   runs at 24.
+
+   The 25fps tiers are unaffected - their own 40ms interval is already slower than 33. */
+const SEEK_MS = Math.max(1000 / FPS, 33)
 
 /* The two sources need not be the same resolution - the browser takes the first it can decode,
    and that is the whole point. HEVC is roughly half the bytes, so where it is available a
