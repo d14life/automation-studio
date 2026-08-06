@@ -110,6 +110,15 @@ gets buried. Run `git config pull.rebase true` once per machine and plain
 - **Never claim without evidence.** Run the check, then report — `curl` the live bundle
   and grep for your change, screenshot the simulator, print the value into the page.
   "It should work" is not done. If a test failed or a step was skipped, say so plainly.
+- **Anything with a screen gets driven, not read — use the `drive-demo` skill.** His
+  standing instruction, and it covers the demos, any artifact someone sends, and this site
+  after a deploy. Reading source tells you what the author intended; only clicking tells you
+  what it does. Every real bug in these prototypes was found by clicking: the calendar that
+  was two days off at 1440px, 33 of 59 invoices multiplying wrong, a scan field that ignored
+  Enter, two dashboards nobody could reach because the app opened elsewhere. The skill also
+  carries the browser-pane traps that cost an hour each and are not guessable — the pane only
+  repaints on fresh navigation, `form_input` is silently ignored by React, refs go stale on
+  every re-render, and motion cannot be verified in the pane at all.
 - **Never build in `/tmp` or a scratchpad.** macOS wipes them; a full day was lost that
   way on 2026-08-02. Real work lives in `~/solutions101/`.
 - **The preview pane cannot verify motion.** It reports `document.hidden`, which freezes

@@ -1,0 +1,189 @@
+<meta charset="utf-8">
+<title>Park — направления дизайна</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--pg:#0E0F11;--pg2:#16181B;--ptx:#E9E9E4;--pdim:#8A8E94;--phair:#26292E}
+html{background:var(--pg);color:var(--ptx);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+body{max-width:1500px;margin:0 auto;padding:56px 40px 120px}
+h1{font-size:34px;letter-spacing:-.02em;font-weight:800}
+.lede{color:var(--pdim);max-width:70ch;margin-top:12px;font-size:16px}
+.rule{height:1px;background:var(--phair);margin:34px 0}
+.panels{display:grid;grid-template-columns:repeat(auto-fit,minmax(430px,1fr));gap:26px}
+.panel{border:1px solid var(--phair);border-radius:10px;overflow:hidden;background:var(--pg2);display:flex;flex-direction:column}
+.phead{padding:15px 18px;border-bottom:1px solid var(--phair);display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.pk{font:800 11px/1 ui-monospace,Menlo,monospace;letter-spacing:.14em;background:var(--ptx);color:var(--pg);padding:4px 7px;border-radius:3px}
+.pname{font-weight:700;font-size:16px}
+.pdna{font:600 11px/1 ui-monospace,Menlo,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--pdim);margin-left:auto}
+.pwhy{padding:13px 18px;color:var(--pdim);font-size:13.5px;border-bottom:1px solid var(--phair);background:rgba(255,255,255,.012)}
+.pwhy b{color:var(--ptx);font-weight:600}
+.stage{padding:18px;display:grid;gap:14px}
+.cap{font:600 10.5px/1 ui-monospace,Menlo,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--pdim)}
+.m{border-radius:6px;overflow:hidden;font-size:13px;position:relative}
+
+/* A · ДИСПЕТЧЕРСКАЯ ДОСКА */
+.dsp{--bg:#111316;--ink:#F2F3F0;--dim:#787D85;--hair:#242830;--hot:#FFC400;--go:#39D98A;--stop:#FF4D4D;
+  background:var(--bg);color:var(--ink);font-family:ui-monospace,Menlo,Consolas,monospace}
+.dsp .top{display:flex;align-items:center;gap:14px;padding:11px 14px;border-bottom:2px solid var(--ink)}
+.dsp .top b{font-size:15px;letter-spacing:.1em}
+.dsp .top .t{margin-left:auto;color:var(--hot);font-weight:700;letter-spacing:.08em}
+.dsp .cols{display:grid;grid-template-columns:118px 1fr;font-size:10.5px;letter-spacing:.1em;color:var(--dim);padding:8px 14px 6px;text-transform:uppercase}
+.dsp .track{display:grid;grid-template-columns:118px 1fr;align-items:center;border-top:1px solid var(--hair);padding:0 14px}
+.dsp .unit{padding:9px 0;font-size:12px;letter-spacing:.04em}
+.dsp .unit i{display:block;font-style:normal;color:var(--dim);font-size:10px;letter-spacing:.08em;margin-top:2px}
+.dsp .lane{position:relative;height:26px;background:repeating-linear-gradient(90deg,transparent 0 calc(100%/14 - 1px),var(--hair) calc(100%/14 - 1px) calc(100%/14))}
+.dsp .blk{position:absolute;top:4px;height:18px;border-radius:2px;font-size:10px;line-height:18px;padding:0 6px;color:#111;font-weight:700;overflow:hidden;white-space:nowrap}
+.dsp .b-go{background:var(--go)}.dsp .b-hot{background:var(--hot)}.dsp .b-stop{background:var(--stop);color:#fff}
+.dsp .foot{display:grid;grid-template-columns:repeat(4,1fr);border-top:2px solid var(--ink)}
+.dsp .foot div{padding:10px 14px;border-right:1px solid var(--hair)}
+.dsp .foot div:last-child{border:0}
+.dsp .foot s{display:block;text-decoration:none;font-size:9.5px;letter-spacing:.13em;color:var(--dim)}
+.dsp .foot b{font-size:19px;letter-spacing:-.01em}
+
+/* B · ПРИБОРНАЯ ПАНЕЛЬ */
+.clu{--bg:#0A0C0B;--ink:#EAF2EC;--dim:#6E7A72;--hair:#1C2320;--amb:#FFB020;--grn:#37E08A;
+  background:radial-gradient(120% 100% at 50% 0%,#141917 0%,var(--bg) 70%);color:var(--ink);font-family:ui-monospace,Menlo,monospace}
+.clu .hd{padding:10px 14px;font-size:10px;letter-spacing:.2em;color:var(--dim);border-bottom:1px solid var(--hair);text-transform:uppercase}
+.clu .main{padding:16px 14px 10px;text-align:center}
+.clu .big{font-size:44px;font-weight:700;letter-spacing:-.02em;color:var(--amb);line-height:1;font-variant-numeric:tabular-nums}
+.clu .big s{text-decoration:none;font-size:16px;color:var(--dim);margin-left:6px}
+.clu .sub{font-size:10px;letter-spacing:.16em;color:var(--dim);margin-top:7px;text-transform:uppercase}
+.clu .arc{height:7px;margin:14px 14px 0;background:var(--hair);border-radius:4px;overflow:hidden}
+.clu .arc i{display:block;height:100%;width:20%;background:linear-gradient(90deg,var(--grn),var(--amb))}
+.clu .gau{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--hair);margin-top:16px;border-top:1px solid var(--hair)}
+.clu .gau div{background:var(--bg);padding:11px 12px}
+.clu .gau s{display:block;text-decoration:none;font-size:9px;letter-spacing:.14em;color:var(--dim)}
+.clu .gau b{font-size:17px;font-variant-numeric:tabular-nums}
+.clu .warn{display:flex;gap:8px;align-items:center;padding:9px 14px;border-top:1px solid var(--hair);font-size:10.5px;letter-spacing:.08em;color:var(--amb)}
+.clu .dot{width:7px;height:7px;border-radius:50%;background:var(--amb);flex:none}
+
+/* C · ПАСПОРТ МАШИНЫ */
+.psp{--pap:#EFEBE1;--ink:#14150F;--dim:#6B6A5E;--hair:#C6C1B0;--stamp:#9C2A1E;
+  background:var(--pap);color:var(--ink);font-family:"Iowan Old Style","Palatino Linotype",Georgia,serif}
+.psp .hd{padding:13px 16px;border-bottom:2px solid var(--ink);display:flex;align-items:flex-end;gap:10px}
+.psp .hd b{font-size:16px}
+.psp .hd s{text-decoration:none;margin-left:auto;font:700 9.5px/1 ui-monospace,Menlo,monospace;letter-spacing:.14em;color:var(--dim);text-transform:uppercase}
+.psp .stamp{position:absolute;right:16px;top:52px;border:2px solid var(--stamp);color:var(--stamp);
+  font:800 10px/1 ui-monospace,Menlo,monospace;letter-spacing:.16em;padding:6px 9px;transform:rotate(-7deg);opacity:.85}
+.psp table{width:100%;border-collapse:collapse;font-size:12.5px}
+.psp td{padding:7px 16px;border-bottom:1px solid var(--hair)}
+.psp td:first-child{color:var(--dim);width:47%;font-size:11.5px}
+.psp td:last-child{text-align:right;font-family:ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
+.psp .sect{padding:9px 16px 5px;font:700 9.5px/1 ui-monospace,Menlo,monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);border-bottom:1px solid var(--hair)}
+.psp .sig{display:grid;grid-template-columns:1fr 1fr;gap:18px;padding:16px}
+.psp .sig div{border-top:1px solid var(--ink);padding-top:5px;font-size:10.5px;color:var(--dim)}
+
+.verdict{border:1px solid var(--phair);border-left:3px solid #FFC400;border-radius:8px;padding:18px 22px;margin-top:26px;background:var(--pg2)}
+.verdict h3{font-size:15px;margin-bottom:9px}
+.verdict p{color:var(--pdim);font-size:14px;max-width:80ch}
+.verdict p+p{margin-top:9px}
+.verdict b{color:var(--ptx)}
+</style>
+
+<h1>Park — направления дизайна</h1>
+<p class="lede">Сейчас «Аренда спецтехники» выглядит как шаблон админки: скруглённые карточки,
+градиентные столбики, рельс иконок слева. По экрану нельзя понять, что он про технику на объекте.
+Ниже — три ДНК. Не палитры: разные формы, разная типографика, разный носитель. Выбери одну.</p>
+<p class="lede">Работа тут — не «аналитика». Работа — знать, где каждая машина стоит сегодня,
+сколько она наработала и отбивает ли она себя. Три способа это показать.</p>
+
+<div class="rule"></div>
+
+<div class="panels">
+
+  <div class="panel">
+    <div class="phead"><span class="pk">A</span><span class="pname">Диспетчерская доска</span>
+      <span class="pdna">Табло · Гант · моноширинный</span></div>
+    <div class="pwhy">Герой экрана — <b>не строка KPI, а занятость по дням</b>. Как расписание в депо:
+      каждая машина — дорожка, каждый заказ — брусок на ней. Дыры в дорожке и есть недозагрузка, её
+      видно без процента. Жёлтый — сигнальный, как на самой технике.</div>
+    <div class="stage">
+      <div class="cap">Смена · 06.08</div>
+      <div class="m dsp">
+        <div class="top"><b>ПАРК · ДИСПЕТЧЕР</b><span class="t">06.08 · 12 ЕД.</span></div>
+        <div class="cols"><span>ЕДИНИЦА</span><span>АВГУСТ 01—14</span></div>
+        <div class="track"><div class="unit">ЭКСКАВАТОР 01<i>JCB JS200 · 1633 м/ч</i></div>
+          <div class="lane"><span class="blk b-go" style="left:0;width:35%">ООО «СТРОЙПУТЬ»</span><span class="blk b-hot" style="left:50%;width:21%">РЕЗЕРВ</span></div></div>
+        <div class="track"><div class="unit">ПОГРУЗЧИК 03<i>Amkodor 342 · 918 м/ч</i></div>
+          <div class="lane"><span class="blk b-go" style="left:14%;width:43%">ТД «ОВРАЖКИ»</span></div></div>
+        <div class="track"><div class="unit">САМОСВАЛ 07<i>КамАЗ 6520 · 2044 м/ч</i></div>
+          <div class="lane"><span class="blk b-stop" style="left:7%;width:22%">ТО-2</span><span class="blk b-go" style="left:36%;width:50%">АО «ПЕРВАЯ»</span></div></div>
+        <div class="track"><div class="unit">КАТОК 02<i>Hamm HD90 · 407 м/ч</i></div>
+          <div class="lane"></div></div>
+        <div class="foot">
+          <div><s>ЗАГРУЗКА</s><b>20%</b></div><div><s>ВЫРУЧКА</s><b>2 395 206</b></div>
+          <div><s>РЕЗУЛЬТАТ</s><b>2 339 706</b></div><div><s>ПРОСТОЙ</s><b>945 дн.</b></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="phead"><span class="pk">B</span><span class="pname">Приборная панель</span>
+      <span class="pdna">Кабина · моточасы · янтарь</span></div>
+    <div class="pwhy">ДНК приборки самой машины. Одно число размером во весь экран, шкала под ним,
+      три вторичных прибора и строка предупреждений. <b>Читается за полсекунды с трёх метров</b> —
+      ровно так, как читают счётчик моточасов.</div>
+    <div class="stage">
+      <div class="cap">Экскаватор 01</div>
+      <div class="m clu">
+        <div class="hd">ЭКСКАВАТОР 01 · JCB JS200 · СМЕНА 2</div>
+        <div class="main">
+          <div class="big">1 633<s>м/ч</s></div>
+          <div class="sub">наработка за период</div>
+          <div class="arc"><i></i></div>
+        </div>
+        <div class="gau">
+          <div><s>ЗАГРУЗКА</s><b>20%</b></div>
+          <div><s>ВЫРУЧКА/ЕД.</s><b>199 601</b></div>
+          <div><s>РАСХОД</s><b>55 500</b></div>
+        </div>
+        <div class="warn"><span class="dot"></span>ТО-2 через 67 моточасов · страховка до 14.09.2026</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="phead"><span class="pk">C</span><span class="pname">Паспорт машины</span>
+      <span class="pdna">Документ · сервисная книжка · бумага</span></div>
+    <div class="pwhy">Не экран, а <b>документ на технику</b>: карточка единицы как страница сервисной
+      книжки, с печатью и подписями. Светлая по умолчанию. Сильная сторона — договор, акт и счёт
+      печатаются из тех же цифр, и здесь это видно с первого взгляда.</div>
+    <div class="stage">
+      <div class="cap">Карточка единицы</div>
+      <div class="m psp" style="position:relative">
+        <div class="hd"><b>Экскаватор JCB JS200</b><s>ИНВ. 01 · 2019 г.</s></div>
+        <div class="stamp">В РАБОТЕ</div>
+        <div class="sect">Наработка и доход</div>
+        <table>
+          <tr><td>Моточасы за период</td><td>1 633,0</td></tr>
+          <tr><td>Выручка</td><td>720 425 ₽</td></tr>
+          <tr><td>Доля в выручке парка</td><td>30 %</td></tr>
+          <tr><td>Расходы на технику</td><td>55 500 ₽</td></tr>
+          <tr><td>Окупаемость</td><td>4 г. 2 мес.</td></tr>
+        </table>
+        <div class="sect">Обслуживание</div>
+        <table>
+          <tr><td>Последнее ТО</td><td>28.07.2026</td></tr>
+          <tr><td>Следующее ТО</td><td>через 67 м/ч</td></tr>
+        </table>
+        <div class="sig"><div>Механик</div><div>Ответственный</div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="verdict">
+  <h3>Моя ставка — A «Диспетчерская доска»</h3>
+  <p>Она единственная показывает то, за что платят: занятость. <b>20 % загрузки в строке KPI</b> —
+  это цифра, которую надо осмыслить; <b>та же 20 % как дырявые дорожки</b> — это удар под дых,
+  и продаёт она сама.</p>
+  <p>B красивая, но это карточка <i>одной машины</i>, а не парк — как главный экран она не тянет.
+  C стоит взять не вместо A, а <b>внутрь неё</b>: карточка единицы и печать документов.</p>
+  <p>То есть по-хорошему выходит <b>A, а C — её внутренний экран</b>. Обе темы обязательны, как
+  в сканере: тёмная — для смены и работы весь день, светлая — для бумаги.</p>
+  <p>Отдельно, вне выбора ДНК: в файле <b>две таблицы стилей</b>, и вторая лежит физически после
+  <code>&lt;/html&gt;</code> — градиентный текст на KPI, три размытых цветных пятна и плёночное
+  зерно. Её удаление возвращает профессиональный вид за десять минут, при любом выбранном
+  направлении. Подробности и два найденных бага — в <code>docs/PROMPT-park-restyle.md</code>.</p>
+</div>
