@@ -33,7 +33,7 @@ section each made it worse, one of them blanking the page. Restore point:
 **Commit on `react` FIRST, then deploy.** The deploy is:
 
 ```bash
-git checkout main && git checkout react -- app docs && rm -rf app/dist && cd app && npm run build && cd .. && cp app/dist/v2.html index.html && cp app/dist/v2.html app/dist/sw.js app/dist/dna-poster.jpg . && cp app/dist/assets/* assets/ && rsync -a --delete app/dist/demo/ demo/ && git add -A && git commit -m "deploy: <what>" && git push origin main && git checkout react
+git checkout main && git checkout react -- app docs && rm -rf app/dist && cd app && npm run build && cd .. && cp app/dist/v2.html index.html && cp app/dist/v2.html app/dist/sw.js app/dist/dna-poster.jpg . && cp app/dist/assets/* assets/ && rsync -a --delete app/dist/demo/ demo/ && rsync -a app/dist/shots/ shots/ && git add -A && git commit -m "deploy: <what>" && git push origin main && git checkout react
 ```
 
 Four parts of that line are not optional, and each one has already gone wrong:
@@ -51,6 +51,11 @@ Four parts of that line are not optional, and each one has already gone wrong:
   deletes. Demos removed upstream stay behind in `app/public/demo`, get swept into the next
   build, and republish themselves. Three orphan folders (`ekran`, `storozh`, `theatre`) came
   back this way and one was nearly redeployed after being deliberately removed.
+- **`rsync -a app/dist/shots/ shots/`** — the demo cards' screenshots live at `/shots/` on the
+  root and this step was missing from the line entirely, so a re-shot card silently kept
+  serving its old picture: the build was right, `app/public/shots` was right, and the live
+  site was months-old. Found on 6 August when the park card would not change. Without
+  `--delete`, same reasoning as `demo/`.
 - **`rsync -a app/dist/demo/ demo/`** — `cp -r` merges unpredictably across nested asset
   folders. Deliberately **without** `--delete`: `/demo/ekran/` and `/demo/storozh/` are
   live pages that exist only on `main`, and `--delete` would silently unpublish them.
