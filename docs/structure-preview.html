@@ -1,0 +1,133 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8">
+<title>Складской сканер — дело не в цвете</title>
+<style>
+/* Judging page 2. The palette test failed - four palettes read the same - so the variable here
+   is STRUCTURE, and the colour is held constant at the current lime in both panels. */
+*{box-sizing:border-box}
+body{margin:0;background:#17181a;color:#e9eaec;
+  font:14px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+.page{max-width:1400px;margin:0 auto;padding:28px 24px 60px}
+h1{font-size:19px;font-weight:600;letter-spacing:-.01em;margin:0 0 4px}
+.sub{color:#9aa0a6;font-size:13px;margin:0 0 26px;max-width:820px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+.col>h2{font-size:13px;letter-spacing:.08em;text-transform:uppercase;margin:0 0 3px}
+.col>.note{color:#9aa0a6;font-size:12px;margin:0 0 12px;min-height:56px}
+.mono{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+.tells{margin-top:12px;font-size:12px;color:#9aa0a6;padding-left:17px}
+.tells li{margin:3px 0}
+:root{--acc:#d8f60a;--err:#ff6b5e}
+
+/* ══ LEFT: the current structure ═══════════════════════════════════════════
+   Every group is its own rounded card with its own 1px border, evenly spaced,
+   every micro-label in letterspaced caps. */
+.old{background:#0d0f0d;border:1px solid #2c312b;border-radius:12px;padding:14px}
+.old .card{background:#12160f;border:1px solid #2c312b;border-radius:9px;padding:13px;
+  margin-bottom:10px}
+.old .cap{font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#8b9284;
+  margin-bottom:7px}
+.old .addr{font-size:38px;line-height:1;font-weight:700;color:var(--acc);letter-spacing:-.02em}
+.old .goods{margin-top:8px;color:#e6ecdf;font-size:13.5px}
+.old .badge{display:inline-block;margin-top:9px;font-size:10.5px;letter-spacing:.06em;
+  padding:3px 8px;border-radius:4px;border:1px solid rgba(255,107,94,.4);color:var(--err)}
+.old .r{display:flex;justify-content:space-between;font-size:12px;padding:6px 0}
+.old .r span:first-child{color:#8b9284;letter-spacing:.09em;text-transform:uppercase;font-size:10.5px}
+.old .fld{background:#161a15;border:1px solid #2c312b;border-radius:7px;padding:11px;
+  color:#8b9284;font-size:13.5px}
+.old .go{margin-top:9px;background:var(--acc);color:#0d0f0d;border-radius:7px;padding:12px;
+  text-align:center;font-weight:700;font-size:12.5px;letter-spacing:.06em}
+
+/* ══ RIGHT: restructured ═══════════════════════════════════════════════════
+   Same colours. One surface instead of five. Hierarchy from size and weight, not
+   from caps+letterspacing. Content bleeds to the edges. Density varies: the task
+   is huge, the reference data is small and quiet. */
+.new{background:#0d0f0d;border:1px solid #23271f;border-radius:12px;overflow:hidden}
+.new .hero{padding:26px 22px 22px;border-bottom:1px solid #1b1f19}
+.new .kicker{font-size:12.5px;color:#8b9284;margin-bottom:10px}
+.new .addr{font-size:62px;line-height:.92;font-weight:700;color:var(--acc);letter-spacing:-.035em}
+.new .goods{margin-top:14px;color:#e6ecdf;font-size:17px;line-height:1.35;max-width:24ch}
+.new .exp{margin-top:12px;font-size:13px;color:var(--err);display:flex;align-items:center;gap:7px}
+.new .exp i{width:3px;height:15px;background:var(--err);border-radius:2px;display:inline-block}
+/* the reference rows: no card, no borders per row - one rule, tight, small, quiet */
+.new .facts{display:flex;gap:0;border-bottom:1px solid #1b1f19}
+.new .f{flex:1;padding:13px 14px;border-right:1px solid #1b1f19}
+.new .f:last-child{border-right:0}
+.new .f .k{font-size:11px;color:#71785f}
+.new .f .v{margin-top:3px;font-size:16px;color:#e6ecdf}
+.new .f .v.hi{color:var(--acc)}
+.new .foot{padding:16px 18px 18px}
+.new .fld{width:100%;background:#0a0c09;border:0;border-bottom:2px solid #2c312b;
+  padding:12px 2px;color:#5f6653;font-size:20px}
+.new .go{margin-top:14px;background:var(--acc);color:#0d0f0d;border-radius:8px;padding:17px;
+  text-align:center;font-weight:700;font-size:15px;letter-spacing:.02em}
+</style></head><body><div class="page">
+
+<h1>Дело не в цвете</h1>
+<p class="sub">Слева и справа <b>один и тот же лайм</b> — <span class="mono">#d8f60a</span>.
+Меняется только структура. Если разница здесь видна сразу, а между четырьмя палитрами не была —
+значит «ИИ-шность» жила не в цвете.</p>
+
+<div class="grid">
+
+  <div class="col">
+    <h2>Сейчас</h2>
+    <p class="note">Каждая группа — отдельная карточка со своей рамкой и своим отступом.
+       Все подписи капсом вразрядку. Всё одного размера, всё в своей коробке.</p>
+    <div class="old">
+      <div class="card">
+        <div class="cap">Идите к ячейке</div>
+        <div class="addr mono">A-05-3-04</div>
+        <div class="goods">Молоко «Заречье» 3,2% 900 мл</div>
+        <div class="badge mono">FEFO · СРОК 08.08.2026 · 3 ДН.</div>
+      </div>
+      <div class="card">
+        <div class="r"><span>Маршрут</span><span class="mono" style="color:var(--acc)">ШАГ 2 ИЗ 4</span></div>
+        <div class="r"><span>Товар</span><span class="mono">АРТ-1001</span></div>
+        <div class="r"><span>Партия</span><span class="mono">П-3101</span></div>
+        <div class="r"><span>В ячейке по учёту</span><span class="mono">48 шт</span></div>
+      </div>
+      <div class="card">
+        <div class="cap">Отсканируйте адрес ячейки</div>
+        <div class="fld mono">A-05-3-04</div>
+        <div class="go">СКАН</div>
+      </div>
+    </div>
+    <ul class="tells">
+      <li>5 вложенных карточек, 5 рамок</li>
+      <li>7 подписей капсом вразрядку</li>
+      <li>всё на одном уровне важности</li>
+      <li>ничто не касается краёв</li>
+    </ul>
+  </div>
+
+  <div class="col">
+    <h2>Перестроено · тот же цвет</h2>
+    <p class="note">Одна поверхность вместо пяти. Иерархия из размера и веса, а не из капса.
+       Задание огромное, справочные цифры — мелкие и тихие. Контент доходит до краёв.</p>
+    <div class="new">
+      <div class="hero">
+        <div class="kicker">Идите к ячейке</div>
+        <div class="addr mono">A-05-3-04</div>
+        <div class="goods">Молоко «Заречье» 3,2% 900 мл</div>
+        <div class="exp"><i></i>Срок 08.08.2026 — 3 дня. Партия по FEFO.</div>
+      </div>
+      <div class="facts">
+        <div class="f"><div class="k">Шаг</div><div class="v hi mono">2 / 4</div></div>
+        <div class="f"><div class="k">Артикул</div><div class="v mono">АРТ-1001</div></div>
+        <div class="f"><div class="k">Партия</div><div class="v mono">П-3101</div></div>
+        <div class="f"><div class="k">По учёту</div><div class="v mono">48</div></div>
+      </div>
+      <div class="foot">
+        <input class="fld mono" value="A-05-3-04" readonly>
+        <div class="go">Подтвердить ячейку</div>
+      </div>
+    </div>
+    <ul class="tells">
+      <li>1 поверхность, рамки только там, где делят смысл</li>
+      <li>1 подпись капсом — остальное обычным регистром</li>
+      <li>адрес 62px против 16px у справочных цифр</li>
+      <li>строка ввода без коробки, во всю ширину</li>
+    </ul>
+  </div>
+
+</div></div></body></html>

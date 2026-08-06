@@ -1,0 +1,288 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8">
+<title>Складской сканер — визуальная спецификация</title>
+<style>
+/* PRINT SPEC. The interactive version toggles a theme; a PDF cannot, so here the tokens live
+   on .lt / .dk wrappers and BOTH themes render at once on the page. */
+/* print-color-adjust on EVERYTHING, not just the device. Chrome strips background fills when
+   printing unless told otherwise, and the 180-cell map is nothing BUT background fills - it
+   came out as five solid black bars the first time. */
+*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+@page{size:A4 landscape;margin:10mm}
+html,body{margin:0;background:#fff;color:#111;
+  font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;font-size:11px}
+.sheet{width:277mm;margin:0 auto;padding:0 0 8mm}
+.sheet+.sheet{page-break-before:always}
+h1{font-size:19px;font-weight:700;letter-spacing:-.015em;margin:0 0 3px}
+.lede{color:#555;font-size:11px;margin:0 0 12px;max-width:200mm;line-height:1.5}
+h2{font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:#777;
+  margin:0 0 8px;padding-bottom:4px;border-bottom:1px solid #ddd}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:9mm}
+.three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6mm}
+.lab{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#888;margin:0 0 5px}
+.cap{margin-top:5px;font-size:9.5px;color:#666;line-height:1.45}
+table.tok{width:100%;border-collapse:collapse;font-family:ui-monospace,Menlo,monospace;
+  font-size:9px}
+table.tok th{text-align:left;font-weight:600;color:#666;padding:4px 6px;
+  border-bottom:1px solid #ccc;letter-spacing:.06em}
+table.tok td{padding:3px 6px;border-bottom:1px solid #eee}
+table.tok td .sw{display:inline-block;width:9px;height:9px;vertical-align:-1px;
+  margin-right:5px;border:1px solid rgba(0,0,0,.25)}
+ul.rules{margin:0;padding-left:14px;font-size:10px;line-height:1.6;color:#333}
+ul.rules li{margin:2px 0}
+ul.rules b{color:#000}
+
+/* ── theme token sets, scoped so both can appear together ─────────────── */
+.lt{--paper:#F1EFE9;--paper-2:#E5E2D8;--ink:#0B0B0B;--ink-2:#5B5B57;--rule:#0B0B0B;
+    --hair:#C9C4B6;--alert:#C81A1A;--alert-ink:#F1EFE9;--ok:#1B7F3B;--ok-ink:#FFFFFF;
+    --field:#FFFFFF}
+.dk{--paper:#111214;--paper-2:#191B1E;--ink:#EDEDE8;--ink-2:#8C8F94;--rule:#EDEDE8;
+    --hair:#2C2F33;--alert:#FF3B30;--alert-ink:#111214;--ok:#3ECF6B;--ok-ink:#0B0D0B;
+    --field:#0A0B0C}
+
+/* ── the device ───────────────────────────────────────────────────────── */
+.dev{background:var(--paper);border:2px solid var(--rule);color:var(--ink);
+     -webkit-print-color-adjust:exact;print-color-adjust:exact}
+.dev .tl{display:flex;justify-content:space-between;padding:5px 8px;
+  font-family:ui-monospace,Menlo,monospace;font-size:7px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-2);border-bottom:2px solid var(--rule)}
+.stripe{height:8px;background:repeating-linear-gradient(-45deg,
+  var(--rule) 0 6px,var(--paper) 6px 12px)}
+.macro{padding:11px 10px 9px}
+.macro .k{font-family:ui-monospace,Menlo,monospace;font-size:7px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-2);margin-bottom:6px}
+.macro .addr{font-size:34px;font-weight:900;line-height:.84;letter-spacing:-.05em}
+.macro .goods{margin-top:7px;font-size:10px;max-width:26ch;line-height:1.25}
+.macro .warn{margin-top:8px;display:inline-block;background:var(--alert);
+  color:var(--alert-ink);font-family:ui-monospace,Menlo,monospace;font-size:7px;
+  letter-spacing:.11em;padding:4px 7px;text-transform:uppercase;font-weight:700}
+.tel{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:var(--rule);
+  border-top:2px solid var(--rule);border-bottom:2px solid var(--rule)}
+.tel>div{background:var(--paper);padding:6px 7px;font-family:ui-monospace,Menlo,monospace}
+.tel .k{font-size:6.5px;letter-spacing:.13em;color:var(--ink-2);text-transform:uppercase}
+.tel .v{margin-top:3px;font-size:10px;font-weight:600;font-variant-numeric:tabular-nums}
+.in{padding:8px 10px 10px}
+.in .p{font-family:ui-monospace,Menlo,monospace;font-size:7px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-2);margin-bottom:6px}
+.in .f{display:flex;gap:2px}
+.in .fld{flex:1;background:var(--field);border:2px solid var(--rule);padding:8px;
+  font-family:ui-monospace,Menlo,monospace;font-size:10px;color:var(--ink-2)}
+.in .go{background:var(--rule);color:var(--paper);padding:8px 14px;font-weight:800;
+  font-size:8px;letter-spacing:.11em;display:flex;align-items:center}
+.sig{background:var(--ok);color:var(--ok-ink);padding:18px 10px 15px;text-align:center}
+.sig.bad{background:var(--alert);color:var(--alert-ink)}
+.sig .ico{font-size:20px;line-height:1;font-weight:700}
+.sig .msg{margin-top:5px;font-family:ui-monospace,Menlo,monospace;font-size:7.5px;
+  letter-spacing:.15em;text-transform:uppercase;font-weight:700}
+.sig .addr{margin-top:7px;font-size:30px;font-weight:900;line-height:.9;letter-spacing:-.045em}
+.sig .goods{margin-top:5px;font-size:9px;opacity:.92}
+.next{padding:9px;text-align:center;border-bottom:2px solid var(--rule)}
+.next .k{font-family:ui-monospace,Menlo,monospace;font-size:7px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-2)}
+.next .v{margin-top:4px;font-size:21px;font-weight:900;letter-spacing:-.04em}
+
+/* ── the 180-cell map, both themes ────────────────────────────────────── */
+.map{background:var(--paper);border:2px solid var(--rule);padding:8px;color:var(--ink)}
+.map .zt{font-family:ui-monospace,Menlo,monospace;font-size:7px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-2);margin:0 0 5px}
+.racks{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-bottom:8px}
+.rack{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:var(--rule);
+  padding:2px}
+.rack i{display:block;height:9px;background-color:var(--paper);background-image:linear-gradient(var(--c,transparent),var(--c,transparent))}
+.mlegend{display:flex;align-items:center;gap:6px;font-family:ui-monospace,Menlo,monospace;
+  font-size:6.5px;letter-spacing:.12em;color:var(--ink-2);text-transform:uppercase}
+.ramp{display:flex;gap:2px}
+.ramp i{width:14px;height:8px;background:var(--ink)}
+</style></head><body>
+
+<!-- ═══════════ SHEET 1 · the system ═══════════ -->
+<div class="sheet">
+  <h1>Складской сканер — визуальная спецификация</h1>
+  <p class="lede">Одна форма, два основания. Швейцарская промышленная геометрия как скелет,
+     полноэкранный сигнал как обратная связь. Светлая и тёмная — это ОДИН дизайн с подменой
+     токенов, а не два дизайна. Слева всегда светлая, справа тёмная.</p>
+
+  <h2>Экран отбора · задание</h2>
+  <div class="two">
+    <div>
+      <p class="lab">Светлая</p>
+      <div class="dev lt">
+        <div class="tl"><span>Сканер / Терминал</span><span>REV 2.4 — ЗО-7057</span></div>
+        <div class="stripe"></div>
+        <div class="macro"><div class="k">Идите к ячейке</div>
+          <div class="addr">A-05-3-04</div>
+          <div class="goods">Молоко «Заречье» 3,2% 900 мл</div>
+          <div class="warn">Срок 08.08.2026 — 3 дня · FEFO</div></div>
+        <div class="tel">
+          <div><div class="k">Шаг</div><div class="v">2 / 4</div></div>
+          <div><div class="k">Арт</div><div class="v">1001</div></div>
+          <div><div class="k">Партия</div><div class="v">3101</div></div>
+          <div><div class="k">Учёт</div><div class="v">48</div></div></div>
+        <div class="in"><div class="p">Сканируйте адрес ячейки</div>
+          <div class="f"><div class="fld">A-05-3-04</div><div class="go">ВВОД</div></div></div>
+      </div>
+    </div>
+    <div>
+      <p class="lab">Тёмная</p>
+      <div class="dev dk">
+        <div class="tl"><span>Сканер / Терминал</span><span>REV 2.4 — ЗО-7057</span></div>
+        <div class="stripe"></div>
+        <div class="macro"><div class="k">Идите к ячейке</div>
+          <div class="addr">A-05-3-04</div>
+          <div class="goods">Молоко «Заречье» 3,2% 900 мл</div>
+          <div class="warn">Срок 08.08.2026 — 3 дня · FEFO</div></div>
+        <div class="tel">
+          <div><div class="k">Шаг</div><div class="v">2 / 4</div></div>
+          <div><div class="k">Арт</div><div class="v">1001</div></div>
+          <div><div class="k">Партия</div><div class="v">3101</div></div>
+          <div><div class="k">Учёт</div><div class="v">48</div></div></div>
+        <div class="in"><div class="p">Сканируйте адрес ячейки</div>
+          <div class="f"><div class="fld">A-05-3-04</div><div class="go">ВВОД</div></div></div>
+      </div>
+    </div>
+  </div>
+  <p class="cap">Углы строго 90°. Линейки 2px. Штриховка нарисована из тех же токенов, поэтому
+     инвертируется сама. Адрес — единственное крупное на экране; вся телеметрия моноширинная
+     7–10px. Между ними нет промежуточного размера — это и есть иерархия.</p>
+</div>
+
+<!-- ═══════════ SHEET 2 · states ═══════════ -->
+<div class="sheet">
+  <h1>Состояния — заливка несёт смысл, но никогда одна</h1>
+  <p class="lede">Верный скан заливает панель зелёным, отказ — красным. В каждом случае три
+     носителя смысла: знак, строка капсом и адрес крупно. Читается с трёх метров, с погрузчика,
+     боковым зрением.</p>
+
+  <h2>Подтверждение</h2>
+  <div class="two">
+    <div><p class="lab">Светлая</p>
+      <div class="dev lt">
+        <div class="sig"><div class="ico">✓</div><div class="msg">Ячейка подтверждена</div>
+          <div class="addr">A-05-3-04</div>
+          <div class="goods">Молоко «Заречье» 3,2% 900 мл · 48 шт</div></div>
+        <div class="next"><div class="k">Следующая ячейка</div><div class="v">B-01-1-02</div></div>
+      </div></div>
+    <div><p class="lab">Тёмная</p>
+      <div class="dev dk">
+        <div class="sig"><div class="ico">✓</div><div class="msg">Ячейка подтверждена</div>
+          <div class="addr">A-05-3-04</div>
+          <div class="goods">Молоко «Заречье» 3,2% 900 мл · 48 шт</div></div>
+        <div class="next"><div class="k">Следующая ячейка</div><div class="v">B-01-1-02</div></div>
+      </div></div>
+  </div>
+
+  <h2 style="margin-top:9mm">Отказ</h2>
+  <div class="two">
+    <div><p class="lab">Светлая</p>
+      <div class="dev lt">
+        <div class="sig bad"><div class="ico">✕</div><div class="msg">Не та ячейка</div>
+          <div class="addr">B-01-1-01</div>
+          <div class="goods">По маршруту — A-05-3-04</div></div>
+      </div></div>
+    <div><p class="lab">Тёмная</p>
+      <div class="dev dk">
+        <div class="sig bad"><div class="ico">✕</div><div class="msg">Не та ячейка</div>
+          <div class="addr">B-01-1-01</div>
+          <div class="goods">По маршруту — A-05-3-04</div></div>
+      </div></div>
+  </div>
+  <p class="cap">Отказ обязан называть, что отсканировано и что ожидалось. Это лучшее, что есть
+     в приложении — не сокращать.</p>
+</div>
+
+<!-- ═══════════ SHEET 3 · map + tokens ═══════════ -->
+<div class="sheet">
+  <h1>Карта склада и токены</h1>
+  <p class="lede">180 ячеек — самая большая цветная поверхность в приложении. Загруженность
+     рисуется ОДНОЦВЕТНОЙ шкалой плотности, а не оттенками. У последовательных величин нет
+     радуги: у радуги нет порядка, и глаз читает её как категории.</p>
+
+  <h2>Карта · зона A, 5 стеллажей</h2>
+  <div class="two">
+    <div><p class="lab">Светлая</p>
+      <div class="map lt">
+        <p class="zt">Зона A · охлаждение · +2…+6 °C</p>
+        <div class="racks">
+          <div class="rack"><i style="--c:rgba(11,11,11,.85)"></i><i style="--c:rgba(11,11,11,.30)"></i><i style="--c:rgba(11,11,11,.60)"></i><i style="--c:rgba(11,11,11,.10)"></i>
+            <i style="--c:rgba(11,11,11,.45)"></i><i style="--c:rgba(11,11,11,.75)"></i><i style="--c:rgba(11,11,11,.20)"></i><i style="--c:rgba(11,11,11,.55)"></i>
+            <i style="--c:rgba(11,11,11,.35)"></i><i style="--c:rgba(11,11,11,.90)"></i><i style="--c:rgba(11,11,11,.15)"></i><i style="--c:rgba(11,11,11,.65)"></i></div>
+          <div class="rack"><i style="--c:rgba(11,11,11,.25)"></i><i style="--c:rgba(11,11,11,.70)"></i><i style="--c:rgba(11,11,11,.40)"></i><i style="--c:rgba(11,11,11,.80)"></i>
+            <i style="--c:rgba(11,11,11,.12)"></i><i style="--c:rgba(11,11,11,.50)"></i><i style="--c:rgba(11,11,11,.88)"></i><i style="--c:rgba(11,11,11,.32)"></i>
+            <i style="--c:rgba(11,11,11,.60)"></i><i style="--c:rgba(11,11,11,.18)"></i><i style="--c:rgba(11,11,11,.72)"></i><i style="--c:rgba(11,11,11,.44)"></i></div>
+          <div class="rack"><i style="--c:rgba(11,11,11,.55)"></i><i style="--c:rgba(11,11,11,.15)"></i><i style="--c:rgba(11,11,11,.82)"></i><i style="--c:rgba(11,11,11,.38)"></i>
+            <i style="--c:rgba(11,11,11,.66)"></i><i style="--c:rgba(11,11,11,.28)"></i><i style="--c:rgba(11,11,11,.92)"></i><i style="--c:rgba(11,11,11,.48)"></i>
+            <i style="--c:rgba(11,11,11,.22)"></i><i style="--c:rgba(11,11,11,.62)"></i><i style="--c:rgba(11,11,11,.35)"></i><i style="--c:rgba(11,11,11,.78)"></i></div>
+          <div class="rack"><i style="--c:rgba(11,11,11,.42)"></i><i style="--c:rgba(11,11,11,.86)"></i><i style="--c:rgba(11,11,11,.20)"></i><i style="--c:rgba(11,11,11,.58)"></i>
+            <i style="--c:rgba(11,11,11,.74)"></i><i style="--c:rgba(11,11,11,.30)"></i><i style="--c:rgba(11,11,11,.52)"></i><i style="--c:rgba(11,11,11,.14)"></i>
+            <i style="--c:rgba(11,11,11,.68)"></i><i style="--c:rgba(11,11,11,.40)"></i><i style="--c:rgba(11,11,11,.24)"></i><i style="--c:rgba(11,11,11,.90)"></i></div>
+          <div class="rack"><i style="--c:rgba(11,11,11,.08)"></i><i style="--c:rgba(11,11,11,.34)"></i><i style="--c:rgba(11,11,11,.06)"></i><i style="--c:rgba(11,11,11,.46)"></i>
+            <i style="--c:rgba(11,11,11,.10)"></i><i style="--c:rgba(11,11,11,.26)"></i><i style="--c:rgba(11,11,11,.05)"></i><i style="--c:rgba(11,11,11,.18)"></i>
+            <i style="--c:rgba(11,11,11,.30)"></i><i style="--c:rgba(11,11,11,.07)"></i><i style="--c:rgba(11,11,11,.22)"></i><i style="--c:rgba(11,11,11,.12)"></i></div>
+        </div>
+        <div class="mlegend">Свободно<span class="ramp"><i style="opacity:.08"></i><i style="opacity:.28"></i><i style="opacity:.5"></i><i style="opacity:.72"></i><i style="opacity:.92"></i></span>Занято</div>
+      </div></div>
+
+    <div><p class="lab">Тёмная</p>
+      <div class="map dk">
+        <p class="zt">Зона A · охлаждение · +2…+6 °C</p>
+        <div class="racks">
+          <div class="rack"><i style="--c:rgba(237,237,232,.85)"></i><i style="--c:rgba(237,237,232,.30)"></i><i style="--c:rgba(237,237,232,.60)"></i><i style="--c:rgba(237,237,232,.10)"></i>
+            <i style="--c:rgba(237,237,232,.45)"></i><i style="--c:rgba(237,237,232,.75)"></i><i style="--c:rgba(237,237,232,.20)"></i><i style="--c:rgba(237,237,232,.55)"></i>
+            <i style="--c:rgba(237,237,232,.35)"></i><i style="--c:rgba(237,237,232,.90)"></i><i style="--c:rgba(237,237,232,.15)"></i><i style="--c:rgba(237,237,232,.65)"></i></div>
+          <div class="rack"><i style="--c:rgba(237,237,232,.25)"></i><i style="--c:rgba(237,237,232,.70)"></i><i style="--c:rgba(237,237,232,.40)"></i><i style="--c:rgba(237,237,232,.80)"></i>
+            <i style="--c:rgba(237,237,232,.12)"></i><i style="--c:rgba(237,237,232,.50)"></i><i style="--c:rgba(237,237,232,.88)"></i><i style="--c:rgba(237,237,232,.32)"></i>
+            <i style="--c:rgba(237,237,232,.60)"></i><i style="--c:rgba(237,237,232,.18)"></i><i style="--c:rgba(237,237,232,.72)"></i><i style="--c:rgba(237,237,232,.44)"></i></div>
+          <div class="rack"><i style="--c:rgba(237,237,232,.55)"></i><i style="--c:rgba(237,237,232,.15)"></i><i style="--c:rgba(237,237,232,.82)"></i><i style="--c:rgba(237,237,232,.38)"></i>
+            <i style="--c:rgba(237,237,232,.66)"></i><i style="--c:rgba(237,237,232,.28)"></i><i style="--c:rgba(237,237,232,.92)"></i><i style="--c:rgba(237,237,232,.48)"></i>
+            <i style="--c:rgba(237,237,232,.22)"></i><i style="--c:rgba(237,237,232,.62)"></i><i style="--c:rgba(237,237,232,.35)"></i><i style="--c:rgba(237,237,232,.78)"></i></div>
+          <div class="rack"><i style="--c:rgba(237,237,232,.42)"></i><i style="--c:rgba(237,237,232,.86)"></i><i style="--c:rgba(237,237,232,.20)"></i><i style="--c:rgba(237,237,232,.58)"></i>
+            <i style="--c:rgba(237,237,232,.74)"></i><i style="--c:rgba(237,237,232,.30)"></i><i style="--c:rgba(237,237,232,.52)"></i><i style="--c:rgba(237,237,232,.14)"></i>
+            <i style="--c:rgba(237,237,232,.68)"></i><i style="--c:rgba(237,237,232,.40)"></i><i style="--c:rgba(237,237,232,.24)"></i><i style="--c:rgba(237,237,232,.90)"></i></div>
+          <div class="rack"><i style="--c:rgba(237,237,232,.08)"></i><i style="--c:rgba(237,237,232,.34)"></i><i style="--c:rgba(237,237,232,.06)"></i><i style="--c:rgba(237,237,232,.46)"></i>
+            <i style="--c:rgba(237,237,232,.10)"></i><i style="--c:rgba(237,237,232,.26)"></i><i style="--c:rgba(237,237,232,.05)"></i><i style="--c:rgba(237,237,232,.18)"></i>
+            <i style="--c:rgba(237,237,232,.30)"></i><i style="--c:rgba(237,237,232,.07)"></i><i style="--c:rgba(237,237,232,.22)"></i><i style="--c:rgba(237,237,232,.12)"></i></div>
+        </div>
+        <div class="mlegend">Свободно<span class="ramp"><i style="opacity:.08"></i><i style="opacity:.28"></i><i style="opacity:.5"></i><i style="opacity:.72"></i><i style="opacity:.92"></i></span>Занято</div>
+      </div></div>
+  </div>
+
+  <h2 style="margin-top:8mm">Токены — значения измерены, а не выбраны</h2>
+  <div class="two">
+    <table class="tok">
+      <tr><th>роль</th><th>светлая</th><th>тёмная</th></tr>
+      <tr><td>--paper</td><td><span class="sw" style="background:#F1EFE9"></span>#F1EFE9</td><td><span class="sw" style="background:#111214"></span>#111214</td></tr>
+      <tr><td>--paper-2</td><td><span class="sw" style="background:#E5E2D8"></span>#E5E2D8</td><td><span class="sw" style="background:#191B1E"></span>#191B1E</td></tr>
+      <tr><td>--ink</td><td><span class="sw" style="background:#0B0B0B"></span>#0B0B0B</td><td><span class="sw" style="background:#EDEDE8"></span>#EDEDE8</td></tr>
+      <tr><td>--ink-2</td><td><span class="sw" style="background:#5B5B57"></span>#5B5B57</td><td><span class="sw" style="background:#8C8F94"></span>#8C8F94</td></tr>
+      <tr><td>--rule</td><td><span class="sw" style="background:#0B0B0B"></span>#0B0B0B</td><td><span class="sw" style="background:#EDEDE8"></span>#EDEDE8</td></tr>
+      <tr><td>--hair</td><td><span class="sw" style="background:#C9C4B6"></span>#C9C4B6</td><td><span class="sw" style="background:#2C2F33"></span>#2C2F33</td></tr>
+      <tr><td>--alert</td><td><span class="sw" style="background:#C81A1A"></span>#C81A1A</td><td><span class="sw" style="background:#FF3B30"></span>#FF3B30</td></tr>
+      <tr><td>--alert-ink</td><td><span class="sw" style="background:#F1EFE9"></span>#F1EFE9</td><td><span class="sw" style="background:#111214"></span>#111214</td></tr>
+      <tr><td>--ok</td><td><span class="sw" style="background:#1B7F3B"></span>#1B7F3B</td><td><span class="sw" style="background:#3ECF6B"></span>#3ECF6B</td></tr>
+      <tr><td>--ok-ink</td><td><span class="sw" style="background:#FFFFFF"></span>#FFFFFF</td><td><span class="sw" style="background:#0B0D0B"></span>#0B0D0B</td></tr>
+      <tr><td>--field</td><td><span class="sw" style="background:#FFFFFF"></span>#FFFFFF</td><td><span class="sw" style="background:#0A0B0C"></span>#0A0B0C</td></tr>
+      <tr><td>--rule-w</td><td>2px</td><td>2px</td></tr>
+    </table>
+    <div>
+      <ul class="rules">
+        <li><b>Красный и зелёный НАМЕРЕННО разные в темах.</b> Красный, который читается как
+            опасность на бумаге, на угле становится грязным. Не сводить к одному значению.</li>
+        <li><b>Контраст, измеренный:</b> текст на основании 17,1 / 16,0 · вторичный 5,9 / 5,8 ·
+            текст на зелёном 5,1 / 9,6 · текст на красном 5,1 / 5,3.</li>
+        <li><b>0 скруглений.</b> Все углы 90°. Сейчас в файле 2px, 5px и 16px без системы.</li>
+        <li><b>Плотные сетки строятся через</b> <code>display:grid; gap:2px;</code> с фоном
+            <code>--rule</code> — зазоры и есть линейки. Не навешивать рамки на детей.</li>
+        <li><b>Типографика:</b> макро (адрес, количество) — тяжёлый гротеск до 62px, вес 900,
+            трекинг −.05em. Микро (вся телеметрия) — моноширинный 9–14px, трекинг .12–.15em,
+            капсом. Промежуточного размера нет.</li>
+        <li><b>Печатные А4 всегда следуют СВЕТЛЫМ токенам</b> независимо от темы — бумага
+            белая.</li>
+        <li><b>Шрифты только системные.</b> Страница не имеет права загружать вебшрифт.</li>
+        <li><b>Движения почти нет.</b> Кладовщик сканирует сотни раз за смену: на цикле скана
+            не анимируется ничего. Остаётся вспышка сигнала, нажатие scale(.97) ~140ms и
+            панели ОФИСа.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+</body></html>

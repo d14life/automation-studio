@@ -1,0 +1,510 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8">
+<title>Складской сканер — доска направлений</title>
+<style>
+/* One board with everything: the structure finding, the palette study, and eight shape
+   languages. Same screen and same data in every panel, so the only variable is the design.
+   Self-contained, system fonts only. Not part of the product. */
+*{box-sizing:border-box}
+body{margin:0;background:#131416;color:#e9eaec;
+  font:14px/1.55 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+.page{max-width:1640px;margin:0 auto;padding:30px 22px 90px}
+h1{font-size:24px;font-weight:600;margin:0 0 6px;letter-spacing:-.015em}
+.lede{color:#9aa0a6;font-size:13.5px;margin:0 0 8px;max-width:860px}
+h2.sec{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#7e848a;
+  margin:44px 0 4px;padding-top:22px;border-top:1px solid #26282c}
+.secl{color:#9aa0a6;font-size:13px;margin:0 0 20px;max-width:860px}
+.grid{display:grid;gap:22px;align-items:start}
+.g2{grid-template-columns:repeat(auto-fit,minmax(430px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(340px,1fr))}
+.col>h3{font-size:12.5px;letter-spacing:.09em;text-transform:uppercase;margin:0 0 4px}
+.col>.note{color:#9aa0a6;font-size:12.5px;margin:0 0 11px;min-height:58px}
+.tells{margin:11px 0 0;padding-left:16px;font-size:11.5px;color:#9aa0a6}
+.tells li{margin:3px 0}
+.mono{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+.meta{margin-top:9px;color:#7e848a;font-size:11.5px}
+.meta b{color:#b9bec4;font-weight:500}
+
+/* ─── shared mini-panel used by the palette study ─────────────────────── */
+.term{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--bg)}
+.term .bar{display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--bar);
+  border-bottom:1px solid var(--line)}
+.term .sq{width:10px;height:10px;border-radius:2px;background:var(--acc)}
+.term .t{font-size:11px;letter-spacing:.1em;color:var(--ink);font-weight:600}
+.term .tab{margin-left:auto;font-size:10.5px;letter-spacing:.09em;padding:4px 9px;
+  border-radius:4px;background:var(--tabOn);color:var(--tabOnInk);font-weight:600}
+.term .body{padding:15px}
+.term .lbl{font-size:10.5px;letter-spacing:.11em;color:var(--dim);margin-bottom:7px}
+.term .addr{font-size:36px;line-height:1;font-weight:700;letter-spacing:-.025em;color:var(--acc)}
+.term .goods{margin-top:9px;color:var(--ink);font-size:13.5px}
+.term .fefo{display:inline-block;margin-top:9px;font-size:10.5px;letter-spacing:.06em;
+  padding:3px 8px;border-radius:3px;color:var(--warn);border:1px solid var(--warnLine)}
+.term .rows{margin-top:13px;border-top:1px solid var(--line)}
+.term .row{display:flex;justify-content:space-between;padding:7px 0;font-size:12px;
+  border-bottom:1px solid var(--line)}
+.term .row .k{color:var(--dim);letter-spacing:.05em}
+.term .row .v{color:var(--ink)}
+.term .scan{margin-top:13px;display:flex;gap:8px}
+.term .fld{flex:1;background:var(--fld);border:1px solid var(--line);border-radius:6px;
+  padding:10px 11px;color:var(--dim);font-size:13.5px}
+.term .go{padding:10px 18px;border-radius:6px;background:var(--btn);color:var(--btnInk);
+  font-weight:700;font-size:12px;letter-spacing:.06em;display:flex;align-items:center}
+.p0{--bg:#0d0f0d;--bar:#111411;--line:#2c312b;--ink:#e6ecdf;--dim:#8b9284;--acc:#d8f60a;
+  --tabOn:#d8f60a;--tabOnInk:#0d0f0d;--btn:#d8f60a;--btnInk:#0d0f0d;--fld:#161a15;
+  --warn:#ff6b5e;--warnLine:rgba(255,107,94,.4)}
+.p1{--bg:#0b0f0c;--bar:#0e130f;--line:rgba(255,255,255,.08);--ink:#e8ede4;--dim:#8a9384;
+  --acc:#b4d600;--tabOn:rgba(180,214,0,.14);--tabOnInk:#b4d600;--btn:#b4d600;--btnInk:#0b0f0c;
+  --fld:#0e130f;--warn:#e8a33d;--warnLine:rgba(232,163,61,.32)}
+.p2{--bg:#0f1113;--bar:#131619;--line:rgba(255,255,255,.09);--ink:#eef1f4;--dim:#858c93;
+  --acc:#e8edf2;--tabOn:rgba(232,237,242,.12);--tabOnInk:#eef1f4;--btn:#e8edf2;--btnInk:#0f1113;
+  --fld:#131619;--warn:#e8a33d;--warnLine:rgba(232,163,61,.32)}
+.p3{--bg:#101410;--bar:#141913;--line:rgba(198,217,46,.13);--ink:#e4e9d8;--dim:#8b9179;
+  --acc:#c6d92e;--tabOn:rgba(198,217,46,.15);--tabOnInk:#c6d92e;--btn:#c6d92e;--btnInk:#101410;
+  --fld:#141913;--warn:#e8a33d;--warnLine:rgba(232,163,61,.34)}
+
+/* ─── structure study ─────────────────────────────────────────────────── */
+.old{background:#0d0f0d;border:1px solid #2c312b;border-radius:12px;padding:13px}
+.old .card{background:#12160f;border:1px solid #2c312b;border-radius:9px;padding:12px;
+  margin-bottom:9px}
+.old .cap{font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#8b9284;
+  margin-bottom:6px}
+.old .addr{font-size:34px;line-height:1;font-weight:700;color:#d8f60a;letter-spacing:-.02em}
+.old .goods{margin-top:7px;color:#e6ecdf;font-size:13px}
+.old .r{display:flex;justify-content:space-between;font-size:12px;padding:5px 0}
+.old .r span:first-child{color:#8b9284;letter-spacing:.09em;text-transform:uppercase;font-size:10.5px}
+.old .fld{background:#161a15;border:1px solid #2c312b;border-radius:7px;padding:10px;
+  color:#8b9284;font-size:13px}
+.old .go{margin-top:8px;background:#d8f60a;color:#0d0f0d;border-radius:7px;padding:11px;
+  text-align:center;font-weight:700;font-size:12px;letter-spacing:.06em}
+.new{background:#0d0f0d;border:1px solid #23271f;border-radius:12px;overflow:hidden}
+.new .hero{padding:24px 20px 20px;border-bottom:1px solid #1b1f19}
+.new .kicker{font-size:12.5px;color:#8b9284;margin-bottom:9px}
+.new .addr{font-size:58px;line-height:.92;font-weight:700;color:#d8f60a;letter-spacing:-.035em}
+.new .goods{margin-top:13px;color:#e6ecdf;font-size:16px;max-width:24ch;line-height:1.35}
+.new .exp{margin-top:11px;font-size:13px;color:#ff6b5e;display:flex;align-items:center;gap:7px}
+.new .exp i{width:3px;height:15px;background:#ff6b5e;border-radius:2px}
+.new .facts{display:flex;border-bottom:1px solid #1b1f19}
+.new .f{flex:1;padding:12px 13px;border-right:1px solid #1b1f19}
+.new .f:last-child{border-right:0}
+.new .f .k{font-size:11px;color:#71785f}
+.new .f .v{margin-top:3px;font-size:16px;color:#e6ecdf}
+.new .foot{padding:15px 17px 17px}
+.new .fld{width:100%;background:#0a0c09;border:0;border-bottom:2px solid #2c312b;
+  padding:11px 2px;color:#5f6653;font-size:19px}
+.new .go{margin-top:13px;background:#d8f60a;color:#0d0f0d;border-radius:8px;padding:16px;
+  text-align:center;font-weight:700;font-size:15px}
+
+/* ═══ A tactical ═══ */
+.a{background:#0E0E0E;position:relative;overflow:hidden;color:#EAEAEA;
+   font-family:ui-monospace,Menlo,monospace}
+.a::after{content:'';position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.16) 2px,rgba(0,0,0,.16) 3px)}
+.a .hd{display:grid;grid-template-columns:1fr auto;gap:1px;background:#242424;border-bottom:1px solid #242424}
+.a .hd>div{background:#0E0E0E;padding:7px 11px;font-size:10px;letter-spacing:.11em;color:#7A7A7A}
+.a .task{padding:8px 11px;font-size:10px;letter-spacing:.11em;color:#E61919;border-bottom:1px solid #242424}
+.a .macro{padding:20px 11px 16px;border-bottom:1px solid #242424}
+.a .macro .k{font-size:10px;letter-spacing:.11em;color:#7A7A7A;margin-bottom:11px}
+.a .macro .addr{font-family:ui-sans-serif,system-ui,sans-serif;font-size:56px;font-weight:800;
+  line-height:.86;letter-spacing:-.045em}
+.a .macro .goods{margin-top:12px;font-size:11px;letter-spacing:.08em;color:#B9B9B9;text-transform:uppercase}
+.a .alert{padding:8px 11px;background:#E61919;color:#0E0E0E;font-size:10px;letter-spacing:.1em;font-weight:700}
+.a .tel{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:#242424}
+.a .tel>div{background:#0E0E0E;padding:9px 10px}
+.a .tel .k{font-size:9px;letter-spacing:.11em;color:#6E6E6E}
+.a .tel .v{margin-top:4px;font-size:13px;font-variant-numeric:tabular-nums}
+.a .in{border-top:1px solid #242424;padding:11px}
+.a .in .p{font-size:10px;letter-spacing:.11em;color:#7A7A7A;margin-bottom:8px}
+.a .in .f{display:grid;grid-template-columns:1fr auto;gap:1px;background:#242424}
+.a .in .f>div{background:#141414;padding:12px;font-size:14px;letter-spacing:.06em}
+.a .in .f .go{background:#EAEAEA;color:#0E0E0E;font-weight:700;font-size:11px;letter-spacing:.13em;
+  display:flex;align-items:center}
+
+/* ═══ B swiss ═══ */
+.b{background:#F1EFE9;color:#0B0B0B;font-family:ui-sans-serif,system-ui,sans-serif}
+.b .top{display:flex;justify-content:space-between;padding:8px 12px;font-family:ui-monospace,Menlo,monospace;
+  font-size:9.5px;letter-spacing:.13em;border-bottom:2px solid #0B0B0B;text-transform:uppercase}
+.b .bar{height:12px;background:repeating-linear-gradient(-45deg,#0B0B0B 0 8px,#F1EFE9 8px 16px)}
+.b .macro{padding:18px 12px 14px}
+.b .macro .k{font-family:ui-monospace,Menlo,monospace;font-size:9.5px;letter-spacing:.13em;
+  text-transform:uppercase;color:#5B5B57;margin-bottom:9px}
+.b .macro .addr{font-size:58px;font-weight:900;line-height:.84;letter-spacing:-.05em}
+.b .macro .goods{margin-top:11px;font-size:14px;max-width:26ch;line-height:1.25}
+.b .strike{margin-top:12px;display:inline-block;background:#E61919;color:#F1EFE9;
+  font-family:ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:.11em;padding:5px 9px;
+  text-transform:uppercase;font-weight:700}
+.b .tel{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:#0B0B0B;
+  border-top:2px solid #0B0B0B;border-bottom:2px solid #0B0B0B}
+.b .tel>div{background:#F1EFE9;padding:9px 10px;font-family:ui-monospace,Menlo,monospace}
+.b .tel .k{font-size:9px;letter-spacing:.12em;color:#5B5B57;text-transform:uppercase}
+.b .tel .v{margin-top:3px;font-size:13px;font-weight:600;font-variant-numeric:tabular-nums}
+.b .in{padding:12px}
+.b .in .f{display:flex;gap:2px}
+.b .in .fld{flex:1;border:2px solid #0B0B0B;padding:11px;font-family:ui-monospace,Menlo,monospace;
+  font-size:14px;letter-spacing:.06em}
+.b .in .go{background:#0B0B0B;color:#F1EFE9;padding:11px 20px;font-weight:800;font-size:11.5px;
+  letter-spacing:.11em;display:flex;align-items:center}
+
+/* ═══ D gauge ═══ */
+.d{background:#0C0E10;color:#E6EAEF;padding:22px 16px 18px}
+.d .head{display:flex;justify-content:space-between;font-size:10px;letter-spacing:.12em;
+  color:#6B7684;text-transform:uppercase;margin-bottom:16px}
+.gauge{position:relative;width:250px;height:250px;margin:0 auto}
+.gauge .ring{position:absolute;inset:0;border-radius:50%;
+  background:conic-gradient(#5AA0FF 0deg 180deg,#1B2028 180deg 360deg);
+  -webkit-mask:radial-gradient(circle,transparent 100px,#000 100px);
+          mask:radial-gradient(circle,transparent 100px,#000 100px)}
+.gauge .core{position:absolute;inset:24px;border-radius:50%;background:#0C0E10;border:1px solid #1B2028;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 14px}
+.gauge .k{font-size:9.5px;letter-spacing:.14em;color:#6B7684;text-transform:uppercase}
+.gauge .addr{font-family:ui-monospace,Menlo,monospace;font-size:31px;font-weight:700;
+  letter-spacing:-.03em;margin:8px 0 6px;line-height:1}
+.gauge .goods{font-size:11.5px;color:#9AA6B4;line-height:1.3}
+.gauge .step{margin-top:9px;font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:#5AA0FF;
+  letter-spacing:.08em}
+.d .warn{margin:16px auto 0;max-width:300px;text-align:center;font-size:12px;color:#F0A93B;
+  padding:8px 10px;border-top:1px solid #1B2028;border-bottom:1px solid #1B2028}
+.d .dials{display:flex;justify-content:center;gap:22px;margin-top:14px}
+.d .dial{text-align:center}
+.d .dial .n{font-family:ui-monospace,Menlo,monospace;font-size:18px;font-variant-numeric:tabular-nums}
+.d .dial .l{font-size:9px;letter-spacing:.13em;color:#6B7684;text-transform:uppercase;margin-top:3px}
+.d .in{margin-top:16px;display:flex;justify-content:center}
+.d .pill{display:flex;align-items:center;gap:12px;border:1px solid #2C333D;border-radius:999px;
+  padding:4px 4px 4px 18px}
+.d .pill .v{font-family:ui-monospace,Menlo,monospace;font-size:15px;color:#6B7684;letter-spacing:.06em}
+.d .pill .go{background:#5AA0FF;color:#0C0E10;border-radius:999px;padding:10px 20px;font-weight:700;
+  font-size:12px}
+
+/* ═══ E tag ═══ */
+.e{display:flex;background:#EFEDE6;color:#111;position:relative;min-height:310px;
+   font-family:ui-sans-serif,system-ui,sans-serif}
+.e .notch{position:absolute;width:20px;height:20px;border-radius:50%;background:#131416;left:calc(68% - 10px)}
+.e .notch.t{top:-10px} .e .notch.b{bottom:-10px}
+.e .main{flex:0 0 68%;padding:18px;border-right:2px dashed #B9B4A6;display:flex;flex-direction:column}
+.e .code{font-family:ui-monospace,Menlo,monospace;font-size:9.5px;letter-spacing:.15em;color:#7A7466;
+  text-transform:uppercase}
+.e .addr{font-size:50px;font-weight:900;letter-spacing:-.05em;line-height:.86;margin:12px 0 0}
+.e .goods{margin-top:11px;font-size:14px;max-width:24ch;line-height:1.3}
+.e .warn{margin-top:auto;display:inline-block;align-self:flex-start;background:#111;color:#EFEDE6;
+  font-family:ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:.1em;padding:6px 9px;
+  text-transform:uppercase}
+.e .in{margin-top:13px;display:flex;border:2px solid #111}
+.e .in .f{flex:1;padding:10px 11px;font-family:ui-monospace,Menlo,monospace;font-size:14px;color:#7A7466}
+.e .in .go{background:#111;color:#EFEDE6;padding:10px 18px;font-weight:800;font-size:11.5px;
+  letter-spacing:.1em;display:flex;align-items:center}
+.e .stub{flex:1;padding:15px 10px;display:flex;flex-direction:column;justify-content:space-between;
+  align-items:center;background:#E5E2D8}
+.e .stub .rot{writing-mode:vertical-rl;transform:rotate(180deg);font-family:ui-monospace,Menlo,monospace;
+  font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#4A4638}
+.e .stub .big{font-family:ui-monospace,Menlo,monospace;font-size:26px;font-weight:700;
+  font-variant-numeric:tabular-nums;line-height:1;text-align:center}
+.e .stub .lbl{font-family:ui-monospace,Menlo,monospace;font-size:8.5px;letter-spacing:.13em;
+  color:#7A7466;text-transform:uppercase;margin-top:3px;text-align:center}
+.e .stub .bc{width:100%;height:40px;background:repeating-linear-gradient(90deg,#111 0 2px,
+  transparent 2px 4px,#111 4px 7px,transparent 7px 9px,#111 9px 10px,transparent 10px 13px)}
+
+/* ═══ F helix — the site's own DNA ═══ */
+.f{background:#0e202d;color:#F2F7F5;position:relative;overflow:hidden;padding:22px 18px 20px}
+.f .strand{position:absolute;left:0;right:0;top:0;bottom:0;pointer-events:none;opacity:.5}
+.f .hd{position:relative;display:flex;justify-content:space-between;font-size:10.5px;
+  letter-spacing:.1em;color:#7FA2AE;text-transform:uppercase}
+.f .macro{position:relative;margin-top:26px}
+.f .macro .k{font-size:12.5px;color:#7FA2AE;margin-bottom:9px}
+.f .macro .addr{font-family:ui-monospace,Menlo,monospace;font-size:52px;font-weight:700;
+  line-height:.94;letter-spacing:-.035em;
+  background:linear-gradient(180deg,#FFFFFF,#8FD4E8);-webkit-background-clip:text;
+  background-clip:text;color:transparent}
+.f .macro .goods{margin-top:12px;font-size:15px;max-width:24ch;line-height:1.35;color:#D6E4EA}
+.f .macro .exp{margin-top:12px;font-size:12.5px;color:#F0A93B;display:flex;gap:8px;align-items:center}
+.f .macro .exp i{width:3px;height:14px;background:#F0A93B;border-radius:2px}
+.f .tel{position:relative;display:flex;margin-top:18px;border-top:1px solid rgba(255,255,255,.1);
+  border-bottom:1px solid rgba(255,255,255,.1)}
+.f .tel>div{flex:1;padding:11px 12px;border-right:1px solid rgba(255,255,255,.1)}
+.f .tel>div:last-child{border-right:0}
+.f .tel .k{font-size:10.5px;color:#6E8B98}
+.f .tel .v{margin-top:3px;font-size:15px;font-family:ui-monospace,Menlo,monospace;
+  font-variant-numeric:tabular-nums}
+.f .in{position:relative;margin-top:15px}
+.f .in .fld{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);
+  border-radius:10px;padding:12px 13px;color:#7FA2AE;font-size:16px;
+  font-family:ui-monospace,Menlo,monospace}
+.f .in .go{margin-top:11px;background:#F2F7F5;color:#0e202d;border-radius:999px;padding:15px;
+  text-align:center;font-weight:700;font-size:14.5px}
+
+/* ═══ G command line ═══ */
+.g{background:#08090A;color:#C8D0C8;font-family:ui-monospace,Menlo,monospace;padding:16px 15px 18px;
+   font-size:13px;line-height:1.75}
+.g .dim{color:#5A6259}
+.g .ok{color:#7FD962}
+.g .err{color:#E5675C}
+.g .warn{color:#E0A93B}
+.g .big{display:block;font-size:44px;line-height:1.05;letter-spacing:-.03em;color:#F0F5EF;
+  margin:10px 0 6px;font-weight:700}
+.g .cur{display:inline-block;width:9px;height:17px;background:#7FD962;vertical-align:-3px;
+  margin-left:3px}
+
+/* ═══ H signal — the whole screen is the state ═══ */
+.h{background:#0A0A0A;color:#fff;position:relative}
+.h .state{background:#12A150;padding:34px 18px 30px;text-align:center}
+.h .state .ico{font-size:34px;line-height:1}
+.h .state .msg{margin-top:9px;font-size:13px;letter-spacing:.14em;text-transform:uppercase;
+  font-weight:700;opacity:.85}
+.h .state .addr{margin-top:12px;font-family:ui-monospace,Menlo,monospace;font-size:52px;
+  font-weight:700;letter-spacing:-.03em;line-height:1}
+.h .state .goods{margin-top:10px;font-size:14px;opacity:.9}
+.h .next{padding:18px;text-align:center;border-bottom:1px solid #1E1E1E}
+.h .next .k{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#7A7A7A}
+.h .next .v{margin-top:8px;font-family:ui-monospace,Menlo,monospace;font-size:34px;font-weight:700;
+  letter-spacing:-.03em}
+.h .tel{display:flex}
+.h .tel>div{flex:1;padding:12px;text-align:center;border-right:1px solid #1E1E1E}
+.h .tel>div:last-child{border-right:0}
+.h .tel .k{font-size:9.5px;letter-spacing:.13em;color:#7A7A7A;text-transform:uppercase}
+.h .tel .v{margin-top:4px;font-family:ui-monospace,Menlo,monospace;font-size:17px;
+  font-variant-numeric:tabular-nums}
+
+@page{size:A4 landscape;margin:8mm}
+*{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+@media print{
+  body{background:#131416}
+  .page{max-width:none;padding:0}
+  .col{break-inside:avoid;page-break-inside:avoid}
+  h2.sec{break-before:page;page-break-before:always}
+  h2.sec:first-of-type{break-before:auto;page-break-before:auto}
+}
+</style></head><body><div class="page">
+
+<h1>Складской сканер — доска направлений</h1>
+<p class="lede">Всё, что собрано до сих пор, в одном файле. Везде один и тот же экран отбора и
+одни и те же данные, чтобы сравнивать можно было только дизайн.</p>
+
+<!-- ═══════════ 1. STRUCTURE ═══════════ -->
+<h2 class="sec">Findings · дело оказалось не в цвете</h2>
+<p class="secl">Четыре палитры оказались неразличимы. Две структуры с ОДНИМ И ТЕМ ЖЕ лаймом —
+различаются мгновенно. Значит «ИИ-шность» жила в структуре.</p>
+<div class="grid g2">
+  <div class="col">
+    <h3>Сейчас</h3>
+    <p class="note">Пять вложенных карточек, у каждой своя рамка. Семь подписей капсом.
+       Всё примерно одного размера, каждое в своей коробке.</p>
+    <div class="old">
+      <div class="card"><div class="cap">Идите к ячейке</div><div class="addr mono">A-05-3-04</div>
+        <div class="goods">Молоко «Заречье» 3,2% 900 мл</div></div>
+      <div class="card">
+        <div class="r"><span>Маршрут</span><span class="mono" style="color:#d8f60a">ШАГ 2 ИЗ 4</span></div>
+        <div class="r"><span>Товар</span><span class="mono">АРТ-1001</span></div>
+        <div class="r"><span>Партия</span><span class="mono">П-3101</span></div>
+        <div class="r"><span>В ячейке по учёту</span><span class="mono">48 шт</span></div></div>
+      <div class="card"><div class="cap">Отсканируйте адрес ячейки</div>
+        <div class="fld mono">A-05-3-04</div><div class="go">СКАН</div></div>
+    </div>
+    <ul class="tells"><li>5 рамок · 7 подписей капсом</li><li>ничто не касается краёв</li></ul>
+  </div>
+  <div class="col">
+    <h3>Перестроено · тот же цвет</h3>
+    <p class="note">Одна поверхность. Иерархия из размера, а не из капса. Адрес 58px против
+       справочных 16px. Ввод — линейка во всю ширину, а не коробка.</p>
+    <div class="new">
+      <div class="hero"><div class="kicker">Идите к ячейке</div><div class="addr mono">A-05-3-04</div>
+        <div class="goods">Молоко «Заречье» 3,2% 900 мл</div>
+        <div class="exp"><i></i>Срок 08.08.2026 — 3 дня. Партия по FEFO.</div></div>
+      <div class="facts">
+        <div class="f"><div class="k">Шаг</div><div class="v mono">2 / 4</div></div>
+        <div class="f"><div class="k">Артикул</div><div class="v mono">1001</div></div>
+        <div class="f"><div class="k">Партия</div><div class="v mono">3101</div></div>
+        <div class="f"><div class="k">Учёт</div><div class="v mono">48</div></div></div>
+      <div class="foot"><div class="fld mono">A-05-3-04</div>
+        <div class="go">Подтвердить ячейку</div></div>
+    </div>
+    <ul class="tells"><li>1 поверхность · 1 подпись капсом</li><li>ввод доходит до краёв</li></ul>
+  </div>
+</div>
+
+<!-- ═══════════ 2. PALETTES ═══════════ -->
+<h2 class="sec">Палитры · разница есть, но она мелкая</h2>
+<p class="secl">Оставлено для полноты: вот почему цвет оказался не тем рычагом.</p>
+<div class="grid g3">
+  <div class="col"><h3>0 · Сейчас</h3><p class="note">Акцент делает шесть работ сразу.</p>
+    <div class="term p0"><div class="bar"><span class="sq"></span><span class="t">СКАНЕР</span><span class="tab">ТЕРМИНАЛ</span></div>
+    <div class="body"><div class="lbl">ИДИТЕ К ЯЧЕЙКЕ</div><div class="addr mono">A-05-3-04</div>
+    <div class="goods">Молоко «Заречье» 3,2% 900 мл</div><div class="fefo mono">FEFO · 08.08.2026</div>
+    <div class="rows"><div class="row"><span class="k">ШАГ</span><span class="v mono">2 / 4</span></div>
+    <div class="row"><span class="k">УЧЁТ</span><span class="v mono">48 шт</span></div></div>
+    <div class="scan"><div class="fld mono">A-05-3-04</div><div class="go">СКАН</div></div></div></div>
+    <p class="meta"><b>#d8f60a</b> · насыщ. <b>0.93</b></p></div>
+
+  <div class="col"><h3>A · Глубже</h3><p class="note">Тот же зелёный на шаг глубже, акцент реже.</p>
+    <div class="term p1"><div class="bar"><span class="sq"></span><span class="t">СКАНЕР</span><span class="tab">ТЕРМИНАЛ</span></div>
+    <div class="body"><div class="lbl">ИДИТЕ К ЯЧЕЙКЕ</div><div class="addr mono">A-05-3-04</div>
+    <div class="goods">Молоко «Заречье» 3,2% 900 мл</div><div class="fefo mono">FEFO · 08.08.2026</div>
+    <div class="rows"><div class="row"><span class="k">ШАГ</span><span class="v mono">2 / 4</span></div>
+    <div class="row"><span class="k">УЧЁТ</span><span class="v mono">48 шт</span></div></div>
+    <div class="scan"><div class="fld mono">A-05-3-04</div><div class="go">СКАН</div></div></div></div>
+    <p class="meta"><b>#b4d600</b> · насыщ. <b>0.84</b></p></div>
+
+  <div class="col"><h3>B · Холодный</h3><p class="note">Почти белый как основной цвет.</p>
+    <div class="term p2"><div class="bar"><span class="sq" style="background:#b4d600"></span><span class="t">СКАНЕР</span><span class="tab">ТЕРМИНАЛ</span></div>
+    <div class="body"><div class="lbl">ИДИТЕ К ЯЧЕЙКЕ</div><div class="addr mono">A-05-3-04</div>
+    <div class="goods">Молоко «Заречье» 3,2% 900 мл</div><div class="fefo mono">FEFO · 08.08.2026</div>
+    <div class="rows"><div class="row"><span class="k">ШАГ</span><span class="v mono">2 / 4</span></div>
+    <div class="row"><span class="k">УЧЁТ</span><span class="v mono">48 шт</span></div></div>
+    <div class="scan"><div class="fld mono">A-05-3-04</div><div class="go">СКАН</div></div></div></div>
+    <p class="meta"><b>#e8edf2</b> · насыщ. <b>0.04</b></p></div>
+
+  <div class="col"><h3>C · Зелёный корпус</h3><p class="note">Зелёный уходит в сам корпус.</p>
+    <div class="term p3"><div class="bar"><span class="sq"></span><span class="t">СКАНЕР</span><span class="tab">ТЕРМИНАЛ</span></div>
+    <div class="body"><div class="lbl">ИДИТЕ К ЯЧЕЙКЕ</div><div class="addr mono">A-05-3-04</div>
+    <div class="goods">Молоко «Заречье» 3,2% 900 мл</div><div class="fefo mono">FEFO · 08.08.2026</div>
+    <div class="rows"><div class="row"><span class="k">ШАГ</span><span class="v mono">2 / 4</span></div>
+    <div class="row"><span class="k">УЧЁТ</span><span class="v mono">48 шт</span></div></div>
+    <div class="scan"><div class="fld mono">A-05-3-04</div><div class="go">СКАН</div></div></div></div>
+    <p class="meta"><b>#c6d92e</b> · насыщ. <b>0.67</b></p></div>
+</div>
+
+<!-- ═══════════ 3. SHAPE LANGUAGES ═══════════ -->
+<h2 class="sec">Восемь ДНК · меняется скелет, а не краска</h2>
+<p class="secl">Здесь отличается сама конструкция: геометрия, где живёт задание, чем измеряется
+прогресс, из чего сделаны разделители.</p>
+
+<div class="grid g2">
+
+  <div class="col">
+    <h3>A · Тактический терминал</h3>
+    <p class="note">Военная телеметрия. Углы строго 90°, ни одного скругления, разделители
+       через grid gap:1px. Акцент — аварийный красный. Скан-линии как на ЭЛТ.</p>
+    <div class="a">
+      <div class="hd"><div>СКАНЕР · ТЕРМИНАЛ</div><div>REV 2.4 · UNIT D-01</div></div>
+      <div class="task">[ ОТБОР ] ЗО-7057 · СМЕНА 1</div>
+      <div class="macro"><div class="k">&gt;&gt;&gt; ИДИТЕ К ЯЧЕЙКЕ</div>
+        <div class="addr">A-05-3-04</div>
+        <div class="goods">Молоко «Заречье» 3,2% 900 мл</div></div>
+      <div class="alert">⚠ СРОК 08.08.2026 — 3 ДНЯ · FEFO</div>
+      <div class="tel"><div><div class="k">ШАГ</div><div class="v">2 / 4</div></div>
+        <div><div class="k">АРТ</div><div class="v">1001</div></div>
+        <div><div class="k">ПАРТИЯ</div><div class="v">3101</div></div>
+        <div><div class="k">УЧЁТ</div><div class="v">48</div></div></div>
+      <div class="in"><div class="p">/// СКАНИРУЙТЕ АДРЕС</div>
+        <div class="f"><div>A-05-3-04</div><div class="go">ВВОД</div></div></div>
+    </div>
+    <ul class="tells"><li>0 скруглений · адрес 56px против 9px</li><li>красный только там, где нужна реакция</li></ul>
+  </div>
+
+  <div class="col">
+    <h3>B · Швейцарская печать</h3>
+    <p class="note">Светлый. Бумага и краска, заводская документация 1960-х. Единственный
+       вариант, который читается на солнце в цеху.</p>
+    <div class="b">
+      <div class="top"><span>Сканер / Терминал</span><span>REV 2.4 — ЗО-7057</span></div>
+      <div class="bar"></div>
+      <div class="macro"><div class="k">Идите к ячейке</div><div class="addr">A-05-3-04</div>
+        <div class="goods">Молоко «Заречье» 3,2% 900 мл</div>
+        <div class="strike">Срок 08.08.2026 — 3 дня · FEFO</div></div>
+      <div class="tel"><div><div class="k">Шаг</div><div class="v">2 / 4</div></div>
+        <div><div class="k">Арт</div><div class="v">1001</div></div>
+        <div><div class="k">Партия</div><div class="v">3101</div></div>
+        <div><div class="k">Учёт</div><div class="v">48</div></div></div>
+      <div class="in"><div class="f"><div class="fld">A-05-3-04</div><div class="go">ВВОД</div></div></div>
+    </div>
+    <ul class="tells"><li>адрес 58px, вес 900</li><li>штриховка = физическая маркировка</li></ul>
+  </div>
+
+  <div class="col">
+    <h3>D · Приборная шкала</h3>
+    <p class="note">Геометрия круглая. Кольцо — это и есть маршрут: два сегмента из четырёх
+       закрашены. Ни одного составленного прямоугольника.</p>
+    <div class="d">
+      <div class="head"><span>Складской сканер</span><span>ЗО-7057</span></div>
+      <div class="gauge"><div class="ring"></div>
+        <div class="core"><div class="k">Идите к ячейке</div><div class="addr">A-05-3-04</div>
+          <div class="goods">Молоко «Заречье»<br>3,2% 900 мл</div>
+          <div class="step">ШАГ 2 / 4</div></div></div>
+      <div class="warn">Срок 08.08.2026 — 3 дня · FEFO</div>
+      <div class="dials"><div class="dial"><div class="n">1001</div><div class="l">артикул</div></div>
+        <div class="dial"><div class="n">3101</div><div class="l">партия</div></div>
+        <div class="dial"><div class="n">48</div><div class="l">учёт</div></div></div>
+      <div class="in"><div class="pill"><span class="v">A-05-3-04</span><span class="go">ВВОД</span></div></div>
+    </div>
+    <ul class="tells"><li>кольцо = прогресс маршрута</li><li>риск: круг ест место на телефоне</li></ul>
+  </div>
+
+  <div class="col">
+    <h3>E · Багажная бирка</h3>
+    <p class="note">Физический предмет: панель задания, перфорация с высечками, отрывной
+       корешок с телеметрией боком и штрихкодом. Деление вдоль, а не стопкой.</p>
+    <div class="e">
+      <span class="notch t"></span><span class="notch b"></span>
+      <div class="main"><div class="code">ЗО-7057 · Смена 1 · Кузнецов И.С.</div>
+        <div class="addr">A-05-3-04</div>
+        <div class="goods">Молоко «Заречье» 3,2% 900 мл</div>
+        <div class="warn">Срок 08.08.2026 — 3 дня · FEFO</div>
+        <div class="in"><div class="f">A-05-3-04</div><div class="go">ВВОД</div></div></div>
+      <div class="stub"><div class="rot">Арт 1001 · Партия 3101</div>
+        <div><div class="big">2/4</div><div class="lbl">шаг</div></div>
+        <div><div class="big">48</div><div class="lbl">учёт</div></div>
+        <div class="bc"></div></div>
+    </div>
+    <ul class="tells"><li>высечки и перфорация — это бирка</li><li>штрихкод нарисован градиентом</li></ul>
+  </div>
+
+  <div class="col">
+    <h3>F · ДНК сайта</h3>
+    <p class="note">Берёт геометрию самого solutions101: тёмно-синий фон страницы, спираль
+       на фоне, градиент от белого к голубому на цифрах. Демо становится частью студии,
+       а не случайным продуктом.</p>
+    <div class="f">
+      <svg class="strand" viewBox="0 0 420 340" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M40,-20 C160,60 -60,140 60,220 C180,300 -40,380 80,460" fill="none"
+              stroke="#8FD4E8" stroke-width="1.4" opacity=".55"/>
+        <path d="M120,-20 C240,60 20,140 140,220 C260,300 40,380 160,460" fill="none"
+              stroke="#8FD4E8" stroke-width="1.4" opacity=".35"/>
+        <path d="M330,-20 C450,60 230,140 350,220 C470,300 250,380 370,460" fill="none"
+              stroke="#8FD4E8" stroke-width="1.4" opacity=".25"/>
+      </svg>
+      <div class="hd"><span>Складской сканер</span><span>ЗО-7057 · смена 1</span></div>
+      <div class="macro"><div class="k">Идите к ячейке</div><div class="addr">A-05-3-04</div>
+        <div class="goods">Молоко «Заречье» 3,2% 900 мл</div>
+        <div class="exp"><i></i>Срок 08.08.2026 — 3 дня. Партия по FEFO.</div></div>
+      <div class="tel"><div><div class="k">Шаг</div><div class="v">2 / 4</div></div>
+        <div><div class="k">Артикул</div><div class="v">1001</div></div>
+        <div><div class="k">Партия</div><div class="v">3101</div></div>
+        <div><div class="k">Учёт</div><div class="v">48</div></div></div>
+      <div class="in"><div class="fld">A-05-3-04</div>
+        <div class="go">Подтвердить ячейку</div></div>
+    </div>
+    <ul class="tells"><li>тот же #0e202d, что и на сайте</li><li>четыре демо начинают читаться как один набор</li></ul>
+  </div>
+
+  <div class="col">
+    <h3>G · Командная строка</h3>
+    <p class="note">Панелей нет вообще. Журнал операций и приглашение ввода — как на
+       мейнфрейме. Самая плотная и самая быстрая для того, кто работает целый день.</p>
+    <div class="g">
+      <span class="dim">склад@заречный:~$</span> отбор --заказ ЗО-7057<br>
+      <span class="dim">[ 1/4 ]</span> A-01-1-01 · молоко 3,2% · <span class="ok">взято 12/12 ✓</span><br>
+      <span class="dim">[ 2/4 ]</span> идите к ячейке<span class="cur"></span>
+      <span class="big">A-05-3-04</span>
+      <span class="dim">товар</span> АРТ-1001 · молоко «Заречье» 3,2% 900 мл<br>
+      <span class="dim">партия</span> П-3101 · <span class="warn">срок 08.08.2026 — 3 дня · FEFO</span><br>
+      <span class="dim">учёт</span> 48 шт<br><br>
+      <span class="err">! не та ячейка</span> <span class="dim">B-01-1-01 — по маршруту A-05-3-04</span><br>
+      <span class="dim">скан &gt;</span> A-05-3-04<span class="cur"></span>
+    </div>
+    <ul class="tells"><li>ноль хрома — только текст и состояние</li><li>риск: не для новичка, зато мгновенно для своего</li></ul>
+  </div>
+
+  <div class="col">
+    <h3>H · Светофор</h3>
+    <p class="note">Весь экран — это статус. Правильный скан заливает экран зелёным,
+       ошибка — красным. Видно с трёх метров, с погрузчика, боковым зрением.</p>
+    <div class="h">
+      <div class="state"><div class="ico">✓</div><div class="msg">Ячейка подтверждена</div>
+        <div class="addr">A-05-3-04</div>
+        <div class="goods">Молоко «Заречье» 3,2% 900 мл · 48 шт</div></div>
+      <div class="next"><div class="k">Следующая ячейка</div><div class="v mono">B-01-1-02</div></div>
+      <div class="tel"><div><div class="k">Шаг</div><div class="v">2 / 4</div></div>
+        <div><div class="k">Партия</div><div class="v">3101</div></div>
+        <div><div class="k">Учёт</div><div class="v">48</div></div></div>
+    </div>
+    <ul class="tells"><li>цвет несёт смысл, а не украшает</li><li>риск: цвет один не может быть единственным сигналом — нужен значок и текст, они здесь есть</li></ul>
+  </div>
+
+</div>
+</div></body></html>
