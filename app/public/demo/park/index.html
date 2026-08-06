@@ -434,7 +434,7 @@ html.light{--cost:#C4CBD1}
 .chart svg{display:block;width:100%;height:auto;aspect-ratio:1000/250;overflow:visible}
 .chart svg text{font-family:var(--ui);letter-spacing:0}
 .chart .ax{fill:var(--dim);font-size:12px}
-.chart .dnum{fill:var(--text);font-size:26px;font-weight:600;font-family:var(--mono)}
+.chart .dnum{fill:var(--text);font-size:30px;font-weight:600;font-family:var(--mono)}
 /* полоса-цель во всю высоту: попасть в неё курсором легче, чем в столбик шириной 8px */
 .hz{cursor:crosshair}
 .hz:hover{fill:var(--tint)}
@@ -447,18 +447,37 @@ html.light{--cost:#C4CBD1}
 .lg--ramp{width:74px;height:9px;border-radius:5px;margin:0 8px;
   background:linear-gradient(90deg,var(--tint),rgba(245,165,36,.35),#F5A524)}
 
-/* донат: пропорция за один взгляд, точные числа - в легенде справа и в таблице ниже */
-.chart--mix{display:flex;gap:26px;align-items:center;flex-wrap:wrap}
-.chart--mix svg{flex:0 0 260px;width:260px;aspect-ratio:1}
+/* ДОНАТ. Раньше это был flex: донат 260px слева, легенда растягивалась на весь остаток, и на
+   широком экране между названием типа и суммой открывалась пустая полоса в 700px - карточка
+   читалась как наполовину пустая. Теперь колонки поменялись ролями: легенда занимает гибкую
+   колонку слева и ЗАПОЛНЯЕТ её долевой полосой, донат стоит фиксированной колонкой справа и
+   крупнее. Полоса не декор - длину глаз сравнивает точнее, чем угол сектора, поэтому «19% vs
+   18%» в списке видно, а в кольце нет; кольцо отвечает за целое, список за порядок. */
+.chart--mix{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:var(--s6);
+  align-items:center;padding-bottom:var(--s4)}
+.chart--mix svg{width:300px;aspect-ratio:1;justify-self:end}
 .chart--mix .sl{transition:opacity .16s ease}
 .chart--mix svg:hover .sl{opacity:.45}
 .chart--mix svg .sl:hover{opacity:1}
-.lgd{flex:1 1 260px;min-width:240px;display:flex;flex-direction:column;gap:9px}
-.lrow{display:flex;align-items:center;gap:9px;font-size:13px}
-.lrow i{width:11px;height:11px;border-radius:3px;flex:0 0 auto}
-.lrow .lt{flex:1 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.lrow b{flex:0 0 42px;text-align:right}
-.lrow .dim{flex:0 0 108px;text-align:right;font-size:12px}
+.lgd{display:flex;flex-direction:column}
+.lrow{display:flex;align-items:center;gap:10px;font-size:13px;padding:8px 0;
+  border-bottom:var(--line)}
+.lrow:last-child{border-bottom:0}
+.lrow i{width:10px;height:10px;border-radius:2px;flex:0 0 auto}
+.lrow .lt{flex:0 0 150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* дорожка забирает ВЕСЬ остаток строки, а не фиксированные 380px: с фиксированной шириной
+   между названием и полосой открывалась та же дыра, из-за которой карточка и выглядела
+   пустой - просто уехавшая на 150px правее. Растущая дорожка дыр не оставляет вообще. */
+.lbar{flex:1 1 auto;min-width:56px;height:6px;border-radius:3px;background:var(--tint)}
+.lbar b{display:block;height:100%;border-radius:3px}
+.lrow>b{flex:0 0 44px;text-align:right}
+.lrow .dim{flex:0 0 118px;text-align:right;font-size:12px}
+@media(max-width:820px){
+  .chart--mix{grid-template-columns:1fr;gap:var(--s4)}
+  .chart--mix svg{justify-self:center;width:min(100%,260px)}
+  .lrow .lt{flex:0 0 92px}
+  .lrow .dim{flex:0 0 96px}
+}
 
 /* теплокарта: одна ячейка = единица за период. Сетка, а не 300 отдельных SVG. */
 .chart--heat{overflow-x:auto}
@@ -1811,7 +1830,7 @@ function chartMix(units,M){
   if(!arr.length) return '';
   if(arr.length>6){ const rest=arr.slice(5).reduce((a,x)=>a+x.v,0); arr=arr.slice(0,5).concat([{t:'Прочее',v:r2(rest)}]); }
   const tot=arr.reduce((a,x)=>a+x.v,0)||1;
-  const S=260, c=S/2, rO=104, rI=66;
+  const S=300, c=S/2, rO=140, rI=88;
   const pol=(r,a)=>[c+r*Math.cos(a),c+r*Math.sin(a)];
   let a0=-Math.PI/2, segs='';
   arr.forEach((x,i)=>{
@@ -1823,15 +1842,20 @@ function chartMix(units,M){
         ' data-tip="'+esc(x.t+' · '+money(x.v)+' · '+Math.round(frac*100)+'%')+'"/>'; }
     a0+=sweep;
   });
-  const legend=arr.map((x,i)=>'<div class="lrow"><i style="background:'+SER[i]+'"></i>'+
-    '<span class="lt">'+esc(x.t)+'</span><b class="num">'+Math.round(x.v/tot*100)+'%</b>'+
-    '<span class="num dim">'+money(x.v)+'</span></div>').join('');
+  const legend=arr.map((x,i)=>{ const p=x.v/tot;
+    return '<div class="lrow"><i style="background:'+SER[i]+'"></i>'+
+    '<span class="lt">'+esc(x.t)+'</span>'+
+    '<span class="lbar"><b style="width:'+(p*100).toFixed(1)+'%;background:'+SER[i]+'"></b></span>'+
+    '<b class="num">'+Math.round(p*100)+'%</b>'+
+    '<span class="num dim">'+money(x.v)+'</span></div>'; }).join('');
+  /* легенда стоит в разметке ПЕРВОЙ: читается слева направо - от списка к итогу в кольце */
   return '<div class="hd"><h2>Из чего сложилась выручка</h2></div>'+
     '<div class="card chart chart--mix">'+
+      '<div class="lgd">'+legend+'</div>'+
       '<svg viewBox="0 0 '+S+' '+S+'" role="img" aria-label="Выручка по типам техники">'+segs+
-      '<text x="'+c+'" y="'+(c-4)+'" text-anchor="middle" class="dnum">'+short(tot)+'</text>'+
-      '<text x="'+c+'" y="'+(c+16)+'" text-anchor="middle" class="ax">всего выручки</text></svg>'+
-      '<div class="lgd">'+legend+'</div></div>';
+      '<text x="'+c+'" y="'+(c-2)+'" text-anchor="middle" class="dnum">'+short(tot)+'</text>'+
+      '<text x="'+c+'" y="'+(c+20)+'" text-anchor="middle" class="ax">всего выручки</text></svg>'+
+      '</div>';
 }
 
 /* ── 3. теплокарта загрузки: единица x период ───────────────────────────────
