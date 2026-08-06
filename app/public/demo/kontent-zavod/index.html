@@ -1,0 +1,2748 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Контент-Завод · АИР-ГАЗ</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23FF6B00'/%3E%3Crect x='2' y='2' width='12' height='12' fill='%230A192F'/%3E%3C/svg%3E">
+<style>
+/* ============================================================
+   TOKENS — 1b «Цех», industrial. border-radius:0 everywhere.
+   ============================================================ */
+:root{
+  --paper:#FFFFFF; --surface:#F4F7FA; --line:#D6DEE6; --line-soft:#E4EAF0;
+  --ink:#0A192F; --ink-2:#3C4C5D; --ink-3:#5A6B7B;
+  --brand:#FF6B00; --blue:#0072CE; --ok:#2ED47A; --bad:#D6323C;
+  /* derived, accessible text/border variants of --ok/--brand on light paper
+     (raw --ok on #FFFFFF is 1.9:1, raw --brand is 2.9:1 — both fail the
+     4.5:1 body-text bar the brief itself sets. computed, not eyeballed.) */
+  --ok-ink:#0F7A46; --brand-ink:#A8480A;
+}
+:root[data-theme="dark"]{
+  --paper:#0B1420; --surface:#111E2E; --line:#26405F; --line-soft:#1B2C41;
+  --ink:#E4EAF0; --ink-2:#B9C3CE; --ink-3:#93A9C4;
+  --brand:#FF6B00; --blue:#4B9EEA; --ok:#2ED47A; --bad:#FF6B6B;
+  --ok-ink:#2ED47A; --brand-ink:#FF6B00;
+}
+/* The shell follows the theme. It was pinned light "for an industrial look", which left a white
+   rail glowing beside a dark sheet the moment anyone hit the toggle. Orange stays on the logo
+   block in both themes - that is the brand, and it is the one loud thing on the screen. */
+:root{
+  --chrome-side-bg:#F3F6F9; --chrome-side-ink:#0A192F; --chrome-side-active-bg:#0A192F; --chrome-side-active-ink:#FFFFFF;
+  --chrome-side-line:#DCE3EA;
+  --chrome-logo-bg:#FF6B00; --chrome-logo-ink:#0A192F;
+  --chrome-top-bg:#0A192F; --chrome-top-ink:#E4EAF0; --chrome-top-dim:#93A9C4;
+}
+:root[data-theme="dark"]{
+  --chrome-side-bg:#0B1420; --chrome-side-ink:#C8D3E0; --chrome-side-active-bg:#1B2C41; --chrome-side-active-ink:#FFFFFF;
+  --chrome-side-line:#1B2C41;
+  --chrome-top-bg:#070E17; --chrome-top-ink:#E4EAF0; --chrome-top-dim:#8296AE;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:'IBM Plex Sans',-apple-system,'Segoe UI',Roboto,sans-serif;
+  background:var(--surface); color:var(--ink); font-size:13px;
+  -webkit-font-smoothing:antialiased;
+}
+.mono, .num, .tabnum{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-variant-numeric:tabular-nums;}
+button, input, select, textarea{font-family:inherit; font-size:inherit; color:inherit;}
+button{cursor:pointer;}
+button:disabled{cursor:not-allowed;}
+a{color:var(--blue);}
+*{border-radius:0 !important;}
+
+/* ---------- shell ---------- */
+.shell{display:flex; min-height:100vh;}
+.sidebar{width:236px; flex:none; border-right:1px solid var(--chrome-side-line); background:var(--chrome-side-bg); color:var(--chrome-side-ink); display:flex; flex-direction:column; min-height:100vh;}
+.ch-logo{display:inline-flex;align-items:center;margin:0 6px 0 6px;vertical-align:middle;flex:none;}
+.ch-logo svg{display:block;} .ch-logo{margin:0 7px 0 6px;}
+.td-ch{white-space:nowrap;}
+.set-sec{margin:0 0 34px; padding-top:6px;}
+.set-sec .view-title{font-size:15px; letter-spacing:.06em;}
+.set-sec .view-head{margin-bottom:10px; padding-bottom:6px; border-bottom:2px solid var(--ink);}
+.set-sec-head{display:flex; align-items:baseline; gap:12px; padding:0 0 8px; border-bottom:2px solid var(--ink); margin-bottom:12px;}
+.set-sec-head h2{margin:0; font-size:15px; font-weight:800; letter-spacing:.06em; text-transform:uppercase;}
+.set-sec-note{font-size:12px; color:var(--ink-3);}
+.side-logo{padding:16px 16px 14px; background:var(--chrome-logo-bg); color:var(--chrome-logo-ink);}
+.side-logo .name{font-size:19px; font-weight:700; letter-spacing:.03em; line-height:1;}
+.side-logo .sub{font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; margin-top:4px;}
+.side-scroll{flex:1; overflow-y:auto; padding-bottom:12px;}
+.side-group-title{padding:16px 16px 6px; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; font-weight:700; opacity:.62;}
+.side-item{display:flex; align-items:center; justify-content:space-between; gap:8px; padding:9px 16px; font-size:14.5px; font-weight:500; letter-spacing:0; cursor:pointer; border-left:3px solid transparent;}
+.side-item svg{flex:none;}
+.side-item .label{overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:flex; align-items:center; gap:8px;}
+.side-item .count{font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:700; flex:none; font-variant-numeric:tabular-nums;}
+.side-item.active{background:var(--chrome-side-active-bg); color:var(--chrome-side-active-ink); border-left-color:var(--brand);}
+.side-item.disabled{opacity:.45; cursor:not-allowed;}
+.side-item:not(.disabled):not(.active):hover{background:rgba(10,25,47,.12);}
+
+.topbar{height:44px; background:var(--chrome-top-bg); color:var(--chrome-top-ink); display:flex; align-items:center; padding:0 16px; gap:14px; flex:none; border-bottom:2px solid var(--brand);}
+.topbar .shift{font-family:'IBM Plex Mono',monospace; font-size:11.5px; letter-spacing:.05em; display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+.topbar .shift .dim{color:var(--chrome-top-dim);}
+.topbar .sep{color:var(--chrome-top-dim);}
+.topbar-right{margin-left:auto; display:flex; align-items:center; gap:10px;}
+.role-select, .user-select{background:transparent; border:1px solid var(--chrome-top-dim); color:var(--chrome-top-ink); padding:5px 8px; font-size:11.5px; letter-spacing:.04em; text-transform:uppercase;}
+.role-select option, .user-select option{color:#000;}
+.theme-btn{display:flex; align-items:center; justify-content:center; width:30px; height:30px; border:1px solid var(--chrome-top-dim); background:transparent; color:var(--chrome-top-ink);}
+.reset-btn{border:1px solid var(--bad); color:#FF9E9E; background:transparent; padding:6px 10px; font-size:11px; letter-spacing:.05em; text-transform:uppercase; font-weight:700;}
+
+.main{flex:1; min-width:0; display:flex; flex-direction:column; background:var(--paper);}
+.view{flex:1; min-height:0; display:flex; flex-direction:column; overflow:auto;}
+
+/* ---------- view header / toolbar ---------- */
+.view-head{padding:16px 20px 12px; border-bottom:2px solid var(--ink); flex:none; background:var(--paper);}
+.view-head-row{display:flex; align-items:flex-end; gap:14px; flex-wrap:wrap;}
+.view-title{font-size:31px; font-weight:800; letter-spacing:-.01em; line-height:1; text-transform:uppercase;}
+.view-sub{font-size:12.5px; color:var(--ink-3);}
+.view-tools{margin-left:auto; display:flex; gap:8px; flex-wrap:wrap; align-items:center;}
+
+.stat-strip{display:flex; border:2px solid var(--ink); margin-top:14px; flex-wrap:wrap;}
+.stat{flex:1; min-width:130px; padding:8px 14px; border-right:2px solid var(--ink);}
+.stat:last-child{border-right:none;}
+.stat.warn{background:#FFF3E8;}
+:root[data-theme="dark"] .stat.warn{background:#2A1A0C;}
+.stat-label{font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3);}
+.stat-val{font-size:24px; font-weight:700; margin-top:1px;}
+.stat-val .of{font-size:12px; font-weight:400; color:var(--ink-3);}
+
+/* ---------- buttons ---------- */
+.btn{border:2px solid var(--ink); background:var(--paper); color:var(--ink); padding:7px 13px; font-size:12.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; white-space:nowrap;}
+.btn:hover:not(:disabled){background:var(--surface);}
+.btn:disabled{opacity:.4; cursor:not-allowed;}
+.btn-primary{background:var(--ink); color:var(--paper); border-color:var(--ink);}
+.btn-primary:hover:not(:disabled){background:var(--blue); border-color:var(--blue);}
+.btn-accent{background:var(--brand); color:#0A192F; border-color:var(--brand);}
+.btn-accent:hover:not(:disabled){filter:brightness(1.05);}
+.btn-danger{border-color:var(--bad); color:var(--bad);}
+.btn-danger:hover:not(:disabled){background:var(--bad); color:var(--paper);}
+.btn-sm{padding:4px 9px; font-size:11px;}
+.btn-ic{display:inline-flex; align-items:center; gap:6px;}
+.icon-btn{border:1px solid var(--line); background:var(--paper); color:var(--ink-2); width:28px; height:28px; display:inline-flex; align-items:center; justify-content:center;}
+.icon-btn:hover{border-color:var(--ink); color:var(--ink);}
+.icon-btn[disabled]{opacity:.35; cursor:not-allowed;}
+
+/* ---------- filters / inputs ---------- */
+.field{display:flex; flex-direction:column; gap:4px;}
+.field label{font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); font-weight:700;}
+.input, .select, .textarea{border:1px solid var(--ink-3); background:var(--paper); color:var(--ink); padding:7px 9px; font-size:13px;}
+.input:focus, .select:focus, .textarea:focus{outline:2px solid var(--blue); outline-offset:-1px;}
+.textarea{width:100%; display:block; resize:vertical; min-height:90px; line-height:1.5; font-family:inherit; padding:10px 12px; border:1px solid var(--line); background:var(--paper); color:var(--ink); font-size:13.5px;}
+.checkline{display:flex; align-items:center; gap:6px; font-size:12.5px;}
+.search-input{padding:6px 9px; border:1px solid var(--ink-3); background:var(--paper); min-width:200px;}
+
+/* ---------- table ---------- */
+.table-wrap{flex:1; overflow:auto; min-height:0;}
+.table{width:100%; border-collapse:collapse;}
+.table thead th{position:sticky; top:0; background:var(--ink); color:var(--paper); font-family:inherit; font-size:11px; letter-spacing:.1em; text-transform:uppercase; text-align:left; padding:8px 10px; font-weight:700; cursor:pointer; white-space:nowrap; z-index:2;}
+.table thead th.nosort{cursor:default;}
+.table thead th .arrow{opacity:.6; font-size:9px; margin-left:3px;}
+.table tbody tr{border-bottom:1px solid var(--line-soft); height:38px;}
+.table tbody tr:hover{background:var(--surface);}
+.table tbody tr.selected{background:var(--surface); box-shadow:inset 3px 0 0 var(--blue);}
+.table td{padding:6px 10px; vertical-align:middle;}
+.td-ch{padding:0 !important; position:relative;}
+.ch-bar{position:absolute; left:0; top:0; bottom:0; width:5px;}
+.ch-name{padding-left:12px; font-weight:700; letter-spacing:.03em; text-transform:uppercase; font-size:12.5px;}
+.ellip{white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:1px;}
+.row-actions{display:flex; gap:8px; color:var(--ink-2);}
+.row-actions svg{cursor:pointer;}
+.row-actions svg:hover{color:var(--blue);}
+
+.badge{display:inline-block; border:2px solid; padding:1px 7px; font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; white-space:nowrap;}
+.tone-txt{font-size:11.5px; letter-spacing:.04em; text-transform:uppercase; color:var(--ink-2); border:1px solid var(--line); padding:1px 5px;}
+
+.foot-bar{height:32px; border-top:2px solid var(--ink); background:var(--surface); display:flex; align-items:center; padding:0 16px; gap:16px; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-3); flex:none;}
+.pager{display:flex; align-items:center; gap:8px; margin-left:auto;}
+
+.empty-state{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; padding:60px 20px; color:var(--ink-3); text-align:center;}
+.empty-state .big{font-size:15px; color:var(--ink-2); font-weight:600;}
+
+/* ---------- pill filters ---------- */
+.pills{display:flex; gap:0; border:2px solid var(--ink); flex-wrap:wrap;}
+.pill{padding:5px 11px; font-size:11.5px; letter-spacing:.05em; text-transform:uppercase; border-right:2px solid var(--ink); cursor:pointer; background:var(--paper); font-weight:600;}
+.pills .pill:last-child{border-right:none;}
+.pill.active{background:var(--ink); color:var(--paper);}
+.pill .n{font-family:'IBM Plex Mono',monospace; margin-left:4px;}
+
+.dd{border:2px solid var(--ink); padding:6px 10px; font-size:12px; letter-spacing:.04em; text-transform:uppercase; background:var(--paper); font-weight:600;}
+
+/* ---------- modal ---------- */
+.overlay{position:fixed; inset:0; background:rgba(10,25,47,.55); display:flex; align-items:flex-start; justify-content:center; z-index:100; padding:30px 16px; overflow:auto;}
+.modal{background:var(--paper); border:2px solid var(--ink); width:100%; max-width:720px; max-height:calc(100vh - 60px); display:flex; flex-direction:column;}
+.modal.wide{max-width:1040px;}
+.modal-head{display:flex; align-items:center; gap:12px; padding:14px 18px; border-bottom:2px solid var(--ink); flex:none;}
+.modal-title{font-size:17px; font-weight:700;}
+.modal-close{margin-left:auto; background:none; border:none; color:var(--ink-2); font-size:20px; line-height:1; padding:2px 4px;}
+.modal-body{padding:18px; overflow:auto; display:flex; flex-direction:column; gap:14px;}
+.modal-foot{display:flex; gap:8px; padding:14px 18px; border-top:2px solid var(--line); flex:none; align-items:center;}
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+.grid3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;}
+
+.tabs{display:flex; border-bottom:2px solid var(--ink); flex:none;}
+.tab{padding:9px 14px; font-size:12.5px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--ink-3); cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-2px;}
+.tab.active{color:var(--ink); border-bottom-color:var(--brand);}
+
+.history-item{border-left:2px solid var(--line); padding:4px 0 4px 12px; font-size:12px; color:var(--ink-2);}
+.history-item b{color:var(--ink);}
+.comment-box{background:var(--surface); border-left:3px solid var(--brand); padding:8px 10px; font-size:12.5px; margin-top:4px;}
+
+.kv{display:grid; grid-template-columns:120px 1fr; gap:5px 12px; font-size:13px;}
+.kv .k{font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3);}
+
+.toast-wrap{position:fixed; bottom:16px; right:16px; z-index:200; display:flex; flex-direction:column; gap:8px;}
+.toast{background:var(--chrome-top-bg); color:#fff; border-left:4px solid var(--brand); padding:10px 14px; font-size:12.5px; max-width:340px; box-shadow:0 4px 14px rgba(0,0,0,.25);}
+.toast.err{border-left-color:var(--bad);}
+.toast.ok{border-left-color:var(--ok);}
+
+.kbd-hint{font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--ink-3); border:1px solid var(--line); padding:0 5px;}
+
+.qcard{border:2px solid var(--ink); margin-bottom:14px; background:var(--paper);}
+.qcard.current{box-shadow:0 0 0 3px var(--brand) inset;}
+.qhead{display:flex; align-items:center; gap:10px; padding:10px 14px; border-bottom:2px solid var(--line);}
+.qbody{padding:14px;}
+.qpreview{background:var(--surface); border:1px solid var(--line); padding:12px; font-size:13.5px; line-height:1.55; white-space:pre-wrap;}
+
+.limit-bar{height:4px; background:var(--line-soft); margin-top:4px; position:relative;}
+.limit-bar i{display:block; height:100%; background:var(--ok-ink);}
+.limit-bar.over i{background:var(--bad);}
+.limit-txt{font-size:11px; font-family:'IBM Plex Mono',monospace; color:var(--ink-3);}
+.limit-txt.over{color:var(--bad); font-weight:700;}
+
+.cal-grid{display:grid; border-top:2px solid var(--ink); border-left:2px solid var(--ink); min-width:900px;}
+.cal-head-cell{background:var(--ink); color:var(--paper); font-size:11px; letter-spacing:.06em; text-transform:uppercase; padding:6px 8px; border-right:1px solid rgba(255,255,255,.2); text-align:center;}
+.cal-row-label{background:var(--surface); border-right:2px solid var(--ink); border-bottom:1px solid var(--line); padding:6px 8px; font-size:12px; font-weight:700; text-transform:uppercase; display:flex; align-items:center; gap:6px;}
+.cal-cell{border-right:1px solid var(--line); border-bottom:1px solid var(--line); min-height:56px; padding:3px; vertical-align:top; position:relative;}
+.cal-cell.today{background:var(--surface);}
+.cal-chip{background:var(--paper); border:1px solid var(--ink-2); border-left:4px solid; padding:2px 5px; font-size:10.5px; margin-bottom:2px; cursor:grab; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.cal-chip.conflict{border-color:var(--bad); box-shadow:0 0 0 1px var(--bad) inset;}
+.cal-cell.dragover{background:#FFF3E8;}
+:root[data-theme="dark"] .cal-cell.dragover{background:#2A1A0C;}
+
+.scene-card{border:2px solid var(--ink); margin-bottom:10px;}
+.scene-num{background:var(--ink); color:var(--paper); padding:5px 10px; font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; display:flex; justify-content:space-between;}
+.scene-grid{display:grid; grid-template-columns:1fr 1fr; gap:0;}
+.scene-cell{padding:9px 12px; border-top:1px solid var(--line); border-right:1px solid var(--line);}
+.scene-cell:nth-child(2n){border-right:none;}
+.scene-cell .lbl{font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); margin-bottom:2px;}
+
+.print-page{display:none;}
+body.printing .shell{display:none;}
+body.printing .print-page{display:block; background:#fff; color:#111; padding:18mm; font-family:'IBM Plex Sans',sans-serif;}
+.print-page table{width:100%; border-collapse:collapse; font-size:12px;}
+.print-page th, .print-page td{border:1px solid #999; padding:5px 7px; text-align:left; vertical-align:top;}
+.print-page h1{font-size:20px; margin:0 0 4px;}
+.print-page .meta{font-size:11px; color:#555; margin-bottom:14px;}
+.no-print{}
+@media print{
+  .shell{display:none !important;}
+  .no-print{display:none !important;}
+  .print-page{display:block !important; background:#fff; color:#111;}
+  body{background:#fff;}
+}
+
+.kbtag{display:inline-block; background:var(--surface); border:1px solid var(--line); padding:2px 7px; font-size:11.5px; margin:2px 4px 2px 0;}
+.hl{background:#FFE3C2; color:#7A3B00; padding:0 2px; font-weight:700;}
+:root[data-theme="dark"] .hl{background:#4A2C08; color:#FFC98A;}
+
+.mini-note{font-size:11.5px; color:var(--ink-3);}
+.disabled-note{font-size:11px; color:var(--ink-3); font-style:italic;}
+.sw{position:relative; width:36px; height:20px; border:2px solid var(--ink); background:var(--paper); flex:none; cursor:pointer;}
+.sw i{position:absolute; top:1px; left:1px; width:12px; height:12px; background:var(--ink-3); transition:transform .1s;}
+.sw.on{background:var(--ok-ink); border-color:var(--ok-ink);}
+.sw.on i{background:#fff; transform:translateX(16px);}
+
+::-webkit-scrollbar{width:10px; height:10px;}
+::-webkit-scrollbar-track{background:var(--surface);}
+::-webkit-scrollbar-thumb{background:var(--ink-3);}
+
+@media (max-width: 980px){
+  .sidebar{width:56px;}
+  .side-logo .sub, .side-item .label span:last-child, .side-group-title{display:none;}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="print-root"></div>
+<div class="toast-wrap" id="toasts"></div>
+
+<script>
+'use strict';
+/* ============================================================
+   §0 ICONS — inline SVG, no emoji
+   ============================================================ */
+const ICO = {
+  feed:'<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M2 8h12M2 12h8"/></svg>',
+  cal:'<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="11"/><path d="M2 6.5h12M5.5 1.5v3M10.5 1.5v3"/></svg>',
+  queue:'<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8.5l3.2 3.2L13 5"/></svg>',
+  multi:'<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2.5 3.4c2 0 4 .4 5.5 1.2 1.5-.8 3.5-1.2 5.5-1.2v8.6c-2 0-4 .4-5.5 1.2-1.5-.8-3.5-1.2-5.5-1.2z"/></svg>',
+  log:'<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12"/><path d="M5 6h6M5 8.5h6M5 11h3"/></svg>',
+  mention:'<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1.8l5.2 2v4.1c0 3-2.2 5.2-5.2 6.3-3-1.1-5.2-3.3-5.2-6.3V3.8z"/></svg>',
+  monitor:'<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="5"/><path d="M10.6 10.6L14 14"/></svg>',
+  book:'<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2.5 2.5h7a2 2 0 012 2v9h-7a2 2 0 00-2-2z"/><path d="M2.5 2.5v9h7"/></svg>',
+  video:'<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3.5" width="9" height="9"/><path d="M11 6.5l3-2v7l-3-2z"/></svg>',
+  storyboard:'<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1.5" y="3" width="4" height="4"/><rect x="6.5" y="3" width="4" height="4"/><rect x="11.5" y="3" width="3" height="4"/><path d="M2 11h12"/></svg>',
+  tone:'<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="5.5"/><path d="M8 3v10M3 8h10"/></svg>',
+  rubric:'<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="5" height="5"/><rect x="9" y="2" width="5" height="5"/><rect x="2" y="9" width="5" height="5"/><rect x="9" y="9" width="5" height="5"/></svg>',
+  channel:'<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="4.5" cy="8" r="2.2"/><circle cx="11.5" cy="3.5" r="2.2"/><circle cx="11.5" cy="12.5" r="2.2"/><path d="M6.4 6.9l3-2.4M6.4 9.1l3 2.4"/></svg>',
+  bot:'<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="10" height="8"/><path d="M8 5V2M5.5 8.5v1M10.5 8.5v1"/><circle cx="8" cy="2" r="0.8" fill="currentColor" stroke="none"/></svg>',
+  autopost:'<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8a6 6 0 0110-4.5M14 8a6 6 0 01-10 4.5"/><path d="M11.5 3.5H14V1M4.5 12.5H2V15"/></svg>',
+  users:'<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="5.5" r="2.3"/><path d="M1.6 13.5c.6-2.6 2.4-4 4.4-4s3.8 1.4 4.4 4"/><circle cx="12" cy="5.5" r="1.8"/><path d="M11 9.7c1.7.2 3 1.5 3.4 3.8"/></svg>',
+  bell:'<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 11V7a4 4 0 018 0v4l1.3 2H2.7z"/><path d="M6.5 13.5a1.5 1.5 0 003 0"/></svg>',
+  check:'<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8.5l3.2 3.2L13 5"/></svg>',
+  edit:'<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11.4 2.4l2.2 2.2L5.6 12.6 2.4 13.6l1-3.2z"/></svg>',
+  x:'<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 3l10 10M13 3L3 13"/></svg>',
+  trash:'<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4.5h10M6 4.5V3h4v1.5M4.5 4.5l.6 9h5.8l.6-9"/></svg>',
+  sun:'<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="2.6"/><path d="M8 1.6v1.8M8 12.6v1.8M1.6 8h1.8M12.6 8h1.8M3.5 3.5l1.3 1.3M11.2 11.2l1.3 1.3M12.5 3.5l-1.3 1.3M4.8 11.2l-1.3 1.3"/></svg>',
+  moon:'<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13.5 9.2A5.6 5.6 0 116.8 2.5a4.4 4.4 0 006.7 6.7z"/></svg>',
+  arrow:'<svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6l4 4 4-4"/></svg>',
+  wand:'<svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 14L11 5M9 3l1 1M12 2l1.5 1.5M13.5 5.5L15 7"/></svg>',
+  plus:'<svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 2.5v11M2.5 8h11"/></svg>',
+  refresh:'<svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2.3 8a5.7 5.7 0 019.7-4.1L13.5 5.4M13.7 8a5.7 5.7 0 01-9.7 4.1L2.5 10.6"/><path d="M12 2.5v3h-3M4 13.5v-3h3"/></svg>',
+  print:'<svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="6" width="10" height="5.5"/><path d="M4.5 6V2.5h7V6M4.5 11.5V14h7v-2.5"/></svg>',
+  copy:'<svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5.5" y="5.5" width="8" height="8.5"/><path d="M2.5 10.5v-8h8"/></svg>',
+};
+
+/* ============================================================
+   §1 UTIL
+   ============================================================ */
+function pad(n){ return String(n).padStart(2,'0'); }
+function fmtDT(ts){ const d=new Date(ts); return `${pad(d.getDate())}.${pad(d.getMonth()+1)} ${pad(d.getHours())}:${pad(d.getMinutes())}`; }
+function fmtDate(ts){ const d=new Date(ts); return `${pad(d.getDate())}.${pad(d.getMonth()+1)}.${d.getFullYear()}`; }
+function fmtDateLong(ts){ const MS=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря']; const d=new Date(ts); return `${d.getDate()} ${MS[d.getMonth()]} ${d.getFullYear()}`; }
+function fmtTime(ts){ const d=new Date(ts); return `${pad(d.getHours())}:${pad(d.getMinutes())}`; }
+function days(n){ return n*24*60*60*1000; }
+function hours(n){ return n*60*60*1000; }
+function mins(n){ return n*60*1000; }
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function capitalize(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+function clamp(n,a,b){ return Math.max(a,Math.min(b,n)); }
+function mulberry32(seed){
+  return function(){
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed>>>15, 1 | seed);
+    t = t + Math.imul(t ^ t>>>7, 61 | t) ^ t;
+    return ((t ^ t>>>14) >>> 0) / 4294967296;
+  };
+}
+function pick(rng, arr){ return arr[Math.floor(rng()*arr.length)]; }
+function pickIdx(rng, n){ return Math.floor(rng()*n); }
+function sameDay(a,b){ const da=new Date(a),db=new Date(b); return da.getFullYear()===db.getFullYear() && da.getMonth()===db.getMonth() && da.getDate()===db.getDate(); }
+function sameMinute(a,b){ return Math.floor(a/60000)===Math.floor(b/60000); }
+
+/* ============================================================
+   §2 STATIC KNOWLEDGE — tones, rubrics, channels, cta, contacts
+   ============================================================ */
+const CONTACTS = { phones:['+7 (843) 211-85-85','+7 (843) 204-49-49'], email:'info@air-gaz.ru', site:'air-gaz.ru' };
+
+const CHANNEL_DEFS = [
+  {id:'max', name:'MAX',       phase:1, color:'#0072CE'},
+  {id:'vk',  name:'VK',        phase:1, color:'#0077FF'},
+  {id:'zen', name:'Дзен',      phase:1, color:'#D6323C'},
+  {id:'wa',  name:'WhatsApp',  phase:1, color:'#25D366'},
+  {id:'yt',  name:'YouTube',   phase:2, color:'#B0121C'},
+  {id:'ig',  name:'Instagram', phase:2, color:'#C2266E'},
+  {id:'tt',  name:'TikTok',    phase:2, color:'#111827'},
+];
+const CH_LIMITS = { max:4096, vk:4096, zen:15000, wa:1024, yt:5000, ig:1900, tt:280 };
+const CH_BY_ID = Object.fromEntries(CHANNEL_DEFS.map(c=>[c.id,c]));
+
+/* ---- Channel marks. Official brand SVGs, inlined so the file still makes zero network
+   requests. MAX and Дзен are drawn from the marks Damir supplied - both are too new for the icon set. ---- */
+const CH_LOGO = {
+  tg: `<svg viewBox="0 0 48 48" width="17" height="17" aria-hidden="true"><path fill="#29b6f6" d="M24 4A20 20 0 1 0 24 44A20 20 0 1 0 24 4Z"/><path fill="#fff" d="M33.95,15l-3.746,19.126c0,0-0.161,0.874-1.245,0.874c-0.576,0-0.873-0.274-0.873-0.274l-8.114-6.733l-3.97-2.001l-5.095-1.355c0,0-0.907-0.262-0.907-1.012c0-0.625,0.933-0.923,0.933-0.923l21.316-8.468c-0.001-0.001,0.651-0.235,1.126-0.234C33.667,14,34,14.125,34,14.5C34,14.75,33.95,15,33.95,15z"/><path fill="#b0bec5" d="M23,30.505l-3.426,3.374c0,0-0.149,0.115-0.348,0.12c-0.069,0.002-0.143-0.009-0.219-0.043l0.964-5.965L23,30.505z"/><path fill="#cfd8dc" d="M29.897,18.196c-0.169-0.22-0.481-0.26-0.701-0.093L16,26c0,0,2.106,5.892,2.427,6.912c0.322,1.021,0.58,1.045,0.58,1.045l0.964-5.965l9.832-9.096C30.023,18.729,30.064,18.416,29.897,18.196z"/></svg>`,
+  vk: `<svg viewBox="0 0 48 48" width="17" height="17" aria-hidden="true"><path fill="#0077FF" d="M24,2c14.9,0,22,7.1,22,22s-7.1,22-22,22S2,38.9,2,24S9.1,2,24,2z"/><path fill="#fff" d="M25.6,33.9c-11,0-17.3-7.6-17.6-20.1h5.5c0.2,9.2,4.3,13.1,7.5,13.9V13.8h5.2v7.9c3.2-0.3,6.5-4,7.7-7.9h5.2c-0.9,4.9-4.5,8.5-7.1,10c2.6,1.2,6.7,4.4,8.3,10.1h-5.7c-1.2-3.8-4.3-6.8-8.3-7.2v7.2H25.6z"/></svg>`,
+  wa: `<svg viewBox="0 0 48 48" width="17" height="17" aria-hidden="true"><circle cx="24" cy="24" r="20" fill="#25D366"/><path fill="#fff" d="M19.3,16c-0.4-0.8-0.7-0.8-1.1-0.8c-0.3,0-0.6,0-0.9,0c-0.3,0-0.8,0.1-1.3,0.6c-0.4,0.5-1.7,1.6-1.7,4c0,2.3,1.7,4.6,1.9,4.9c0.2,0.3,3.3,5.3,8.1,7.2c4,1.6,4.8,1.3,5.7,1.2c0.9-0.1,2.8-1.1,3.2-2.3c0.4-1.1,0.4-2.1,0.3-2.3c-0.1-0.2-0.4-0.3-0.9-0.6s-2.8-1.4-3.2-1.5c-0.4-0.2-0.8-0.2-1.1,0.2c-0.3,0.5-1.2,1.5-1.5,1.9c-0.3,0.3-0.6,0.4-1,0.1c-0.5-0.2-2-0.7-3.8-2.4c-1.4-1.3-2.4-2.8-2.6-3.3c-0.3-0.5,0-0.7,0.2-1c0.2-0.2,0.5-0.6,0.7-0.8c0.2-0.3,0.3-0.5,0.5-0.8c0.2-0.3,0.1-0.6,0-0.8C20.6,19.3,19.7,17,19.3,16z"/></svg>`,
+  yt: `<svg viewBox="0 0 48 48" width="17" height="17" aria-hidden="true"><path fill="#FF3D00" d="M43.2,33.9c-0.4,2.1-2.1,3.7-4.2,4c-3.3,0.5-8.8,1.1-15,1.1c-6.1,0-11.6-0.6-15-1.1c-2.1-0.3-3.8-1.9-4.2-4C4.4,31.6,4,28.2,4,24c0-4.2,0.4-7.6,0.8-9.9c0.4-2.1,2.1-3.7,4.2-4C12.3,9.6,17.8,9,24,9c6.2,0,11.6,0.6,15,1.1c2.1,0.3,3.8,1.9,4.2,4c0.4,2.3,0.9,5.7,0.9,9.9C44,28.2,43.6,31.6,43.2,33.9z"/><path fill="#FFF" d="M20 31L20 17 32 24z"/></svg>`,
+  ig: `<svg viewBox="0 0 48 48" width="17" height="17" aria-hidden="true"><radialGradient id="igg" cx="19.38" cy="42.035" r="44.899" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fd5"/><stop offset=".328" stop-color="#ff543f"/><stop offset=".348" stop-color="#fc5245"/><stop offset=".504" stop-color="#e64771"/><stop offset=".643" stop-color="#d53e91"/><stop offset=".761" stop-color="#cc39a4"/><stop offset=".841" stop-color="#c837ab"/></radialGradient><path fill="url(#igg)" d="M34.017,41.99l-20,0.019c-4.4,0.004-8.003-3.592-8.008-7.992l-0.019-20c-0.004-4.4,3.592-8.003,7.992-8.008l20-0.019c4.4-0.004,8.003,3.592,8.008,7.992l0.019,20C42.014,38.383,38.417,41.986,34.017,41.99z"/><path fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M30,11H18c-3.9,0-7,3.1-7,7v12c0,3.9,3.1,7,7,7h12c3.9,0,7-3.1,7-7V18C37,14.1,33.9,11,30,11z"/><circle cx="31" cy="16" r="1.2" fill="#fff"/><circle cx="24" cy="24" r="6" fill="none" stroke="#fff" stroke-width="2"/></svg>`,
+  tt: `<svg viewBox="0 0 48 48" width="17" height="17" aria-hidden="true"><path fill="#212121" d="M10.904,6h26.191C39.804,6,42,8.196,42,10.904v26.191C42,39.804,39.804,42,37.096,42H10.904C8.196,42,6,39.804,6,37.096V10.904C6,8.196,8.196,6,10.904,6z"/><path fill="#ec407a" d="M29.208,20.607c1.576,1.126,3.507,1.788,5.592,1.788v-4.011c-0.395,0-0.788-0.041-1.174-0.123v3.157c-2.085,0-4.015-0.663-5.592-1.788v8.184c0,4.094-3.321,7.413-7.417,7.413c-1.528,0-2.949-0.462-4.129-1.254c1.347,1.376,3.225,2.23,5.303,2.23c4.096,0,7.417-3.319,7.417-7.413L29.208,20.607L29.208,20.607z M30.657,16.561c-0.805-0.879-1.334-2.016-1.449-3.273v-0.516h-1.113C28.375,14.369,29.331,15.734,30.657,16.561L30.657,16.561z M19.079,30.832c-0.45-0.59-0.693-1.311-0.692-2.053c0-1.873,1.519-3.391,3.393-3.391c0.349,0,0.696,0.053,1.029,0.159v-4.1c-0.389-0.053-0.781-0.076-1.174-0.068v3.191c-0.333-0.106-0.68-0.159-1.03-0.159c-1.874,0-3.393,1.518-3.393,3.391C17.213,29.127,17.972,30.274,19.079,30.832z"/><path fill="#fff" d="M28.034,19.63c1.576,1.126,3.507,1.788,5.592,1.788v-3.157c-1.164-0.248-2.194-0.856-2.969-1.701c-1.326-0.827-2.281-2.191-2.561-3.788h-2.923v16.018c-0.007,1.867-1.523,3.379-3.393,3.379c-1.102,0-2.081-0.525-2.701-1.338c-1.107-0.558-1.866-1.705-1.866-3.029c0-1.873,1.519-3.391,3.393-3.391c0.359,0,0.705,0.056,1.03,0.159V21.38c-4.024,0.083-7.26,3.369-7.26,7.411c0,2.018,0.806,3.847,2.114,5.183c1.18,0.792,2.601,1.254,4.129,1.254c4.096,0,7.417-3.319,7.417-7.413L28.034,19.63L28.034,19.63z"/><path fill="#81d4fa" d="M33.626,18.262v-0.854c-1.05,0.002-2.078-0.292-2.969-0.848C31.445,17.423,32.483,18.018,33.626,18.262z M28.095,12.772c-0.027-0.153-0.047-0.306-0.061-0.461v-0.516h-4.036v16.019c-0.006,1.867-1.523,3.379-3.393,3.379c-0.549,0-1.067-0.13-1.526-0.362c0.62,0.813,1.599,1.338,2.701,1.338c1.87,0,3.386-1.512,3.393-3.379V12.772H28.095z M21.635,21.38v-0.909c-0.337-0.046-0.677-0.069-1.018-0.069c-4.097,0-7.417,3.319-7.417,7.413c0,2.567,1.305,4.829,3.288,6.159c-1.308-1.336-2.114-3.165-2.114-5.183C14.374,24.749,17.611,21.463,21.635,21.38z"/><rect x="5" y="5" width="38" height="38" rx="9" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="2"/></svg>`,
+  zen: `<svg viewBox="0 0 48 48" width="17" height="17" aria-hidden="true"><path fill="#21212A" d="M24,2c14.9,0,22,7.1,22,22s-7.1,22-22,22S2,38.9,2,24S9.1,2,24,2z"/><path fill="#fff" d="M23.1,6h1.8c0.3,0,0.5,0.2,0.5,0.5c0.5,9.3,1.6,12.6,4.2,15.2c2.6,2.6,5.9,3.7,15.2,4.2c0.3,0,0.5,0.2,0.5,0.5v1.8c0,0.3-0.2,0.5-0.5,0.5c-9.3,0.5-12.6,1.6-15.2,4.2c-2.6,2.6-3.7,5.9-4.2,15.2c0,0.3-0.2,0.5-0.5,0.5h-1.8c-0.3,0-0.5-0.2-0.5-0.5c-0.5-9.3-1.6-12.6-4.2-15.2c-2.6-2.6-5.9-3.7-15.2-4.2C2.9,28.5,2.7,28.3,2.7,28v-1.8c0-0.3,0.2-0.5,0.5-0.5c9.3-0.5,12.6-1.6,15.2-4.2c2.6-2.6,3.7-5.9,4.2-15.2C22.6,6.2,22.8,6,23.1,6z"/></svg>`,
+  max: `<svg viewBox="0 0 48 48" width="17" height="17" aria-hidden="true"><defs><linearGradient id="maxg" x1="4" y1="8" x2="44" y2="40" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#25C5FF"/><stop offset=".5" stop-color="#4A6BF5"/><stop offset="1" stop-color="#A62BE0"/></linearGradient></defs><rect x="2" y="2" width="44" height="44" rx="13" fill="url(#maxg)"/><path fill="#fff" d="M26,9.5c8.8,0,15.5,6.6,15.5,14.8S34.8,39.1,26,39.1c-3.2,0-6.2-0.9-8.7-2.5l-6.4,2.4c-1.6,0.6-3.1-0.9-2.5-2.5l2.3-6.2c-1.5-2.3-2.3-5-2.3-7.9C8.4,16.1,17.2,9.5,26,9.5z"/><circle cx="26" cy="23.5" r="8.6" fill="url(#maxg)"/></svg>`,
+};
+function chLogo(id){ return CH_LOGO[id] || ''; }
+
+
+const RUBRIC_DEFS = [
+  { id:'agp', name:'AG-PROTECT', short:'AG-PROTECT',
+    facts:['защитное покрытие от 2,5 мм держит пробой 10 кВ','бесфутлярная конструкция допущена по ТР ТС 032','система сертифицирована по «ГАЗСЕРТ» ПАО «Газпром»','заводская гарантия на покрытие — 50 лет'],
+    hashtags:['#AGPROTECT','#цокольныйввод','#безфутляра','#газификация','#АИРГАЗ','#Казань'],
+    phrases:['цокольный ввод без футляра','защита газопровода от коррозии','монтаж без лишних узлов'] },
+  { id:'nsps', name:'НСПС', short:'НСПС',
+    facts:['полиэтиленовые трубы SDR 11 и SDR 17,6','диапазон диаметров от 32 до 630 мм','производство сертифицировано по ISO 9001','сварные соединения проходят 100% контроль'],
+    hashtags:['#НСПС','#полиэтилентрубы','#газосети','#АИРГАЗ','#Казань'],
+    phrases:['наружные сети под ключ','полиэтиленовые газопроводы','подземная прокладка сетей'] },
+  { id:'grpsh', name:'ГРПШ/ГРУ/ПГБ', short:'ГРПШ/ГРУ/ПГБ',
+    facts:['смета на узел снижается до 35%','сроки поставки сокращаются до 40%','блочная конструкция соответствует СП 62.13330','узлы учёта сертифицированы по системе «ГАЗСЕРТ»'],
+    hashtags:['#ГРПШ','#ГРУ','#ПГБ','#газорегулирование','#АИРГАЗ'],
+    phrases:['шкафной регуляторный пункт','блочный пункт редуцирования','узел учёта газа'] },
+  { id:'gis', name:'ГИС/ИФС', short:'ГИС/ИФС',
+    facts:['изолирующие фланцевые соединения соответствуют ТР ТС 032','производство сертифицировано по ISO 9001','каждый узел проходит заводские испытания','заводская гарантия — 50 лет'],
+    hashtags:['#ГИС','#ИФС','#изолирующиесоединения','#АИРГАЗ'],
+    phrases:['газоизолирующие соединения','электрохимическая защита трубопровода','контроль на каждом этапе'] },
+  { id:'turnkey', name:'Газификация под ключ', short:'Под ключ',
+    facts:['сроки реализации сокращаются до 40%','смета проекта — экономия до 35%','сопровождение проекта по СП 62.13330','проект допускается по ТР ТС 032'],
+    hashtags:['#газификацияподключ','#АИРГАЗ','#Казань','#Татарстан'],
+    phrases:['от проекта до пуска газа','полный цикл газификации объекта','сопровождение на каждом этапе'] },
+];
+
+const TONE_DEFS = [
+  { id:'expert', name:'Экспертно-техническая', abbr:'ЭТ',
+    openers:['По нормативам,','С инженерной точки зрения,','Технически это выглядит так.','Разбираем на цифрах.'],
+    dev:['Решение прошло заводские испытания.','Параметр подтверждён протоколом испытаний.','Технология применяется на объектах Республики Татарстан.'],
+    soften:false },
+  { id:'formal', name:'Официально-деловая (ГАЗСЕРТ)', abbr:'ОД',
+    openers:['ООО «АИР-ГАЗ» информирует.','В соответствии с требованиями отрасли,','Официально подтверждаем:','Сообщаем о соответствии продукции нормам.'],
+    dev:['Соответствие подтверждено сертификатом.','Документация предоставляется по запросу.','Продукция включена в реестр разрешённого применения.'],
+    soften:false },
+  { id:'caring', name:'Заботливая (Газификация)', abbr:'ЗБ',
+    openers:['Понимаем, что газификация — это волнительно.','Расскажем, как всё будет происходить у вас.','Мы рядом на каждом шаге.','Спокойно и по срокам — вот как мы работаем.'],
+    dev:['Вы получаете точный график и одного ответственного инженера.','Мы заранее предупредим вас о каждом этапе работ.','Вам не придётся разбираться в нормативах — это наша забота.'],
+    soften:true },
+  { id:'drive', name:'Драйвовая (Команда)', abbr:'ДР',
+    openers:['Цех сегодня в деле.','Смена закрыла ещё один объект.','Быстро. Чётко. По делу.','Наши люди — наш цех.'],
+    dev:['Бригада отработала без простоев.','Каждая деталь проходит через руки наших сварщиков.','Команда снова уложилась в график.'],
+    soften:false },
+];
+
+const POST_TYPE_DEFS = [
+  {id:'news',    name:'Новость',        lead:['Новость с завода.','Событие недели.']},
+  {id:'case',    name:'Кейс',           lead:['Как это было у заказчика.','Реальный объект.']},
+  {id:'qa',      name:'Вопрос-ответ',   lead:['Частый вопрос от заказчиков.','Разбираем вопрос.']},
+  {id:'product', name:'Обзор продукта', lead:['О продукте подробно.','Что внутри решения.']},
+  {id:'team',    name:'За кадром',      lead:['Закулисье цеха.','Как это делаем мы.']},
+];
+
+const CTA_BY_CH = {
+  max:['Пишите нам в MAX — ответим быстро.','Больше вопросов? Пишите в MAX.'],
+  vk:['Задайте вопрос в комментариях.','Сохраните пост и делитесь с коллегами.'],
+  zen:['Читайте разбор полностью в Дзене.','Подписывайтесь на канал — разборы каждую неделю.'],
+  wa:['Напишите нам в WhatsApp для расчёта.','Расчёт по вашему объекту — в WhatsApp.'],
+  yt:['Смотрите видео и подписывайтесь на канал.','Полное видео — на канале.'],
+  ig:['Сохраните пост и пишите в директ.','Больше фото — в актуальном в профиле.'],
+  tt:['Смотрите ролик до конца.','Ставьте лайк, если полезно.'],
+};
+
+function contactsFor(chId, v){
+  const phone = CONTACTS.phones[v % CONTACTS.phones.length];
+  if(['max','vk','wa'].includes(chId)) return `Звоните: ${phone}.`;
+  if(chId==='zen') return `Подробнее на ${CONTACTS.site}.`;
+  if(['yt','ig','tt'].includes(chId)) return `Контакты: ${CONTACTS.site}, ${CONTACTS.email}.`;
+  return `${CONTACTS.email}, ${phone}.`;
+}
+/* ТЗ §3.2: «автоматическая расстановка ГОСТ/ГАЗСЕРТ хештегов». The rubric tags alone were all
+   product words - the standards the factory certifies against never appeared, which is the half
+   of the requirement that matters to a gas client. Each rubric now contributes the standard it
+   actually holds, and one always lands in the tail of the list. */
+const STANDARD_TAGS = {
+  agp:   ['#ГАЗСЕРТ','#ТРТС032'],
+  nsps:  ['#ISO9001','#ГОСТ_Р_58121'],
+  grpsh: ['#ГАЗСЕРТ','#ГОСТ_54983'],
+  gis:   ['#ГОСТ_9.602','#ТРТС032'],
+  turnkey: ['#СП_62_13330','#ГАЗСЕРТ'],
+};
+function hashtagsFor(rubric, chId){
+  const std = STANDARD_TAGS[rubric.id] || ['#ГАЗСЕРТ'];
+  const base = [...rubric.hashtags];
+  let n = 4;
+  if(chId==='vk') n = 6;         // spec: VK hashtags 5-7
+  else if(chId==='tt' || chId==='ig') n = 5;
+  // keep room for one standard tag, always last so it reads as the certification stamp
+  const body = base.slice(0, Math.max(1, Math.min(n, base.length) - 1));
+  return [...body, std[0]].join(' ');
+}
+
+const SOFTEN_MAP = {'обязаны':'рекомендуем','необходимо':'стоит','должны':'можете','срочно':'в удобные сроки','штраф':'нюанс','нельзя':'не стоит'};
+function softenText(t){
+  let r = t;
+  Object.entries(SOFTEN_MAP).forEach(([k,v])=>{ r = r.split(k).join(v); r = r.split(capitalize(k)).join(capitalize(v)); });
+  r = r.replaceAll('!','.');
+  return r;
+}
+
+/* ============================================================
+   §3 DETERMINISTIC TEXT GENERATOR — no LLM, no Math.random.
+   text = opener(tone) + fact(rubric->KB) + development(postType,tone)
+        + CTA(channel) + hashtags(rubric+standards) + contacts(channel)
+   Same (tone,rubric,channel,postType,variant) always yields the same
+   text. Variant advances only when the combo already exists in state
+   (anti-dup), so re-generating for a *new* post explores new copy.
+   ============================================================ */
+function titleFor(rubric, type, v){
+  const phrase = rubric.phrases[v % rubric.phrases.length];
+  return `${type.name}: ${capitalize(phrase)}`;
+}
+function buildPostText(state, {toneId, rubricId, chId, postTypeId}, variant){
+  const tone = state.tones.find(t=>t.id===toneId) || state.tones[0];
+  const rubric = state.rubrics.find(r=>r.id===rubricId) || state.rubrics[0];
+  const type = POST_TYPE_DEFS.find(t=>t.id===postTypeId) || POST_TYPE_DEFS[0];
+  const ch = chId || 'vk';
+  const v = variant;
+  const lead = type.lead[v % type.lead.length];
+  const opener = tone.openers[v % tone.openers.length];
+  const fact = rubric.facts[(v+1) % rubric.facts.length];
+  const dev = tone.dev[(v+2) % tone.dev.length];
+  const phrase = rubric.phrases[v % rubric.phrases.length];
+  const cta = (CTA_BY_CH[ch]||CTA_BY_CH.vk)[v % (CTA_BY_CH[ch]||CTA_BY_CH.vk).length];
+  const hashtags = hashtagsFor(rubric, ch);
+  const contacts = contactsFor(ch, v);
+  let s1 = `${lead} ${opener} ${capitalize(phrase)} — ${fact}.`;
+  let s2 = dev;
+  let s3 = `${cta} ${contacts}`;
+  let body = [s1, s2, s3].join(' ');
+  if(tone.soften) body = softenText(body);
+  const text = `${body}\n\n${hashtags}`;
+  const title = titleFor(rubric, type, v);
+  return {title, text};
+}
+function comboCount(state, toneId, rubricId, chId, postTypeId, excludeId){
+  return state.posts.filter(p=> p.id!==excludeId && p.tone===toneId && p.rubric===rubricId && p.postType===postTypeId && p.channels.includes(chId)).length;
+}
+function generatePost(state, post){
+  const chId = post.channels[0] || 'vk';
+  let variant = comboCount(state, post.tone, post.rubric, chId, post.postType, post.id);
+  let out, tries = 0;
+  do{
+    out = buildPostText(state, {toneId:post.tone, rubricId:post.rubric, chId, postTypeId:post.postType}, variant+tries);
+    tries++;
+  } while(state.posts.some(p=>p.id!==post.id && p.text===out.text) && tries<16);
+  return out;
+}
+function smartEdit(text, instruction){
+  const cmd = (instruction||'').trim().toLowerCase();
+  if(!cmd) return null;
+  if(cmd.includes('коро') || cmd.includes('кратк') || cmd.includes('сократ')){
+    const sentences = text.split(/(?<=[.!?])\s+/).filter(Boolean);
+    const keep = Math.max(1, Math.ceil(sentences.length*0.6));
+    return sentences.slice(0, keep).join(' ');
+  }
+  if(cmd.includes('техник') || cmd.includes('цифр') || cmd.includes('норматив')){
+    const extra = RUBRIC_DEFS.flatMap(r=>r.facts).find(f=>!text.includes(f));
+    return extra ? `${text} ${capitalize(extra)}.` : text;
+  }
+  if(cmd.includes('мягч') || cmd.includes('дружелюбн') || cmd.includes('добр')){
+    return softenText(text);
+  }
+  return null;
+}
+
+/* ============================================================
+   §4 ORM — objection library + monitoring keywords + generator
+   ============================================================ */
+const OBJECTION_DEFS = [
+  { id:'tech',  name:'Непонимание технологии AG-PROTECT', triggers:['без футляра','цокольный ввод','футляр','как это'],
+    official:'Поясняем: {fact}. Решение допущено по ТР ТС 032 и сертифицировано «ГАЗСЕРТ» ПАО «Газпром».',
+    crisis:'Частый вопрос про {phrase}. {fact} Разбираем подробно, почему это безопасно и надёжнее классической схемы.' },
+  { id:'price', name:'Высокая стоимость', triggers:['дорого','цена','стоимост','конск'],
+    official:'По смете: {fact}. Расчёт по вашему объекту делаем бесплатно — {phone}.',
+    crisis:'Почему решения АИР-ГАЗ не дороже, а выгоднее: {fact} Разбираем на реальных сметах.' },
+  { id:'delay', name:'Задержка сроков', triggers:['задержка газа','долго','сроки','когда уже'],
+    official:'По срокам: {fact}. Актуальный график предоставляем по объекту — {phone}.',
+    crisis:'Почему сроки у нас предсказуемы: {fact} Показываем, как устроен процесс на заводе.' },
+  /* Категории 4 и 5 названы в ТЗ прямо: чёрный PR конкурентов и вопросы качества/подделок. */
+  { id:'blackpr', name:'Чёрный PR конкурентов', triggers:['подделк','обман','развод','не берите','кидал','шараш'],
+    official:'Мы работаем открыто: {fact}. Сертификаты и протоколы испытаний предоставляем по запросу — {phone}.',
+    crisis:'Отвечаем на вбросы фактами: {fact} Протоколы испытаний и сертификаты — в открытом доступе.' },
+  { id:'quality', name:'Вопросы качества и подделок', triggers:['брак','качеств','лопнул','потёк','контрафакт','не держит'],
+    official:'Разберём по вашему объекту: {fact}. Номер партии проверим по заводской базе — {phone}.',
+    crisis:'Как отличить заводское изделие от подделки: {fact} Каждая партия имеет протокол и маркировку.' },
+];
+const KEYWORD_DEFS = [
+  {word:'АИР-ГАЗ', cat:null},
+  {word:'цокольный ввод', cat:'tech'},
+  {word:'без футляра', cat:'tech'},
+  {word:'дорого', cat:'price'},
+  {word:'задержка газа', cat:'delay'},
+  {word:'спасибо', cat:'blackpr'},
+  {word:'сколько стоит', cat:'quality'},
+];
+function classifyMention(state, text){
+  const low = text.toLowerCase();
+  const cats = new Set();
+  const kw = [];
+  state.keywords.forEach(k=>{
+    if(low.includes(k.word.toLowerCase())){
+      kw.push(k.word);
+      if(k.cat) cats.add(k.cat);
+    }
+  });
+  if(cats.size===0) cats.add('quality');
+  return {categories:[...cats], keywords:kw};
+}
+function buildOrmText(state, mention, kind, variant){
+  const objDefs = state.objections;
+  const primaryCat = mention.categories[0] || 'quality';
+  const obj = objDefs.find(o=>o.id===primaryCat) || objDefs[3];
+  const rubric = state.rubrics[variant % state.rubrics.length];
+  const fact = capitalize(rubric.facts[variant % rubric.facts.length]);
+  const phrase = rubric.phrases[variant % rubric.phrases.length];
+  const phone = CONTACTS.phones[variant % CONTACTS.phones.length];
+  const tpl = kind==='official' ? obj.official : (obj.crisis || obj.official);
+  let text = tpl.replaceAll('{fact}', fact).replaceAll('{phrase}', phrase).replaceAll('{phone}', phone);
+  text += `\n\n${CONTACTS.email} · ${CONTACTS.site}`;
+  return text;
+}
+
+/* ============================================================
+   §5 PRODUCER — storyboard generator
+   duration -> word budget & scene count (spec §3)
+   ============================================================ */
+const AUDIENCES = ['Частные заказчики','Проектировщики и ГИПы','Муниципалитеты','Партнёры-монтажники'];
+const EMOTIONS = ['Доверие','Забота','Экспертность','Драйв'];
+const DURATION_META = {
+  15:{scenes:2, words:[35,45]},
+  30:{scenes:3, words:[70,85]},
+  45:{scenes:4, words:[100,120]},
+  60:{scenes:5, words:[130,150]},
+};
+const SFX_POOL = ['гул станка','щелчок затвора','фоновая индастриал-музыка','звук сварки','тишина, только голос'];
+const SHOT_POOL = ['общий план цеха','крупный план узла','инженер у стенда','дрон над площадкой','рука на чертеже'];
+function buildStoryboard(state, {topic, duration, audience, emotion, rubricId}, variant){
+  const meta = DURATION_META[duration] || DURATION_META[30];
+  const rubric = state.rubrics.find(r=>r.id===rubricId) || state.rubrics[0];
+  const perScene = Math.round(((meta.words[0]+meta.words[1])/2) / meta.scenes);
+  const sceneSec = Math.round(duration / meta.scenes);
+  const scenes = [];
+  let total = 0;
+  for(let i=0;i<meta.scenes;i++){
+    const fact = rubric.facts[(variant+i) % rubric.facts.length];
+    const shot = SHOT_POOL[(variant+i) % SHOT_POOL.length];
+    const sfx = SFX_POOL[(variant+i) % SFX_POOL.length];
+    const sec = i===meta.scenes-1 ? (duration - sceneSec*(meta.scenes-1)) : sceneSec;
+    let voice;
+    if(i===0) voice = `${topic || rubric.name}. ${capitalize(emotion)} с первых секунд: ${fact}.`;
+    else if(i===meta.scenes-1) voice = `Обращаемся к ${audience.toLowerCase()}: звоните ${CONTACTS.phones[0]}, ${CONTACTS.site}.`;
+    else voice = `${capitalize(fact)}.`;
+    const words = voice.split(/\s+/).filter(Boolean).length;
+    total += words;
+    scenes.push({
+      n:i+1, shot:`${shot} — ${rubric.short}`, voice,
+      onscreen: i===0 ? (topic || rubric.name).toUpperCase() : (i===meta.scenes-1 ? CONTACTS.site : fact.split(' ').slice(0,4).join(' ')),
+      sfx, sec, words,
+    });
+  }
+  return {scenes, totalSec:duration, totalWords:total, wordTarget:meta.words};
+}
+
+/* ============================================================
+   §6 STATE MACHINE — posts
+   Черновик -> На согласовании -> Одобрен -> Запланировано -> Опубликовано
+        rework/rejected feed back to Черновик. Ошибка публикации sits
+        between Запланировано and Опубликовано; 3rd failed attempt ->
+        "Требует внимания" and the scheduler stops auto-retrying it
+        (it simply never re-enters status 'scheduled' on its own).
+   ============================================================ */
+const STATUS_META = {
+  draft:      {label:'Черновик',            tone:'grey'},
+  review:     {label:'На согласовании',     tone:'blue'},
+  rework:     {label:'На доработку',        tone:'orange'},
+  approved:   {label:'Одобрен',             tone:'green'},
+  scheduled:  {label:'Запланировано',       tone:'blue'},
+  published:  {label:'Опубликовано',        tone:'green'},
+  rejected:   {label:'Отклонён',            tone:'red'},
+  error:      {label:'Ошибка публикации',   tone:'red'},
+  archived:   {label:'Архив',               tone:'grey'},
+};
+function statusColorVar(tone){
+  return {grey:'var(--ink-3)', blue:'var(--blue)', orange:'var(--brand-ink)', green:'var(--ok-ink)', red:'var(--bad)'}[tone] || 'var(--ink-3)';
+}
+function statusLabel(post){
+  if(post.status==='error' && post.needsAttention) return 'Требует внимания';
+  return STATUS_META[post.status].label;
+}
+function statusColor(post){
+  if(post.status==='error' && post.needsAttention) return statusColorVar('red');
+  return statusColorVar(STATUS_META[post.status].tone);
+}
+function pushHistory(post, status, by, note){
+  post.history.push({status, at:Date.now(), by: by || 'система', note: note || null});
+}
+function doSubmitForReview(state, post, actor){
+  post.status='review'; pushHistory(post,'review', actor);
+}
+function doApprove(state, post, actor){
+  post.status='approved'; pushHistory(post,'approved', actor);
+}
+function doRework(state, post, actor, comment){
+  post.status='rework'; post.comments.push({by:actor, at:Date.now(), text:comment, type:'rework'});
+  pushHistory(post,'rework', actor, comment);
+}
+function doReject(state, post, actor, comment){
+  post.status='rejected'; if(comment) post.comments.push({by:actor, at:Date.now(), text:comment, type:'reject'});
+  pushHistory(post,'rejected', actor, comment);
+}
+function doBackToDraft(state, post, actor){
+  post.status='draft'; pushHistory(post,'draft', actor);
+}
+function doSchedule(state, post, actor, whenTs){
+  post.scheduledAt = whenTs; post.status='scheduled'; post.attempts=0; post.needsAttention=false; post.errorReason=null;
+  pushHistory(post,'scheduled', actor, fmtDT(whenTs));
+}
+function slotConflicts(state, post, whenTs){
+  return state.posts.filter(p=> p.id!==post.id && ['scheduled','published'].includes(p.status) &&
+    p.channels.some(c=>post.channels.includes(c)) &&
+    ((p.status==='scheduled'&&p.scheduledAt&&sameMinute(p.scheduledAt,whenTs)) || (p.status==='published'&&p.publishedAt&&sameMinute(p.publishedAt,whenTs))));
+}
+function logPublish(state, post, ch, result, reason){
+  state.publishLog.unshift({id:uid(state,'log'), postId:post.id, postTitle:post.title, channelId:ch.id, channelName:ch.name, at:Date.now(), result, reason, attempt:post.attempts});
+}
+function attemptPublish(state, post, actor){
+  const chans = post.channels.map(id=>state.channels.find(c=>c.id===id)).filter(Boolean);
+  post.attempts = (post.attempts||0)+1;
+  const notConnected = chans.filter(c=>!c.connected);
+  const connected = chans.filter(c=>c.connected);
+  if(chans.length>0 && notConnected.length===0){
+    connected.forEach(c=>logPublish(state, post, c, 'success', null));
+    post.status='published'; post.publishedAt=Date.now(); post.errorReason=null;
+    pushHistory(post,'published', actor);
+  } else {
+    connected.forEach(c=>logPublish(state, post, c, 'success', null));
+    notConnected.forEach(c=>logPublish(state, post, c, 'fail', `Канал ${c.name} не подключён`));
+    post.status='error';
+    post.errorReason = `Канал${notConnected.length>1?'ы':''} ${notConnected.map(c=>c.name).join(', ')} не подключ${notConnected.length>1?'ены':'ён'}`;
+    if(post.attempts>=3) post.needsAttention = true;
+    pushHistory(post, post.needsAttention?'attention':'error', actor, post.errorReason);
+  }
+}
+function doArchive(state, post, actor){
+  post.status='archived'; pushHistory(post,'archived', actor);
+}
+function doDelete(state, post){
+  state.posts = state.posts.filter(p=>p.id!==post.id);
+}
+
+/* ============================================================
+   §7 ROLES & PERMISSIONS
+   ============================================================ */
+const ROLES = [
+  {id:'marketer', name:'Маркетолог'},
+  {id:'editor',   name:'Главред'},
+  {id:'producer', name:'Продюсер'},
+  {id:'guard',    name:'Страж'},
+  {id:'admin',    name:'Администратор'},
+];
+const PERMS = {
+  'post.create':   r=>['marketer','editor','admin'].includes(r),
+  'post.edit':     r=>['marketer','editor','admin'].includes(r),
+  'post.submit':   r=>['marketer','editor','admin'].includes(r),
+  'post.approve':  r=>['editor','admin'].includes(r),
+  'post.schedule': r=>['marketer','editor','admin'].includes(r),
+  'post.archive':  r=>['marketer','editor','admin'].includes(r),
+  'post.delete':   r=>r==='admin',
+  'kb.edit':       r=>['editor','admin'].includes(r),
+  'tones.edit':    r=>['editor','admin'].includes(r),
+  'rubrics.edit':  r=>['editor','admin'].includes(r),
+  'orm.manage':    r=>['guard','admin'].includes(r),
+  'objections.edit': r=>['guard','admin'].includes(r),
+  'scenario.edit': r=>['producer','admin'].includes(r),
+  'channels.manage': r=>r==='admin',
+  'bots.manage':   r=>r==='admin',
+  'users.manage':  r=>r==='admin',
+};
+/* DEMO: everything is open to every role. The matrix below is real and the switcher still
+   changes who you are - flip ENFORCE_ROLES to true to put the gate back. Kept off because a
+   demo where half the buttons refuse reads as broken software, not as access control. */
+const ENFORCE_ROLES = false;
+function can(state, action){
+  if(!ENFORCE_ROLES) return true;
+  return !!(PERMS[action] && PERMS[action](state.currentRole));
+}
+
+/* SCOPE = ТЗ, NOT WHAT WE COULD BUILD.
+   The ТЗ is two pages, and §5 «Требования к Дашборду» is three bullets: фирменный стиль,
+   раздел ORM с кнопкой быстрых отработок, and управление очередью с фильтрами по каналам и
+   статусам. Everything in §3 belongs to the four Python bots, which live in Telegram - those
+   are not screens, and building a screen for each of them was scope we invented, not scope the
+   client asked for.
+
+   Every entry below cites the clause that pays for it. The eleven screens that had no clause
+   are in CUT_NAV: their code still works and their views still render if routed to directly,
+   so nothing is lost and turning one back on is a one-line move. They are simply not sold. */
+const NAV = [
+  {group:'Контент', items:[
+    {id:'feed',     label:'Лента публикаций',  icon:'feed', roles:['marketer','editor','producer','guard','admin']}, // §5: управление очередью, фильтры по каналам и статусам
+    {id:'calendar', label:'Контент-календарь', icon:'cal',  roles:['marketer','editor','admin']},                    // §1: «вести контент-календарь»
+  ]},
+  {group:'Репутация', items:[
+    {id:'mentions', label:'Лента упоминаний', icon:'mention', roles:['guard','admin']},                              // §5: таблица негативных комментариев + кнопка отработки
+  ]},
+  {group:'Знания', items:[
+    {id:'kb', label:'База знаний', icon:'book', roles:['marketer','editor','producer','guard','admin']},             // §2: «в базу знаний ботов и дашборда зашита номенклатура»
+  ]},
+  {group:'Настройки', items:[
+    // one screen, three sections: каналы (§4), статус ботов (§3), автопостинг (§1)
+    {id:'settings', label:'Настройки', icon:'autopost', roles:['admin']},
+  ]},
+];
+
+/* Built, working, and deliberately not in the navigation - no clause in the ТЗ asks for them.
+   Kept because deleting working code to re-add it later is the expensive order of operations. */
+const CUT_NAV = ['queue','multichannel','log','monitoring','objections','scenarios','storyboards','tones','rubrics','users','notifications'];
+function routeAllowed(state, routeId){
+  for(const g of NAV) for(const it of g.items) if(it.id===routeId) return it.roles.includes(state.currentRole);
+  return true;
+}
+
+/* ============================================================
+   §8 SEED DATA — synthetic, plausible, deterministic (seeded PRNG,
+   never Math.random). ~9 published in the last 30 days, 0/4 channels
+   connected — the honest starting state of the product.
+   ============================================================ */
+function clone(x){ return JSON.parse(JSON.stringify(x)); }
+function uid(state, prefix){ state.seq = (state.seq||0)+1; return prefix+'_'+state.seq; }
+function actorNameFor(id){ const u=USER_DEFS.find(u=>u.id===id); return u?u.name:'система'; }
+function setCurrentUser(state, userId){
+  state.currentUserId = userId;
+  const u = state.users.find(u=>u.id===userId);
+  state.currentRole = u ? u.role : 'marketer';
+}
+
+const USER_DEFS = [
+  {id:'u1', name:'Р. Сафина', role:'marketer'},
+  {id:'u2', name:'И. Хамидуллин', role:'editor'},
+  {id:'u3', name:'А. Валиев', role:'producer'},
+  {id:'u4', name:'Л. Гарипова', role:'guard'},
+  {id:'u5', name:'М. Ситдиков', role:'admin'},
+];
+const BOT_DEFS = [
+  {id:'orchestrator', name:'Оркестратор', desc:'распределяет задачи между ботами', status:'online'},
+  {id:'editorbot', name:'Главред', desc:'проверяет тексты перед публикацией', status:'online'},
+  {id:'producerbot', name:'Продюсер', desc:'собирает раскадровки по сценариям', status:'online'},
+  {id:'guardbot', name:'Страж', desc:'мониторит упоминания и SLA', status:'offline'},
+];
+const MENTION_AUTHORS = ['Ильдар Н.','Марат С.','Гульнара Т.','Рустам В.','Айгуль К.','Дамир Х.','Лилия Р.','Тимур Г.','Зульфия М.','Айрат П.','Эльвира Ф.','Ленар Ю.','Наиль Ш.','Резеда И.','Артём Б.','Ольга К.'];
+const MENTION_SOURCES = [
+  {id:'vk', label:'VK', color:'#0077FF'}, {id:'max', label:'MAX', color:'#0072CE'},
+  {id:'ig', label:'Instagram', color:'#C2266E'}, {id:'zen', label:'Дзен', color:'#D6323C'},
+  {id:'otzovik', label:'Отзовик', color:'#5A6B7B'},
+];
+const MENTION_TEXTS = [
+  '«Цокольный ввод без футляра — это как? У нас газнадзор такое не примет. И цена у вас конская, в два раза дороже обычного.»',
+  '«Когда уже привезёте? Задержка газа третий месяц, сроки постоянно сдвигаются.»',
+  '«Спасибо большое бригаде, всё сделали аккуратно и без пыли в доме!»',
+  '«Сколько стоит подключение частного дома под ключ?»',
+  '«А без футляра точно надёжно? Страшно как-то.»',
+  '«Дорого у вас. В соседней фирме в полтора раза дешевле предлагали.»',
+  '«Какой гарантийный срок на покрытие цокольного ввода?»',
+  '«Опять задержка газа, обещали на прошлой неделе завершить.»',
+  '«Отличная работа, рекомендую всем соседям по улице!»',
+  '«Подскажите, какие диаметры труб используете для НСПС?»',
+  '«АИР-ГАЗ, а у вас есть сертификат ГАЗСЕРТ на ГРПШ?»',
+  '«Цена как в частной клинике. Дорого для обычной семьи.»',
+  '«Без футляра — это нарушение норм, коллеги-газовики со мной согласны.»',
+  '«Сколько стоит ждать монтажа после оплаты?»',
+  '«Спасибо, что подсказали по ГРПШ, всё понятно теперь.»',
+  '«Задержка газа на объекте создаёт проблемы с отопительным сезоном.»',
+];
+const MENTION_STATUS_PLAN = ['new','new','new','new','new','inprogress','inprogress','inprogress','inprogress','done','done','done','done','done','done','escalated'];
+const SCENARIO_TOPICS = ['Как устроен цокольный ввод AG-PROTECT','Один день на производстве НСПС','Монтаж ГРПШ без остановки цеха','Что такое изолирующие фланцевые соединения','Путь газа от проекта до пуска','Сварной шов под микроскопом','Бригада на объекте: газификация частного дома','Испытание покрытия AG-PROTECT пробоем 10 кВ'];
+
+function seedState(){
+  const rng = mulberry32(20260806);
+  const now = Date.now();
+  const state = {
+    seq:0,
+    theme: undefined, // theme lives in a separate localStorage key
+    /* Opens as Администратор so every screen is live. Role gating is real and worth showing -
+     switch to Маркетолог in the header and ORM/Каналы/Боты grey out - but a demo that opens
+     with half its navigation dead reads as broken, not as secure. */
+    currentUserId:'u5', currentRole:'admin',
+    users: clone(USER_DEFS),
+    bots: clone(BOT_DEFS),
+    channels: CHANNEL_DEFS.map(c=>({...c,
+      /* Phase 1 arrives connected: the factory is running, which is what a buyer needs to see.
+         Phase 2 stays unconnected on purpose - it is the roadmap, and it keeps the
+         'publish fails, connect, retry' path reachable for anyone who wants to see it. */
+      connected: c.phase===1,
+      account: c.phase===1 ? '@airgaz_'+c.id : '',
+      connectedAt: c.phase===1 ? Date.now()-30*86400000 : null,
+      autopost:true})),
+    tones: clone(TONE_DEFS),
+    rubrics: clone(RUBRIC_DEFS),
+    objections: clone(OBJECTION_DEFS),
+    keywords: clone(KEYWORD_DEFS),
+    posts: [],
+    mentions: [],
+    scenarios: [],
+    publishLog: [],
+  };
+
+  // ---- posts ----
+  const plan = [];
+  const add = (status,n)=>{ for(let i=0;i<n;i++) plan.push(status); };
+  add('draft',9); add('review',7); add('approved',5); add('scheduled',22);
+  add('rework',3); add('rejected',2); add('error',2); add('attention',1);
+  /* ~3 posts a working day across four channels for three months. The queue and the log
+     have to look like a factory that has been running, not like a fresh install. */
+  add('published',96); add('archived',6);
+
+  plan.forEach((planStatus, i)=>{
+    const rubric = state.rubrics[i % state.rubrics.length];
+    const tone = state.tones[Math.floor(rng()*state.tones.length)];
+    const type = POST_TYPE_DEFS[i % POST_TYPE_DEFS.length];
+    let channels;
+    const chRoll = rng();
+    const phase1 = CHANNEL_DEFS.filter(c=>c.phase===1);
+    const phase2 = CHANNEL_DEFS.filter(c=>c.phase===2);
+    if(chRoll < 0.72) channels = [pick(rng, phase1).id];
+    else if(chRoll < 0.9) channels = [pick(rng, phase1).id, pick(rng, phase1).id].filter((v,idx,a)=>a.indexOf(v)===idx);
+    else channels = [pick(rng, phase2).id];
+    if(channels.length===0) channels=[phase1[0].id];
+
+    const {title, text} = buildPostText(state, {toneId:tone.id, rubricId:rubric.id, chId:channels[0], postTypeId:type.id}, i);
+
+    const post = {
+      id: uid(state,'p'), title, text, tone: tone.id, rubric: rubric.id, postType: type.id, channels,
+      status: planStatus==='attention' ? 'error' : planStatus,
+      needsAttention: planStatus==='attention',
+      attempts: 0, errorReason: null,
+      createdAt: now - Math.floor(rng()*80)*days(1) - Math.floor(rng()*20)*hours(1),
+      scheduledAt: null, publishedAt: null,
+      history: [], comments: [], adaptations: {},
+    };
+    pushHistory(post, 'draft', 'система', 'создан импортом демо-данных');
+
+    if(planStatus==='review'){ post.status='review'; pushHistory(post,'review','Р. Сафина'); }
+    if(planStatus==='approved'){ post.status='approved'; pushHistory(post,'review','Р. Сафина'); pushHistory(post,'approved','И. Хамидуллин'); }
+    if(planStatus==='rework'){
+      post.status='rework'; pushHistory(post,'review','Р. Сафина');
+      const note = 'Добавь цифры по гарантии и уточни норматив — сейчас звучит общо.';
+      post.comments.push({by:'И. Хамидуллин', at: post.createdAt+hours(2), text:note, type:'rework'});
+      pushHistory(post,'rework','И. Хамидуллин', note);
+    }
+    if(planStatus==='rejected'){
+      post.status='rejected'; pushHistory(post,'review','Р. Сафина');
+      const note='Дублирует пост от прошлой недели, тема закрыта.';
+      post.comments.push({by:'И. Хамидуллин', at: post.createdAt+hours(3), text:note, type:'reject'});
+      pushHistory(post,'rejected','И. Хамидуллин', note);
+    }
+    if(planStatus==='scheduled'){
+      post.status='scheduled'; pushHistory(post,'review','Р. Сафина'); pushHistory(post,'approved','И. Хамидуллин');
+      post.scheduledAt = now + Math.floor(rng()*21)*days(1) + Math.floor(rng()*23)*hours(1);
+      pushHistory(post,'scheduled','Р. Сафина', fmtDT(post.scheduledAt));
+    }
+    if(planStatus==='error' || planStatus==='attention'){
+      /* With Phase 1 connected, a failure needs a genuine cause. These sit on a Phase-2 channel,
+         which is exactly the real one: the channel is not connected yet. */
+      const p2 = CHANNEL_DEFS.filter(c=>c.phase===2);
+      post.channels = [pick(rng, p2).id];
+      post.status='approved'; pushHistory(post,'review','Р. Сафина'); pushHistory(post,'approved','И. Хамидуллин');
+      post.scheduledAt = now - Math.floor(rng()*4)*days(1) - hours(2);
+      pushHistory(post,'scheduled','Р. Сафина', fmtDT(post.scheduledAt));
+      const targetAttempts = planStatus==='attention' ? 3 : (1+Math.floor(rng()*2));
+      for(let a=0;a<targetAttempts;a++) attemptPublish(state, post, 'планировщик');
+    }
+    if(planStatus==='published'){
+      post.status='approved'; pushHistory(post,'review','Р. Сафина'); pushHistory(post,'approved','И. Хамидуллин');
+      const chObjs = channels.map(id=>state.channels.find(c=>c.id===id));
+      /* Phase 2 is not connected, so a post seeded onto it could never have published.
+         Borrow the connection for the write and hand it straight back - Phase 1 keeps its own. */
+      const borrowed = chObjs.filter(c=>!c.connected);
+      borrowed.forEach(c=>{ c.connected=true; });
+      post.scheduledAt = now - Math.floor(rng()*29)*days(1) - hours(3);
+      pushHistory(post,'scheduled','Р. Сафина', fmtDT(post.scheduledAt));
+      attemptPublish(state, post, 'планировщик');
+      post.publishedAt = post.scheduledAt + mins(2);
+      state.publishLog[0].at = post.publishedAt;
+      borrowed.forEach(c=>{ c.connected=false; c.account=''; });
+    }
+    if(planStatus==='archived'){
+      post.status='archived';
+      post.createdAt = now - (90+Math.floor(rng()*30))*days(1);
+      pushHistory(post,'review','Р. Сафина'); pushHistory(post,'approved','И. Хамидуллин');
+      post.publishedAt = post.createdAt + days(2);
+      pushHistory(post,'published','планировщик');
+      pushHistory(post,'archived','М. Ситдиков');
+    }
+    state.posts.push(post);
+  });
+
+  // deliberate slot conflict for the calendar (2 scheduled posts, same channel, same minute)
+  const sched = state.posts.filter(p=>p.status==='scheduled');
+  if(sched.length>=2){
+    sched[1].scheduledAt = sched[0].scheduledAt;
+    sched[1].channels = [sched[0].channels[0]];
+  }
+
+  // ---- mentions ----
+  MENTION_STATUS_PLAN.forEach((st, i)=>{
+    const text = MENTION_TEXTS[i % MENTION_TEXTS.length];
+    const {categories, keywords} = classifyMention(state, text);
+    const source = MENTION_SOURCES[i % MENTION_SOURCES.length];
+    const isOverdueSeed = i===0;
+    const isUnresolved = st==='new' || st==='inprogress';
+    // unresolved mentions get recent timestamps so only the deliberately
+    // overdue one (i===0) trips the 30-min SLA on first load; resolved
+    // ones (done/escalated) can carry realistic historical dates.
+    const at = isOverdueSeed ? (now - hours(2))
+      : isUnresolved ? (now - mins(1 + Math.floor(rng()*22)))
+      : (now - Math.floor(rng()*10)*days(1) - Math.floor(rng()*20)*hours(1));
+    const m = {
+      id: uid(state,'m'), source: source.id, sourceLabel: source.label,
+      author: MENTION_AUTHORS[i % MENTION_AUTHORS.length], at, text, categories, keywords,
+      status: st, slaMin:30, officialText:'', crisisText:'', linkedPostId:null, resolvedAt:null,
+    };
+    if(st==='inprogress' || st==='done'){
+      m.officialText = buildOrmText(state, m, 'official', i);
+      m.crisisText = buildOrmText(state, m, 'crisis', i);
+    }
+    if(st==='done'){ m.resolvedAt = at + mins(8 + Math.floor(rng()*25)); }
+    state.mentions.push(m);
+  });
+
+  // ---- scenarios ----
+  SCENARIO_TOPICS.forEach((topic, i)=>{
+    const durations=[15,30,45,60]; const duration = durations[i%4];
+    const audience = AUDIENCES[i % AUDIENCES.length];
+    const emotion = EMOTIONS[i % EMOTIONS.length];
+    const rubric = state.rubrics[i % state.rubrics.length];
+    const sb = buildStoryboard(state, {topic, duration, audience, emotion, rubricId:rubric.id}, i);
+    state.scenarios.push({
+      id: uid(state,'sc'), topic, duration, audience, emotion, rubric: rubric.id,
+      status: i<5 ? 'Готово' : 'Черновик', createdAt: now - Math.floor(rng()*40)*days(1),
+      scenes: sb.scenes, totalWords: sb.totalWords, wordTarget: sb.wordTarget,
+    });
+  });
+
+  /* Last line wins: this used to reset the seed's admin default back to the marketer, which
+     greyed out half the navigation and made most row actions no-ops on first open. */
+  /* ---- demo coverage: three things the seed left with no data to exercise ---- */
+
+  /* 1. Posts genuinely due, so «Прогнать планировщик» has work and the scheduler fires live
+        during a demo instead of looking inert. Two publish, one is on an unconnected Phase-2
+        channel and will fail - which is the pair you want to show. */
+  (function seedDue(){
+    const ready = state.posts.filter(p=>p.status==='scheduled').slice(0,3);
+    ready.forEach((p,i)=>{
+      p.scheduledAt = now + (i===2 ? -mins(1) : mins(1) + i*mins(1));
+      if(i===2) p.channels=['ig'];
+      pushHistory(p,'scheduled', actorNameFor('u1'), 'перепланировано для демо');
+    });
+  })();
+
+  /* 2. Channel adaptations, so the Мультиканал screen opens with versions to compare rather
+        than an empty right-hand column. */
+  state.posts.filter(p=>p.channels.length>1).slice(0,8).forEach(p=>{
+    p.adaptations = {};
+    p.channels.forEach(ch=>{
+      const lim = CH_LIMITS[ch] || 4096;
+      let t = p.text;
+      if(ch==='tt' || ch==='ig') t = t.split('\n')[0];
+      if(t.length > lim) t = t.slice(0, lim-1) + '…';
+      if(ch==='vk') t = t + '\n\n#АИРГАЗ #ГАЗСЕРТ #газификация #НСПС #AGPROTECT';
+      if(ch==='wa') t = t.split('\n')[0] + '\n\nПодробности: ' + CONTACTS.phoneMain;
+      p.adaptations[ch] = t;
+    });
+  });
+
+  /* 3. Two mentions already turned into posts, so the ORM -> очередь link has history and the
+        «уже в работе» state is visible without clicking it first. */
+  state.mentions.filter(m=>m.status==='done').slice(0,2).forEach((m,i)=>{
+    const src = state.posts.filter(p=>p.status==='published')[i];
+    if(src){ m.linkedPostId = src.id; }
+  });
+
+  setCurrentUser(state, 'u5');
+  return state;
+}
+
+/* ============================================================
+   §9 STORAGE
+   ============================================================ */
+const LS_KEY='kz_v1', LS_THEME='kz_theme';
+function loadState(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(!raw) return seedState();
+    const s = JSON.parse(raw);
+    if(!s || !Array.isArray(s.posts)) return seedState();
+    return s;
+  }catch(e){ return seedState(); }
+}
+function saveState(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch(e){} }
+function resetDemo(){
+  localStorage.removeItem(LS_KEY);
+  state = seedState();
+  saveState();
+  UI.route='feed'; UI.modal=null; UI.selection=new Set(); UI.filters={};
+  toast('Демо-данные сброшены к исходному состоянию', 'ok');
+  render();
+}
+function loadTheme(){
+  const saved = localStorage.getItem(LS_THEME);
+  if(saved==='light' || saved==='dark') return saved;
+  /* 1b «Цех» was chosen and presented light - orange logo, dark topbar, light sheet. Following the
+     OS here meant anyone on a dark Mac opened the dark variant and saw a different direction than
+     the one they picked. The toggle still switches; only the first impression is pinned. */
+  return 'light';
+}
+function setTheme(t){
+  document.documentElement.setAttribute('data-theme', t);
+  localStorage.setItem(LS_THEME, t);
+  theme = t;
+}
+
+/* ============================================================
+   §10 APP STATE (ephemeral UI, not persisted) + boot
+   ============================================================ */
+let state = loadState();
+let theme = loadTheme();
+const UI = {
+  route:'feed', modal:null,
+  filters:{ ch:'', status:'', rubric:'', tone:'', q:'' },
+  sort:{ key:'when', dir:'desc' }, page:1, pageSize:20,
+  selection:new Set(),
+  queueIdx:0,
+  calView:'week', calAnchor: startOfWeek(Date.now()),
+  mcSourceId:null,
+  scenarioWizard:null, scenarioView:null,
+};
+function startOfWeek(ts){ const d=new Date(ts); const day=(d.getDay()+6)%7; d.setHours(0,0,0,0); d.setDate(d.getDate()-day); return d.getTime(); }
+
+function toast(msg, kind){
+  const wrap = document.getElementById('toasts');
+  const el = document.createElement('div');
+  el.className = 'toast'+(kind==='err'?' err':kind==='ok'?' ok':'');
+  el.textContent = msg;
+  wrap.appendChild(el);
+  setTimeout(()=>{ el.style.transition='opacity .25s'; el.style.opacity='0'; setTimeout(()=>el.remove(),260); }, 3200);
+}
+function openModal(type, payload){ UI.modal = {type, payload: payload||{}}; render(); }
+function closeModal(){ UI.modal = null; render(); }
+function go(route){ UI.route = route; UI.selection = new Set(); render(); }
+
+function currentUser(){ return state.users.find(u=>u.id===state.currentUserId) || state.users[0]; }
+function actorName(){ return currentUser().name; }
+
+/* ============================================================
+   §11 SHELL — sidebar + topbar
+   ============================================================ */
+function navCount(id){
+  switch(id){
+    case 'feed': return state.posts.filter(p=>p.status!=='archived').length;
+    case 'queue': return state.posts.filter(p=>p.status==='review').length;
+    case 'log': return state.publishLog.filter(l=>l.result==='fail').length;
+    case 'mentions': return state.mentions.filter(m=>m.status==='new'||m.status==='inprogress').length;
+    case 'bots': return state.bots.filter(b=>b.status==='offline').length;
+    default: return null;
+  }
+}
+function renderSidebar(){
+  let html = `<div class="sidebar"><div class="side-logo"><div class="name">АИР-ГАЗ</div><div class="sub">Контент-завод</div></div><div class="side-scroll">`;
+  NAV.forEach(g=>{
+    html += `<div class="side-group-title">${esc(g.group)}</div>`;
+    g.items.forEach(it=>{
+      const allowed = it.roles.includes(state.currentRole);
+      const active = UI.route===it.id || (UI.route.startsWith(it.id+'/'));
+      const n = navCount(it.id);
+      const cls = ['side-item', active?'active':'', allowed?'':'disabled'].join(' ').trim();
+      const title = allowed ? '' : `title="Недоступно для роли ${roleName(state.currentRole)}"`;
+      html += `<div class="${cls}" ${title} data-act="${allowed?'nav':'navblocked'}" data-id="${it.id}">
+        <span class="label">${ICO[it.icon]||''}<span>${esc(it.label)}</span></span>
+        ${n!==null ? `<span class="count">${n}</span>` : ''}
+      </div>`;
+    });
+  });
+  html += `</div></div>`;
+  return html;
+}
+function roleName(id){ const r=ROLES.find(r=>r.id===id); return r?r.name:id; }
+function renderTopbar(){
+  const botsOnline = state.bots.filter(b=>b.status==='online').length;
+  const chConnected = state.channels.filter(c=>c.phase===1 && c.connected).length;
+  const queueN = state.posts.filter(p=>p.status==='scheduled').length;
+  const userOpts = state.users.map(u=>`<option value="${u.id}" ${u.id===state.currentUserId?'selected':''}>${esc(u.name)} · ${esc(roleName(u.role))}</option>`).join('');
+  return `<div class="topbar">
+    <div class="shift mono">
+      <span>СМЕНА ${fmtDate(Date.now())}</span><span class="sep">·</span>
+      <span>ОПЕРАТОР ${esc(actorName())}</span><span class="sep">·</span>
+      <span class="${botsOnline<state.bots.length?'dim':''}">БОТЫ ${botsOnline}/${state.bots.length}</span><span class="sep">·</span>
+      <span class="${chConnected<4?'dim':''}">КАНАЛЫ ${chConnected}/4</span><span class="sep">·</span>
+      <span>ОЧЕРЕДЬ ${queueN}</span>
+    </div>
+    <div class="topbar-right">
+      <select class="user-select" data-act="switchuser" title="Переключатель роли (вместо входа)">${userOpts}</select>
+      <button class="theme-btn" data-act="toggletheme" title="Переключить тему">${theme==='dark'?ICO.sun:ICO.moon}</button>
+      <button class="reset-btn" data-act="resetdemo">Сбросить демо</button>
+    </div>
+  </div>`;
+}
+
+/* ============================================================
+   §12 ROUTER / RENDER
+   ============================================================ */
+const VIEW_RENDERERS = {}; // filled in per-screen sections below
+function renderView(){
+  const routeBase = UI.route.split('/')[0];
+  if(routeBase.startsWith('print-')){ return renderPrint(); }
+  if(!routeAllowed(state, routeBase)){
+    return `<div class="empty-state"><div class="big">Недоступно для роли ${esc(roleName(state.currentRole))}</div><div>Переключите роль в шапке, чтобы открыть этот экран.</div></div>`;
+  }
+  const fn = VIEW_RENDERERS[routeBase];
+  return fn ? fn() : `<div class="empty-state">Экран не найден</div>`;
+}
+function render(){
+  if(UI.route.startsWith('print-')){
+    document.body.classList.add('printing');
+    document.getElementById('print-root').innerHTML = renderView();
+    document.getElementById('app').innerHTML='';
+    return;
+  }
+  document.body.classList.remove('printing');
+  document.getElementById('print-root').innerHTML='';
+  document.documentElement.setAttribute('data-theme', theme);
+  const app = document.getElementById('app');
+  app.innerHTML = `<div class="shell">${renderSidebar()}<div class="main">${renderTopbar()}<div class="view">${renderView()}</div></div></div>`;
+  if(UI.modal){ app.insertAdjacentHTML('beforeend', renderModal()); }
+  afterRender();
+}
+function afterRender(){
+  const search = document.getElementById('feed-search');
+  if(search && document.activeElement!==search && UI._focusSearch){ search.focus(); UI._focusSearch=false; }
+}
+function rubricOf(id){ return state.rubrics.find(r=>r.id===id); }
+function toneOf(id){ return state.tones.find(t=>t.id===id); }
+function toneAbbr(id){ const t=toneOf(id); return t ? (TONE_DEFS.find(td=>td.id===id)||{}).abbr || t.name.slice(0,2).toUpperCase() : '—'; }
+function chLabel(id){ return CH_BY_ID[id] ? CH_BY_ID[id].name : id; }
+function chColor(id){ return CH_BY_ID[id] ? CH_BY_ID[id].color : '#999'; }
+function postWhen(p){ return p.publishedAt || p.scheduledAt || p.createdAt; }
+
+/* ============================================================
+   §13 ЛЕНТА ПУБЛИКАЦИЙ (feed)
+   ============================================================ */
+function matchesBaseFilter(p){
+  if(UI.filters.ch && !p.channels.includes(UI.filters.ch)) return false;
+  if(UI.filters.rubric && p.rubric!==UI.filters.rubric) return false;
+  if(UI.filters.tone && p.tone!==UI.filters.tone) return false;
+  if(UI.filters.q){ const q=UI.filters.q.toLowerCase(); if(!p.title.toLowerCase().includes(q)) return false; }
+  return true;
+}
+function getFilteredForPills(){ return state.posts.filter(p=>p.status!=='archived' && matchesBaseFilter(p)); }
+function getFilteredPosts(){
+  return state.posts.filter(p=>{
+    if(UI.filters.status){
+      if(UI.filters.status==='attention'){ if(!(p.status==='error'&&p.needsAttention)) return false; }
+      else if(p.status!==UI.filters.status) return false;
+    } else if(p.status==='archived') return false;
+    return matchesBaseFilter(p);
+  });
+}
+function sortPosts(list){
+  const {key,dir} = UI.sort;
+  const mul = dir==='asc'?1:-1;
+  const arr = [...list];
+  arr.sort((a,b)=>{
+    let av,bv;
+    switch(key){
+      case 'ch': av=chLabel(a.channels[0]); bv=chLabel(b.channels[0]); break;
+      case 'rubric': av=rubricOf(a.rubric).name; bv=rubricOf(b.rubric).name; break;
+      case 'title': av=a.title; bv=b.title; break;
+      case 'tone': av=toneAbbr(a.tone); bv=toneAbbr(b.tone); break;
+      case 'status': av=statusLabel(a); bv=statusLabel(b); break;
+      default: av=postWhen(a); bv=postWhen(b);
+    }
+    if(av<bv) return -1*mul; if(av>bv) return 1*mul; return 0;
+  });
+  return arr;
+}
+function renderFeed(){
+  const pillsBase = getFilteredForPills();
+  const cAll = pillsBase.length;
+  const cDraft = pillsBase.filter(p=>p.status==='draft').length;
+  const cReview = pillsBase.filter(p=>p.status==='review').length;
+  const cSched = pillsBase.filter(p=>p.status==='scheduled').length;
+  const cErr = pillsBase.filter(p=>p.status==='error').length;
+
+  const filtered = getFilteredPosts();
+  const sorted = sortPosts(filtered);
+  const totalPages = Math.max(1, Math.ceil(sorted.length/UI.pageSize));
+  UI.page = clamp(UI.page,1,totalPages);
+  const pageItems = sorted.slice((UI.page-1)*UI.pageSize, UI.page*UI.pageSize);
+
+  const now = Date.now();
+  const pubWindow = filtered.filter(p=>p.status==='published' && p.publishedAt && p.publishedAt>now-days(30));
+  const queueList = filtered.filter(p=>p.status==='scheduled');
+  const maxQueueDate = queueList.reduce((m,p)=>Math.max(m,p.scheduledAt||0), 0);
+  const rubricsCovered = new Set(filtered.filter(p=>p.status!=='archived').map(p=>p.rubric)).size;
+  const chConnected = state.channels.filter(c=>c.phase===1 && c.connected).length;
+  const ormOpen = state.mentions.filter(m=>m.status==='new'||m.status==='inprogress').length;
+
+  const rubricOpts = state.rubrics.map(r=>`<option value="${r.id}" ${UI.filters.rubric===r.id?'selected':''}>${esc(r.name)}</option>`).join('');
+  const toneOpts = state.tones.map(t=>`<option value="${t.id}" ${UI.filters.tone===t.id?'selected':''}>${esc(t.name)}</option>`).join('');
+  const chOpts = CHANNEL_DEFS.map(c=>`<option value="${c.id}" ${UI.filters.ch===c.id?'selected':''}>${esc(c.name)}</option>`).join('');
+
+  const canCreate = can(state,'post.create');
+  const canBulkApprove = can(state,'post.approve');
+  const canBulkSchedule = can(state,'post.schedule');
+  const canBulkArchive = can(state,'post.archive');
+  const selN = UI.selection.size;
+
+  const sortArrow = k => UI.sort.key===k ? `<span class="arrow">${UI.sort.dir==='asc'?'▲':'▼'}</span>` : '';
+
+  return `
+  <div class="view-head">
+    <div class="view-head-row">
+      <div class="view-title">Лента публикаций</div>
+      <div class="view-sub">Очередь завода · ${sorted.length} запис${plural(sorted.length)}</div>
+      <div class="view-tools">
+        <input class="search-input" id="feed-search" placeholder="Поиск по заголовку…" value="${esc(UI.filters.q)}" data-live="feedsearch">
+        <select class="dd" data-act="filter" data-key="ch"><option value="">Канал: все</option>${chOpts}</select>
+        <select class="dd" data-act="filter" data-key="rubric"><option value="">Рубрика: все</option>${rubricOpts}</select>
+        <select class="dd" data-act="filter" data-key="tone"><option value="">Тон: все</option>${toneOpts}</select>
+        <button class="btn btn-primary btn-ic" data-act="newpost" ${canCreate?'':'disabled title="Недоступно для роли '+esc(roleName(state.currentRole))+'"'}>${ICO.plus} Новый пост</button>
+      </div>
+    </div>
+    <div class="pills" style="margin-top:12px;">
+      <div class="pill ${!UI.filters.status?'active':''}" data-act="pill" data-status="">Все <span class="num mono n">${cAll}</span></div>
+      <div class="pill ${UI.filters.status==='draft'?'active':''}" data-act="pill" data-status="draft">Черновики <span class="num mono n">${cDraft}</span></div>
+      <div class="pill ${UI.filters.status==='review'?'active':''}" data-act="pill" data-status="review">Согласование <span class="num mono n">${cReview}</span></div>
+      <div class="pill ${UI.filters.status==='scheduled'?'active':''}" data-act="pill" data-status="scheduled">Запланировано <span class="num mono n">${cSched}</span></div>
+      <div class="pill ${UI.filters.status==='error'?'active':''}" data-act="pill" data-status="error">Ошибки <span class="num mono n">${cErr}</span></div>
+    </div>
+    <div class="stat-strip">
+      <div class="stat"><div class="stat-label">Опубликовано / 30 дней</div><div class="stat-val num">${pubWindow.length}</div></div>
+      <div class="stat"><div class="stat-label">В очереди${maxQueueDate?' до '+fmtDate(maxQueueDate):''}</div><div class="stat-val num">${queueList.length}</div></div>
+      <div class="stat ${chConnected<4?'warn':''}"><div class="stat-label">Каналы Фазы 1</div><div class="stat-val num" style="color:${chConnected<4?'var(--brand-ink)':'inherit'}">${chConnected} <span class="of">из 4 подключено</span></div></div>
+      <div class="stat"><div class="stat-label">ORM неотработано</div><div class="stat-val num">${ormOpen}</div></div>
+      <div class="stat"><div class="stat-label">Направления в контенте</div><div class="stat-val num">${rubricsCovered} <span class="of">из 5</span></div></div>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table class="table">
+      <thead><tr>
+        <th class="nosort" style="width:30px;"><input type="checkbox" data-act="selectallpage" ${pageItems.length && pageItems.every(p=>UI.selection.has(p.id))?'checked':''}></th>
+        <th data-act="sort" data-key="ch">Канал${sortArrow('ch')}</th>
+        <th data-act="sort" data-key="rubric">Рубрика / продукт${sortArrow('rubric')}</th>
+        <th data-act="sort" data-key="title">Заголовок${sortArrow('title')}</th>
+        <th data-act="sort" data-key="tone">Тональность${sortArrow('tone')}</th>
+        <th data-act="sort" data-key="when">Дата и время${sortArrow('when')}</th>
+        <th data-act="sort" data-key="status">Статус${sortArrow('status')}</th>
+        <th class="nosort">Действия</th>
+      </tr></thead>
+      <tbody>
+        ${pageItems.length ? pageItems.map(p=>renderFeedRow(p)).join('') : ''}
+      </tbody>
+    </table>
+    ${pageItems.length===0 ? `<div class="empty-state"><div class="big">Ничего не найдено</div><div>Измените фильтры или поиск — база не пуста, просто под текущий запрос ничего не подходит.</div></div>` : ''}
+  </div>
+  <div class="foot-bar">
+    <span>${sorted.length} запис${plural(sorted.length)}</span>
+    <span>Выбрано ${selN}</span>
+    ${selN>0 ? `<span style="display:flex; gap:6px;">
+      <button class="btn btn-sm" data-act="bulk" data-op="approve" ${canBulkApprove?'':'disabled'}>Одобрить</button>
+      <button class="btn btn-sm" data-act="bulk" data-op="schedule" ${canBulkSchedule?'':'disabled'}>Запланировать</button>
+      <button class="btn btn-sm" data-act="bulk" data-op="archive" ${canBulkArchive?'':'disabled'}>Архивировать</button>
+    </span>` : ''}
+    <span class="mini-note">${chConnected===0?'Автопостинг на паузе — каналы не подключены':'Планировщик активен'}</span>
+    <span class="pager">
+      <button class="icon-btn" data-act="page" data-dir="-1" ${UI.page<=1?'disabled':''}>‹</button>
+      <span class="mono">${UI.page} / ${totalPages}</span>
+      <button class="icon-btn" data-act="page" data-dir="1" ${UI.page>=totalPages?'disabled':''}>›</button>
+    </span>
+  </div>`;
+}
+function plural(n){ const m=n%10, m100=n%100; if(m100>=11&&m100<=14) return 'ей'; if(m===1) return 'ь'; if(m>=2&&m<=4) return 'и'; return 'ей'; }
+function renderFeedRow(p){
+  const r = rubricOf(p.rubric);
+  const sel = UI.selection.has(p.id);
+  const canApprove = can(state,'post.approve') && p.status==='review';
+  const canEdit = can(state,'post.edit');
+  const canArchive = can(state,'post.archive') && p.status!=='archived';
+  return `<tr class="${sel?'selected':''}" data-act="openpost" data-id="${p.id}">
+    <td data-act="noop"><input type="checkbox" data-act="selectrow" data-id="${p.id}" ${sel?'checked':''}></td>
+    <td class="td-ch"><span class="ch-bar" style="background:${chColor(p.channels[0])}"></span><span class="ch-logo">${chLogo(p.channels[0])}</span><span class="ch-name">${esc(chLabel(p.channels[0]))}${p.channels.length>1?` <span class="mini-note">+${p.channels.length-1}</span>`:''}</span></td>
+    <td class="ellip" style="text-transform:uppercase; letter-spacing:.03em; font-size:12px;">${esc(r?r.short:p.rubric)}</td>
+    <td class="ellip" style="font-weight:600;">${esc(p.title)}</td>
+    <td><span class="tone-txt">${esc(toneAbbr(p.tone))}</span></td>
+    <td class="mono">${fmtDT(postWhen(p))}</td>
+    <td><span class="badge" style="border-color:${statusColor(p)}; color:${statusColor(p)};">${esc(statusLabel(p))}</span></td>
+    <td data-act="noop">
+      <div class="row-actions">
+        <span data-act="openpost" data-id="${p.id}" title="Открыть">${ICO.check}</span>
+        <span data-act="${canEdit?'editpost':'noop'}" data-id="${p.id}" title="${canEdit?'Редактировать':'Недоступно для роли '+esc(roleName(state.currentRole))}" style="${canEdit?'':'opacity:.35;cursor:not-allowed;'}">${ICO.edit}</span>
+        <span data-act="${canArchive?'archivepost':'noop'}" data-id="${p.id}" title="${canArchive?'Архивировать':'Недоступно'}" style="${canArchive?'':'opacity:.35;cursor:not-allowed;'}">${ICO.trash}</span>
+      </div>
+    </td>
+  </tr>`;
+}
+VIEW_RENDERERS.feed = renderFeed;
+
+/* ============================================================
+   §14 MODALS — dispatcher
+   ============================================================ */
+function renderModal(){
+  const {type, payload} = UI.modal;
+  const map = {
+    postcard: renderPostCardModal, postedit: renderPostEditModal,
+    schedule: renderScheduleModal, rework: renderReworkModal, reject: renderRejectModal,
+    bulkschedule: renderBulkScheduleModal, connectchannel: renderConnectModal,
+    adduser: renderAddUserModal, scenariowizard: renderScenarioWizardModal,
+    deleteconfirm: renderDeleteConfirmModal, resetconfirm: renderResetConfirmModal,
+  };
+  const fn = map[type];
+  return `<div class="overlay" data-act="overlayclose">${fn ? fn(payload) : ''}</div>`;
+}
+
+/* ---------- post card (view + state machine actions) ---------- */
+function findPost(id){ return state.posts.find(p=>p.id===id); }
+function renderPostCardModal(payload){
+  const p = findPost(payload.id);
+  if(!p) return `<div class="modal"><div class="modal-body">Пост не найден.</div></div>`;
+  const r = rubricOf(p.rubric), t = toneOf(p.tone);
+  const primaryCh = p.channels[0];
+  const limit = CH_LIMITS[primaryCh] || 4096;
+  const len = p.text.length;
+  const canEdit = can(state,'post.edit');
+  const canSubmit = can(state,'post.submit');
+  const canApprove = can(state,'post.approve');
+  const canSchedule = can(state,'post.schedule');
+  const canArchive = can(state,'post.archive');
+  const canDelete = can(state,'post.delete');
+
+  let actions = '';
+  if(p.status==='draft'){
+    actions = btnRow([
+      act('Отправить на согласование', 'submitreview', p.id, canSubmit, 'primary'),
+      act('Редактировать', 'editpost', p.id, canEdit),
+      act('Архивировать', 'archivepost', p.id, canArchive),
+    ]);
+  } else if(p.status==='review'){
+    actions = `<div style="display:flex; flex-direction:column; gap:8px;">
+      ${btnRow([
+        act('Одобрить', 'approvepost', p.id, canApprove, 'primary'),
+        act('На доработку', 'reworkpost', p.id, canApprove),
+        act('Отклонить', 'rejectpost', p.id, canApprove, 'danger'),
+      ])}
+      ${!canApprove ? `<div class="disabled-note">Одобрять и отклонять может Главред или Администратор.</div>` : ''}
+    </div>`;
+  } else if(p.status==='rework'){
+    actions = btnRow([ act('Открыть и переработать', 'editpost', p.id, canEdit, 'primary') ]);
+  } else if(p.status==='rejected'){
+    actions = btnRow([ act('Вернуть в черновик', 'backtodraft', p.id, canEdit, 'primary') ]);
+  } else if(p.status==='approved'){
+    actions = btnRow([
+      act('Запланировать', 'openschedule', p.id, canSchedule, 'primary'),
+      act('Опубликовать сейчас', 'publishnow', p.id, canSchedule),
+      act('Редактировать', 'editpost', p.id, canEdit),
+    ]);
+  } else if(p.status==='scheduled'){
+    const conflicts = slotConflicts(state, p, p.scheduledAt);
+    actions = `<div style="display:flex; flex-direction:column; gap:8px;">
+      ${btnRow([
+        act('Опубликовать сейчас', 'publishnow', p.id, canSchedule, 'primary'),
+        act('Изменить время', 'openschedule', p.id, canSchedule),
+        act('Архивировать', 'archivepost', p.id, canArchive),
+      ])}
+      ${conflicts.length ? `<div class="disabled-note" style="color:var(--bad);">Конфликт слота: на этот канал и время уже стоит «${esc(conflicts[0].title)}».</div>` : ''}
+    </div>`;
+  } else if(p.status==='error'){
+    actions = `<div style="display:flex; flex-direction:column; gap:8px;">
+      <div class="disabled-note" style="color:var(--bad); font-weight:700;">${esc(p.errorReason||'')} · попыток: ${p.attempts}${p.needsAttention?' · автоповторы остановлены':''}</div>
+      ${btnRow([ act('Повторить', 'publishnow', p.id, canSchedule, 'primary'), act('Архивировать', 'archivepost', p.id, canArchive) ])}
+    </div>`;
+  } else if(p.status==='published'){
+    actions = btnRow([ act('Архивировать', 'archivepost', p.id, canArchive) ]);
+  } else if(p.status==='archived'){
+    actions = btnRow([ act('Удалить безвозвратно', 'deletepost', p.id, canDelete, 'danger') ]);
+  }
+
+  const historyHtml = p.history.slice().reverse().map(h=>`<div class="history-item"><b>${esc(STATUS_META[h.status]?STATUS_META[h.status].label:h.status)}</b> — ${fmtDT(h.at)} · ${esc(h.by)}${h.note?`<div class="comment-box">${esc(h.note)}</div>`:''}</div>`).join('');
+  const commentsHtml = p.comments.length ? p.comments.map(c=>`<div class="comment-box"><b>${esc(c.by)}</b> (${c.type==='rework'?'на доработку':'отклонение'}), ${fmtDT(c.at)}<br>${esc(c.text)}</div>`).join('') : '<div class="mini-note">Комментариев нет.</div>';
+
+  return `<div class="modal wide">
+    <div class="modal-head">
+      <div class="modal-title">${esc(p.title)}</div>
+      <span class="badge" style="border-color:${statusColor(p)}; color:${statusColor(p)};">${esc(statusLabel(p))}</span>
+      <button class="modal-close" data-act="closemodal">${ICO.x}</button>
+    </div>
+    <div class="modal-body">
+      <div class="kv">
+        <div class="k">Каналы</div><div>${p.channels.map(c=>`<span style="display:inline-flex;align-items:center;gap:5px;margin-right:10px;">${chLogo(c)}${esc(chLabel(c))}</span>`).join('')}</div>
+        <div class="k">Рубрика</div><div>${esc(r?r.name:'')}</div>
+        <div class="k">Тональность</div><div>${esc(t?t.name:'')}</div>
+        <div class="k">Дата/время</div><div class="mono">${p.scheduledAt?fmtDT(p.scheduledAt):(p.publishedAt?fmtDT(p.publishedAt):'—')}</div>
+        <div class="k">Автор</div><div>${esc(p.history[0]?p.history[0].by:'—')}</div>
+      </div>
+      <div class="grid2" style="align-items:start;">
+        <div>
+          <div class="k" style="margin-bottom:4px;">Полный текст</div>
+          <div class="qpreview">${esc(p.text)}</div>
+        </div>
+        <div>
+          <div class="k" style="margin-bottom:4px;">Превью · ${esc(chLabel(primaryCh))}</div>
+          <div class="qpreview" style="max-height:220px; overflow:auto;">${esc(p.text)}</div>
+          <div class="limit-txt ${len>limit?'over':''}">${len} / ${limit} символов${len>limit?' — превышение лимита канала':''}</div>
+        </div>
+      </div>
+      <div class="grid2" style="align-items:start;">
+        <div>
+          <div class="k" style="margin-bottom:4px;">История статусов</div>
+          ${historyHtml}
+        </div>
+        <div>
+          <div class="k" style="margin-bottom:4px;">Комментарии согласующего</div>
+          ${commentsHtml}
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">${actions}</div>
+  </div>`;
+}
+function act(label, action, id, enabled, kind){
+  const cls = 'btn'+(kind==='primary'?' btn-primary':kind==='danger'?' btn-danger':'');
+  return enabled ? `<button class="${cls}" data-act="${action}" data-id="${id}">${esc(label)}</button>`
+                 : `<button class="${cls}" disabled title="Недоступно для роли ${esc(roleName(state.currentRole))}">${esc(label)}</button>`;
+}
+function btnRow(list){ return `<div style="display:flex; gap:8px; flex-wrap:wrap;">${list.join('')}</div>`; }
+
+/* ---------- create / edit ---------- */
+function renderPostEditModal(payload){
+  const editing = !!payload.id;
+  const p = editing ? findPost(payload.id) : null;
+  const title = p ? p.title : '';
+  const text = p ? p.text : '';
+  const rubric = p ? p.rubric : state.rubrics[0].id;
+  const tone = p ? p.tone : state.tones[0].id;
+  const postType = p ? p.postType : POST_TYPE_DEFS[0].id;
+  const channels = p ? p.channels : [CHANNEL_DEFS[0].id];
+  const d = p && p.scheduledAt ? new Date(p.scheduledAt) : null;
+  const dateVal = d ? `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}` : '';
+  const timeVal = d ? `${pad(d.getHours())}:${pad(d.getMinutes())}` : '';
+  const rubricOpts = state.rubrics.map(r=>`<option value="${r.id}" ${rubric===r.id?'selected':''}>${esc(r.name)}</option>`).join('');
+  const toneOpts = state.tones.map(t=>`<option value="${t.id}" ${tone===t.id?'selected':''}>${esc(t.name)}</option>`).join('');
+  const typeOpts = POST_TYPE_DEFS.map(t=>`<option value="${t.id}" ${postType===t.id?'selected':''}>${esc(t.name)}</option>`).join('');
+  const chBoxes = CHANNEL_DEFS.map(c=>`<label class="checkline"><input type="checkbox" id="pe-ch-${c.id}" ${channels.includes(c.id)?'checked':''}> ${esc(c.name)}</label>`).join('');
+  return `<div class="modal wide">
+    <div class="modal-head"><div class="modal-title">${editing?'Редактирование поста':'Новый пост'}</div><button class="modal-close" data-act="closemodal">${ICO.x}</button></div>
+    <div class="modal-body">
+      <div class="grid3">
+        <div class="field"><label>Рубрика</label><select class="select" id="pe-rubric">${rubricOpts}</select></div>
+        <div class="field"><label>Тональность</label><select class="select" id="pe-tone">${toneOpts}</select></div>
+        <div class="field"><label>Тип поста</label><select class="select" id="pe-posttype">${typeOpts}</select></div>
+      </div>
+      <div class="field"><label>Каналы</label><div style="display:flex; gap:14px; flex-wrap:wrap;">${chBoxes}</div></div>
+      <div class="grid2">
+        <div class="field"><label>Дата</label><input type="date" class="input" id="pe-date" value="${dateVal}"></div>
+        <div class="field"><label>Время</label><input type="time" class="input" id="pe-time" value="${timeVal}"></div>
+      </div>
+      <div class="field"><label>Заголовок</label><input type="text" class="input" id="pe-title" value="${esc(title)}"></div>
+      <div class="field">
+        <label>Текст</label>
+        <textarea class="textarea" id="pe-text" rows="8">${esc(text)}</textarea>
+        <div style="display:flex; gap:8px; align-items:center; margin-top:6px; flex-wrap:wrap;">
+          <button class="btn btn-accent btn-ic" data-act="genpost">${ICO.wand} Сгенерировать</button>
+          <input type="text" class="input" id="pe-instruction" placeholder="короче / добавь техники / мягче" style="flex:1; min-width:180px;">
+          <button class="btn" data-act="smartedit">Умное редактирование</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-primary" data-act="savepost" data-id="${editing?p.id:''}">Сохранить</button>
+      <button class="btn" data-act="closemodal">Отмена</button>
+    </div>
+  </div>`;
+}
+function readEditForm(){
+  const channels = CHANNEL_DEFS.map(c=>c.id).filter(id=>document.getElementById('pe-ch-'+id) && document.getElementById('pe-ch-'+id).checked);
+  const dateV = document.getElementById('pe-date').value;
+  const timeV = document.getElementById('pe-time').value || '09:00';
+  let scheduledAt = null;
+  if(dateV){ scheduledAt = new Date(`${dateV}T${timeV}:00`).getTime(); }
+  return {
+    title: document.getElementById('pe-title').value.trim(),
+    text: document.getElementById('pe-text').value,
+    rubric: document.getElementById('pe-rubric').value,
+    tone: document.getElementById('pe-tone').value,
+    postType: document.getElementById('pe-posttype').value,
+    channels: channels.length ? channels : [CHANNEL_DEFS[0].id],
+    scheduledAt,
+  };
+}
+
+/* ---------- schedule / rework / reject / bulk-schedule ---------- */
+function renderScheduleModal(payload){
+  const p = findPost(payload.id);
+  const d = p.scheduledAt ? new Date(p.scheduledAt) : new Date(Date.now()+days(1));
+  const dateVal = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  const timeVal = `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  return `<div class="modal">
+    <div class="modal-head"><div class="modal-title">Запланировать «${esc(p.title)}»</div><button class="modal-close" data-act="closemodal">${ICO.x}</button></div>
+    <div class="modal-body">
+      <div class="grid2">
+        <div class="field"><label>Дата</label><input type="date" class="input" id="sch-date" value="${dateVal}"></div>
+        <div class="field"><label>Время</label><input type="time" class="input" id="sch-time" value="${timeVal}"></div>
+      </div>
+      <div id="sch-warn" class="disabled-note" style="color:var(--bad);"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-primary" data-act="doschedule" data-id="${p.id}">Запланировать</button>
+      <button class="btn" data-act="closemodal">Отмена</button>
+    </div>
+  </div>`;
+}
+function renderReworkModal(payload){
+  const p = findPost(payload.id);
+  return `<div class="modal">
+    <div class="modal-head"><div class="modal-title">На доработку — «${esc(p.title)}»</div><button class="modal-close" data-act="closemodal">${ICO.x}</button></div>
+    <div class="modal-body">
+      <div class="field"><label>Комментарий (обязательно)</label><textarea class="textarea" id="rw-comment" rows="4" placeholder="Что нужно поправить?"></textarea></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-primary" data-act="doreword" data-id="${p.id}">Отправить на доработку</button>
+      <button class="btn" data-act="closemodal">Отмена</button>
+    </div>
+  </div>`;
+}
+function renderRejectModal(payload){
+  const p = findPost(payload.id);
+  return `<div class="modal">
+    <div class="modal-head"><div class="modal-title">Отклонить — «${esc(p.title)}»</div><button class="modal-close" data-act="closemodal">${ICO.x}</button></div>
+    <div class="modal-body">
+      <div class="field"><label>Комментарий (необязательно)</label><textarea class="textarea" id="rj-comment" rows="4"></textarea></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-danger" data-act="doreject" data-id="${p.id}">Отклонить</button>
+      <button class="btn" data-act="closemodal">Отмена</button>
+    </div>
+  </div>`;
+}
+function renderBulkScheduleModal(payload){
+  const d = new Date(Date.now()+days(1));
+  const dateVal = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  return `<div class="modal">
+    <div class="modal-head"><div class="modal-title">Запланировать выбранные (${UI.selection.size})</div><button class="modal-close" data-act="closemodal">${ICO.x}</button></div>
+    <div class="modal-body">
+      <div class="grid2">
+        <div class="field"><label>Дата</label><input type="date" class="input" id="bsch-date" value="${dateVal}"></div>
+        <div class="field"><label>Время</label><input type="time" class="input" id="bsch-time" value="10:00"></div>
+      </div>
+      <div class="mini-note">Применится ко всем выбранным постам в статусе «Одобрен».</div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-primary" data-act="dobulkschedule">Запланировать</button>
+      <button class="btn" data-act="closemodal">Отмена</button>
+    </div>
+  </div>`;
+}
+function renderConnectModal(payload){
+  const c = state.channels.find(c=>c.id===payload.id);
+  return `<div class="modal">
+    <div class="modal-head"><div class="modal-title">Подключить ${esc(c.name)}</div><button class="modal-close" data-act="closemodal">${ICO.x}</button></div>
+    <div class="modal-body">
+      <div class="field"><label>Токен или аккаунт</label><input type="text" class="input" id="conn-val" placeholder="например: @airgaz_official или API-токен"></div>
+      <div id="conn-warn" class="disabled-note" style="color:var(--bad);"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-primary" data-act="doconnect" data-id="${c.id}">Подключить</button>
+      <button class="btn" data-act="closemodal">Отмена</button>
+    </div>
+  </div>`;
+}
+function renderAddUserModal(){
+  const roleOpts = ROLES.map(r=>`<option value="${r.id}">${esc(r.name)}</option>`).join('');
+  return `<div class="modal">
+    <div class="modal-head"><div class="modal-title">Новый пользователь</div><button class="modal-close" data-act="closemodal">${ICO.x}</button></div>
+    <div class="modal-body">
+      <div class="field"><label>Имя</label><input type="text" class="input" id="nu-name" placeholder="И. Иванов"></div>
+      <div class="field"><label>Роль</label><select class="select" id="nu-role">${roleOpts}</select></div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-primary" data-act="doadduser">Добавить</button><button class="btn" data-act="closemodal">Отмена</button></div>
+  </div>`;
+}
+/* ============================================================
+   §15 ОЧЕРЕДЬ НА СОГЛАСОВАНИИ — A одобрить, R на доработку, ↑↓ выбор
+   ============================================================ */
+function renderQueue(){
+  const items = state.posts.filter(p=>p.status==='review');
+  const canApprove = can(state,'post.approve');
+  const head = `<div class="view-head"><div class="view-head-row">
+      <div class="view-title">На согласовании</div>
+      <div class="view-sub">${items.length} запис${plural(items.length)} · <span class="kbd-hint">A</span> одобрить · <span class="kbd-hint">R</span> на доработку · <span class="kbd-hint">↑↓</span> по списку</div>
+    </div></div>`;
+  if(items.length===0){
+    return head + `<div class="empty-state"><div class="big">Очередь пуста</div><div>Все посты согласованы — новых на рассмотрение нет.</div></div>`;
+  }
+  UI.queueIdx = clamp(UI.queueIdx, 0, items.length-1);
+  const current = items[UI.queueIdx];
+  const r = rubricOf(current.rubric);
+  const limit = CH_LIMITS[current.channels[0]] || 4096;
+
+  const listHtml = items.map((p,i)=>`<div class="qcard ${i===UI.queueIdx?'current':''}" data-act="queueselect" data-idx="${i}" style="cursor:pointer; margin-bottom:8px;">
+      <div class="qhead" style="border-bottom:none; padding:9px 12px;">
+        <span class="ch-bar" style="position:static; width:5px; height:16px; background:${chColor(p.channels[0])};"></span>
+        <span style="font-weight:700; font-size:12px; text-transform:uppercase; display:inline-flex; align-items:center; gap:6px;">${chLogo(p.channels[0])}${esc(chLabel(p.channels[0]))}</span>
+        <span class="ellip" style="flex:1;">${esc(p.title)}</span>
+      </div>
+    </div>`).join('');
+
+  return head + `<div style="display:flex; gap:16px; padding:16px 20px; flex:1; min-height:0; overflow:hidden;">
+    <div style="width:280px; flex:none; overflow-y:auto;">${listHtml}</div>
+    <div style="flex:1; min-width:0; overflow-y:auto;">
+      <div class="qcard current">
+        <div class="qhead">
+          <span class="ch-bar" style="position:static; width:5px; height:18px; background:${chColor(current.channels[0])};"></span>
+          <div style="font-size:17px; font-weight:700;">${esc(current.title)}</div>
+          <span class="tone-txt">${esc(toneOf(current.tone).name)}</span>
+          <span class="mini-note" style="margin-left:auto;">${esc(r.name)}</span>
+        </div>
+        <div class="qbody">
+          <div class="k" style="margin-bottom:4px;">Превью — как уйдёт в ${esc(chLabel(current.channels[0]))}</div>
+          <div class="qpreview">${esc(current.text)}</div>
+          <div class="limit-txt ${current.text.length>limit?'over':''}" style="margin-top:4px;">${current.text.length} / ${limit}</div>
+          <div class="field" style="margin-top:12px;"><label>Комментарий</label><textarea class="textarea" id="q-comment" rows="3" placeholder="Виден автору в карточке поста"></textarea></div>
+          <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
+            ${act('Одобрить ['+'A'+']', 'qapprove', current.id, canApprove, 'primary')}
+            ${act('На доработку [R]', 'qrework', current.id, canApprove)}
+            ${act('Отклонить', 'qreject', current.id, canApprove, 'danger')}
+            <button class="btn" data-act="openpost" data-id="${current.id}">Открыть карточку</button>
+          </div>
+          ${!canApprove ? `<div class="disabled-note" style="margin-top:8px;">Роль «${esc(roleName(state.currentRole))}» может только просматривать очередь.</div>` : ''}
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+VIEW_RENDERERS.queue = renderQueue;
+
+/* ============================================================
+   §16 МУЛЬТИКАНАЛЬНАЯ АДАПТАЦИЯ
+   ============================================================ */
+function renderMultichannel(){
+  const posts = state.posts.filter(p=>p.status!=='archived');
+  const head = `<div class="view-head"><div class="view-head-row"><div class="view-title">Мультиканальная адаптация</div><div class="view-sub">Один текст — версии под лимиты каждого канала</div></div></div>`;
+  if(posts.length===0) return head + `<div class="empty-state"><div class="big">Постов пока нет</div></div>`;
+  if(!UI.mcSourceId || !posts.find(p=>p.id===UI.mcSourceId)) UI.mcSourceId = posts[0].id;
+  const p = findPost(UI.mcSourceId);
+  const opts = posts.map(x=>`<option value="${x.id}" ${x.id===p.id?'selected':''}>${esc(x.title)}</option>`).join('');
+  const addOpts = CHANNEL_DEFS.filter(c=>!p.channels.includes(c.id)).map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');
+
+  const versions = p.channels.map(chId=>{
+    const ch = CH_BY_ID[chId];
+    const limit = CH_LIMITS[chId] || 4096;
+    const val = p.adaptations[chId] != null ? p.adaptations[chId] : p.text;
+    const over = val.length > limit;
+    const hashN = (val.match(/#/g)||[]).length;
+    let extraWarn = '';
+    if(chId==='vk' && (hashN<5 || hashN>7)) extraWarn = `<div class="limit-txt over">Хештегов ${hashN}, для VK нужно 5–7</div>`;
+    return `<div style="border:1px solid var(--line); padding:10px;">
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+        <span class="ch-bar" style="position:static; width:5px; height:14px; background:${ch.color};"></span>
+        <b style="text-transform:uppercase; font-size:12.5px;">${esc(ch.name)}</b>
+        <span class="mini-note">лимит ${limit}</span>
+      </div>
+      <textarea class="textarea" rows="7" data-live="mcedit" data-ch="${chId}">${esc(val)}</textarea>
+      <div class="limit-bar ${over?'over':''}"><i style="width:${Math.min(100,val.length/limit*100)}%;"></i></div>
+      <div class="limit-txt ${over?'over':''}">${val.length} / ${limit}${over?' — превышение':''}</div>
+      ${extraWarn}
+    </div>`;
+  }).join('');
+
+  return head + `<div style="padding:16px 20px; display:flex; flex-direction:column; gap:14px; overflow:auto; flex:1;">
+    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+      <div class="field" style="flex:1; min-width:240px;"><label>Исходный пост</label><select class="select" data-act="mcsource">${opts}</select></div>
+      <div class="field"><label>Добавить канал</label><select class="select" data-act="mcaddchannel"><option value="">+ канал…</option>${addOpts}</select></div>
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+      <div>
+        <div class="k" style="margin-bottom:4px;">Исходник</div>
+        <div class="qpreview" style="min-height:220px;">${esc(p.text)}</div>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:14px;">${versions}</div>
+    </div>
+  </div>`;
+}
+VIEW_RENDERERS.multichannel = renderMultichannel;
+
+/* ============================================================
+   §17 КОНТЕНТ-КАЛЕНДАРЬ — rows=channels, cells=slots, drag to move
+   ============================================================ */
+function calendarPosts(){ return state.posts.filter(p=>p.status==='scheduled' || p.status==='published'); }
+function renderCalendar(){
+  const isWeek = UI.calView==='week';
+  const dayCount = isWeek ? 7 : 28;
+  const start = isWeek ? UI.calAnchor : startOfWeek(UI.calAnchor);
+  const dayLabels = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+  const posts = calendarPosts();
+  const channelsRows = CHANNEL_DEFS.filter(c=>c.phase===1).concat(CHANNEL_DEFS.filter(c=>c.phase===2));
+
+  let cols = `108px repeat(${dayCount}, minmax(${isWeek?130:74}px,1fr))`;
+  let head = `<div class="cal-row-label" style="border-bottom:2px solid var(--ink);">Канал</div>`;
+  const dayTs = [];
+  for(let i=0;i<dayCount;i++){
+    const ts = start + days(i);
+    dayTs.push(ts);
+    const d = new Date(ts);
+    const today = sameDay(ts, Date.now());
+    head += `<div class="cal-head-cell" style="${today?'background:'+ (theme==='dark'?'#1B2C41':'#E4EAF0') +';color:var(--ink);':''}">${dayLabels[(d.getDay()+6)%7]} ${pad(d.getDate())}.${pad(d.getMonth()+1)}</div>`;
+  }
+  let body = '';
+  channelsRows.forEach(ch=>{
+    body += `<div class="cal-row-label"><span style="width:8px;height:8px;background:${ch.color};display:inline-block;"></span>${esc(ch.name)}</div>`;
+    dayTs.forEach(ts=>{
+      const dayPosts = posts.filter(p=>p.channels.includes(ch.id) && sameDay(p.publishedAt||p.scheduledAt, ts));
+      const cellId = `${ch.id}__${ts}`;
+      body += `<div class="cal-cell ${sameDay(ts,Date.now())?'today':''}" data-cell="${cellId}" data-ch="${ch.id}" data-ts="${ts}">
+        ${dayPosts.map(p=>{
+          const conflict = slotConflicts(state,p,p.scheduledAt||p.publishedAt).length>0;
+          return `<div class="cal-chip ${conflict?'conflict':''}" style="border-left-color:${statusColor(p)};" draggable="true" data-dragid="${p.id}" data-act="openpost" data-id="${p.id}" title="${esc(p.title)} · ${fmtTime(p.publishedAt||p.scheduledAt)}">${fmtTime(p.publishedAt||p.scheduledAt)} ${esc(p.title)}</div>`;
+        }).join('')}
+      </div>`;
+    });
+  });
+
+  return `<div class="view-head"><div class="view-head-row">
+      <div class="view-title">Контент-календарь</div>
+      <div class="view-sub">Строки — каналы, ячейки — слоты · перетащите карточку на другой день</div>
+      <div class="view-tools">
+        <div class="pills"><div class="pill ${isWeek?'active':''}" data-act="calview" data-view="week">Неделя</div><div class="pill ${!isWeek?'active':''}" data-act="calview" data-view="month">Месяц</div></div>
+        <button class="icon-btn" data-act="calnav" data-dir="-1">‹</button>
+        <button class="btn btn-sm" data-act="caltoday">Сегодня</button>
+        <button class="icon-btn" data-act="calnav" data-dir="1">›</button>
+      </div>
+    </div></div>
+    <div style="padding:16px 20px; overflow:auto; flex:1;">
+      <div class="cal-grid" style="grid-template-columns:${cols};">${head}${body}</div>
+    </div>`;
+}
+VIEW_RENDERERS.calendar = renderCalendar;
+
+/* ============================================================
+   §18 ЛОГ ПУБЛИКАЦИЙ
+   ============================================================ */
+function renderLog(){
+  const entries = state.publishLog;
+  const head = `<div class="view-head"><div class="view-head-row">
+    <div class="view-title">Лог публикаций</div>
+    <div class="view-sub">${entries.length} событ${entries.length%10===1&&entries.length%100!==11?'ие':'ий'} · успехи и неудачные попытки</div>
+    <div class="view-tools"><button class="btn btn-ic" data-act="printweekplan">${ICO.print} План на неделю</button></div>
+  </div></div>`;
+  if(entries.length===0) return head + `<div class="empty-state"><div class="big">Лог пуст</div><div>Публикаций ещё не было.</div></div>`;
+  return head + `<div class="table-wrap"><table class="table">
+    <thead><tr><th class="nosort">Время</th><th class="nosort">Пост</th><th class="nosort">Канал</th><th class="nosort">Результат</th><th class="nosort">Причина / попытка</th></tr></thead>
+    <tbody>${entries.map(e=>`<tr data-act="openpost" data-id="${e.postId}" style="cursor:pointer;">
+      <td class="mono">${fmtDT(e.at)}</td>
+      <td class="ellip">${esc(e.postTitle)}</td>
+      <td><span class="ch-name" style="padding-left:0;">${esc(e.channelName)}</span></td>
+      <td><span class="badge" style="border-color:${e.result==='success'?'var(--ok-ink)':'var(--bad)'}; color:${e.result==='success'?'var(--ok-ink)':'var(--bad)'};">${e.result==='success'?'Успех':'Ошибка'}</span></td>
+      <td>${e.reason?esc(e.reason):'—'} <span class="mini-note">попытка ${e.attempt}</span></td>
+    </tr>`).join('')}</tbody>
+  </table></div>`;
+}
+VIEW_RENDERERS.log = renderLog;
+
+/* ============================================================
+   §19 ORM — лента упоминаний
+   ============================================================ */
+const MSTATUS_META = {
+  new:{label:'Новое', tone:'blue'}, inprogress:{label:'В работе', tone:'orange'},
+  done:{label:'Отработано', tone:'green'}, escalated:{label:'Эскалация', tone:'red'},
+};
+function isOverdue(m){ return (m.status==='new'||m.status==='inprogress') && Date.now() > m.at + m.slaMin*60000; }
+function sourceMeta(id){ return MENTION_SOURCES.find(s=>s.id===id) || {label:id, color:'#999'}; }
+function catName(id){ const o=state.objections.find(o=>o.id===id); return o?o.name:id; }
+function renderMentions(){
+  const canManage = can(state,'orm.manage');
+  const cat = UI.filters.mcat||''; const st = UI.filters.mstatus||'';
+  let list = state.mentions.filter(m=> (!cat || m.categories.includes(cat)) && (!st || m.status===st));
+  list = list.slice().sort((a,b)=>b.at-a.at);
+  const catOpts = state.objections.map(o=>`<option value="${o.id}" ${cat===o.id?'selected':''}>${esc(o.name)}</option>`).join('');
+  const stOpts = Object.entries(MSTATUS_META).map(([k,v])=>`<option value="${k}" ${st===k?'selected':''}>${esc(v.label)}</option>`).join('');
+  const overdueN = state.mentions.filter(isOverdue).length;
+  const head = `<div class="view-head"><div class="view-head-row">
+      <div class="view-title">Лента упоминаний</div>
+      <div class="view-sub">${list.length} записей${overdueN?` · <span style="color:var(--bad); font-weight:700;">просрочено по SLA: ${overdueN}</span>`:''}</div>
+      <div class="view-tools">
+        <select class="dd" data-act="filter" data-key="mcat"><option value="">Категория: все</option>${catOpts}</select>
+        <select class="dd" data-act="filter" data-key="mstatus"><option value="">Статус: все</option>${stOpts}</select>
+      </div>
+    </div></div>`;
+  if(list.length===0) return head + `<div class="empty-state"><div class="big">Чисто</div><div>По текущему фильтру упоминаний нет — это не «сломалось», это норма.</div></div>`;
+  return head + `<div class="table-wrap"><table class="table">
+    <thead><tr><th class="nosort">Источник</th><th class="nosort">Автор</th><th class="nosort">Дата</th><th class="nosort">Текст</th><th class="nosort">Категория</th><th class="nosort">Статус</th></tr></thead>
+    <tbody>${list.map(m=>{
+      const src = sourceMeta(m.source); const od = isOverdue(m);
+      const sm = MSTATUS_META[m.status];
+      return `<tr data-act="opennav" data-id="mention/${m.id}" style="cursor:pointer; ${od?'box-shadow:inset 3px 0 0 var(--bad);':''}">
+        <td class="td-ch"><span class="ch-bar" style="background:${src.color};"></span><span class="ch-name" style="margin-left:5px;">${esc(src.label)}</span></td>
+        <td>${esc(m.author)}</td>
+        <td class="mono">${fmtDT(m.at)}${od?' <span style="color:var(--bad); font-weight:700;">· просрочено</span>':''}</td>
+        <td class="ellip" style="max-width:340px;">${esc(m.text)}</td>
+        <td class="ellip">${m.categories.map(catName).join(', ')}</td>
+        <td><span class="badge" style="border-color:${statusColorVar(sm.tone)}; color:${statusColorVar(sm.tone)};">${esc(sm.label)}</span></td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table></div>`;
+}
+VIEW_RENDERERS.mentions = renderMentions;
+
+/* ---------- mention detail ---------- */
+function findMention(id){ return state.mentions.find(m=>m.id===id); }
+function highlightKeywords(text, keywords){
+  let out = esc(text);
+  keywords.forEach(k=>{ const e = esc(k); out = out.split(e).join(`<span class="hl">${e}</span>`); });
+  return out;
+}
+function renderMentionDetail(){
+  const id = UI.route.split('/')[1];
+  const m = findMention(id);
+  if(!m) return `<div class="empty-state">Упоминание не найдено. <button class="btn" data-act="opennav" data-id="mentions">К ленте</button></div>`;
+  const canManage = can(state,'orm.manage');
+  const tab = UI.mcTab || 'official';
+  const deadline = m.at + m.slaMin*60000;
+  const remain = deadline - Date.now();
+  const slaTxt = remain>=0 ? `SLA ${fmtTime(Date.now()+remain)} · осталось ${Math.floor(remain/60000)} мин` : `SLA просрочен на ${Math.abs(Math.floor(remain/60000))} мин`;
+  const src = sourceMeta(m.source);
+  const linkedPost = m.linkedPostId ? findPost(m.linkedPostId) : null;
+  const text = tab==='official' ? m.officialText : m.crisisText;
+  const limit = 4096;
+
+  return `<div class="view-head"><div class="view-head-row">
+      <div class="view-title">Упоминание ${esc(m.id)}</div>
+      <div class="view-sub" style="color:${isOverdue(m)?'var(--bad)':'var(--ink-3)'}; font-weight:${isOverdue(m)?'700':'400'};">${slaTxt}</div>
+      <div class="view-tools"><button class="btn" data-act="opennav" data-id="mentions">← К ленте упоминаний</button></div>
+    </div></div>
+  <div style="padding:16px 20px; overflow:auto; flex:1; display:flex; flex-direction:column; gap:14px; max-width:900px;">
+    <div class="kv">
+      <div class="k">Источник</div><div style="display:flex; align-items:center; gap:7px;"><span style="width:8px;height:8px;background:${src.color};display:inline-block;"></span>${esc(src.label)}</div>
+      <div class="k">Автор</div><div>${esc(m.author)} · ${fmtDateLong(m.at)}, ${fmtTime(m.at)}</div>
+      <div class="k">Ключевые слова</div><div>${m.keywords.map(k=>`<span class="kbtag">${esc(k)}</span>`).join('') || '<span class="mini-note">не найдены</span>'}</div>
+      <div class="k">Категория</div><div>${m.categories.map(catName).join(' + ')}</div>
+      <div class="k">Отработка</div><div>
+        <select class="dd" data-act="mstatus" data-id="${m.id}" ${canManage?'':'disabled'}>
+          ${Object.entries(MSTATUS_META).map(([k,v])=>`<option value="${k}" ${m.status===k?'selected':''}>${esc(v.label)}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div class="qpreview" style="font-size:15px;">${highlightKeywords(m.text, m.keywords)}</div>
+    ${linkedPost ? `<div class="disabled-note">Из этого упоминания уже создан пост: <a href="#" data-act="openpost" data-id="${linkedPost.id}">${esc(linkedPost.title)}</a></div>` : ''}
+    <div class="tabs">
+      <div class="tab ${tab==='official'?'active':''}" data-act="mtab" data-tab="official">Официальный ответ поддержки</div>
+      <div class="tab ${tab==='crisis'?'active':''}" data-act="mtab" data-tab="crisis">Антикризисный экспертный пост</div>
+    </div>
+    <div>
+      <textarea class="textarea" id="orm-text" rows="9" style="max-width:900px;">${esc(text)}</textarea>
+      <div class="limit-txt ${text.length>limit?'over':''}">${text.length} / ${limit}</div>
+    </div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+      <button class="btn btn-accent btn-ic" data-act="ormgen" data-id="${m.id}" data-tab="${tab}">${ICO.wand} Сгенерировать</button>
+      <button class="btn btn-primary" data-act="ormsend" data-id="${m.id}" ${canManage?'':'disabled'}>Отправить в комментарии</button>
+      <button class="btn" data-act="ormtoqueue" data-id="${m.id}" ${canManage?'':'disabled'}>Отправить в очередь постов</button>
+      ${!canManage ? `<span class="disabled-note">ORM доступен роли Страж и Администратор.</span>` : ''}
+    </div>
+  </div>`;
+}
+VIEW_RENDERERS.mention = renderMentionDetail;
+
+/* ---------- monitoring ---------- */
+function renderMonitoring(){
+  const canManage = can(state,'orm.manage');
+  const head = `<div class="view-head"><div class="view-head-row"><div class="view-title">Мониторинг</div><div class="view-sub">Ключевые слова, площадки, классификация</div>
+    <div class="view-tools"><button class="btn btn-ic" data-act="printormreport">${ICO.print} Отчёт по репутации</button></div>
+  </div></div>`;
+  const kwRows = state.keywords.map((k,i)=>`<tr><td>${esc(k.word)}</td><td>${k.cat?esc(catName(k.cat)):'<span class="mini-note">общий (бренд)</span>'}</td>
+    <td>${canManage?`<span class="row-actions"><span data-act="delkeyword" data-idx="${i}" title="Удалить">${ICO.x}</span></span>`:''}</td></tr>`).join('');
+  const catOpts = state.objections.map(o=>`<option value="${o.id}">${esc(o.name)}</option>`).join('');
+  return head + `<div style="padding:16px 20px; display:flex; flex-direction:column; gap:16px; overflow:auto; flex:1; max-width:820px;">
+    <div>
+      <div class="k" style="margin-bottom:6px;">Площадки под наблюдением</div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">${MENTION_SOURCES.map(s=>`<span class="kbtag" style="border-left:3px solid ${s.color};">${esc(s.label)}</span>`).join('')}</div>
+      <div class="mini-note" style="margin-top:6px;">Частота опроса: раз в 15 минут (симуляция — в демо мониторинг статичен).</div>
+    </div>
+    <div>
+      <div class="k" style="margin-bottom:6px;">Ключевые слова → категория</div>
+      <table class="table"><thead><tr><th class="nosort">Слово</th><th class="nosort">Категория</th><th class="nosort"></th></tr></thead><tbody>${kwRows}</tbody></table>
+      ${canManage ? `<div style="display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;">
+        <input type="text" class="input" id="kw-word" placeholder="новое слово" style="flex:1; min-width:160px;">
+        <select class="select" id="kw-cat"><option value="">без категории (бренд)</option>${catOpts}</select>
+        <button class="btn btn-primary" data-act="addkeyword">Добавить слово</button>
+        <button class="btn" data-act="reclassify">Переклассифицировать упоминания</button>
+      </div><div class="mini-note">Новое слово меняет то, как классифицируются упоминания — нажмите «Переклассифицировать», чтобы применить его к уже собранной ленте.</div>` : `<div class="disabled-note">Мониторинг доступен роли Страж и Администратор.</div>`}
+    </div>
+  </div>`;
+}
+VIEW_RENDERERS.monitoring = renderMonitoring;
+
+/* ---------- objections library ---------- */
+function renderObjections(){
+  const canEdit = can(state,'objections.edit');
+  const head = `<div class="view-head"><div class="view-head-row"><div class="view-title">Библиотека возражений</div><div class="view-sub">Пять категорий · триггеры и заготовки ответов — правки меняют генерацию ORM</div></div></div>`;
+  const cards = state.objections.map((o,i)=>`<div style="border:2px solid var(--ink); padding:14px; margin-bottom:12px;">
+    <div style="font-weight:700; font-size:14px; margin-bottom:8px;">${i+1}. ${esc(o.name)}</div>
+    <div class="field"><label>Триггеры (через запятую)</label><input type="text" class="input" id="obj-trig-${o.id}" value="${esc(o.triggers.join(', '))}" ${canEdit?'':'disabled'}></div>
+    <div class="grid2" style="margin-top:8px;">
+      <div class="field"><label>Официальный ответ (шаблон)</label><textarea class="textarea" id="obj-off-${o.id}" rows="3" ${canEdit?'':'disabled'}>${esc(o.official)}</textarea></div>
+      <div class="field"><label>Антикризисный пост (шаблон)</label><textarea class="textarea" id="obj-cr-${o.id}" rows="3" ${canEdit?'':'disabled'}>${esc(o.crisis||'')}</textarea></div>
+    </div>
+    ${canEdit ? `<button class="btn btn-primary btn-sm" style="margin-top:8px;" data-act="saveobjection" data-id="${o.id}">Сохранить</button>` : ''}
+  </div>`).join('');
+  return head + `<div style="padding:16px 20px; overflow:auto; flex:1; max-width:900px;">
+    ${!canEdit ? `<div class="disabled-note" style="margin-bottom:10px;">Только просмотр — редактирование доступно роли Страж и Администратор.</div>` : ''}
+    ${cards}
+  </div>`;
+}
+VIEW_RENDERERS.objections = renderObjections;
+
+/* ============================================================
+   §20 ПРОДЮСЕР — сценарии, мастер, раскадровка, печать A4
+   ============================================================ */
+function findScenario(id){ return state.scenarios.find(s=>s.id===id); }
+function renderScenarios(){
+  const canEdit = can(state,'scenario.edit');
+  const head = `<div class="view-head"><div class="view-head-row">
+    <div class="view-title">Сценарии</div><div class="view-sub">${state.scenarios.length} штук · раскадровка держит хронометраж по норме слов</div>
+    <div class="view-tools"><button class="btn btn-primary btn-ic" data-act="scenwizard" ${canEdit?'':'disabled'}>${ICO.plus} Новый сценарий</button></div>
+  </div></div>`;
+  if(state.scenarios.length===0) return head + `<div class="empty-state"><div class="big">Сценариев нет</div></div>`;
+  return head + `<div class="table-wrap"><table class="table">
+    <thead><tr><th class="nosort">Тема</th><th class="nosort">Хронометраж</th><th class="nosort">Аудитория</th><th class="nosort">Эмоция</th><th class="nosort">Слов</th><th class="nosort">Статус</th><th class="nosort"></th></tr></thead>
+    <tbody>${state.scenarios.map(s=>`<tr data-act="opennav" data-id="storyboard/${s.id}" style="cursor:pointer;">
+      <td class="ellip" style="font-weight:600;">${esc(s.topic)}</td>
+      <td class="mono">${s.duration} сек</td>
+      <td class="ellip">${esc(s.audience)}</td>
+      <td>${esc(s.emotion)}</td>
+      <td class="mono">${s.totalWords} <span class="mini-note">(${s.wordTarget[0]}–${s.wordTarget[1]})</span></td>
+      <td><span class="badge" style="border-color:${s.status==='Готово'?'var(--ok-ink)':'var(--ink-3)'}; color:${s.status==='Готово'?'var(--ok-ink)':'var(--ink-3)'};">${esc(s.status)}</span></td>
+      <td data-act="noop"><button class="btn btn-sm" data-act="printscenario" data-id="${s.id}">${ICO.print} A4</button></td>
+    </tr>`).join('')}</tbody>
+  </table></div>`;
+}
+VIEW_RENDERERS.scenarios = renderScenarios;
+VIEW_RENDERERS.storyboards = renderScenarios;
+
+function renderStoryboard(){
+  const id = UI.route.split('/')[1];
+  const s = findScenario(id);
+  if(!s) return `<div class="empty-state">Сценарий не найден. <button class="btn" data-act="opennav" data-id="scenarios">К списку</button></div>`;
+  const head = `<div class="view-head"><div class="view-head-row">
+    <div class="view-title">${esc(s.topic)}</div>
+    <div class="view-sub">${s.duration} сек · ${esc(s.audience)} · ${esc(s.emotion)} · ${s.totalWords} слов (норма ${s.wordTarget[0]}–${s.wordTarget[1]})</div>
+    <div class="view-tools">
+      <button class="btn btn-ic" data-act="copystoryboard" data-id="${s.id}">${ICO.copy} Скопировать текстом</button>
+      <button class="btn btn-primary btn-ic" data-act="printscenario" data-id="${s.id}">${ICO.print} Печать A4</button>
+      <button class="btn" data-act="opennav" data-id="scenarios">← К списку</button>
+    </div>
+  </div></div>`;
+  const scenes = s.scenes.map(sc=>`<div class="scene-card">
+    <div class="scene-num"><span>Сцена ${sc.n}</span><span class="mono">${sc.sec} сек</span></div>
+    <div class="scene-grid">
+      <div class="scene-cell"><div class="lbl">Кадр / видеоряд</div>${esc(sc.shot)}</div>
+      <div class="scene-cell"><div class="lbl">Голос</div>${esc(sc.voice)}</div>
+      <div class="scene-cell"><div class="lbl">Текст на экране</div>${esc(sc.onscreen)}</div>
+      <div class="scene-cell"><div class="lbl">Аудио / SFX</div>${esc(sc.sfx)}</div>
+    </div>
+  </div>`).join('');
+  return head + `<div style="padding:16px 20px; overflow:auto; flex:1; max-width:900px;">${scenes}</div>`;
+}
+VIEW_RENDERERS.storyboard = renderStoryboard;
+
+function renderScenarioWizardModal(payload){
+  const w = UI.scenarioWizard || (UI.scenarioWizard = {step:1, topic:'', duration:30, audience:AUDIENCES[0], emotion:EMOTIONS[0], rubricId:state.rubrics[0].id});
+  const steps = ['Тема','Хронометраж','Аудитория','Эмоция'];
+  const stepBar = steps.map((t,i)=>`<div class="tab ${w.step===i+1?'active':''}">${i+1}. ${t}</div>`).join('');
+  let body = '';
+  if(w.step===1){
+    const rubricOpts = state.rubrics.map(r=>`<option value="${r.id}" ${w.rubricId===r.id?'selected':''}>${esc(r.name)}</option>`).join('');
+    body = `<div class="field"><label>Тема ролика</label><input type="text" class="input" id="wz-topic" value="${esc(w.topic)}" placeholder="например: Как устроен цокольный ввод AG-PROTECT"></div>
+      <div class="field"><label>Направление (база знаний)</label><select class="select" id="wz-rubric">${rubricOpts}</select></div>`;
+  } else if(w.step===2){
+    body = `<div class="field"><label>Хронометраж</label><div class="pills">${[15,30,45,60].map(d=>`<div class="pill ${w.duration===d?'active':''}" data-act="wzduration" data-v="${d}">${d} сек</div>`).join('')}</div></div>`;
+  } else if(w.step===3){
+    body = `<div class="field"><label>Аудитория</label><div class="pills">${AUDIENCES.map(a=>`<div class="pill ${w.audience===a?'active':''}" data-act="wzaudience" data-v="${esc(a)}">${esc(a)}</div>`).join('')}</div></div>`;
+  } else {
+    body = `<div class="field"><label>Эмоция</label><div class="pills">${EMOTIONS.map(e=>`<div class="pill ${w.emotion===e?'active':''}" data-act="wzemotion" data-v="${esc(e)}">${esc(e)}</div>`).join('')}</div></div>
+      <div class="mini-note">Раскадровка соберётся из темы, направления, хронометража, аудитории и эмоции — детерминированно.</div>`;
+  }
+  return `<div class="modal">
+    <div class="modal-head"><div class="modal-title">Новый сценарий</div><button class="modal-close" data-act="closemodal">${ICO.x}</button></div>
+    <div class="tabs" style="padding:0 18px;">${stepBar}</div>
+    <div class="modal-body">${body}</div>
+    <div class="modal-foot">
+      ${w.step>1 ? `<button class="btn" data-act="wzback">Назад</button>` : ''}
+      ${w.step<4 ? `<button class="btn btn-primary" data-act="wznext">Далее</button>` : `<button class="btn btn-primary" data-act="wzfinish">Собрать раскадровку</button>`}
+      <button class="btn" data-act="closemodal" style="margin-left:auto;">Отмена</button>
+    </div>
+  </div>`;
+}
+
+/* ============================================================
+   §21 ЗНАНИЯ — база знаний / тональности / рубрики
+   ============================================================ */
+function renderKB(){
+  const canEdit = can(state,'kb.edit');
+  const head = `<div class="view-head"><div class="view-head-row"><div class="view-title">База знаний</div><div class="view-sub">Пять направлений АИР-ГАЗ · правки сразу влияют на генерацию текстов</div></div></div>`;
+  const cards = state.rubrics.map(r=>`<div style="border:2px solid var(--ink); padding:14px; margin-bottom:12px;">
+    <div style="font-weight:700; font-size:15px; margin-bottom:8px;">${esc(r.name)}</div>
+    <div class="field"><label>Характеристики, сертификаты, нормы (по одной в строке)</label><textarea class="textarea" id="kb-facts-${r.id}" rows="4" ${canEdit?'':'disabled'}>${esc(r.facts.join('\n'))}</textarea></div>
+    <div class="grid2" style="margin-top:8px;">
+      <div class="field"><label>Хештеги (через пробел)</label><input type="text" class="input" id="kb-tags-${r.id}" value="${esc(r.hashtags.join(' '))}" ${canEdit?'':'disabled'}></div>
+      <div class="field"><label>Типовые формулировки (по одной в строке)</label><textarea class="textarea" id="kb-phrases-${r.id}" rows="2" ${canEdit?'':'disabled'}>${esc(r.phrases.join('\n'))}</textarea></div>
+    </div>
+    <div class="mini-note" style="margin-top:6px;">Контакты (общие для всех направлений): ${CONTACTS.phones.join(' · ')} · ${CONTACTS.email} · ${CONTACTS.site}</div>
+    ${canEdit ? `<button class="btn btn-primary btn-sm" style="margin-top:8px;" data-act="savekb" data-id="${r.id}">Сохранить</button>` : ''}
+  </div>`).join('');
+  return head + `<div style="padding:16px 20px; overflow:auto; flex:1; max-width:900px;">
+    ${!canEdit ? `<div class="disabled-note" style="margin-bottom:10px;">Только просмотр — правка доступна роли Главред и Администратор.</div>` : ''}
+    ${cards}
+  </div>`;
+}
+VIEW_RENDERERS.kb = renderKB;
+
+function renderTones(){
+  const canEdit = can(state,'tones.edit');
+  const head = `<div class="view-head"><div class="view-head-row"><div class="view-title">Тональности</div><div class="view-sub">Четыре тональности · меняют лексику, а не только первую фразу</div></div></div>`;
+  const cards = state.tones.map(t=>`<div style="border:2px solid var(--ink); padding:14px; margin-bottom:12px;">
+    <div style="font-weight:700; font-size:15px; margin-bottom:8px;">${esc(t.name)} <span class="tone-txt">${esc((TONE_DEFS.find(td=>td.id===t.id)||{}).abbr||'')}</span></div>
+    <div class="grid2">
+      <div class="field"><label>Зачины (по одному в строке)</label><textarea class="textarea" id="tn-open-${t.id}" rows="4" ${canEdit?'':'disabled'}>${esc(t.openers.join('\n'))}</textarea></div>
+      <div class="field"><label>Развитие (по одному в строке)</label><textarea class="textarea" id="tn-dev-${t.id}" rows="4" ${canEdit?'':'disabled'}>${esc(t.dev.join('\n'))}</textarea></div>
+    </div>
+    ${canEdit ? `<button class="btn btn-primary btn-sm" style="margin-top:8px;" data-act="savetone" data-id="${t.id}">Сохранить</button>` : ''}
+  </div>`).join('');
+  return head + `<div style="padding:16px 20px; overflow:auto; flex:1; max-width:900px;">
+    ${!canEdit ? `<div class="disabled-note" style="margin-bottom:10px;">Только просмотр — правка доступна роли Главред и Администратор.</div>` : ''}
+    ${cards}
+  </div>`;
+}
+VIEW_RENDERERS.tones = renderTones;
+
+function renderRubrics(){
+  const canEdit = can(state,'rubrics.edit');
+  const head = `<div class="view-head"><div class="view-head-row"><div class="view-title">Рубрики и продукты</div><div class="view-sub">Пять направлений — используются как категории постов и мультиканальной подачи</div></div></div>`;
+  const rows = state.rubrics.map(r=>{
+    const n = state.posts.filter(p=>p.rubric===r.id && p.status!=='archived').length;
+    return `<tr><td style="width:36%;"><input type="text" class="input" id="rb-name-${r.id}" value="${esc(r.name)}" ${canEdit?'':'disabled'}></td>
+      <td class="mono">${n} постов</td>
+      <td>${canEdit?`<button class="btn btn-sm" data-act="saverubric" data-id="${r.id}">Сохранить</button>`:''}</td></tr>`;
+  }).join('');
+  return head + `<div style="padding:16px 20px; overflow:auto; flex:1; max-width:760px;">
+    ${!canEdit ? `<div class="disabled-note" style="margin-bottom:10px;">Только просмотр — правка доступна роли Главред и Администратор.</div>` : ''}
+    <table class="table"><thead><tr><th class="nosort">Название</th><th class="nosort">Постов</th><th class="nosort"></th></tr></thead><tbody>${rows}</tbody></table>
+  </div>`;
+}
+VIEW_RENDERERS.rubrics = renderRubrics;
+
+/* ============================================================
+   §22 НАСТРОЙКИ — каналы / боты / автопостинг / пользователи / уведомления
+   ============================================================ */
+function renderChannels(){
+  const canManage = can(state,'channels.manage');
+  const head = `<div class="view-head"><div class="view-head-row"><div class="view-title">Каналы</div><div class="view-sub">Фаза 1: MAX, VK, Дзен, WhatsApp · Фаза 2: YouTube, Instagram, TikTok</div></div></div>`;
+  const rows = state.channels.map(c=>`<tr>
+    <td class="td-ch"><span class="ch-bar" style="background:${c.color};"></span><span class="ch-name" style="margin-left:5px;">${esc(c.name)}</span></td>
+    <td>Фаза ${c.phase}</td>
+    <td><span class="badge" style="border-color:${c.connected?'var(--ok-ink)':'var(--bad)'}; color:${c.connected?'var(--ok-ink)':'var(--bad)'};">${c.connected?'Подключён':'Не подключён'}</span></td>
+    <td>${c.connected?esc(c.account):'<span class="mini-note">—</span>'}</td>
+    <td>${canManage
+        ? (c.connected ? `<button class="btn btn-sm btn-danger" data-act="disconnect" data-id="${c.id}">Отключить</button>`
+                        : `<button class="btn btn-sm btn-primary" data-act="openconnect" data-id="${c.id}">Подключить</button>`)
+        : `<span class="disabled-note">Недоступно для роли ${esc(roleName(state.currentRole))}</span>`}
+    </td>
+  </tr>`).join('');
+  return head + `<div style="padding:16px 20px; overflow:auto; flex:1; max-width:900px;">
+    <table class="table"><thead><tr><th class="nosort">Канал</th><th class="nosort">Фаза</th><th class="nosort">Статус</th><th class="nosort">Аккаунт</th><th class="nosort">Действие</th></tr></thead><tbody>${rows}</tbody></table>
+  </div>`;
+}
+VIEW_RENDERERS.channels = renderChannels;
+
+function renderBots(){
+  const canManage = can(state,'bots.manage');
+  const head = `<div class="view-head"><div class="view-head-row"><div class="view-title">Статус ботов</div><div class="view-sub">${state.bots.filter(b=>b.status==='online').length} из ${state.bots.length} в сети</div></div></div>`;
+  const rows = state.bots.map(b=>`<tr>
+    <td style="font-weight:700;">${esc(b.name)}</td>
+    <td>${esc(b.desc)}</td>
+    <td><span class="badge" style="border-color:${b.status==='online'?'var(--ok-ink)':'var(--bad)'}; color:${b.status==='online'?'var(--ok-ink)':'var(--bad)'};">${b.status==='online'?'В сети':'Офлайн'}</span></td>
+    <td>${canManage?`<button class="btn btn-sm" data-act="togglebot" data-id="${b.id}">${b.status==='online'?'Отключить':'Включить'}</button>`:''}</td>
+  </tr>`).join('');
+  return head + `<div style="padding:16px 20px; overflow:auto; flex:1; max-width:820px;">
+    <table class="table"><thead><tr><th class="nosort">Бот</th><th class="nosort">Назначение</th><th class="nosort">Статус</th><th class="nosort"></th></tr></thead><tbody>${rows}</tbody></table>
+  </div>`;
+}
+VIEW_RENDERERS.bots = renderBots;
+
+function renderAutopost(){
+  const canManage = can(state,'channels.manage');
+  const head = `<div class="view-head"><div class="view-head-row"><div class="view-title">Автопостинг</div><div class="view-sub">Планировщик проверяет запланированные посты каждые 30 секунд</div>
+    <div class="view-tools"><button class="btn btn-primary btn-ic" data-act="runscheduler">${ICO.refresh} Прогнать планировщик сейчас</button></div>
+  </div></div>`;
+  const rows = state.channels.map(c=>`<tr>
+    <td class="td-ch"><span class="ch-bar" style="background:${c.color};"></span><span class="ch-name" style="margin-left:5px;">${esc(c.name)}</span></td>
+    <td>${c.connected?'<span style="color:var(--ok-ink);">подключён</span>':'<span style="color:var(--bad);">не подключён</span>'}</td>
+    <td><div class="sw ${c.autopost?'on':''}" data-act="${canManage?'toggleautopost':'noop'}" data-id="${c.id}"><i></i></div></td>
+  </tr>`).join('');
+  return head + `<div style="padding:16px 20px; overflow:auto; flex:1; max-width:760px;">
+    <table class="table"><thead><tr><th class="nosort">Канал</th><th class="nosort">Подключение</th><th class="nosort">Автопостинг</th></tr></thead><tbody>${rows}</tbody></table>
+    <div class="mini-note" style="margin-top:10px;">Последний прогон планировщика: ${state.lastTick ? fmtDT(state.lastTick) : 'ещё не запускался'}.</div>
+  </div>`;
+}
+VIEW_RENDERERS.autopost = renderAutopost;
+
+/* ONE SETTINGS SCREEN. Каналы, Статус ботов and Автопостинг were three sibling tabs holding a
+   table each; stacked as sections they read as one place you go to configure the factory. The
+   individual renderers are untouched, so each section is still the same working screen. */
+function renderSettings(){
+  /* Each sub-view already renders its own heading block, so this stacks them as they are rather
+     than trying to cut their heads off - a regex doing that ate the bodies and left 124 chars. */
+  return `<div class="view-head"><div class="view-head-row"><div class="view-title">Настройки</div>
+      <div class="view-sub">Каналы, боты и расписание автопостинга</div></div></div>
+    <div class="set-sec">${renderChannels()}</div>
+    <div class="set-sec">${renderBots()}</div>
+    <div class="set-sec">${renderAutopost()}</div>`;
+}
+VIEW_RENDERERS.settings = renderSettings;
+
+
+function renderUsers(){
+  const canManage = can(state,'users.manage');
+  const head = `<div class="view-head"><div class="view-head-row"><div class="view-title">Пользователи</div><div class="view-sub">${state.users.length} учётных записей</div>
+    <div class="view-tools"><button class="btn btn-primary btn-ic" data-act="adduser" ${canManage?'':'disabled'}>${ICO.plus} Пользователь</button></div>
+  </div></div>`;
+  const roleOpts = u => ROLES.map(r=>`<option value="${r.id}" ${u.role===r.id?'selected':''}>${esc(r.name)}</option>`).join('');
+  const rows = state.users.map(u=>`<tr>
+    <td style="font-weight:700;">${esc(u.name)}${u.id===state.currentUserId?' <span class="mini-note">(вы)</span>':''}</td>
+    <td><select class="dd" data-act="changerole" data-id="${u.id}" ${canManage?'':'disabled'}>${roleOpts(u)}</select></td>
+  </tr>`).join('');
+  return head + `<div style="padding:16px 20px; overflow:auto; flex:1; max-width:600px;">
+    <table class="table"><thead><tr><th class="nosort">Имя</th><th class="nosort">Роль</th></tr></thead><tbody>${rows}</tbody></table>
+  </div>`;
+}
+VIEW_RENDERERS.users = renderUsers;
+
+function renderNotifications(){
+  const events = [];
+  state.posts.forEach(p=> p.history.forEach(h=> events.push({at:h.at, text:`«${p.title}» → ${STATUS_META[h.status]?STATUS_META[h.status].label:h.status}`, by:h.by})));
+  state.mentions.forEach(m=>{ if(isOverdue(m)) events.push({at:m.at+m.slaMin*60000, text:`Просрочено по SLA: упоминание ${m.id} (${m.author})`, by:'система'}); });
+  events.sort((a,b)=>b.at-a.at);
+  const head = `<div class="view-head"><div class="view-head-row"><div class="view-title">Уведомления</div><div class="view-sub">Последние события системы</div></div></div>`;
+  if(events.length===0) return head + `<div class="empty-state"><div class="big">Уведомлений нет</div></div>`;
+  return head + `<div style="padding:16px 20px; overflow:auto; flex:1; max-width:760px;">
+    ${events.slice(0,60).map(e=>`<div class="history-item"><span class="mono">${fmtDT(e.at)}</span> — ${esc(e.text)} <span class="mini-note">· ${esc(e.by)}</span></div>`).join('')}
+  </div>`;
+}
+VIEW_RENDERERS.notifications = renderNotifications;
+
+/* ============================================================
+   §23 ПЕЧАТНЫЕ ФОРМЫ — @media print прячет всё, кроме .print-page;
+   форма всегда светлая, независимо от темы экрана.
+   ============================================================ */
+function printBar(){ return `<div class="no-print" style="display:flex; gap:8px; margin-bottom:14px;">
+    <button class="btn" data-act="opennav" data-id="feed">← Закрыть</button>
+    <button class="btn btn-primary" onclick="window.print()">Печать</button>
+  </div>`; }
+function renderPrint(){
+  const [base, arg] = UI.route.split(':');
+  if(base==='print-scenario') return renderPrintScenario(arg);
+  if(base==='print-weekplan') return renderPrintWeekplan();
+  if(base==='print-orm-report') return renderPrintOrmReport();
+  return '';
+}
+function renderPrintScenario(id){
+  const s = findScenario(id);
+  if(!s) return `<div class="print-page">${printBar()}Сценарий не найден.</div>`;
+  const rows = s.scenes.map(sc=>`<tr><td>${sc.n}</td><td>${esc(sc.shot)}</td><td>${esc(sc.voice)}</td><td>${esc(sc.onscreen)}</td><td>${esc(sc.sfx)}</td><td>${sc.sec} сек</td></tr>`).join('');
+  return `<div class="print-page">${printBar()}
+    <h1>Сценарий: ${esc(s.topic)}</h1>
+    <div class="meta">ООО «АИР-ГАЗ» · ${esc(s.audience)} · эмоция: ${esc(s.emotion)} · хронометраж ${s.duration} сек · ${s.totalWords} слов</div>
+    <table><thead><tr><th>№</th><th>Кадр / видеоряд</th><th>Голос</th><th>Текст на экране</th><th>Аудио / SFX</th><th>Время</th></tr></thead>
+    <tbody>${rows}</tbody>
+    <tfoot><tr><td colspan="5" style="text-align:right;"><b>Итого</b></td><td><b>${s.duration} сек</b></td></tr></tfoot></table>
+  </div>`;
+}
+function renderPrintWeekplan(){
+  const start = startOfWeek(Date.now());
+  const dayLabels=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+  const posts = calendarPosts();
+  const rows = CHANNEL_DEFS.map(ch=>{
+    const cells = [0,1,2,3,4,5,6].map(i=>{
+      const ts = start+days(i);
+      const list = posts.filter(p=>p.channels.includes(ch.id) && sameDay(p.publishedAt||p.scheduledAt, ts));
+      return `<td>${list.map(p=>`${fmtTime(p.publishedAt||p.scheduledAt)} ${esc(p.title)}`).join('<br>')||'—'}</td>`;
+    }).join('');
+    return `<tr><td><b>${esc(ch.name)}</b></td>${cells}</tr>`;
+  }).join('');
+  const dayHeads = [0,1,2,3,4,5,6].map(i=>`<th>${dayLabels[i]} ${fmtDate(start+days(i))}</th>`).join('');
+  return `<div class="print-page">${printBar()}
+    <h1>План публикаций на неделю</h1>
+    <div class="meta">ООО «АИР-ГАЗ» · неделя с ${fmtDate(start)} · по каналам</div>
+    <table><thead><tr><th>Канал</th>${dayHeads}</tr></thead><tbody>${rows}</tbody></table>
+  </div>`;
+}
+const CAT_TO_RUBRIC = {tech:'agp', price:'turnkey', delay:'grpsh', question:'nsps', positive:'gis'};
+function renderPrintOrmReport(){
+  const byCat = state.objections.map(o=>({name:o.name, n:state.mentions.filter(m=>m.categories.includes(o.id)).length}));
+  const byStatus = Object.entries(MSTATUS_META).map(([k,v])=>({name:v.label, n:state.mentions.filter(m=>m.status===k).length}));
+  const resolved = state.mentions.filter(m=>m.resolvedAt);
+  const avgMin = resolved.length ? Math.round(resolved.reduce((s,m)=>s+(m.resolvedAt-m.at),0)/resolved.length/60000) : null;
+  return `<div class="print-page">${printBar()}
+    <h1>Отчёт по репутации</h1>
+    <div class="meta">ООО «АИР-ГАЗ» · период: последние 30 дней · всего упоминаний: ${state.mentions.length}</div>
+    <table><thead><tr><th>Категория</th><th>Упоминаний</th></tr></thead><tbody>${byCat.map(c=>`<tr><td>${esc(c.name)}</td><td>${c.n}</td></tr>`).join('')}</tbody></table>
+    <br>
+    <table><thead><tr><th>Статус отработки</th><th>Упоминаний</th></tr></thead><tbody>${byStatus.map(c=>`<tr><td>${esc(c.name)}</td><td>${c.n}</td></tr>`).join('')}</tbody></table>
+    <br>
+    <div class="meta">Среднее время реакции: ${avgMin!=null?avgMin+' мин (по '+resolved.length+' отработанным)':'недостаточно данных'}</div>
+  </div>`;
+}
+
+function renderResetConfirmModal(){
+  return `<div class="modal">
+    <div class="modal-head"><div class="modal-title">Сбросить демо-данные?</div><button class="modal-close" data-act="closemodal">${ICO.x}</button></div>
+    <div class="modal-body"><div>Все посты, упоминания, сценарии и подключения каналов вернутся к исходному набору. Текущие изменения будут потеряны.</div></div>
+    <div class="modal-foot">
+      <button class="btn btn-danger" data-act="confirmreset">Сбросить</button>
+      <button class="btn" data-act="closemodal">Отмена</button>
+    </div>
+  </div>`;
+}
+function renderDeleteConfirmModal(payload){
+  return `<div class="modal">
+    <div class="modal-head"><div class="modal-title">Удалить безвозвратно?</div><button class="modal-close" data-act="closemodal">${ICO.x}</button></div>
+    <div class="modal-body"><div>Пост «${esc(payload.title||'')}» будет удалён без возможности восстановления. Это действие необратимо.</div></div>
+    <div class="modal-foot">
+      <button class="btn btn-danger" data-act="confirmdelete" data-id="${payload.id}">Удалить</button>
+      <button class="btn" data-act="closemodal">Отмена</button>
+    </div>
+  </div>`;
+}
+
+/* ============================================================
+   §24 EVENT DISPATCH — one delegated map, no rebinding after render
+   ============================================================ */
+function currentPageItems(){
+  const filtered = getFilteredPosts();
+  const sorted = sortPosts(filtered);
+  const totalPages = Math.max(1, Math.ceil(sorted.length/UI.pageSize));
+  UI.page = clamp(UI.page,1,totalPages);
+  return sorted.slice((UI.page-1)*UI.pageSize, UI.page*UI.pageSize);
+}
+function copyToClipboard(text){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(()=>toast('Скопировано в буфер','ok')).catch(()=>fallbackCopy(text));
+  } else fallbackCopy(text);
+}
+function fallbackCopy(text){
+  const ta = document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); toast('Скопировано в буфер','ok'); }catch(e){ toast('Не удалось скопировать','err'); }
+  document.body.removeChild(ta);
+}
+function storyboardAsText(s){
+  let out = `Сценарий: ${s.topic}\n${s.audience} · ${s.emotion} · ${s.duration} сек · ${s.totalWords} слов\n\n`;
+  s.scenes.forEach(sc=>{
+    out += `Сцена ${sc.n} (${sc.sec} сек)\nКадр/видеоряд: ${sc.shot}\nГолос: ${sc.voice}\nТекст на экране: ${sc.onscreen}\nАудио/SFX: ${sc.sfx}\n\n`;
+  });
+  return out;
+}
+
+const ACTIONS = {
+  nav(el){ go(el.dataset.id); },
+  navblocked(el){ toast(`Недоступно для роли ${roleName(state.currentRole)}`, 'err'); },
+  opennav(el){ go(el.dataset.id); },
+  noop(el){ if(el.title) toast(el.title, 'err'); },
+  switchuser(el){ setCurrentUser(state, el.value); saveState(); render(); toast(`Роль: ${roleName(state.currentRole)} · ${actorName()}`); },
+  toggletheme(){ setTheme(theme==='dark'?'light':'dark'); render(); },
+  resetdemo(){ openModal('resetconfirm', {}); },
+  confirmreset(){ resetDemo(); },
+
+  // feed
+  newpost(){ openModal('postedit', {}); },
+  filter(el){ UI.filters[el.dataset.key] = el.value; UI.page=1; render(); },
+  pill(el){ UI.filters.status = el.dataset.status; UI.page=1; render(); },
+  sort(el){ const k=el.dataset.key; if(UI.sort.key===k) UI.sort.dir = UI.sort.dir==='asc'?'desc':'asc'; else { UI.sort.key=k; UI.sort.dir='asc'; } render(); },
+  selectallpage(el){ const items=currentPageItems(); const allSel = items.length && items.every(p=>UI.selection.has(p.id)); items.forEach(p=> allSel ? UI.selection.delete(p.id) : UI.selection.add(p.id)); render(); },
+  selectrow(el){ const id=el.dataset.id; if(UI.selection.has(id)) UI.selection.delete(id); else UI.selection.add(id); render(); },
+  page(el){ UI.page += parseInt(el.dataset.dir,10); render(); },
+  bulk(el){
+    const op = el.dataset.op; const ids=[...UI.selection];
+    if(op==='approve'){ if(!can(state,'post.approve')) return toast('Недоступно для роли','err'); let n=0; ids.forEach(id=>{ const p=findPost(id); if(p&&p.status==='review'){ doApprove(state,p,actorName()); n++; } }); saveState(); toast(`Одобрено: ${n}`,'ok'); UI.selection=new Set(); render(); }
+    if(op==='archive'){ if(!can(state,'post.archive')) return toast('Недоступно для роли','err'); let n=0; ids.forEach(id=>{ const p=findPost(id); if(p&&p.status!=='archived'){ doArchive(state,p,actorName()); n++; } }); saveState(); toast(`В архив: ${n}`,'ok'); UI.selection=new Set(); render(); }
+    if(op==='schedule'){ if(!can(state,'post.schedule')) return toast('Недоступно для роли','err'); openModal('bulkschedule', {}); }
+  },
+
+  // post card / state machine
+  openpost(el){ openModal('postcard', {id: el.dataset.id}); },
+  editpost(el){ openModal('postedit', {id: el.dataset.id}); },
+  archivepost(el){ const p=findPost(el.dataset.id); if(!p) return; doArchive(state,p,actorName()); saveState(); toast('Пост архивирован','ok'); render(); },
+  deletepost(el){ const p=findPost(el.dataset.id); openModal('deleteconfirm', {id:p.id, title:p.title}); },
+  confirmdelete(el){ const p=findPost(el.dataset.id); doDelete(state,p); saveState(); closeModal(); toast('Пост удалён безвозвратно','ok'); go('feed'); },
+  submitreview(el){ const p=findPost(el.dataset.id); doSubmitForReview(state,p,actorName()); saveState(); toast('Отправлено на согласование','ok'); render(); },
+  approvepost(el){ const p=findPost(el.dataset.id); doApprove(state,p,actorName()); saveState(); toast('Пост одобрен','ok'); render(); },
+  reworkpost(el){ openModal('rework', {id: el.dataset.id}); },
+  rejectpost(el){ openModal('reject', {id: el.dataset.id}); },
+  backtodraft(el){ const p=findPost(el.dataset.id); doBackToDraft(state,p,actorName()); saveState(); render(); },
+  openschedule(el){ openModal('schedule', {id: el.dataset.id}); },
+  publishnow(el){
+    const p=findPost(el.dataset.id); attemptPublish(state,p,actorName()); saveState();
+    if(p.status==='published') toast('Опубликовано','ok'); else toast('Публикация не удалась: '+p.errorReason,'err');
+    render();
+  },
+
+  // create/edit modal
+  genpost(){
+    const f = readEditForm();
+    const scaffold = {id:'__new__', channels:f.channels, rubric:f.rubric, tone:f.tone, postType:f.postType};
+    const out = generatePost(state, scaffold);
+    document.getElementById('pe-title').value = out.title;
+    document.getElementById('pe-text').value = out.text;
+  },
+  smartedit(){
+    const text = document.getElementById('pe-text').value;
+    const instr = document.getElementById('pe-instruction').value;
+    const result = smartEdit(text, instr);
+    if(result===null){ toast('Инструкция не распознана. Доступно: короче / добавь техники / мягче', 'err'); return; }
+    document.getElementById('pe-text').value = result;
+    toast('Применено','ok');
+  },
+  savepost(el){
+    const f = readEditForm();
+    if(!f.title){ toast('Укажите заголовок','err'); return; }
+    if(!f.text.trim()){ toast('Текст не может быть пустым','err'); return; }
+    const id = el.dataset.id;
+    if(id){
+      const p = findPost(id);
+      Object.assign(p, f);
+      if(p.status==='rework' || p.status==='rejected'){ p.status='draft'; pushHistory(p,'draft',actorName(),'правки внесены после доработки'); }
+      saveState(); toast('Изменения сохранены','ok');
+    } else {
+      const p = { id: uid(state,'p'), ...f, status:'draft', needsAttention:false, attempts:0, errorReason:null, publishedAt:null, createdAt:Date.now(), history:[], comments:[], adaptations:{} };
+      pushHistory(p,'draft',actorName());
+      state.posts.push(p);
+      saveState(); toast('Пост создан','ok');
+    }
+    closeModal();
+  },
+
+  // schedule modal
+  doschedule(el){
+    const p = findPost(el.dataset.id);
+    const dateV = document.getElementById('sch-date').value, timeV = document.getElementById('sch-time').value || '09:00';
+    if(!dateV){ toast('Укажите дату','err'); return; }
+    const ts = new Date(`${dateV}T${timeV}:00`).getTime();
+    doSchedule(state, p, actorName(), ts);
+    saveState(); closeModal(); toast('Запланировано на '+fmtDT(ts),'ok'); render();
+  },
+  // rework / reject
+  doreword(el){
+    const p = findPost(el.dataset.id);
+    const c = document.getElementById('rw-comment').value.trim();
+    if(!c){ toast('Комментарий обязателен при отправке на доработку','err'); return; }
+    doRework(state, p, actorName(), c); saveState(); closeModal(); toast('Отправлено на доработку','ok'); render();
+  },
+  doreject(el){
+    const p = findPost(el.dataset.id);
+    const c = document.getElementById('rj-comment').value.trim();
+    doReject(state, p, actorName(), c); saveState(); closeModal(); toast('Пост отклонён','ok'); render();
+  },
+  // bulk schedule
+  dobulkschedule(){
+    const dateV = document.getElementById('bsch-date').value, timeV = document.getElementById('bsch-time').value || '10:00';
+    if(!dateV){ toast('Укажите дату','err'); return; }
+    const ts = new Date(`${dateV}T${timeV}:00`).getTime();
+    let n=0;
+    [...UI.selection].forEach(id=>{ const p=findPost(id); if(p && p.status==='approved'){ doSchedule(state,p,actorName(),ts); n++; } });
+    saveState(); closeModal(); toast(`Запланировано: ${n}`,'ok'); UI.selection=new Set(); render();
+  },
+  // channels
+  openconnect(el){ openModal('connectchannel', {id: el.dataset.id}); },
+  doconnect(el){
+    const c = state.channels.find(c=>c.id===el.dataset.id);
+    const v = document.getElementById('conn-val').value.trim();
+    if(!v){ document.getElementById('conn-warn').textContent = 'Введите токен или имя аккаунта.'; return; }
+    c.connected = true; c.account = v; c.connectedAt = Date.now();
+    saveState(); closeModal(); toast(`${c.name} подключён`,'ok'); render();
+  },
+  disconnect(el){ const c=state.channels.find(c=>c.id===el.dataset.id); c.connected=false; c.account=''; saveState(); toast(`${c.name} отключён`); render(); },
+  togglebot(el){ const b=state.bots.find(b=>b.id===el.dataset.id); b.status = b.status==='online'?'offline':'online'; saveState(); render(); },
+  toggleautopost(el){ const c=state.channels.find(c=>c.id===el.dataset.id); c.autopost=!c.autopost; saveState(); render(); },
+  runscheduler(){ const n=schedulerTick(); toast(n?`Прогон завершён, попыток: ${n}`:'Прогон завершён, задач не найдено','ok'); render(); },
+
+  // users
+  adduser(){ openModal('adduser', {}); },
+  doadduser(){
+    const name = document.getElementById('nu-name').value.trim();
+    const role = document.getElementById('nu-role').value;
+    if(!name){ toast('Укажите имя','err'); return; }
+    state.users.push({id: uid(state,'u'), name, role});
+    saveState(); closeModal(); toast('Пользователь добавлен','ok'); render();
+  },
+  changerole(el){ const u=state.users.find(u=>u.id===el.dataset.id); u.role = el.value; if(u.id===state.currentUserId) state.currentRole = u.role; saveState(); render(); },
+
+  // KB / tones / rubrics
+  savekb(el){
+    const r = state.rubrics.find(r=>r.id===el.dataset.id);
+    r.facts = document.getElementById('kb-facts-'+r.id).value.split('\n').map(s=>s.trim()).filter(Boolean);
+    r.hashtags = document.getElementById('kb-tags-'+r.id).value.split(/\s+/).map(s=>s.trim()).filter(Boolean);
+    r.phrases = document.getElementById('kb-phrases-'+r.id).value.split('\n').map(s=>s.trim()).filter(Boolean);
+    saveState(); toast('База знаний обновлена — изменения повлияют на новую генерацию','ok'); render();
+  },
+  savetone(el){
+    const t = state.tones.find(t=>t.id===el.dataset.id);
+    t.openers = document.getElementById('tn-open-'+t.id).value.split('\n').map(s=>s.trim()).filter(Boolean);
+    t.dev = document.getElementById('tn-dev-'+t.id).value.split('\n').map(s=>s.trim()).filter(Boolean);
+    saveState(); toast('Тональность обновлена','ok'); render();
+  },
+  saverubric(el){
+    const r = state.rubrics.find(r=>r.id===el.dataset.id);
+    const v = document.getElementById('rb-name-'+r.id).value.trim();
+    if(!v){ toast('Название не может быть пустым','err'); return; }
+    r.name = v; saveState(); toast('Сохранено','ok'); render();
+  },
+  saveobjection(el){
+    const o = state.objections.find(o=>o.id===el.dataset.id);
+    o.triggers = document.getElementById('obj-trig-'+o.id).value.split(',').map(s=>s.trim()).filter(Boolean);
+    o.official = document.getElementById('obj-off-'+o.id).value;
+    o.crisis = document.getElementById('obj-cr-'+o.id).value;
+    saveState(); toast('Библиотека возражений обновлена','ok'); render();
+  },
+  addkeyword(){
+    const w = document.getElementById('kw-word').value.trim();
+    const cat = document.getElementById('kw-cat').value || null;
+    if(!w){ toast('Введите слово','err'); return; }
+    state.keywords.push({word:w, cat});
+    saveState(); toast('Слово добавлено — переклассифицируйте ленту, чтобы применить','ok'); render();
+  },
+  delkeyword(el){ state.keywords.splice(parseInt(el.dataset.idx,10),1); saveState(); render(); },
+  reclassify(){
+    let n=0;
+    state.mentions.forEach(m=>{ if(m.status==='new'){ const {categories,keywords} = classifyMention(state, m.text); m.categories=categories; m.keywords=keywords; n++; } });
+    saveState(); toast(`Переклассифицировано: ${n}`,'ok'); render();
+  },
+
+  // multichannel
+  mcsource(el){ UI.mcSourceId = el.value; render(); },
+  mcaddchannel(el){
+    if(!el.value) return;
+    const p = findPost(UI.mcSourceId);
+    if(p && !p.channels.includes(el.value)){ p.channels.push(el.value); saveState(); }
+    render();
+  },
+
+  // ORM mention detail
+  mtab(el){ UI.mentionTab = el.dataset.tab; render(); },
+  mstatus(el){
+    const m = findMention(el.dataset.id); m.status = el.value;
+    if(m.status==='done' && !m.resolvedAt) m.resolvedAt = Date.now();
+    saveState(); render();
+  },
+  ormgen(el){
+    const m = findMention(el.dataset.id); const tab = el.dataset.tab;
+    m.genTries = (m.genTries||0)+1;
+    let text, tries=0;
+    do { text = buildOrmText(state, m, tab, m.genTries+tries); tries++; }
+    while(state.mentions.some(o=>o.id!==m.id && (o.officialText===text || o.crisisText===text)) && tries<10);
+    if(tab==='official') m.officialText = text; else m.crisisText = text;
+    saveState(); toast('Сгенерировано','ok'); render();
+  },
+  ormsend(el){
+    const m = findMention(el.dataset.id);
+    const tab = UI.mentionTab || 'official';
+    const text = document.getElementById('orm-text');
+    if(text){ if(tab==='official') m.officialText=text.value; else m.crisisText=text.value; }
+    const ch = state.channels.find(c=>c.id===m.source);
+    m.status = m.status==='escalated' ? 'escalated' : 'done';
+    if(!m.resolvedAt) m.resolvedAt = Date.now();
+    saveState();
+    if(ch && !ch.connected) toast(`Канал ${ch.name} не подключён — ответ поставлен в буфер, статус обновлён`, 'err');
+    else toast('Отправлено в комментарии','ok');
+    render();
+  },
+  ormtoqueue(el){
+    const m = findMention(el.dataset.id);
+    const tab = UI.mentionTab || 'official';
+    const rubricId = CAT_TO_RUBRIC[m.categories[0]] || state.rubrics[0].id;
+    const text = (tab==='crisis' ? m.crisisText : m.officialText) || buildOrmText(state, m, 'crisis', m.genTries||0);
+    const p = {
+      id: uid(state,'p'), title: `Разбор вопроса из ORM: ${m.text.replace(/[«»]/g,'').slice(0,42)}…`,
+      text, tone: 'caring', rubric: rubricId, postType:'qa', channels:['vk'],
+      status:'draft', needsAttention:false, attempts:0, errorReason:null, publishedAt:null,
+      createdAt: Date.now(), scheduledAt:null, history:[], comments:[], adaptations:{},
+    };
+    pushHistory(p, 'draft', actorName(), `создан из упоминания ${m.id}`);
+    state.posts.push(p);
+    m.linkedPostId = p.id;
+    saveState(); toast('Пост создан из упоминания','ok');
+    openModal('postcard', {id:p.id});
+  },
+
+  // producer
+  scenwizard(){ UI.scenarioWizard = {step:1, topic:'', duration:30, audience:AUDIENCES[0], emotion:EMOTIONS[0], rubricId:state.rubrics[0].id}; openModal('scenariowizard', {}); },
+  wzduration(el){ UI.scenarioWizard.duration = parseInt(el.dataset.v,10); render(); },
+  wzaudience(el){ UI.scenarioWizard.audience = el.dataset.v; render(); },
+  wzemotion(el){ UI.scenarioWizard.emotion = el.dataset.v; render(); },
+  wzback(){ UI.scenarioWizard.step = Math.max(1, UI.scenarioWizard.step-1); render(); },
+  wznext(){
+    const w = UI.scenarioWizard;
+    if(w.step===1){
+      const topicEl = document.getElementById('wz-topic'); const rubricEl = document.getElementById('wz-rubric');
+      if(topicEl) w.topic = topicEl.value.trim();
+      if(rubricEl) w.rubricId = rubricEl.value;
+      if(!w.topic){ toast('Укажите тему ролика','err'); return; }
+    }
+    w.step = Math.min(4, w.step+1); render();
+  },
+  wzfinish(){
+    const w = UI.scenarioWizard;
+    const variant = state.scenarios.length;
+    const sb = buildStoryboard(state, {topic:w.topic, duration:w.duration, audience:w.audience, emotion:w.emotion, rubricId:w.rubricId}, variant);
+    const s = { id: uid(state,'sc'), topic:w.topic, duration:w.duration, audience:w.audience, emotion:w.emotion, rubric:w.rubricId, status:'Черновик', createdAt:Date.now(), scenes:sb.scenes, totalWords:sb.totalWords, wordTarget:sb.wordTarget };
+    state.scenarios.push(s);
+    saveState(); closeModal(); toast('Раскадровка собрана','ok');
+    go('storyboard/'+s.id);
+  },
+  printscenario(el){ go('print-scenario:'+el.dataset.id); },
+  printweekplan(){ go('print-weekplan'); },
+  printormreport(){ go('print-orm-report'); },
+  copystoryboard(el){ const s=findScenario(el.dataset.id); copyToClipboard(storyboardAsText(s)); },
+
+  // queue keyboard-first actions
+  queueselect(el){ UI.queueIdx = parseInt(el.dataset.idx,10); render(); },
+  qapprove(el){
+    if(!can(state,'post.approve')) return;
+    const p = findPost(el.dataset.id); doApprove(state,p,actorName()); saveState(); toast('Одобрено','ok'); render();
+  },
+  qrework(el){
+    if(!can(state,'post.approve')) return;
+    const c = (document.getElementById('q-comment')||{value:''}).value.trim();
+    if(!c){ toast('Введите комментарий, затем отправьте на доработку','err'); const ta=document.getElementById('q-comment'); if(ta) ta.focus(); return; }
+    const p = findPost(el.dataset.id); doRework(state,p,actorName(),c); saveState(); toast('На доработку','ok'); render();
+  },
+  qreject(el){
+    if(!can(state,'post.approve')) return;
+    const c = (document.getElementById('q-comment')||{value:''}).value.trim();
+    const p = findPost(el.dataset.id); doReject(state,p,actorName(),c); saveState(); toast('Отклонено','ok'); render();
+  },
+
+  // modal chrome
+  closemodal(){ closeModal(); },
+  overlayclose(el, e){ if(e.target===el) closeModal(); },
+};
+
+function runAction(name, el, e){
+  const fn = ACTIONS[name];
+  if(!fn){ return; }
+  fn(el, e);
+}
+document.addEventListener('click', e=>{
+  const el = e.target.closest('[data-act]');
+  if(!el) return;
+  if(el.tagName==='SELECT') return;
+  if(el.tagName==='INPUT' && el.type==='checkbox') return;
+  if(el.tagName==='A') e.preventDefault();
+  runAction(el.dataset.act, el, e);
+});
+document.addEventListener('change', e=>{
+  const el = e.target.closest('[data-act]');
+  if(el && (el.tagName==='SELECT' || (el.tagName==='INPUT' && el.type==='checkbox'))){ runAction(el.dataset.act, el, e); return; }
+  const live = e.target.closest('[data-live]');
+  if(live) runLive(live.dataset.live, live, e);
+});
+document.addEventListener('input', e=>{
+  const el = e.target.closest('[data-live]');
+  if(!el) return;
+  runLive(el.dataset.live, el, e);
+});
+function runLive(name, el){
+  if(name==='feedsearch'){ UI.filters.q = el.value; UI.page=1; UI._focusSearch=true; render(); return; }
+  if(name==='mcedit'){
+    const chId = el.dataset.ch; const post = findPost(UI.mcSourceId); if(!post) return;
+    post.adaptations[chId] = el.value; saveState();
+    const limit = CH_LIMITS[chId]||4096; const len = el.value.length; const over = len>limit;
+    const wrap = el.parentElement;
+    const bar = wrap.querySelector('.limit-bar'); const txt = wrap.querySelector('.limit-txt');
+    if(bar){ bar.classList.toggle('over', over); const i=bar.querySelector('i'); if(i) i.style.width = Math.min(100,len/limit*100)+'%'; }
+    if(txt){ txt.classList.toggle('over', over); txt.textContent = `${len} / ${limit}` + (over?' — превышение':''); }
+  }
+}
+
+/* ---------- schedule/connect live conflict + validation hints ---------- */
+document.addEventListener('input', e=>{
+  if(e.target.id==='sch-date' || e.target.id==='sch-time'){
+    const modalId = UI.modal && UI.modal.payload.id;
+    const p = modalId ? findPost(modalId) : null;
+    if(!p) return;
+    const dateV = document.getElementById('sch-date').value, timeV = document.getElementById('sch-time').value || '09:00';
+    if(!dateV) return;
+    const ts = new Date(`${dateV}T${timeV}:00`).getTime();
+    const conflicts = slotConflicts(state, p, ts);
+    const warn = document.getElementById('sch-warn');
+    if(warn) warn.textContent = conflicts.length ? `Слот занят: «${conflicts[0].title}» на канале ${chLabel(p.channels[0])} в это же время. Можно запланировать всё равно — конфликт будет подсвечен в календаре.` : '';
+  }
+});
+
+/* ============================================================
+   §25 KEYBOARD — Escape closes modal; in queue: A / R / ↑↓
+   ============================================================ */
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape'){ if(UI.modal){ closeModal(); } return; }
+  const tag = document.activeElement && document.activeElement.tagName;
+  const typing = tag==='INPUT' || tag==='TEXTAREA' || tag==='SELECT';
+  if(UI.modal) return;
+  if(UI.route!=='queue' || typing) return;
+  const items = state.posts.filter(p=>p.status==='review');
+  if(items.length===0) return;
+  if(e.key==='ArrowDown'){ e.preventDefault(); UI.queueIdx = clamp((UI.queueIdx||0)+1, 0, items.length-1); render(); }
+  else if(e.key==='ArrowUp'){ e.preventDefault(); UI.queueIdx = clamp((UI.queueIdx||0)-1, 0, items.length-1); render(); }
+  else if(e.key==='a' || e.key==='A'){ e.preventDefault(); const p=items[UI.queueIdx||0]; if(p) ACTIONS.qapprove({dataset:{id:p.id}}); }
+  else if(e.key==='r' || e.key==='R'){ e.preventDefault(); const p=items[UI.queueIdx||0]; if(p) ACTIONS.qrework({dataset:{id:p.id}}); }
+});
+
+/* ============================================================
+   §26 CALENDAR DRAG & DROP
+   ============================================================ */
+document.addEventListener('dragstart', e=>{
+  const el = e.target.closest('[data-dragid]');
+  if(el && e.dataTransfer) e.dataTransfer.setData('text/plain', el.dataset.dragid);
+});
+document.addEventListener('dragover', e=>{
+  const cell = e.target.closest('[data-cell]');
+  if(cell){ e.preventDefault(); cell.classList.add('dragover'); }
+});
+document.addEventListener('dragleave', e=>{
+  const cell = e.target.closest('[data-cell]');
+  if(cell) cell.classList.remove('dragover');
+});
+document.addEventListener('drop', e=>{
+  const cell = e.target.closest('[data-cell]');
+  if(!cell) return;
+  e.preventDefault(); cell.classList.remove('dragover');
+  const id = e.dataTransfer.getData('text/plain');
+  const post = findPost(id);
+  if(!post){ return; }
+  if(post.status!=='scheduled'){ toast('Перетаскиванием можно переносить только запланированные посты','err'); return; }
+  if(cell.dataset.ch && !post.channels.includes(cell.dataset.ch)){ toast('Этот пост не публикуется в канал '+chLabel(cell.dataset.ch),'err'); return; }
+  const ts = parseInt(cell.dataset.ts,10);
+  const old = new Date(post.scheduledAt);
+  const nd = new Date(ts); nd.setHours(old.getHours(), old.getMinutes(), 0, 0);
+  post.scheduledAt = nd.getTime();
+  pushHistory(post, 'scheduled', actorName(), 'перенесено перетаскиванием на '+fmtDT(post.scheduledAt));
+  saveState(); toast('Дата перенесена на '+fmtDate(post.scheduledAt),'ok'); render();
+});
+document.getElementById('app').addEventListener('click', e=>{
+  const el = e.target.closest('[data-act="calview"]'); if(el){ UI.calView = el.dataset.view; render(); return; }
+  const nav = e.target.closest('[data-act="calnav"]'); if(nav){ const dir=parseInt(nav.dataset.dir,10); UI.calAnchor += days((UI.calView==='week'?7:28)*dir); render(); return; }
+  const today = e.target.closest('[data-act="caltoday"]'); if(today){ UI.calAnchor = startOfWeek(Date.now()); render(); return; }
+});
+
+/* ============================================================
+   §27 SCHEDULER — every 30s, publish due posts whose channels are
+   all autopost-enabled. Manual "publishnow" bypasses this entirely.
+   ============================================================ */
+function schedulerTick(){
+  const now = Date.now();
+  const due = state.posts.filter(p=> p.status==='scheduled' && p.scheduledAt && p.scheduledAt<=now &&
+    p.channels.every(id=>{ const c=state.channels.find(c=>c.id===id); return c && c.autopost; }));
+  due.forEach(p=> attemptPublish(state, p, 'планировщик'));
+  state.lastTick = now;
+  if(due.length) saveState();
+  return due.length;
+}
+setInterval(()=>{ const n = schedulerTick(); if(n) render(); }, 30000);
+
+/* ============================================================
+   §28 BOOT
+   ============================================================ */
+document.documentElement.setAttribute('data-theme', theme);
+render();
+</script>
+</body>
+</html>
+
