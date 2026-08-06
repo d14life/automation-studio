@@ -368,10 +368,13 @@ html.v2light{--slogan:linear-gradient(100deg,#8A7261,#5C4536 46%,#33241A)}
    The frame is a live picture; the card around it is the control. */
 .proj__shot{position:relative;display:block;flex:1 1 auto;overflow:hidden;
   background:var(--bg);pointer-events:none}
-.proj__shot iframe{position:absolute;top:0;left:0;border:0;
-  width:1440px;height:1000px;
-  transform:scale(var(--shot-s,.21));transform-origin:0 0;
-  pointer-events:none}
+/* A PICTURE OF THE PRODUCT, NOT THE PRODUCT ITSELF. This used to be an <iframe> of the whole
+   demo laid out at 1440x1000 and scaled to 21%, three of them at once - three complete desktop
+   applications running inside a landing page, each still live long after it had been scrolled
+   past. That is what he was pointing at: the card should show the product, not load it.
+   A 1120x780 capture is the same picture at a fraction of the cost, and it is the same picture
+   whether the demo is awake, slow or mid-deploy. Refresh with app/tools/shots.sh. */
+.proj__shot img{display:block;width:100%;height:auto;border:0;pointer-events:none}
 /* a hairline of the page colour over the shot, so the demo's own edge never reads as a seam
    against the card, and the bottom fades into the caption band instead of stopping dead */
 .proj__shot::after{content:'';position:absolute;inset:0;pointer-events:none;
