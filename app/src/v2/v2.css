@@ -449,7 +449,7 @@ html.v2light{--slogan:linear-gradient(100deg,#8A7261,#5C4536 46%,#33241A)}
 /* THE DECK BLEEDS PAST THE TEXT COLUMN. Four landscape cards need more room to fan than a
    reading measure allows; confined to the column each one buried the next one's title. The deck
    is a picture, not prose, so it takes the full viewport and the text around it stays put. */
-.v2 .projects,.projects{position:relative;height:min(620px,40vw);margin:44px 0 8px;
+.v2 .projects,.projects{position:relative;height:min(780px,52vw);margin:44px 0 8px;
   width:100vw;margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw);perspective:1500px}
 /* THE CARD IS THE SHAPE OF THE SCREENSHOT. It used to be a square holding a 1120x780 landscape
    picture, so the product was always shown cropped or letterboxed - his words: each one should
