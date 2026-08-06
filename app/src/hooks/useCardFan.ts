@@ -14,11 +14,18 @@ export function useCardFan(): void {
        piling up on each other or running off the side */
     /* Card size follows the container: every card keeps at least 55 percent of its width clear
        of the next one, so six cards read as a fan instead of a pile on a narrow screen. */
+    /* WIDER THAN IT WAS. avail/2.9 capped at 520 was sized for a square card; the card is now
+       the screenshot's own 1120/780 shape, and at that ratio a 520px card is only 362px tall -
+       too small to read a dashboard in. avail/2.15 capped at 700 makes the product legible,
+       which is the entire job of the deck. */
     function cardW() {
       const avail = wrap!.clientWidth
-      return Math.round(Math.max(260, Math.min(520, avail / 2.9)))
+      return Math.round(Math.max(300, Math.min(620, avail / 2.45)))
     }
-    function edgeX() { return Math.max(60, (wrap!.clientWidth - cardW()) / 2 * 0.92) }
+    /* 0.92 left a margin the fan did not need. At the full viewport width the cards can use the
+       whole span, and every extra pixel here is a pixel of the next card's title that stops
+       being covered. */
+    function edgeX() { return Math.max(60, (wrap!.clientWidth - cardW()) / 2 * 1) }
     function slotCfg(slot: number) {
       const d = N > 1 ? (slot - center) / center : 0, ad = Math.abs(d)
       return { rot: d * 8, scale: 1 - 0.08 * ad * ad, x: d * edgeX(), y: ad * ad * 2.2, z: 10 - Math.abs(slot - center) }
