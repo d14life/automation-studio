@@ -12,6 +12,117 @@
     src:url(/fonts/golos-latin.woff2) format('woff2')}
   @font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:400 700;font-display:swap;
     src:url(/fonts/jbmono-cyrillic.woff2) format('woff2')}
+
+/* ═══ ПОЛИТИКА АКЦЕНТА ════════════════════════════════════════════════════════
+   Янтарь делал семь работ одновременно - CTA, активная вкладка, серия столбиков, рампа
+   теплокарты, брусок брони, ховер строки и микрополоса загрузки. Семь работ = ноль сигнала.
+   Разрешён ТОЛЬКО на: заливке главной кнопки, активном состоянии навигации/сегмента и
+   линии «сегодня». Данные рисует плоская сталь. */
+tbody tr:hover{background:rgba(255,255,255,.035)}
+html.light tbody tr:hover{background:rgba(0,0,0,.035)}
+
+/* БОКОВЫЕ ПОЛОСКИ УБРАНЫ. На 17 карточках подряд цветная полоска слева - это уже обои,
+   а не сигнал: она стояла и на каждом KPI, и на каждом алерте. */
+.kpi .k::before,.note::before{display:none}
+.note{padding-left:var(--s3)}
+
+/* НАДЗАГОЛОВКИ БЕЗ КАПСА. Капс по-русски читается заметно хуже - «КОМПРЕССОР 5 М³/МИН»
+   тому доказательство - и остаётся только на микроподписях в 11px. */
+.caps{text-transform:none;letter-spacing:0;font:600 12px/1.45 var(--ui);color:var(--dim)}
+
+/* РАДИУС: одна политика на весь файл, переопределяет всё, что накопилось раньше */
+.card,.kpi,.modal>div,.seg,.btn,input,select,textarea,.f input,.f select,.f textarea{border-radius:var(--r-panel)}
+.chip,.badge,.tag,table.heat td i,.lg{border-radius:var(--r-mark)}
+.btn{min-height:38px}
+.dot,.avatar{border-radius:999px}
+
+/* ГЛУБИНА ТОНОМ, А НЕ ЛИНИЕЙ - три ступени поверхности, границ почти нет.
+   Референс: тональные почти-чёрные поверхности, глубина тоном, а не тенью. */
+.card,.kpi{background:var(--panel);border:1px solid transparent;box-shadow:none}
+html.light .card,html.light .kpi{border-color:var(--lc)}
+
+
+/* ПЕРЕКЛЮЧАТЕЛЬ ТЕМЫ. Светлой темы не было вообще - только @media print, где акцент
+   вычищался в чёрный, то есть бренд исчезал ровно на том листе, который клиент уносит. */
+.thm{display:inline-flex;align-items:center;gap:6px;background:var(--panel2);border:var(--line);
+  border-radius:var(--r-panel);padding:3px;flex:none}
+.thm button{border:0;background:transparent;color:var(--dim);padding:5px 10px;border-radius:var(--r-mark);
+  cursor:pointer;font:500 12px/1 var(--ui)}
+.thm button[aria-pressed="true"]{background:var(--acc);color:var(--on-acc);font-weight:600}
+
+/* ── графики: марки данных, а не украшения ─────────────────────────────────── */
+:root{--cost:#3A3D31}          /* расходы: тёмный нейтральный, читается как «съедено» */
+html.light{--cost:#C4CBD1}
+.chart .gl{stroke:var(--lc)}
+.chart .gz{stroke:var(--dim);stroke-width:1}
+.chart .ax.pt{fill:var(--dim);font-size:11px}
+.lgn{color:var(--dim);margin-left:16px;font-size:12px}
+.chart .bl{fill:var(--text);font:600 13px/1 var(--mono);font-variant-numeric:tabular-nums}
+.chart .bm{fill:var(--dim);font:500 11px/1 var(--ui)}
+.chnote{color:var(--dim);font-size:12px;padding:2px 2px 6px}
+/* ЗАЛИВКА СТОЛБИКА ПЛОСКАЯ. Была linear-gradient(180deg,#F5A524,rgba(245,165,36,.3)) -
+   низ растворялся ровно там, где глаз меряет высоту, то есть градиент стоял против
+   единственной задачи столбика. */
+/* ── графики (наследие) ──────────────────────────────────────────────────────────────
+   preserveAspectRatio="none" on the SVG means the viewBox stretches to whatever width the card
+   has, so a fixed aspect-ratio here is what stops it squashing to a stripe on a wide screen. */
+.chart{padding:var(--s4) var(--s4) var(--s2)}
+.chart svg{display:block;width:100%;height:auto;aspect-ratio:1000/250;overflow:visible}
+.chart svg text{font-family:var(--ui);letter-spacing:0}
+.chart .ax{fill:var(--dim);font-size:12px}
+.chart .dnum{fill:var(--text);font-size:26px;font-weight:600;font-family:var(--mono)}
+/* полоса-цель во всю высоту: попасть в неё курсором легче, чем в столбик шириной 8px */
+.hz{cursor:crosshair}
+.hz:hover{fill:var(--tint)}
+.crosshair{opacity:0;transition:opacity .12s ease}
+.chart svg:hover .crosshair{opacity:1}
+.lgs{display:flex;align-items:center;color:var(--dim);font-size:12.5px}
+.lg{display:inline-block;width:11px;height:11px;border-radius:3px;margin:0 6px 0 16px;
+  vertical-align:-1px}
+.lg--dot{width:9px;height:9px;border-radius:50%}
+.lg--ramp{width:74px;height:9px;border-radius:5px;margin:0 8px;
+  background:linear-gradient(90deg,var(--tint),rgba(245,165,36,.35),#F5A524)}
+
+/* донат: пропорция за один взгляд, точные числа - в легенде справа и в таблице ниже */
+.chart--mix{display:flex;gap:26px;align-items:center;flex-wrap:wrap}
+.chart--mix svg{flex:0 0 260px;width:260px;aspect-ratio:1}
+.chart--mix .sl{transition:opacity .16s ease}
+.chart--mix svg:hover .sl{opacity:.45}
+.chart--mix svg .sl:hover{opacity:1}
+.lgd{flex:1 1 260px;min-width:240px;display:flex;flex-direction:column;gap:9px}
+.lrow{display:flex;align-items:center;gap:9px;font-size:13px}
+.lrow i{width:11px;height:11px;border-radius:3px;flex:0 0 auto}
+.lrow .lt{flex:1 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lrow b{flex:0 0 42px;text-align:right}
+.lrow .dim{flex:0 0 108px;text-align:right;font-size:12px}
+
+/* теплокарта: одна ячейка = единица за период. Сетка, а не 300 отдельных SVG. */
+.chart--heat{overflow-x:auto}
+/* table-layout:fixed - иначе колонки с подписью месяца становятся шире соседних, и решётка
+   выглядит рваной: ширину задаёт содержимое заголовка, а не данные */
+table.heat{border-collapse:separate;border-spacing:2px;width:100%;min-width:520px;
+  table-layout:fixed}
+table.heat th:first-child,table.heat td:first-child{width:168px}
+table.heat th{font-weight:400;color:var(--dim);font-size:11px;text-align:center;padding:0}
+table.heat tbody th{text-align:left;white-space:nowrap;padding-right:10px;font-size:12px;
+  max-width:170px;overflow:hidden;text-overflow:ellipsis}
+table.heat td{padding:0}
+table.heat td i{display:block;height:20px;border-radius:3px;min-width:9px}
+table.heat td i:hover{outline:2px solid var(--text);outline-offset:-1px}
+
+/* одна подсказка на все графики: 300 ячеек с нативным title - это 300 узлов и задержка
+   браузера в секунду перед показом */
+#tip{position:fixed;z-index:90;pointer-events:none;opacity:0;transform:translate(-50%,-140%);
+  background:var(--panel2);border:var(--line);border-radius:var(--r-panel);padding:7px 10px;font-size:12.5px;
+  color:var(--text);box-shadow:0 10px 30px rgba(0,0,0,.55);white-space:nowrap;
+  transition:opacity .1s ease}
+#tip.on{opacity:1}
+
+/* теплокарта заменила полосу загрузки: та показывала парк одним числом за период, а вопрос
+   владельца - какая ИМЕННО единица простаивает. */
+@media (prefers-reduced-motion:reduce){
+  .crosshair,.chart--mix .sl,#tip{transition:none}
+}
 </style>
 
 <meta charset="utf-8">
@@ -21,13 +132,40 @@
 
 <style>
 :root{
-  --bg:#0E1013; --panel:#16191D; --panel2:#1C2025; --panel3:#242A31;
-  --text:#FFFFFF; --muted:#C9D5DF; --dim:#98A8B6;
-  --acc:#F5A524; --danger:#E5484D; --ok:#3FB980; --warn:#D8A72E; --steel:#616B77;
-  --line:1px solid rgba(255,255,255,.11); --lc:rgba(255,255,255,.11);
+  /* ТЁПЛЫЙ ГРАФИТ, а не нейтральный чёрный. На том же сайте стоит /demo/sklad/ - тёмный
+     терминал на #111214 с кислотным лаймом, капсом и моноширинным во всём. Park обязан
+     читаться как ДРУГОЙ продукт, и подтон - половина этой работы: #14150F уходит в
+     зелёно-жёлтую сторону и на глаз читается как тёплое железо, а не как чёрный экран.
+     Контраст посчитан, не прикинут: ink 16.9:1 на surface, ink-2 8.4:1, ink-3 5.8:1,
+     акцент 9.2:1. Всё, что светлее 5:1, для мелкого текста не берётся. */
+  --bg:#0C0D0A; --panel:#14150F; --panel2:#1C1E16; --panel3:#24261C;
+  --text:#F2F1E8; --muted:#ADAC9C; --dim:#8D8C7E;
+  --acc:#F5A524; --on-acc:#12140F;
+  --danger:#FF6B6B; --ok:#3FB980; --warn:#D8A72E; --steel:#616B77;
+  --line:1px solid #2B2E24; --lc:#2B2E24;
   --ui:"Golos Text",system-ui,-apple-system,"Segoe UI",sans-serif;
   --mono:"JetBrains Mono",ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
   --rail:68px;
+  /* РАДИУС - ТРИ ЗНАЧЕНИЯ, БЕЗ ИСКЛЮЧЕНИЙ. В файле их было двенадцать (3,4,5,6,7,8,12,16,
+     50%,999px), то есть политики радиуса не было вообще. */
+  --r-mark:2px;   /* марки данных: столбики, ячейки теплокарты, чипы, бейджи */
+  --r-panel:6px;  /* карточки, панели, поля, кнопки */
+  /* ОТСТУПЫ от базы 4 */
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px;
+  --inset:#0F100C; --scheme:dark; --tint:rgba(255,255,255,.055); --tint2:var(--tint2);
+  --heat0:#1A1C15;   /* самый тёмный шаг рампы - ОТЛИЧИМ от панели, иначе 0% и «нет данных» сливаются */
+}
+/* СВЕТЛАЯ ТЕМА. Её не было вообще - только @media print, где акцент вычищался в чёрный,
+   то есть бренд исчезал ровно на том артефакте, который клиент уносит с собой.
+   #6E7A84 проваливается на 4.39 и потому не взят; --dim здесь 5.28:1 на бумаге. */
+html.light{
+  --bg:#F5F6F7; --panel:#FFFFFF; --panel2:#FFFFFF; --panel3:#EDEFF1;
+  --text:#14181C; --muted:#4C565F; --dim:#636D76;
+  --acc:#A85F00; --on-acc:#FFFFFF;
+  --danger:#C2181D; --ok:#0F7A4E; --warn:#8A6100; --steel:#5A6470;
+  --line:1px solid #D8DDE1; --lc:#D8DDE1;
+  --inset:#EDEFF1; --scheme:light; --tint:rgba(0,0,0,.045); --tint2:rgba(0,0,0,.10);
+  --heat0:#E7EAEC;
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0;color:var(--text);font-family:var(--ui);font-size:14px;line-height:1.5;letter-spacing:-.008em;-webkit-text-size-adjust:100%}
@@ -40,12 +178,11 @@ html::-webkit-scrollbar,body::-webkit-scrollbar,#nav::-webkit-scrollbar{width:0;
 .card::-webkit-scrollbar-track,.gantt::-webkit-scrollbar-track,.modal .body::-webkit-scrollbar-track,#modalWrap::-webkit-scrollbar-track{background:transparent}
 .card::-webkit-scrollbar-thumb,.gantt::-webkit-scrollbar-thumb,.modal .body::-webkit-scrollbar-thumb,#modalWrap::-webkit-scrollbar-thumb{background:rgba(255,255,255,.20);border-radius:4px}
 .card::-webkit-scrollbar-thumb:hover,.gantt::-webkit-scrollbar-thumb:hover,.modal .body::-webkit-scrollbar-thumb:hover{background:rgba(245,165,36,.6)}
-body{overflow-x:hidden;background:
-  radial-gradient(1100px 520px at 72% -12%,rgba(245,165,36,.055),transparent 62%),
-  radial-gradient(700px 400px at 0% 100%,rgba(255,255,255,.03),transparent 60%),
-  repeating-linear-gradient(90deg,rgba(255,255,255,.028) 0 1px,transparent 1px 40px),
-  repeating-linear-gradient(0deg,rgba(255,255,255,.028) 0 1px,transparent 1px 40px),
-  var(--bg);background-attachment:fixed}
+/* ГЛУБИНА ТОНОМ, НЕ РИСУНКОМ. Здесь стояли янтарное пятно, второе белое и миллиметровка в
+   обе стороны - четыре слоя фона под учётной ведомостью. Янтарь по новой политике работает
+   только на кнопке, активном состоянии и линии «сегодня», поэтому пятно ушло; сетка ушла
+   вместе с ним, потому что глубину дают три ступени поверхности, а не линии. */
+body{overflow-x:hidden;background:var(--bg)}
 .num,td.n,th.n,.mono{font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1}
 td.n,th.n{text-align:right}
 a{color:var(--text);text-decoration:none}
@@ -55,7 +192,9 @@ button{font:inherit;color:inherit}
 #app{display:flex;min-height:100vh}
 
 /* ── рельс ── */
-#nav{width:var(--rail);flex:none;background:linear-gradient(180deg,rgba(23,49,63,.9),rgba(19,41,55,.9));border-right:var(--line);padding:14px 0 20px;display:flex;flex-direction:column;align-items:center;gap:4px;position:sticky;top:0;height:100vh;backdrop-filter:blur(6px);z-index:40}
+/* РЕЛЬС БЫЛ ХОЛОДНО-СИНИМ - ровно тот подтон, от которого уходит весь этот рестайл.
+   Тёплый графит, одна ступень поверхности, без стекла. */
+#nav{width:var(--rail);flex:none;background:var(--panel);border-right:var(--line);padding:14px 0 20px;display:flex;flex-direction:column;align-items:center;gap:4px;position:sticky;top:0;height:100vh;z-index:40}
 .brand{width:38px;height:38px;flex:none;display:grid;place-items:center;border-radius:7px;margin-bottom:10px;
   font:800 13px/1 var(--ui);letter-spacing:.03em;color:var(--acc);
   background:rgba(245,165,36,.10);box-shadow:inset 0 0 0 1px rgba(245,165,36,.45)}
@@ -64,7 +203,7 @@ button{font:inherit;color:inherit}
 .navadd:hover{background:#FFB63F}
 .navb{position:relative;width:46px;height:42px;display:grid;place-items:center;border-radius:7px;background:none;border:0;cursor:pointer;color:var(--dim)}
 .navb span:not(.badge){display:none}
-.navb:hover{color:var(--text);background:rgba(255,255,255,.06)}
+.navb:hover{color:var(--text);background:var(--tint)}
 .navb[aria-current="true"]{color:var(--acc);background:rgba(245,165,36,.12);box-shadow:inset 0 0 0 1px rgba(245,165,36,.28)}
 .navb[aria-current="true"]::before{content:'';position:absolute;left:-11px;top:11px;bottom:11px;width:3px;border-radius:0 3px 3px 0;background:var(--acc);box-shadow:0 0 10px 1px rgba(245,165,36,.8)}
 .navb::after{content:attr(data-t);position:absolute;left:52px;top:50%;transform:translateY(-50%) scale(.96);transform-origin:left center;white-space:nowrap;background:var(--panel3);border:var(--line);border-radius:8px;padding:5px 9px;font-size:12px;color:var(--text);opacity:0;pointer-events:none;transition:.12s;z-index:60;box-shadow:0 8px 22px rgba(0,0,0,.5)}
@@ -73,11 +212,11 @@ button{font:inherit;color:inherit}
 .navsp{flex:1}
 /* ponytail: своя история — у приложения один URL, кнопка «назад» браузера тут бесполезна */
 .hedge{position:fixed;top:0;bottom:0;width:12px;z-index:55;border:0;padding:0;cursor:pointer;
-  background:rgba(255,255,255,.045);color:transparent;display:grid;place-items:center;
+  background:var(--tint);color:transparent;display:grid;place-items:center;
   transition:width .14s ease,background .14s ease,color .14s ease}
 .hedge:not(.r){left:var(--rail);border-left:var(--line)}
 .hedge.r{right:0;border-right:var(--line)}
-.hedge:hover,.hedge:focus-visible{width:34px;background:rgba(255,255,255,.11);color:var(--text);outline:none}
+.hedge:hover,.hedge:focus-visible{width:34px;background:var(--tint2);color:var(--text);outline:none}
 .hedge:active{background:rgba(245,165,36,.18);color:var(--acc)}
 .hedge svg{flex:none}
 .hedge.r svg{transform:scaleX(-1)}
@@ -87,7 +226,7 @@ button{font:inherit;color:inherit}
 main{flex:1;min-width:0;display:flex;flex-direction:column}
 /* ── шапка ── */
 #top{position:sticky;top:0;z-index:30;padding:13px 22px 12px;border-bottom:var(--line);
-  background:linear-gradient(180deg,rgba(14,32,45,.96),rgba(14,32,45,.86));backdrop-filter:blur(10px);
+  background:var(--panel);
   display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 #top .tl{display:flex;align-items:baseline;gap:10px;min-width:0}
 #top h1{font-size:19px;margin:0;font-weight:650;letter-spacing:-.01em;white-space:nowrap}
@@ -95,17 +234,17 @@ main{flex:1;min-width:0;display:flex;flex-direction:column}
 .spacer,#top .sp{flex:1}
 .searchwrap{position:relative;display:flex;align-items:center}
 .searchwrap svg{position:absolute;left:10px;opacity:.45;pointer-events:none}
-input,select,textarea{background:rgba(9,24,34,.72);border:var(--line);color:var(--text);border-radius:6px;padding:9px 11px;font:inherit;outline:none;width:100%}
+input,select,textarea{background:var(--inset);border:var(--line);color:var(--text);border-radius:6px;padding:9px 11px;font:inherit;outline:none;width:100%}
 input:focus,select:focus,textarea:focus{border-color:rgba(245,165,36,.65);box-shadow:0 0 0 3px rgba(245,165,36,.13)}
-input[type=date]{color-scheme:dark;font-family:var(--mono);font-size:13px}
+input[type=date]{color-scheme:var(--scheme);font-family:var(--mono);font-size:13px}
 #search{padding-left:32px;width:200px;font-size:13px}
 #search::placeholder{color:var(--dim)}
 .btn{background:var(--panel2);border:var(--line);border-radius:6px;padding:8px 13px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;white-space:nowrap;transition:.14s}
 .btn:hover{border-color:rgba(255,255,255,.32);background:var(--panel3)}
 .btn.pri{background:var(--acc);color:#17130A;border-color:transparent;font-weight:700;box-shadow:none}
 .btn.pri:hover{background:#FFB63F;border-color:transparent}
-.btn.term{background:rgba(255,255,255,.06);color:var(--text);border-color:rgba(255,255,255,.30);font-weight:650}
-.btn.term:hover{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.55)}
+.btn.term{background:var(--tint);color:var(--text);border-color:var(--tint2);font-weight:650}
+.btn.term:hover{background:var(--tint2);border-color:var(--tint2)}
 .btn.dgr{color:var(--danger)}
 .btn.dgr:hover{border-color:rgba(229,72,77,.5);background:rgba(229,72,77,.08)}
 .btn.sm{padding:5px 10px;font-size:12.5px;border-radius:6px}
@@ -119,7 +258,7 @@ input[type=date]{color-scheme:dark;font-family:var(--mono);font-size:13px}
 
 /* ── панели ── */
 .card{background:linear-gradient(180deg,rgba(255,255,255,.035),transparent 70%),var(--panel);border:var(--line);border-radius:8px;padding:16px;overflow-x:auto}
-.card h3{margin:0 0 12px;font:600 11px/1 var(--ui);text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.card h3{margin:0 0 12px;font:600 15px/1.4 var(--ui);letter-spacing:-.01em;color:var(--text)}
 .grid{display:grid;gap:14px}
 .muted{color:var(--muted)}.dim{color:var(--dim)}
 .danger{color:var(--danger)}.ok{color:var(--ok)}.warn{color:var(--warn)}.acc{color:var(--acc)}
@@ -131,7 +270,7 @@ input[type=date]{color-scheme:dark;font-family:var(--mono);font-size:13px}
 
 /* ── таблицы ── */
 table{width:100%;border-collapse:collapse}
-th{text-align:left;font:600 11px/1.3 var(--ui);text-transform:uppercase;letter-spacing:.05em;color:var(--dim);padding:0 12px 9px;white-space:nowrap}
+th{text-align:left;font:600 12px/1.45 var(--ui);color:var(--dim);padding:0 12px 9px;white-space:nowrap}
 td{padding:10px 12px;border-top:var(--line);vertical-align:top}
 td.n,th.n{white-space:nowrap;font-variant-numeric:tabular-nums}
 tbody tr{transition:background .12s}
@@ -142,8 +281,8 @@ tr.clk:hover td:first-child{box-shadow:inset 2px 0 0 var(--acc)}
 
 /* ── табло KPI ── */
 .kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(172px,1fr));gap:12px}
-.kpi .k{position:relative;overflow:hidden;background:linear-gradient(180deg,rgba(255,255,255,.045),transparent 62%),var(--panel);border:var(--line);border-radius:8px;padding:13px 15px 14px}
-.kpi .k .lbl{font:600 10.5px/1.3 var(--ui);text-transform:uppercase;letter-spacing:.05em;color:var(--dim);margin-bottom:9px}
+.kpi .k{position:relative;overflow:hidden;background:var(--panel);border:var(--line);border-radius:var(--r-panel);padding:var(--s4)}
+.kpi .k .lbl{font:500 12px/1.45 var(--ui);color:var(--dim);margin-bottom:8px}
 .kpi .k .val{font:650 25px/1.08 var(--mono);letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .kpi .k .note,.kpi .k .nt{font:12px/1.4 var(--ui);color:var(--muted);margin-top:6px}
 .kpi .k::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:rgba(255,255,255,.1)}
@@ -154,7 +293,7 @@ tr.clk:hover td:first-child{box-shadow:inset 2px 0 0 var(--acc)}
 
 /* ── формы ── */
 .f{margin-bottom:12px}
-.f label{display:block;font:600 10.5px/1.3 var(--ui);text-transform:uppercase;letter-spacing:.05em;color:var(--dim);margin-bottom:6px}
+.f label{display:block;font:500 12px/1.45 var(--ui);color:var(--dim);margin-bottom:6px}
 .f .err{color:var(--danger);font-size:12px;margin-top:5px;display:none}
 .f.bad input,.f.bad select,.f.bad textarea{border-color:var(--danger);box-shadow:0 0 0 3px rgba(229,72,77,.14)}
 .f.bad .err{display:block}
@@ -166,19 +305,19 @@ tr.clk:hover td:first-child{box-shadow:inset 2px 0 0 var(--acc)}
 #modalWrap{position:fixed;inset:0;background:rgba(4,12,18,.72);display:flex;align-items:flex-start;justify-content:center;padding:24px 12px;z-index:100;overflow:auto;backdrop-filter:blur(3px);animation:fade .16s both}
 @keyframes fade{from{opacity:0}}
 #modalWrap[hidden]{display:none}
-.modal{background:linear-gradient(180deg,rgba(255,255,255,.04),transparent 40%),var(--panel);border:var(--line);border-radius:16px;width:100%;max-width:640px;margin:auto;box-shadow:0 30px 70px rgba(0,0,0,.6);animation:pop .2s cubic-bezier(.2,.8,.2,1) both}
+.modal{background:var(--panel);border:var(--line);border-radius:var(--r-panel);width:100%;max-width:640px;margin:auto;box-shadow:0 30px 70px rgba(0,0,0,.6);animation:pop .2s cubic-bezier(.2,.8,.2,1) both}
 @keyframes pop{from{opacity:0;transform:translateY(10px) scale(.985)}}
 .modal header{display:flex;align-items:center;gap:10px;padding:15px 18px;border-bottom:var(--line)}
 .modal header h2{margin:0;font-size:15px;font-weight:650;letter-spacing:-.01em}
 .modal .body{padding:16px 18px;max-height:calc(100vh - 210px);overflow:auto}
 .modal footer{display:flex;gap:10px;justify-content:flex-end;padding:13px 18px;border-top:var(--line);flex-wrap:wrap;background:rgba(9,24,34,.4);border-radius:0 0 16px 16px}
 .x{background:none;border:0;cursor:pointer;color:var(--muted);padding:5px;line-height:0;border-radius:6px}
-.x:hover{color:var(--text);background:rgba(255,255,255,.08)}
+.x:hover{color:var(--text);background:var(--tint)}
 #toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,140%);opacity:0;visibility:hidden;background:var(--panel3);border:var(--line);border-radius:7px;padding:11px 15px;z-index:200;transition:transform .24s cubic-bezier(.2,.8,.2,1),opacity .2s;display:flex;gap:12px;align-items:center;max-width:92vw;box-shadow:0 16px 40px rgba(0,0,0,.55),0 0 0 1px rgba(245,165,36,.14)}
 #toast.on{transform:translate(-50%,0);opacity:1;visibility:visible}
 
 /* ── Гантт-календарь ── */
-.gantt{--cw:34px;--nm:196px;position:relative;overflow:auto;border:var(--line);border-radius:8px;background:var(--panel);max-height:calc(100vh - 200px);min-height:280px;box-shadow:0 1px 0 rgba(255,255,255,.05) inset,0 18px 40px -28px rgba(0,0,0,.8)}
+.gantt{--cw:34px;--nm:196px;position:relative;overflow:auto;border:var(--line);border-radius:8px;background:var(--panel);max-height:calc(100vh - 200px);min-height:280px;box-shadow:0 1px 0 var(--tint) inset,0 18px 40px -28px rgba(0,0,0,.8)}
 .gwrap{position:relative;min-width:calc(var(--nm) + var(--cw)*var(--n))}
 .gover{position:absolute;top:0;bottom:0;left:var(--nm);right:0;pointer-events:none;z-index:0}
 .gover i{position:absolute;top:0;bottom:0;width:var(--cw);background:rgba(255,255,255,.035)}
@@ -191,22 +330,22 @@ tr.clk:hover td:first-child{box-shadow:inset 2px 0 0 var(--acc)}
 .gname .um{display:flex;align-items:center;gap:7px;margin-top:4px}
 .gname .um b{font:600 10.5px var(--mono);color:var(--muted);flex:none}
 .gtrack{position:relative;flex:1;height:46px;cursor:copy;background-color:transparent;
-  background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.06) 0 1px,transparent 1px var(--cw))}
+  background-image:repeating-linear-gradient(90deg,var(--tint) 0 1px,transparent 1px var(--cw))}
 .ghead{border-top:0;position:sticky;top:0;z-index:8;background:linear-gradient(180deg,var(--panel2),var(--panel))}
 .ghead .gname{background:transparent;border-bottom:var(--line)}
 .ghead .gtrack{height:38px;cursor:default;border-bottom:var(--line);background:none}
 .gd{position:absolute;top:5px;width:var(--cw);text-align:center;font:600 11px/1.15 var(--mono);color:var(--muted)}
-.gd s{display:block;text-decoration:none;font:600 9.5px/1.5 var(--ui);color:var(--dim);text-transform:uppercase;letter-spacing:.04em}
+.gd s{display:block;text-decoration:none;font:500 11px/1.5 var(--ui);color:var(--dim)}
 .gd.we{color:var(--dim)}
 .gd.td{color:var(--acc)}
 .gbar{position:absolute;top:8px;height:30px;border-radius:5px;display:flex;align-items:center;padding:0 10px;gap:6px;min-width:0;
   font-size:11.5px;color:var(--text);font-weight:600;overflow:hidden;white-space:nowrap;cursor:pointer;
-  background:#252C34;box-shadow:inset 0 0 0 1px rgba(255,255,255,.10),inset 3px 0 0 0 var(--acc);transition:background .12s,box-shadow .12s}
+  background:var(--panel3);box-shadow:inset 0 0 0 1px var(--tint2),inset 3px 0 0 0 var(--acc);transition:background .12s,box-shadow .12s}
 .gbar:hover{background:#2E363F;box-shadow:inset 0 0 0 1px rgba(245,165,36,.45),inset 3px 0 0 0 var(--acc);z-index:5}
-.gbar.past{background:rgba(255,255,255,.04);color:var(--muted);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08),inset 3px 0 0 0 var(--steel)}
-.gbar.mnt{background:repeating-linear-gradient(135deg,rgba(216,167,46,.85) 0 5px,rgba(22,25,29,.95) 5px 10px);color:var(--text);
+.gbar.past{background:var(--tint);color:var(--muted);box-shadow:inset 0 0 0 1px var(--tint),inset 3px 0 0 0 var(--steel)}
+.gbar.mnt{background:repeating-linear-gradient(135deg,rgba(216,167,46,.7) 0 5px,var(--panel2) 5px 10px);color:var(--text);
   box-shadow:inset 0 0 0 1px rgba(216,167,46,.55);font-weight:600}
-.gbar.mnt span{background:rgba(22,25,29,.9);padding:1px 5px;border-radius:4px}
+.gbar.mnt span{background:var(--panel2);padding:1px 5px;border-radius:var(--r-mark)}
 .gbar.clash{background:rgba(229,72,77,.18);color:var(--text);box-shadow:inset 0 0 0 1px rgba(229,72,77,.65),inset 3px 0 0 0 var(--danger)}
 .legend{display:flex;gap:18px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:12px;align-items:center}
 .sw{display:inline-block;width:14px;height:10px;border-radius:3px;vertical-align:-1px;margin-right:7px}
@@ -216,12 +355,15 @@ tr.clk:hover td:first-child{box-shadow:inset 2px 0 0 var(--acc)}
 .empty{text-align:center;padding:56px 20px;color:var(--muted);max-width:540px;margin:0 auto}
 .empty h3{font-size:17px;margin:16px 0 8px;color:var(--text);letter-spacing:-.01em}
 .empty p{margin:0 0 18px;font-size:13.5px;text-wrap:pretty}
-.seg{display:inline-flex;background:rgba(9,24,34,.6);border:var(--line);border-radius:7px;padding:3px;gap:2px}
+.seg{display:inline-flex;background:var(--inset);border:var(--line);border-radius:7px;padding:3px;gap:2px}
 .seg button{background:none;border:0;padding:6px 11px;border-radius:8px;cursor:pointer;color:var(--muted);font-size:12.5px;white-space:nowrap}
 .seg button:hover{color:var(--text)}
 .seg button[aria-pressed="true"]{background:rgba(245,165,36,.15);color:var(--acc);box-shadow:inset 0 0 0 1px rgba(245,165,36,.25)}
 .hd{display:flex;align-items:center;gap:12px;margin:26px 0 11px;flex-wrap:wrap}
-.hd h2{font:600 11px/1 var(--ui);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0;flex:none}
+/* НАДЗАГОЛОВОК СТАЛ ЗАГОЛОВКОМ. 11px капсом с трекингом .06em - это подпись, а не название
+   раздела; и капс по-русски читается заметно хуже латиницы. Сканер на соседнем демо кричит
+   капсом во всём, park должен говорить - это самая заметная из пяти осей расхождения. */
+.hd h2{font:600 15px/1.4 var(--ui);letter-spacing:-.01em;color:var(--text);margin:0;flex:none}
 .hd .dim{font:11px var(--mono)}
 .hd::after{content:'';flex:1;min-width:20px;height:1px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.2) 0 3px,transparent 3px 7px)}
 .note{position:relative;padding:10px 13px 10px 14px;background:rgba(245,165,36,.06);border-radius:6px;font-size:12.5px;color:var(--muted);overflow:hidden}
@@ -259,7 +401,7 @@ tr.clk:hover td:first-child{box-shadow:inset 2px 0 0 var(--acc)}
   table.resp tr{display:block;border-top:var(--line);padding:9px 0}
   table.resp tr:first-child{border-top:0}
   table.resp td{display:flex;justify-content:space-between;gap:14px;border:0;padding:3px 2px}
-  table.resp td::before{content:attr(data-l);color:var(--dim);font:600 11px/1.4 var(--ui);text-transform:uppercase;letter-spacing:.05em;flex:none}
+  table.resp td::before{content:attr(data-l);color:var(--dim);font:500 12px/1.45 var(--ui);flex:none}
   table.resp td.n{text-align:right}
   tr.clk:hover td:first-child{box-shadow:none}
 }
@@ -289,6 +431,7 @@ tr.clk:hover td:first-child{box-shadow:inset 2px 0 0 var(--acc)}
       <div class="tl"><h1 id="viewTitle">—</h1><span class="sub" id="viewSub"></span></div>
       <span class="sp"></span>
       <span class="searchwrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="search" placeholder="Поиск  /"></span>
+      <span class="thm" role="group" aria-label="Тема оформления"><button type="button" data-thm="dark" aria-pressed="true">Тёмная</button><button type="button" data-thm="light" aria-pressed="false">Светлая</button></span>
       <span id="actions" style="display:flex;gap:8px;flex-wrap:wrap"></span>
     </header>
     <div id="view"></div>
@@ -1022,9 +1165,9 @@ function renderCal(){
       days.map((d,i)=>'<span class="gd'+(isWeekend(d)?' we':'')+(d===today()?' td':'')+'" style="left:calc(var(--cw)*'+i+')">'+(+d.slice(8,10))+'<s>'+WDS[dow(d)]+'</s></span>').join('')+
     '</div></div>'+(list.length?rows:'<div class="grow"><div class="gname"></div><div class="gtrack" style="display:grid;place-items:center;cursor:default"><span class="dim" style="font-size:12px">Ничего не нашлось по запросу</span></div></div>')+
    '</div></div>'+
-   '<div class="legend"><span><i class="sw" style="background:#252C34;box-shadow:inset 0 0 0 1px rgba(255,255,255,.10),inset 3px 0 0 0 #F5A524"></i>в аренде</span>'+
-   '<span><i class="sw" style="background:rgba(255,255,255,.05);box-shadow:inset 0 0 0 1px rgba(255,255,255,.10),inset 3px 0 0 0 #616B77"></i>завершённые</span>'+
-   '<span><i class="sw" style="background:repeating-linear-gradient(135deg,rgba(216,167,46,.9) 0 4px,#16191D 4px 8px)"></i>ремонт и ТО</span>'+
+   '<div class="legend"><span><i class="sw" style="background:var(--panel3);box-shadow:inset 0 0 0 1px var(--tint2),inset 3px 0 0 0 #F5A524"></i>в аренде</span>'+
+   '<span><i class="sw" style="background:var(--tint);box-shadow:inset 0 0 0 1px var(--tint2),inset 3px 0 0 0 #616B77"></i>завершённые</span>'+
+   '<span><i class="sw" style="background:repeating-linear-gradient(135deg,rgba(216,167,46,.9) 0 4px,var(--panel2) 4px 8px)"></i>ремонт и ТО</span>'+
    '<span class="dim">клик по свободному дню — новая бронь · клик по полосе — договор</span></div>';
   bindCalNav();
   $$('#view [data-u]').forEach(el=>el.onclick=ev=>{ev.preventDefault();ev.stopPropagation();openUnit(el.dataset.u)});
@@ -1417,17 +1560,22 @@ const MON3=['янв','фев','мар','апр','май','июн','июл','ав
 function trendBuckets(from,to){
   const out=[], days=dayCount(from,to);
   if(days<=16){                                  // дни - иначе первые числа месяца дают один столбец
-    eachDay(from,to,d=>out.push({from:d,to:d,label:dmy(d).slice(0,5)}));
+    eachDay(from,to,d=>out.push({from:d,to:d,full:true,label:dmy(d).slice(0,5)}));
   }else if(days<=70){                            // недели
     let a=from;
     while(a<=to){ const b=minStr(addDays(a,6),to);
-      out.push({from:a,to:b,label:dmy(a).slice(0,5)}); a=addDays(b,1); }
+      out.push({from:a,to:b,full:dayCount(a,b)===7,label:dmy(a).slice(0,5)}); a=addDays(b,1); }
   }else{                                         // месяцы
     let a=monthStart(from);
     while(a<=to){
       const next=monthStart(addDays(monthEnd(a),1));
       const b=minStr(monthEnd(a),to), s=maxStr(a,from);
-      if(s<=b) out.push({from:s,to:b,label:MON3[+a.slice(5,7)-1]+(a.slice(5,7)==='01'||out.length===0?' '+a.slice(2,4):'')});
+      /* ПОЛНЫЙ ЛИ ЭТО МЕСЯЦ. Период 98 дней даёт корзины май/июн/июл/авг, и последняя - это
+         6 дней из 31. Раньше её столбик стоял рядом с полными месяцами без единой пометки, и
+         график заявлял, что август обвалился. Он не обвалился, он ещё идёт. */
+      if(s<=b) out.push({from:s,to:b,full:(s===a&&b===monthEnd(a)),
+        days:dayCount(s,b), span:dayCount(a,monthEnd(a)),
+        label:MON3[+a.slice(5,7)-1]+(a.slice(5,7)==='01'||out.length===0?' '+a.slice(2,4):'')});
       a=next;
     }
   }
@@ -1459,36 +1607,62 @@ function trendChart(from,to){
    Одна ось: обе величины в рублях. Две шкалы на одной картинке - самая частая ошибка в
    графиках и способ показать любую корреляцию, какую захочется. */
 function chartTrend(bk){
-  const W=1000,H=280,L=68,R=16,T=18,B=32, iw=W-L-R, ih=H-T-B;
-  const top=Math.max.apply(null,bk.map(b=>Math.max(b.rev,b.net)).concat([1]));
-  const bot=Math.min(0,Math.min.apply(null,bk.map(b=>b.net)));
-  const span=(top-bot)||1, y=v=>T+ih-(v-bot)/span*ih;
-  const bw=iw/bk.length, gap=Math.min(10,Math.max(2,bw*0.26)), w=bw-gap, rad=Math.min(4,w/2);
+  const W=1000,H=300,L=76,R=16,T=30,B=34, iw=W-L-R, ih=H-T-B;
+  /* СТОЛБИК = ВЫРУЧКА, а нижний тёмный сегмент = расходы. Раньше поверх столбиков шла
+     зелёная линия результата, и она была бесполезна: выручка 2 395 206 против результата
+     2 339 706 - это 97,7%, поэтому линия липла к вершинам, а в июне маркер садился ровно на
+     кромку. Интересна РАЗНИЦА (расходы 55 500), и теперь её видно как сегмент у основания.
+     Верх окрашен статусом: зелёный - заработали, красный - ушли в минус. */
+  const lo=Math.min(0,Math.min.apply(null,bk.map(b=>Math.min(b.net,b.rev)))); 
+  const hi=Math.max.apply(null,bk.map(b=>Math.max(b.rev,b.net)).concat([1]));
+  const N=niceTicks(lo,hi,4), span=(N.hi-N.lo)||1, y=v=>T+ih-(v-N.lo)/span*ih;
+  /* ШИРИНА СТОЛБИКА ОГРАНИЧЕНА. Четыре корзины на 900px дали столбики по 213px - это уже
+     не марка данных, а заливка. Ширина упирается в 84px и столбик встаёт по центру своей
+     дорожки, поэтому число корзин меняет их количество, а не их массу. */
+  const bw=iw/bk.length, w=Math.min(84,bw*0.62), rad=2;
   const y0=y(0);
-  let grid='';
-  for(let i=0;i<=4;i++){ const v=bot+span*i/4, yy=y(v), zero=Math.abs(v)<1e-6;
-    grid+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+yy+'" y2="'+yy+'" stroke="rgba(255,255,255,'+(zero?'.24':'.06')+')" stroke-width="1"/>'+
-          '<text x="'+(L-12)+'" y="'+(yy+4)+'" text-anchor="end" class="ax">'+short(v)+'</text>'; }
-  /* столбик - path, а не rect: rx у rect скругляет и низ тоже, а низ должен стоять на нуле */
-  const bars=bk.map((b,i)=>{const x=L+i*bw+gap/2, yv=y(b.rev), h=Math.max(1,y0-yv), r=Math.min(rad,h);
-    return '<path d="M'+x+' '+y0+'V'+(yv+r)+'a'+r+' '+r+' 0 0 1 '+r+' -'+r+'h'+(w-2*r)+'a'+r+' '+r+' 0 0 1 '+r+' '+r+'V'+y0+'Z" fill="url(#gRev)"/>';}).join('');
+  const grid=N.ticks.map(v=>{const yy=y(v), zero=Math.abs(v)<1e-9;
+    return '<line x1="'+L+'" x2="'+(W-R)+'" y1="'+yy+'" y2="'+yy+'" class="'+(zero?'gz':'gl')+'"/>'+
+           '<text x="'+(L-12)+'" y="'+(yy+4)+'" text-anchor="end" class="ax">'+short(v)+'</text>';}).join('');
   const cx=i=>L+i*bw+bw/2;
-  const pts=bk.map((b,i)=>cx(i)+','+y(b.net)).join(' ');
-  const dots=bk.map((b,i)=>'<circle cx="'+cx(i)+'" cy="'+y(b.net)+'" r="4" fill="'+(b.net<0?'#E5484D':'#3FB980')+'" stroke="#16191D" stroke-width="2"/>').join('');
+  const bars=bk.map((b,i)=>{
+    const x=L+i*bw+(bw-w)/2;
+    const cost=Math.max(0,b.rev-b.net);
+    const partial=b.full===false;
+    /* СТОПКА СНИЗУ ВВЕРХ: расходы стоят на нуле, результат лежит на них, вершина = выручка.
+       Первый заход клался наоборот и читался как «расходы съели всё»: расходы здесь 55 500
+       против выручки 2 395 206 - 2,3% - а серым была залита почти вся высота. */
+    const yCost=y(cost), yTop=y(Math.max(b.rev,0));
+    let s='';
+    if(cost>0.004) s+='<rect x="'+x+'" y="'+yCost+'" width="'+w+'" height="'+Math.max(1,y0-yCost)+'" fill="var(--cost)"/>';
+    s+='<rect x="'+x+'" y="'+yTop+'" width="'+w+'" height="'+Math.max(1,yCost-yTop)+'" rx="'+rad+'" fill="var(--ok)"/>';
+    if(b.net<0) s='<rect x="'+x+'" y="'+y0+'" width="'+w+'" height="'+Math.max(1,y(b.net)-y0)+'" fill="var(--danger)"/>';
+    /* ЦИФРА НА СТОЛБИКЕ. Его замечание было «недостаточно деталей»: чтобы прочесть значение,
+       приходилось водить глазом от вершины к оси. Сумма и маржа стоят прямо над столбиком. */
+    const mg=b.rev>0.004?Math.round(b.net/b.rev*100):0;
+    s+='<text x="'+(x+w/2)+'" y="'+(yTop-10)+'" text-anchor="middle" class="bl">'+short(b.rev)+'</text>'+
+       '<text x="'+(x+w/2)+'" y="'+(yTop-25)+'" text-anchor="middle" class="bm">'+mg+'%</text>';
+    /* НЕПОЛНЫЙ ПЕРИОД штрихуется и подписывается - иначе он сравнивается как полный */
+    if(partial) s+='<rect x="'+x+'" y="'+yTop+'" width="'+w+'" height="'+Math.max(1,y0-yTop)+'" fill="url(#hatch)"/>'+
+      '<text x="'+(x+w/2)+'" y="'+(yTop-40)+'" text-anchor="middle" class="ax pt">неполный</text>';
+    return s;}).join('');
   const step=Math.ceil(bk.length/12);
-  const labs=bk.map((b,i)=>i%step?'':'<text x="'+cx(i)+'" y="'+(H-10)+'" text-anchor="middle" class="ax">'+esc(b.label)+'</text>').join('');
-  /* прозрачные полосы во всю высоту - цель для курсора крупнее самого столбика */
-  const hit=bk.map((b,i)=>'<rect class="hz" x="'+(L+i*bw)+'" y="'+T+'" width="'+bw+'" height="'+ih+'" fill="transparent"'+
-    ' data-tip="'+esc(b.label+' · выручка '+money(b.rev)+' · результат '+money(b.net)+' · загрузка '+Math.round(b.util*100)+'%')+'"/>').join('');
+  const labs=bk.map((b,i)=>i%step?'':'<text x="'+cx(i)+'" y="'+(H-10)+'" text-anchor="middle" class="ax">'+esc(b.label)+(b.full===false?' *':'')+'</text>').join('');
+  const hit=bk.map((b,i)=>{const m=b.rev>0.004?Math.round(b.net/b.rev*100):0;
+    return '<rect class="hz" x="'+(L+i*bw)+'" y="'+T+'" width="'+bw+'" height="'+ih+'" fill="transparent"'+
+    ' data-tip="'+esc(b.label+(b.full===false?' · неполный период'+(b.days?' ('+b.days+' из '+b.span+' дн.)':''):'')+
+      ' · выручка '+money(b.rev)+' · расходы '+money(Math.max(0,b.rev-b.net))+' · результат '+money(b.net)+' ('+m+'%)')+'"/>';}).join('');
+  const anyPartial=bk.some(b=>b.full===false);
   return '<div class="hd"><h2>Динамика за период</h2><span class="lgs">'+
-      '<i class="lg" style="background:linear-gradient(180deg,#F5A524,rgba(245,165,36,.3))"></i>выручка'+
-      '<i class="lg lg--dot" style="background:#3FB980"></i>результат</span></div>'+
-    '<div class="card chart"><svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" role="img" aria-label="Выручка и результат по периодам">'+
-    '<defs><linearGradient id="gRev" x1="0" y1="0" x2="0" y2="1">'+
-      '<stop offset="0" stop-color="#F5A524" stop-opacity=".92"/><stop offset="1" stop-color="#F5A524" stop-opacity=".26"/></linearGradient></defs>'+
-    grid+bars+
-    '<polyline points="'+pts+'" fill="none" stroke="#3FB980" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>'+
-    dots+labs+'<g class="crosshair"><line y1="'+T+'" y2="'+(T+ih)+'" stroke="rgba(255,255,255,.28)" stroke-width="1"/></g>'+hit+'</svg></div>';
+      '<i class="lg" style="background:var(--ok)"></i>результат'+
+      '<i class="lg" style="background:var(--cost)"></i>расходы'+
+      '<span class="lgn">высота столбика — выручка</span></span></div>'+
+    '<div class="card chart"><svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" role="img" aria-label="Выручка, расходы и результат по периодам">'+
+    '<defs><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">'+
+      '<line x1="0" y1="0" x2="0" y2="6" stroke="var(--panel)" stroke-width="3"/></pattern></defs>'+
+    grid+bars+labs+'<g class="crosshair"><line y1="'+T+'" y2="'+(T+ih)+'" stroke="var(--dim)" stroke-width="1"/></g>'+hit+'</svg>'+
+    (anyPartial?'<div class="chnote">* период ещё не закончился — столбик заштрихован и не сравним с полными месяцами</div>':'')+
+    '</div>';
 }
 
 /* ── 2. структура выручки по типам: донат ───────────────────────────────────
@@ -1534,7 +1708,7 @@ function chartHeat(units,buckets,M){
   if(buckets.length<3) return '';
   const step=Math.ceil(buckets.length/12);
   const cell=u=>{const k=clamp(u,0,1);
-    return k<0.02?'rgba(255,255,255,.05)':'rgba(245,165,36,'+(0.14+0.86*k).toFixed(3)+')';};
+    return k<0.02?'var(--tint)':'rgba(245,165,36,'+(0.14+0.86*k).toFixed(3)+')';};
   const rows=units.map((u,i)=>'<tr><th scope="row">'+esc(u.name)+'</th>'+
     buckets.map((b,j)=>{const e=M[i][j], k=e.ut.avail?e.ut.rent/e.ut.avail:0;
       return '<td><i style="background:'+cell(k)+'" data-tip="'+esc(u.name+' · '+b.label+' · загрузка '+Math.round(k*100)+'%')+'"></i></td>';}).join('')+'</tr>').join('');
@@ -1543,6 +1717,19 @@ function chartHeat(units,buckets,M){
       'меньше<i class="lg lg--ramp"></i>больше</span></div>'+
     '<div class="card chart chart--heat"><table class="heat"><thead><tr><th></th>'+head+'</tr></thead>'+
     '<tbody>'+rows+'</tbody></table></div>';
+}
+/* ОСЬ, КОТОРУЮ МОЖНО ПОКАЗАТЬ. Тиков-функции в файле не было вообще - деления считались как
+   max*k/4, поэтому ось читалась 0 / 351 тыс / 701 тыс / 1,1 млн / 1,4 млн. Никто не выпускает
+   «701 тыс». Шаг округляется вверх до 1/2/2.5/5/10 x 10^n, то есть до числа, которое человек
+   и так держит в голове, и ось становится 0 / 400 тыс / 800 тыс / 1,2 млн. */
+function niceTicks(lo,hi,want){
+  want=want||4;
+  if(!(hi>lo)) hi=lo+1;
+  const raw=(hi-lo)/want, mag=Math.pow(10,Math.floor(Math.log10(raw))), n=raw/mag;
+  const step=(n<=1?1:n<=2?2:n<=2.5?2.5:n<=5?5:10)*mag;
+  const start=Math.floor(lo/step)*step, end=Math.ceil(hi/step)*step, out=[];
+  for(let v=start;v<=end+step*1e-9;v+=step) out.push(Math.abs(v)<step*1e-9?0:v);
+  return {ticks:out, lo:start, hi:end};
 }
 const short=v=>Math.abs(v)>=1e6?fmt(v/1e6,1)+' млн':(Math.abs(v)>=1e3?Math.round(v/1e3)+' тыс':String(Math.round(v)));
 
@@ -2084,7 +2271,7 @@ function printDogovor(id){
   const c=contract(id); if(!c)return;
   const u=unit(c.unitId), cl=client(c.clientId), o=db.ui.org||{};
   const unitName=c.rateMode==='hour'?'машино-час':(c.rateMode==='shift'?'смену':'сутки');
-  const days=Math.max(1,dayDiff(c.from,c.to)+1);
+  const days=Math.max(1,daysBetween(c.from,c.to)+1);
   const terms=[];
   if(c.rateMode==='hour'&&c.minShift) terms.push('минимальная оплачиваемая смена — '+fmt(c.minShift,1)+' ч');
   if((c.otMult||1)>1) terms.push('переработка сверх '+(c.rateMode==='hour'?fmt(c.otAfter||0,1)+' ч':'нормы')+' оплачивается с коэффициентом '+fmt(c.otMult,2));
@@ -2230,143 +2417,18 @@ console.log('Проверка сумм прописью:',WORDS_TESTS.map(v=>v+'
 
 
 
+
+/* ТЕМА. Выбор запоминается: посмотреть демо в светлой, закрыть вкладку и вернуться в тёмную -
+   это не демо, а сброс настроек. Ключ отдельный от данных, чтобы очистка демо-базы не
+   сбрасывала оформление. */
+const THKEY='park.theme';
+function applyTheme(v){
+  document.documentElement.classList.toggle('light', v==='light');
+  $$('.thm button').forEach(b=>b.setAttribute('aria-pressed', String(b.dataset.thm===v)));
+  try{ localStorage.setItem(THKEY,v); }catch(e){}
+}
+document.addEventListener('click',e=>{const b=e.target.closest('.thm button'); if(b) applyTheme(b.dataset.thm);});
+(function(){ let v='dark'; try{ v=localStorage.getItem(THKEY)||'dark'; }catch(e){} applyTheme(v); })();
 </script>
 </body>
 </html>
-<style>
-/* ═══ ВИД: атмосфера вместо плоского чёрного ═════════════════════════════════
-   Приём взят из герой-секции, которую он прислал (21st.dev): огромные размытые
-   градиентные пятна за интерфейсом плюс зерно. Но взят ПРИЁМ, а не компонент —
-   тот на React, Tailwind и motion, а этот файл обязан работать офлайн одним
-   куском. Три радужных пятна на финансовой панели читались бы как игрушка,
-   поэтому здесь их два, приглушённых, и они стоят ЗА панелями: цвет виден в
-   промежутках и по краям, а числа остаются на спокойном тёмном.
-
-   Его замечания, по пунктам: текст был серым — стал белым; было «жёстко, как
-   будто ИИ рисовал» — добавлены скругления, стеклянные поверхности и цвет;
-   цветов было мало — теперь их два семейства, тёплое и холодное. */
-
-body::before{
-  content:'';position:fixed;inset:-20% -10% auto -10%;height:70vh;z-index:0;
-  pointer-events:none;filter:blur(90px);opacity:.42;
-  background:
-    radial-gradient(38rem 12rem at 18% 22%, #7c4dff 0%, transparent 68%),
-    radial-gradient(42rem 12rem at 74% 8%,  #ff7a4d 0%, transparent 66%),
-    radial-gradient(34rem 11rem at 52% 34%, #1fa2ff 0%, transparent 70%);
-}
-body::after{
-  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.055;
-  /* зерно: одна маленькая SVG-турбулентность, никаких картинок */
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-#app,#nav,.modal,.toast{position:relative;z-index:1}
-
-/* ТЕКСТ БЕЛЫЙ, а не серый — его прямое замечание. Приглушённый остаётся
-   приглушённым, но поднят настолько, чтобы читаться на стекле. */
-:root{
-  --muted:#E3ECF3; --dim:#B6C4D1; --steel:#8FA0AE;
-  --panel:rgba(24,29,35,.72); --panel2:rgba(31,38,46,.78); --panel3:rgba(41,49,58,.85);
-  --lc:rgba(255,255,255,.14); --line:1px solid rgba(255,255,255,.14);
-  --ok:#4FD69C; --danger:#FF6B6B; --warn:#F2C14E; --acc:#FFB43D;
-}
-/* стекло: панели пропускают пятна за собой, поэтому цвет живёт в интерфейсе,
-   а не только в фоне */
-.card,.kpi,.modal>div,.seg,#nav{
-  backdrop-filter:blur(18px) saturate(1.35);
-  -webkit-backdrop-filter:blur(18px) saturate(1.35);
-}
-.card,.kpi{border-radius:16px}
-.card:hover{border-color:rgba(255,255,255,.2)}
-
-/* КНОПКИ — таблетки, как в присланном примере */
-.btn{border-radius:999px;min-height:44px;padding:11px 20px;transition:transform .12s ease,filter .15s ease}
-.btn.sm{min-height:38px;padding:9px 16px;border-radius:999px}
-.btn:active{transform:scale(.97)}
-.btn.pri{background:linear-gradient(135deg,#FFC65C,#FF8A3D);color:#171310;border:0;font-weight:700}
-.btn.pri:hover{filter:brightness(1.07)}
-.seg button{border-radius:999px;min-height:38px}
-.x{min-width:44px;min-height:44px;border-radius:999px}
-.navb{min-height:44px;border-radius:12px}
-
-/* цифры KPI — градиентом, чтобы главный экран не был одноцветным */
-.kpi .val{
-  background:linear-gradient(180deg,#FFFFFF 0%,#C7D8E6 100%);
-  -webkit-background-clip:text;background-clip:text;color:transparent}
-.kpi .val.danger{background:linear-gradient(180deg,#FF9B9B,#E5484D);
-  -webkit-background-clip:text;background-clip:text;color:transparent}
-.kpi .val.ok{background:linear-gradient(180deg,#8FF3C6,#3FB980);
-  -webkit-background-clip:text;background-clip:text;color:transparent}
-
-/* таблицы: строка подсвечивается тёплым, а не серым */
-tbody tr:hover{background:linear-gradient(90deg,rgba(255,180,61,.09),transparent 60%)}
-thead th{color:var(--dim)}
-
-@media (prefers-reduced-transparency:reduce){
-  body::before,body::after{display:none}
-  .card,.kpi,.modal>div,.seg,#nav{backdrop-filter:none;-webkit-backdrop-filter:none;
-    background:#16191D}
-}
-@media (prefers-reduced-motion:reduce){.btn{transition:none}}
-
-/* ── графики ──────────────────────────────────────────────────────────────
-   preserveAspectRatio="none" on the SVG means the viewBox stretches to whatever width the card
-   has, so a fixed aspect-ratio here is what stops it squashing to a stripe on a wide screen. */
-.chart{padding:14px 16px 10px}
-.chart svg{display:block;width:100%;height:auto;aspect-ratio:1000/280;overflow:visible}
-.chart svg text{font-family:var(--ui);letter-spacing:0}
-.chart .ax{fill:var(--dim);font-size:12px}
-.chart .dnum{fill:var(--text);font-size:26px;font-weight:600;font-family:var(--mono)}
-/* полоса-цель во всю высоту: попасть в неё курсором легче, чем в столбик шириной 8px */
-.hz{cursor:crosshair}
-.hz:hover{fill:rgba(255,255,255,.045)}
-.crosshair{opacity:0;transition:opacity .12s ease}
-.chart svg:hover .crosshair{opacity:1}
-.lgs{display:flex;align-items:center;color:var(--dim);font-size:12.5px}
-.lg{display:inline-block;width:11px;height:11px;border-radius:3px;margin:0 6px 0 16px;
-  vertical-align:-1px}
-.lg--dot{width:9px;height:9px;border-radius:50%}
-.lg--ramp{width:74px;height:9px;border-radius:5px;margin:0 8px;
-  background:linear-gradient(90deg,rgba(255,255,255,.06),rgba(245,165,36,.35),#F5A524)}
-
-/* донат: пропорция за один взгляд, точные числа - в легенде справа и в таблице ниже */
-.chart--mix{display:flex;gap:26px;align-items:center;flex-wrap:wrap}
-.chart--mix svg{flex:0 0 260px;width:260px;aspect-ratio:1}
-.chart--mix .sl{transition:opacity .16s ease}
-.chart--mix svg:hover .sl{opacity:.45}
-.chart--mix svg .sl:hover{opacity:1}
-.lgd{flex:1 1 260px;min-width:240px;display:flex;flex-direction:column;gap:9px}
-.lrow{display:flex;align-items:center;gap:9px;font-size:13px}
-.lrow i{width:11px;height:11px;border-radius:3px;flex:0 0 auto}
-.lrow .lt{flex:1 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.lrow b{flex:0 0 42px;text-align:right}
-.lrow .dim{flex:0 0 108px;text-align:right;font-size:12px}
-
-/* теплокарта: одна ячейка = единица за период. Сетка, а не 300 отдельных SVG. */
-.chart--heat{overflow-x:auto}
-/* table-layout:fixed - иначе колонки с подписью месяца становятся шире соседних, и решётка
-   выглядит рваной: ширину задаёт содержимое заголовка, а не данные */
-table.heat{border-collapse:separate;border-spacing:2px;width:100%;min-width:520px;
-  table-layout:fixed}
-table.heat th:first-child,table.heat td:first-child{width:168px}
-table.heat th{font-weight:400;color:var(--dim);font-size:11px;text-align:center;padding:0}
-table.heat tbody th{text-align:left;white-space:nowrap;padding-right:10px;font-size:12px;
-  max-width:170px;overflow:hidden;text-overflow:ellipsis}
-table.heat td{padding:0}
-table.heat td i{display:block;height:20px;border-radius:3px;min-width:9px}
-table.heat td i:hover{outline:2px solid var(--text);outline-offset:-1px}
-
-/* одна подсказка на все графики: 300 ячеек с нативным title - это 300 узлов и задержка
-   браузера в секунду перед показом */
-#tip{position:fixed;z-index:90;pointer-events:none;opacity:0;transform:translate(-50%,-140%);
-  background:#0B0E11;border:var(--line);border-radius:8px;padding:7px 10px;font-size:12.5px;
-  color:var(--text);box-shadow:0 10px 30px rgba(0,0,0,.55);white-space:nowrap;
-  transition:opacity .1s ease}
-#tip.on{opacity:1}
-
-/* теплокарта заменила полосу загрузки: та показывала парк одним числом за период, а вопрос
-   владельца - какая ИМЕННО единица простаивает. */
-}
-@media (prefers-reduced-motion:reduce){
-  .crosshair,.chart--mix .sl,#tip{transition:none}
-}
-</style>
