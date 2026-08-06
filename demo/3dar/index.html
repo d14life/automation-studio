@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="ru">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>STUDIO 3DAR — креативная студия архитектурной визуализации</title>
+<style>
+/* PUBLISHED COPY. Two things differ from ~/studio3dar-scroll/site.html, and both exist because
+   this URL is for sending to people rather than for tuning:
+
+   1. The dev bar is hidden. It is a workbench - a runway slider and five encode tiers, four of
+      which have no file here - and a visitor should see the studio, not the workshop. Delete
+      the one rule below to bring it back.
+   2. review/v/ARC.mp4 is a re-encode, not the original. The original is 64MB and 777 of 777
+      keyframes; this is the same footage with a keyframe every 10 frames, 30MB, and it scrubs
+      no slower because at 1080p the decoder is not the bottleneck. */
+.dev{display:none!important}
+
+*{box-sizing:border-box}
+html{scroll-behavior:auto}
+body{margin:0;background:#0a0b0d;color:#f2f2f3;
+  font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased}
+h1,h2,h3{margin:0;font-weight:600;letter-spacing:-.01em}
+
+/* ---------- nav ---------- */
+nav{position:fixed;top:0;left:0;right:0;z-index:40;display:flex;align-items:center;gap:28px;
+  padding:18px 32px;font-size:12px;letter-spacing:.14em;
+  background:linear-gradient(to bottom,rgba(10,11,13,.72),transparent);
+  transition:background .3s}
+nav.solid{background:rgba(10,11,13,.92);backdrop-filter:blur(12px);border-bottom:1px solid #1a1e24}
+nav .mark{width:52px;color:#fff;margin-right:auto}
+nav .mark svg{display:block;width:100%;height:auto}
+nav a{color:#9aa2ab;text-decoration:none;white-space:nowrap}
+nav a:hover{color:#fff}
+nav .cta{color:#fff;border:1px solid #2f363f;padding:8px 16px;border-radius:999px}
+nav .cta:hover{background:#fff;color:#0a0b0d;border-color:#fff}
+@media(max-width:860px){nav .hide{display:none}}
+
+/* ---------- hero: scroll-scrubbed flight ---------- */
+#scene{position:relative}
+#stage{position:sticky;top:0;height:100vh;overflow:hidden;background:#000}
+#stage video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+#veil{position:absolute;inset:0;
+  background:linear-gradient(to bottom,rgba(10,11,13,.55) 0%,transparent 34%,transparent 60%,rgba(10,11,13,.9) 100%)}
+#logo{position:absolute;top:27%;left:50%;width:clamp(170px,20vw,380px);
+  transform:translate(-50%,-50%);will-change:transform,opacity;pointer-events:none}
+#logo svg{display:block;width:100%;height:auto;color:#fff}
+/* ---------- liquid glass, recipe lifted from solutions101/app/src/site.css ----------
+   A near-clear pane over a blurred, slightly brightened backdrop, with a hairline rim.
+   Deliberately NO url()/SVG displacement filter: their notes record that stacking one on a
+   backdrop forces the browser to re-read and re-raster everything behind it every frame, and
+   behind this sits a video being scrubbed - nothing could ever be cached. Blur + rim carry it. */
+.glass{position:relative;isolation:isolate;border-radius:22px;
+  /* solutions101 puts white .085 over a dark page; here the backdrop is a bright lit Earth,
+     so the white sheen alone left the headline unreadable. A soft dark tint under the sheen
+     keeps the pane translucent and still blurring, and guarantees contrast at every frame. */
+  background:linear-gradient(rgba(10,12,16,.40),rgba(10,12,16,.24)),rgba(255,255,255,.085);
+  -webkit-backdrop-filter:blur(5px) brightness(1.06);
+  backdrop-filter:blur(5px) brightness(1.06);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.42), inset 0 -1px 0 rgba(255,255,255,.10),
+             0 10px 34px rgba(0,0,0,.45)}
+.glass::after{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  padding:1px;background:linear-gradient(150deg,rgba(255,255,255,.7),rgba(255,255,255,.06) 45%,
+    rgba(223,246,255,.5));
+  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  mask-composite:exclude}
+.glass>*{position:relative;z-index:1}
+
+#tag{position:absolute;left:50%;bottom:9vh;transform:translateX(-50%);
+  width:min(680px,calc(100% - 40px));padding:32px clamp(22px,3.4vw,44px) 34px;
+  text-align:center;will-change:transform,opacity}
+#tag h1{font-size:clamp(19px,2.7vw,38px);line-height:1.16;letter-spacing:.02em;
+  max-width:18ch;margin:0 auto}
+#tag p{margin:18px auto 0;max-width:52ch;color:#dfe4ea;font-size:clamp(13px,1.1vw,16.5px)}
+#tag .row{display:flex;gap:12px;justify-content:center;margin-top:26px;flex-wrap:wrap}
+#tag .row a{font-size:12px;letter-spacing:.14em;text-decoration:none;color:#fff;
+  padding:12px 22px;border-radius:999px;background:rgba(255,255,255,.13);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.5);transition:background .2s}
+#tag .row a:hover{background:rgba(255,255,255,.24)}
+#tag .row a.solid{background:#fff;color:#0a0b0d;box-shadow:none}
+#tag .row a.solid:hover{background:#dfe4ea}
+
+/* a weak GPU cannot re-blur a scrubbing video: drop to flat glass instead of live glass */
+@media (prefers-reduced-transparency:reduce){
+  .glass{backdrop-filter:none;-webkit-backdrop-filter:none;background:rgba(16,19,24,.72)}
+}
+#hint{position:absolute;left:50%;bottom:26px;transform:translateX(-50%);
+  font-size:11px;letter-spacing:.2em;color:#8b939c;display:flex;align-items:center;gap:8px}
+#hint i{display:block;width:1px;height:26px;background:linear-gradient(#8b939c,transparent)}
+#bar{position:absolute;left:0;bottom:0;height:2px;width:0;background:#fff;opacity:.8}
+
+/* ---------- content ---------- */
+main{position:relative;z-index:2;background:#0a0b0d}
+.wrap{max-width:1180px;margin:0 auto;padding:0 32px}
+section.blk{padding:110px 0;border-top:1px solid #16191f}
+.eyebrow{font-size:11px;letter-spacing:.2em;color:#6f7883;margin-bottom:22px}
+h2.big{font-size:clamp(24px,3.4vw,46px);line-height:1.1;max-width:22ch}
+
+.svc{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1px;
+  margin-top:56px;background:#16191f;border:1px solid #16191f}
+.svc article{background:#0a0b0d;padding:34px 28px 40px;transition:background .25s}
+.svc article:hover{background:#0e1014}
+.svc h3{font-size:15px;letter-spacing:.08em;margin-bottom:16px}
+.svc .num{font-size:11px;color:#5c6470;margin-bottom:20px;font-variant-numeric:tabular-nums}
+.svc p{margin:0;color:#a8b0b9;font-size:14px;line-height:1.65}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:40px;margin-top:8px}
+.stats div b{display:block;font-size:clamp(38px,5.6vw,74px);line-height:1;letter-spacing:-.03em;font-weight:600}
+.stats div span{display:block;margin-top:14px;font-size:11px;letter-spacing:.14em;color:#7d858e;max-width:18ch}
+
+.faq{margin-top:48px;border-top:1px solid #16191f}
+.faq details{border-bottom:1px solid #16191f}
+.faq summary{cursor:pointer;padding:26px 40px 26px 0;font-size:14px;letter-spacing:.05em;
+  position:relative;list-style:none}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:'+';position:absolute;right:6px;top:50%;transform:translateY(-50%);
+  font-size:20px;color:#6f7883}
+.faq details[open] summary::after{content:'\2212'}
+.faq .ans{padding:0 0 26px;color:#8b939c;font-size:14px;max-width:70ch}
+
+.contact{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:36px;margin-top:48px}
+.contact a,.contact span{display:block;color:#f2f2f3;text-decoration:none;font-size:19px}
+.contact a:hover{color:#9aa2ab}
+.contact .lbl{font-size:11px;letter-spacing:.16em;color:#6f7883;margin-bottom:12px}
+.mess{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.mess a{font-size:12px;letter-spacing:.08em;border:1px solid #2f363f;border-radius:999px;padding:7px 15px}
+
+footer{padding:44px 0 60px;border-top:1px solid #16191f;color:#5c6470;font-size:12px;
+  display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+
+/* ---------- dev control bar ---------- */
+.dev{position:fixed;bottom:0;left:0;right:0;z-index:50;display:flex;align-items:center;gap:14px;
+  flex-wrap:wrap;padding:10px 20px;background:rgba(10,11,13,.94);backdrop-filter:blur(10px);
+  border-top:1px solid #1a1e24;font-size:12px;color:#8b939c}
+.dev label b{color:#f2f2f3;font-variant-numeric:tabular-nums}
+.dev input[type=range]{flex:1;min-width:160px;accent-color:#fff}
+.dev button{font:inherit;padding:5px 11px;border-radius:6px;cursor:pointer;
+  background:#161b21;color:#8b939c;border:1px solid #232a33}
+.dev button.on{background:#fff;color:#0a0b0d;border-color:#fff}
+.dev button:disabled{opacity:.35;cursor:not-allowed}
+@media (prefers-reduced-motion:reduce){#stage{height:100vh}#hint{display:none}}
+</style>
+<body>
+
+<nav id="nav">
+  <div class="mark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 81.5 38" fill="none" role="img" aria-label="3DAR">
+      <path d="M20.8 0H30.4436C33.5103 0 35.7827 0.796191 37.2606 2.38857C38.7755 3.98095 39.533 6.31524 39.533 9.39143V28.6086C39.533 31.6848 38.7755 34.019 37.2606 35.6114C35.7827 37.2038 33.5103 38 30.4436 38H20.8V0ZM26.8965 5.42857V32.5714H30.3327C31.2934 32.5714 32.0508 32.3 32.6051 31.7571C33.1593 31.2143 33.4364 30.2552 33.4364 28.88V9.12C33.4364 7.74476 33.1593 6.78571 32.6051 6.24286C32.0508 5.7 31.2934 5.42857 30.3327 5.42857H26.8965Z" fill="currentColor"/>
+      <path d="M61.4918 38H55.3398L54.2868 31.1057H46.8046L45.7516 38H40.1539L46.3613 0H55.2844L61.4918 38ZM47.5806 25.9486H53.4554L50.518 6.73143L47.5806 25.9486Z" fill="currentColor"/>
+      <path d="M75.4155 38C75.3416 37.7467 75.2677 37.5114 75.1938 37.2943C75.1199 37.0771 75.046 36.8057 74.9721 36.48C74.9352 36.1543 74.8982 35.7381 74.8613 35.2314C74.8613 34.7248 74.8613 34.0914 74.8613 33.3314V27.36C74.8613 25.5867 74.5472 24.3381 73.9191 23.6143C73.291 22.8905 72.2749 22.5286 70.8708 22.5286H68.7647V38H62.6682V0H71.8684C75.046 0 77.3368 0.72381 78.7409 2.17143C80.1819 3.61905 80.9024 5.80857 80.9024 8.74V11.7257C80.9024 15.6343 79.5722 18.2038 76.9119 19.4343C78.4638 20.0495 79.5168 21.0629 80.0711 22.4743C80.6622 23.8495 80.9578 25.5324 80.9578 27.5229V33.3857C80.9578 34.3267 80.9948 35.159 81.0687 35.8829C81.1426 36.5705 81.3273 37.2762 81.6229 38H75.4155ZM68.7647 5.42857V17.1H71.1479C72.2933 17.1 73.1801 16.8105 73.8082 16.2314C74.4733 15.6524 74.8059 14.6029 74.8059 13.0829V9.33715C74.8059 7.96191 74.5472 6.96667 74.0299 6.35143C73.5496 5.73619 72.7737 5.42857 71.7022 5.42857H68.7647Z" fill="currentColor"/>
+      <path d="M18.733 2.58854e-06V38H9.08935C6.0226 38 3.75021 37.2037 2.27226 35.6113C0.757414 34.0189 0 31.6847 0 28.6085V24.2689H6.0966V28.8801C6.09662 30.2553 6.37367 31.2144 6.92789 31.7572C7.48211 32.3 8.23952 32.5714 9.20014 32.5714H12.6364V5.42857H9.20014C8.23952 5.42858 7.48211 5.69999 6.92789 6.2428C6.37367 6.78564 6.09662 7.7447 6.0966 9.11986V14.3697H0V9.39148C0 6.31534 0.757414 3.9811 2.27226 2.38872C3.75021 0.796342 6.0226 2.58854e-06 9.08935 2.58854e-06H18.733Z" fill="currentColor"/>
+      <path d="M6.27903 16.9244H13.1254V21.0756H6.27903V16.9244Z" fill="currentColor"/>
+      <path d="M95.8391 32.5845C96.8278 32.5845 97.6036 32.839 98.1665 33.3479C98.7222 33.8568 99 34.592 99 35.5533C99 36.0763 98.9314 36.5358 98.7943 36.9316C98.6572 37.3275 98.5057 37.6349 98.3397 37.8541H97.1381C97.4051 37.5925 97.6216 37.2462 97.7876 36.815C97.9464 36.3838 98.0258 35.942 98.0258 35.4897C98.0258 34.8959 97.8273 34.4294 97.4304 34.0901C97.0335 33.7508 96.5031 33.5812 95.8391 33.5812C95.3196 33.5812 94.883 33.7049 94.5293 33.9523C94.1685 34.1926 93.7608 34.6556 93.3061 35.3412C92.801 36.1258 92.3969 36.663 92.0938 36.9528C91.7907 37.2356 91.4515 37.4582 91.0762 37.6208C90.701 37.7763 90.2535 37.8541 89.734 37.8541C88.8896 37.8541 88.1932 37.5749 87.6448 37.0164C87.0891 36.458 86.8112 35.7477 86.8112 34.8853C86.8112 33.9593 87.035 33.1853 87.4824 32.5633L88.3808 33.0829C87.9839 33.6625 87.7855 34.2774 87.7855 34.9277C87.7855 35.5215 87.9659 35.9951 88.3267 36.3485C88.6803 36.7019 89.1494 36.8786 89.734 36.8786C90.2535 36.8786 90.6901 36.7584 91.0438 36.5181C91.3901 36.2778 91.8123 35.7689 92.3103 34.9913C92.8226 34.2279 93.234 33.7049 93.5443 33.4221C93.8474 33.1394 94.1866 32.9309 94.5618 32.7966C94.9299 32.6552 95.3556 32.5845 95.8391 32.5845Z" fill="currentColor"/>
+      <path d="M98.0474 29.0106C98.0474 28.6996 98.0041 28.4239 97.9175 28.1836H98.7835C98.9278 28.4946 99 28.8939 99 29.3817C99 30.5692 98.0943 31.1629 96.283 31.1629H87.9479V32.202H87.3417L87.0386 31.1841L84.2458 30.8554V30.1557H87.0386V28.332H87.9479V30.1557H95.9907C96.7845 30.1557 97.3258 30.0708 97.6144 29.9012C97.9031 29.7316 98.0474 29.4347 98.0474 29.0106Z" fill="currentColor"/>
+      <path d="M87.0386 26.253H94.7025C95.8644 26.253 96.7124 26.1187 97.2464 25.8501C97.7804 25.5745 98.0474 25.1539 98.0474 24.5884C98.0474 23.719 97.6902 23.0828 96.9758 22.6799C96.2541 22.27 95.0922 22.065 93.4902 22.065H87.0386V21.0683H98.7835V21.9165L97.1381 22.0438V22.1286C97.7371 22.376 98.199 22.7188 98.5237 23.1571C98.8412 23.5953 99 24.0724 99 24.5884C99 25.5144 98.6644 26.193 97.9933 26.6241C97.3221 27.0482 96.2252 27.2603 94.7025 27.2603H87.0386V26.253Z" fill="currentColor"/>
+      <path d="M99 16.0524C99 18.286 96.9758 19.4029 92.9273 19.4029C90.9355 19.4029 89.42 19.1236 88.3808 18.5652C87.3344 18.0068 86.8112 17.1834 86.8112 16.0948C86.8112 15.5788 86.9628 15.0911 87.2659 14.6316C87.569 14.1651 87.9875 13.794 88.5216 13.5184V13.4335L87.2118 13.476H81.9401V12.4687H98.7835V13.2957L97.1381 13.3805V13.476C97.7371 13.7516 98.199 14.1086 98.5237 14.5468C98.8412 14.9851 99 15.4869 99 16.0524ZM98.1015 15.9888C98.1015 15.183 97.7227 14.5645 96.9649 14.1333C96.2 13.6951 95.0778 13.476 93.5984 13.476H92.9273C91.152 13.476 89.853 13.688 89.0303 14.1121C88.2004 14.5292 87.7855 15.1689 87.7855 16.0312C87.7855 16.8582 88.2293 17.452 89.1169 17.8125C89.9974 18.1729 91.2747 18.3532 92.9489 18.3532C94.6376 18.3532 95.9185 18.1659 96.7917 17.7912C97.6649 17.4166 98.1015 16.8158 98.1015 15.9888Z" fill="currentColor"/>
+      <path d="M98.7835 9.24464V10.2519H87.0386V9.24464H98.7835ZM83.7803 10.4003C83.4556 10.4003 83.203 10.3367 83.0226 10.2095C82.8421 10.0752 82.7519 9.90554 82.7519 9.70055C82.7519 9.50971 82.8421 9.35773 83.0226 9.24464C83.203 9.13154 83.4556 9.075 83.7803 9.075C84.0906 9.075 84.3396 9.13154 84.5272 9.24464C84.7076 9.35773 84.7978 9.50971 84.7978 9.70055C84.7978 9.90554 84.7076 10.0752 84.5272 10.2095C84.3396 10.3367 84.0906 10.4003 83.7803 10.4003Z" fill="currentColor"/>
+      <path d="M92.884 0.549595C94.8613 0.549595 96.3768 0.857073 97.4304 1.47203C98.4768 2.07991 99 2.95287 99 4.09089C99 5.21477 98.4768 6.07712 97.4304 6.67794C96.3768 7.27169 94.8613 7.56857 92.884 7.56857C88.8355 7.56857 86.8112 6.3952 86.8112 4.04848C86.8112 2.9458 87.3417 2.08698 88.4025 1.47203C89.4633 0.857073 90.9572 0.549595 92.884 0.549595ZM92.884 6.5189C94.5799 6.5189 95.8608 6.32099 96.7268 5.92515C97.5928 5.52932 98.0258 4.91083 98.0258 4.06968C98.0258 2.42273 96.3118 1.59926 92.884 1.59926C89.485 1.59926 87.7855 2.42273 87.7855 4.06968C87.7855 4.93204 88.2113 5.55759 89.0628 5.94636C89.9144 6.32805 91.1881 6.5189 92.884 6.5189Z" fill="currentColor"/>
+    </svg></div>
+  <a class="hide" href="#services">УСЛУГИ</a>
+  <a class="hide" href="#about">О НАС</a>
+  <a class="hide" href="#faq">FAQ</a>
+  <a class="hide" href="#contacts">КОНТАКТЫ</a>
+  <a class="cta" href="#contacts">СВЯЗАТЬСЯ</a>
+</nav>
+
+<div id="scene">
+  <div id="stage">
+    <video id="flight" playsinline muted preload="auto" disablepictureinpicture></video>
+    <div id="veil"></div>
+    <div id="logo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 81.5 38" fill="none" role="img" aria-label="3DAR">
+      <path d="M20.8 0H30.4436C33.5103 0 35.7827 0.796191 37.2606 2.38857C38.7755 3.98095 39.533 6.31524 39.533 9.39143V28.6086C39.533 31.6848 38.7755 34.019 37.2606 35.6114C35.7827 37.2038 33.5103 38 30.4436 38H20.8V0ZM26.8965 5.42857V32.5714H30.3327C31.2934 32.5714 32.0508 32.3 32.6051 31.7571C33.1593 31.2143 33.4364 30.2552 33.4364 28.88V9.12C33.4364 7.74476 33.1593 6.78571 32.6051 6.24286C32.0508 5.7 31.2934 5.42857 30.3327 5.42857H26.8965Z" fill="currentColor"/>
+      <path d="M61.4918 38H55.3398L54.2868 31.1057H46.8046L45.7516 38H40.1539L46.3613 0H55.2844L61.4918 38ZM47.5806 25.9486H53.4554L50.518 6.73143L47.5806 25.9486Z" fill="currentColor"/>
+      <path d="M75.4155 38C75.3416 37.7467 75.2677 37.5114 75.1938 37.2943C75.1199 37.0771 75.046 36.8057 74.9721 36.48C74.9352 36.1543 74.8982 35.7381 74.8613 35.2314C74.8613 34.7248 74.8613 34.0914 74.8613 33.3314V27.36C74.8613 25.5867 74.5472 24.3381 73.9191 23.6143C73.291 22.8905 72.2749 22.5286 70.8708 22.5286H68.7647V38H62.6682V0H71.8684C75.046 0 77.3368 0.72381 78.7409 2.17143C80.1819 3.61905 80.9024 5.80857 80.9024 8.74V11.7257C80.9024 15.6343 79.5722 18.2038 76.9119 19.4343C78.4638 20.0495 79.5168 21.0629 80.0711 22.4743C80.6622 23.8495 80.9578 25.5324 80.9578 27.5229V33.3857C80.9578 34.3267 80.9948 35.159 81.0687 35.8829C81.1426 36.5705 81.3273 37.2762 81.6229 38H75.4155ZM68.7647 5.42857V17.1H71.1479C72.2933 17.1 73.1801 16.8105 73.8082 16.2314C74.4733 15.6524 74.8059 14.6029 74.8059 13.0829V9.33715C74.8059 7.96191 74.5472 6.96667 74.0299 6.35143C73.5496 5.73619 72.7737 5.42857 71.7022 5.42857H68.7647Z" fill="currentColor"/>
+      <path d="M18.733 2.58854e-06V38H9.08935C6.0226 38 3.75021 37.2037 2.27226 35.6113C0.757414 34.0189 0 31.6847 0 28.6085V24.2689H6.0966V28.8801C6.09662 30.2553 6.37367 31.2144 6.92789 31.7572C7.48211 32.3 8.23952 32.5714 9.20014 32.5714H12.6364V5.42857H9.20014C8.23952 5.42858 7.48211 5.69999 6.92789 6.2428C6.37367 6.78564 6.09662 7.7447 6.0966 9.11986V14.3697H0V9.39148C0 6.31534 0.757414 3.9811 2.27226 2.38872C3.75021 0.796342 6.0226 2.58854e-06 9.08935 2.58854e-06H18.733Z" fill="currentColor"/>
+      <path d="M6.27903 16.9244H13.1254V21.0756H6.27903V16.9244Z" fill="currentColor"/>
+      <path d="M95.8391 32.5845C96.8278 32.5845 97.6036 32.839 98.1665 33.3479C98.7222 33.8568 99 34.592 99 35.5533C99 36.0763 98.9314 36.5358 98.7943 36.9316C98.6572 37.3275 98.5057 37.6349 98.3397 37.8541H97.1381C97.4051 37.5925 97.6216 37.2462 97.7876 36.815C97.9464 36.3838 98.0258 35.942 98.0258 35.4897C98.0258 34.8959 97.8273 34.4294 97.4304 34.0901C97.0335 33.7508 96.5031 33.5812 95.8391 33.5812C95.3196 33.5812 94.883 33.7049 94.5293 33.9523C94.1685 34.1926 93.7608 34.6556 93.3061 35.3412C92.801 36.1258 92.3969 36.663 92.0938 36.9528C91.7907 37.2356 91.4515 37.4582 91.0762 37.6208C90.701 37.7763 90.2535 37.8541 89.734 37.8541C88.8896 37.8541 88.1932 37.5749 87.6448 37.0164C87.0891 36.458 86.8112 35.7477 86.8112 34.8853C86.8112 33.9593 87.035 33.1853 87.4824 32.5633L88.3808 33.0829C87.9839 33.6625 87.7855 34.2774 87.7855 34.9277C87.7855 35.5215 87.9659 35.9951 88.3267 36.3485C88.6803 36.7019 89.1494 36.8786 89.734 36.8786C90.2535 36.8786 90.6901 36.7584 91.0438 36.5181C91.3901 36.2778 91.8123 35.7689 92.3103 34.9913C92.8226 34.2279 93.234 33.7049 93.5443 33.4221C93.8474 33.1394 94.1866 32.9309 94.5618 32.7966C94.9299 32.6552 95.3556 32.5845 95.8391 32.5845Z" fill="currentColor"/>
+      <path d="M98.0474 29.0106C98.0474 28.6996 98.0041 28.4239 97.9175 28.1836H98.7835C98.9278 28.4946 99 28.8939 99 29.3817C99 30.5692 98.0943 31.1629 96.283 31.1629H87.9479V32.202H87.3417L87.0386 31.1841L84.2458 30.8554V30.1557H87.0386V28.332H87.9479V30.1557H95.9907C96.7845 30.1557 97.3258 30.0708 97.6144 29.9012C97.9031 29.7316 98.0474 29.4347 98.0474 29.0106Z" fill="currentColor"/>
+      <path d="M87.0386 26.253H94.7025C95.8644 26.253 96.7124 26.1187 97.2464 25.8501C97.7804 25.5745 98.0474 25.1539 98.0474 24.5884C98.0474 23.719 97.6902 23.0828 96.9758 22.6799C96.2541 22.27 95.0922 22.065 93.4902 22.065H87.0386V21.0683H98.7835V21.9165L97.1381 22.0438V22.1286C97.7371 22.376 98.199 22.7188 98.5237 23.1571C98.8412 23.5953 99 24.0724 99 24.5884C99 25.5144 98.6644 26.193 97.9933 26.6241C97.3221 27.0482 96.2252 27.2603 94.7025 27.2603H87.0386V26.253Z" fill="currentColor"/>
+      <path d="M99 16.0524C99 18.286 96.9758 19.4029 92.9273 19.4029C90.9355 19.4029 89.42 19.1236 88.3808 18.5652C87.3344 18.0068 86.8112 17.1834 86.8112 16.0948C86.8112 15.5788 86.9628 15.0911 87.2659 14.6316C87.569 14.1651 87.9875 13.794 88.5216 13.5184V13.4335L87.2118 13.476H81.9401V12.4687H98.7835V13.2957L97.1381 13.3805V13.476C97.7371 13.7516 98.199 14.1086 98.5237 14.5468C98.8412 14.9851 99 15.4869 99 16.0524ZM98.1015 15.9888C98.1015 15.183 97.7227 14.5645 96.9649 14.1333C96.2 13.6951 95.0778 13.476 93.5984 13.476H92.9273C91.152 13.476 89.853 13.688 89.0303 14.1121C88.2004 14.5292 87.7855 15.1689 87.7855 16.0312C87.7855 16.8582 88.2293 17.452 89.1169 17.8125C89.9974 18.1729 91.2747 18.3532 92.9489 18.3532C94.6376 18.3532 95.9185 18.1659 96.7917 17.7912C97.6649 17.4166 98.1015 16.8158 98.1015 15.9888Z" fill="currentColor"/>
+      <path d="M98.7835 9.24464V10.2519H87.0386V9.24464H98.7835ZM83.7803 10.4003C83.4556 10.4003 83.203 10.3367 83.0226 10.2095C82.8421 10.0752 82.7519 9.90554 82.7519 9.70055C82.7519 9.50971 82.8421 9.35773 83.0226 9.24464C83.203 9.13154 83.4556 9.075 83.7803 9.075C84.0906 9.075 84.3396 9.13154 84.5272 9.24464C84.7076 9.35773 84.7978 9.50971 84.7978 9.70055C84.7978 9.90554 84.7076 10.0752 84.5272 10.2095C84.3396 10.3367 84.0906 10.4003 83.7803 10.4003Z" fill="currentColor"/>
+      <path d="M92.884 0.549595C94.8613 0.549595 96.3768 0.857073 97.4304 1.47203C98.4768 2.07991 99 2.95287 99 4.09089C99 5.21477 98.4768 6.07712 97.4304 6.67794C96.3768 7.27169 94.8613 7.56857 92.884 7.56857C88.8355 7.56857 86.8112 6.3952 86.8112 4.04848C86.8112 2.9458 87.3417 2.08698 88.4025 1.47203C89.4633 0.857073 90.9572 0.549595 92.884 0.549595ZM92.884 6.5189C94.5799 6.5189 95.8608 6.32099 96.7268 5.92515C97.5928 5.52932 98.0258 4.91083 98.0258 4.06968C98.0258 2.42273 96.3118 1.59926 92.884 1.59926C89.485 1.59926 87.7855 2.42273 87.7855 4.06968C87.7855 4.93204 88.2113 5.55759 89.0628 5.94636C89.9144 6.32805 91.1881 6.5189 92.884 6.5189Z" fill="currentColor"/>
+    </svg></div>
+    <div id="tag" class="glass">
+      <h1>КРЕАТИВНАЯ СТУДИЯ АРХИТЕКТУРНОЙ ВИЗУАЛИЗАЦИИ</h1>
+      <p>Мы создаем визуальные проекты для ведущих компаний рынка недвижимости, синтезируя творческий подход и безупречное техническое исполнение.</p>
+      <div class="row"><a class="solid" href="#contacts">СВЯЗАТЬСЯ</a><a href="#services">УСЛУГИ</a></div>
+    </div>
+    <div id="hint">SCROLL<i></i></div>
+    <div id="bar"></div>
+  </div>
+</div>
+
+<main>
+  <section class="blk" id="services">
+    <div class="wrap">
+      <div class="eyebrow">УСЛУГИ</div>
+      <h2 class="big">Полный цикл визуального продакшена</h2>
+      <div class="svc"><article><div class="num">01</div><h3>3D ВИЗУАЛИЗАЦИИ</h3><p>Фотореалистичная визуализация, моделирование архитектуры и окружения, атмосферные рендеры, 3D-проектирование и создание контента для отдела продаж.</p></article><article><div class="num">02</div><h3>3D АНИМАЦИЯ</h3><p>Сюжетные короткометражные фильмы и рекламные ролики. Организация съемочного процесса. Интеграция натурных и персонажных кадров в 3D-сцену.</p></article><article><div class="num">03</div><h3>VR ТУРЫ</h3><p>Иммерсивные 3D-панорамы, разработка сценариев, интеграция натурных съемок с хромакеем и 3D-графики.</p></article><article><div class="num">04</div><h3>BREND РЕШЕНИЯ</h3><p>Комплексные решения: от разработки бренда и визуального образа до создания контента для онлайн и офлайн-носителей. Отражение мировых трендов и внедрение собственных ноу-хау.</p></article></div>
+    </div>
+  </section>
+
+  <section class="blk" id="about">
+    <div class="wrap">
+      <div class="eyebrow">О НАС</div>
+      <div class="stats"><div><b>15+</b><span>ПРОФЕССИОНАЛОВ В КОМАНДЕ</span></div><div><b>35+</b><span>РЕАЛИЗОВАННЫХ ПРОЕКТОВ</span></div><div><b>100%</b><span>КЛИЕНТОВ ВОЗВРАЩАЮТСЯ</span></div><div><b>2024</b><span>С 2024 ГОДА</span></div></div>
+    </div>
+  </section>
+
+  <section class="blk" id="faq">
+    <div class="wrap">
+      <div class="eyebrow">FAQ</div>
+      <h2 class="big">Частые вопросы</h2>
+      <div class="faq"><details><summary>ЧТО ТАКОЕ 3D АРХИТЕКТУРНАЯ АНИМАЦИЯ И ЧЕМ ОНА ОТЛИЧАЕТСЯ ОТ СТАТИЧНЫХ РЕНДЕРОВ?</summary><div class="ans">[текст ответа с сайта не извлечён]</div></details><details><summary>КАКАЯ ИНФОРМАЦИЯ ИЛИ МАТЕРИАЛЫ НУЖНЫ ДЛЯ СОЗДАНИЯ 3D ВИЗУАЛИЗАЦИИ?</summary><div class="ans">[текст ответа с сайта не извлечён]</div></details><details><summary>МОЖНО ЛИ ВНОСИТЬ ПРАВКИ? И СКОЛЬКО РАЗ И НА КАКОМ ЭТАПЕ?</summary><div class="ans">[текст ответа с сайта не извлечён]</div></details><details><summary>КАК РАССЧИТЫВАЕТСЯ СТОИМОСТЬ ВИЗУАЛИЗАЦИИ АРХИТЕКТУРНЫХ ПРОЕКТОВ?</summary><div class="ans">[текст ответа с сайта не извлечён]</div></details></div>
+    </div>
+  </section>
+
+  <section class="blk" id="contacts">
+    <div class="wrap">
+      <div class="eyebrow">КОНТАКТЫ</div>
+      <h2 class="big">Обсудим проект</h2>
+      <div class="contact">
+        <div><div class="lbl">ТЕЛЕФОН</div><a href="tel:+79934111650">+7 993 411 16 50</a>
+          <div class="mess"><a href="#">TELEGRAM</a><a href="#">WHATSAPP</a></div></div>
+        <div><div class="lbl">EMAIL</div><a href="mailto:art@3darstudio.ru">art@3darstudio.ru</a></div>
+        <div><div class="lbl">ЕЩЁ</div><span>Avito · VKontakte</span></div>
+      </div>
+      <footer><span>© All rights reserved 2025</span><span>STUDIO 3DAR</span></footer>
+    </div>
+  </section>
+</main>
+
+<div class="dev">
+  <label>Полёт: <b id="sv">300</b> vh</label>
+  <input id="stretch" type="range" min="100" max="900" step="25" value="300">
+  <span id="tiers">
+    <button data-src="review/v/ARC.mp4" class="on">1080p24</button>
+    <button data-src="review/v/ARC2_1080p48.mp4">1080p48 new</button>
+    <button data-src="review/v/ARC_1080p48.mp4">1080p48 old</button>
+    <button data-src="review/v/ARC_4k24.mp4">4K24</button>
+    <button data-src="review/v/ARC2_4k48.mp4">4K48 new</button>
+  </span>
+</div>
+
+<script>
+(()=>{
+const FPS=24, HALF=0.5/FPS, SEEK_MS=16;
+const v=document.getElementById('flight'), scene=document.getElementById('scene'),
+      logo=document.getElementById('logo'), tag=document.getElementById('tag'),
+      hint=document.getElementById('hint'), bar=document.getElementById('bar'),
+      nav=document.getElementById('nav'),
+      slider=document.getElementById('stretch'), readout=document.getElementById('sv'),
+      tiers=document.getElementById('tiers');
+const KEY='s3dar.flight';
+let last=-1, lastAt=0;
+
+function setRunway(vhv){
+  scene.style.height=(vhv+100)+'vh';
+  readout.textContent=vhv; localStorage.setItem(KEY,vhv); last=-1;
+}
+const saved=parseFloat(localStorage.getItem(KEY));
+if(saved>=100&&saved<=900) slider.value=saved;
+slider.addEventListener('input',e=>{setRunway(+e.target.value); frame();});
+
+function buffered(t){
+  for(let i=0;i<v.buffered.length;i++)
+    if(t>=v.buffered.start(i)&&t<=v.buffered.end(i)) return true;
+  return false;
+}
+function frame(){
+  const b=scene.getBoundingClientRect(), vh=innerHeight;
+  const span=b.height-vh;
+  let k=(-b.top)/(span>0?span:1); k=k<0?0:k>1?1:k;
+  // overlays are cheap, they can track every frame
+  logo.style.transform=`translate(-50%,-50%) scale(${1+k*7})`;
+  logo.style.opacity=String(Math.max(0,1-k*1.25));
+  logo.style.visibility=k>=1?'hidden':'visible';
+  tag.style.opacity=String(Math.max(0,1-k*2.2));
+  tag.style.transform=`translate(-50%,${-k*40}px)`;
+  hint.style.opacity=String(Math.max(0,1-k*4));
+  bar.style.width=(k*100).toFixed(2)+'%';
+  nav.classList.toggle('solid', k>0.02);
+  const dur=v.duration||1, t=k*(dur-1/FPS);
+  if(Math.abs(t-last)<HALF) return;
+  if(performance.now()-lastAt<SEEK_MS) return;
+  if(v.readyState<1||!buffered(t)) return;
+  v.currentTime=t; last=t; lastAt=performance.now();
+}
+function tick(){ frame(); requestAnimationFrame(tick); }
+addEventListener('scroll',frame,{passive:true});
+addEventListener('resize',frame);
+
+(async()=>{
+  for(const b of tiers.children){
+    try{ const r=await fetch(b.dataset.src,{method:'HEAD'}); if(!r.ok) b.disabled=true; }
+    catch(e){ b.disabled=true; }
+  }
+})();
+tiers.addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b||b.disabled) return;
+  v.src=b.dataset.src; last=-1;
+  for(const x of tiers.children) x.classList.toggle('on',x===b);
+});
+
+v.src=tiers.querySelector('.on').dataset.src;
+setRunway(+slider.value);
+requestAnimationFrame(tick);
+window.__frame=frame;
+})();
+</script>
