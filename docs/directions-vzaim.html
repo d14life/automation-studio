@@ -1,0 +1,412 @@
+<meta charset="utf-8">
+<title>Взаиморасчёты — направления дизайна</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--pg:#0E0F11;--pg2:#16181B;--ptx:#E9E9E4;--pdim:#8A8E94;--phair:#26292E}
+html{background:var(--pg);color:var(--ptx);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+body{max-width:1500px;margin:0 auto;padding:56px 40px 120px}
+h1{font-size:34px;letter-spacing:-.02em;font-weight:800}
+.lede{color:var(--pdim);max-width:70ch;margin-top:12px;font-size:16px}
+.rule{height:1px;background:var(--phair);margin:34px 0}
+h2.grp{font:700 12px/1 ui-monospace,Menlo,monospace;letter-spacing:.18em;text-transform:uppercase;color:var(--pdim);margin:48px 0 6px}
+h2.grp b{color:var(--ptx)}
+.grpnote{color:var(--pdim);font-size:14px;max-width:78ch;margin-bottom:22px}
+.panels{display:grid;grid-template-columns:repeat(auto-fit,minmax(430px,1fr));gap:26px}
+.panel{border:1px solid var(--phair);border-radius:10px;overflow:hidden;background:var(--pg2);display:flex;flex-direction:column}
+.phead{padding:15px 18px;border-bottom:1px solid var(--phair);display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.pk{font:800 11px/1 ui-monospace,Menlo,monospace;letter-spacing:.14em;background:var(--ptx);color:var(--pg);padding:4px 7px;border-radius:3px}
+.pname{font-weight:700;font-size:16px}
+.pdna{font:600 11px/1 ui-monospace,Menlo,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--pdim);margin-left:auto}
+.pwhy{padding:13px 18px;color:var(--pdim);font-size:13.5px;border-bottom:1px solid var(--phair);background:rgba(255,255,255,.012)}
+.pwhy b{color:var(--ptx);font-weight:600}
+.stage{padding:18px;display:grid;gap:14px}
+.cap{font:600 10.5px/1 ui-monospace,Menlo,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--pdim)}
+.m{border-radius:6px;overflow:hidden;font-size:13px;position:relative}
+
+/* D · БУХГАЛТЕРСКАЯ КНИГА */
+.led{--pap:#FBFAF6;--ink:#14120E;--dim:#77736A;--hair:#DAD5C6;--rd:#B3261E;
+  background:var(--pap);color:var(--ink);font-family:"Iowan Old Style",Georgia,serif}
+.led .hd{padding:12px 16px;border-bottom:2px solid var(--ink);display:flex;align-items:baseline}
+.led .hd b{font-size:15px}
+.led .hd s{text-decoration:none;margin-left:auto;font:600 10px/1 ui-monospace,Menlo,monospace;letter-spacing:.13em;color:var(--dim)}
+.led table{width:100%;border-collapse:collapse;font-size:12.5px}
+.led th{font:700 9.5px/1 ui-monospace,Menlo,monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--dim);padding:8px 14px;border-bottom:1px solid var(--ink);text-align:right}
+.led th:first-child{text-align:left}
+.led td{padding:7px 14px;border-bottom:1px solid var(--hair);text-align:right;font-family:ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:12px;color:var(--ink)}
+.led td:first-child{text-align:left;font-family:"Iowan Old Style",Georgia,serif;font-size:13px}
+.led .rd{color:var(--rd)}
+.led tr.tot td{border-top:2px solid var(--ink);border-bottom:3px double var(--ink);font-weight:700;font-size:13.5px}
+.led .note{padding:9px 14px;font-size:11px;color:var(--dim);font-style:italic}
+
+/* E · БАНКОВСКИЙ ТЕРМИНАЛ */
+.trm{--bg:#07090A;--ink:#D8E4E0;--dim:#5A6B66;--hair:#161C1E;--amb:#FFB300;--grn:#00E07B;--rd:#FF3B4E;
+  background:var(--bg);color:var(--ink);font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11.5px}
+.trm .bar{display:flex;gap:12px;padding:7px 12px;background:#0C1012;border-bottom:1px solid var(--hair);font-size:10px;letter-spacing:.1em;color:var(--dim)}
+.trm .bar b{color:var(--amb)} .trm .bar s{text-decoration:none;margin-left:auto}
+.trm .big3{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--hair)}
+.trm .big3 div{background:var(--bg);padding:11px 12px}
+.trm .big3 s{display:block;text-decoration:none;font-size:9px;letter-spacing:.14em;color:var(--dim)}
+.trm .big3 b{font-size:20px;font-variant-numeric:tabular-nums}
+.trm table{width:100%;border-collapse:collapse}
+.trm th{text-align:right;padding:7px 12px;font-size:9px;letter-spacing:.13em;color:var(--dim);border-bottom:1px solid var(--hair);font-weight:700}
+.trm th:first-child{text-align:left}
+.trm td{text-align:right;padding:5px 12px;border-bottom:1px solid rgba(255,255,255,.028);font-variant-numeric:tabular-nums}
+.trm td:first-child{text-align:left;color:var(--ink)}
+.trm .up{color:var(--rd)} .trm .dn{color:var(--grn)}
+.trm .blink{display:inline-block;width:6px;height:6px;background:var(--grn);border-radius:50%;margin-right:5px;vertical-align:middle}
+
+/* F · АКТ СВЕРКИ */
+.act{--pap:#FFFFFF;--ink:#0B0B0B;--dim:#6E6E6E;--hair:#D8D8D4;--rd:#C41E1E;
+  background:var(--pap);color:var(--ink);font-family:"Helvetica Neue",Arial,sans-serif}
+.act .hd{text-align:center;padding:14px 16px 12px;border-bottom:2px solid var(--ink)}
+.act .hd b{display:block;font-size:14px}
+.act .hd s{text-decoration:none;font-size:10.5px;color:var(--dim)}
+.act .two{display:grid;grid-template-columns:1fr 1px 1fr}
+.act .spine{background:var(--ink)}
+.act .side{padding:12px 14px}
+.act .side h4{font:700 9.5px/1 ui-monospace,Menlo,monospace;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);margin-bottom:9px}
+.act .row{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px solid var(--hair);font-size:12px}
+.act .row s{text-decoration:none;font-family:ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
+.act .delta{text-align:center;padding:14px;border-top:2px solid var(--ink);background:#FAFAF8}
+.act .delta s{display:block;text-decoration:none;font:700 9.5px/1 ui-monospace,Menlo,monospace;letter-spacing:.16em;color:var(--dim)}
+.act .delta b{font-size:27px;font-variant-numeric:tabular-nums;color:var(--rd)}
+.act .sig{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:14px}
+.act .sig div{border-top:1px solid var(--ink);padding-top:4px;font-size:10px;color:var(--dim)}
+
+/* G · Т-СЧЁТ */
+.tac{--pap:#F7F5EF;--ink:#111;--dim:#787264;--hair:#CFC8B6;--rd:#A8201A;
+  background:var(--pap);color:var(--ink);font-family:"Iowan Old Style",Georgia,serif}
+.tac .hd{padding:11px 16px;text-align:center;border-bottom:1px solid var(--hair)}
+.tac .hd b{font-size:14px} .tac .hd s{display:block;text-decoration:none;font:600 9.5px/1.6 ui-monospace,Menlo,monospace;letter-spacing:.14em;color:var(--dim);text-transform:uppercase}
+.tac .tt{display:grid;grid-template-columns:1fr 2px 1fr;border-top:2px solid var(--ink)}
+.tac .spine{background:var(--ink)}
+.tac .col h5{font:700 9.5px/1 ui-monospace,Menlo,monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);padding:8px 14px;border-bottom:2px solid var(--ink);text-align:center}
+.tac .ln{display:flex;justify-content:space-between;gap:8px;padding:6px 14px;font-size:12px;border-bottom:1px solid var(--hair)}
+.tac .ln s{text-decoration:none;font-family:ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:11.5px}
+.tac .sum{display:flex;justify-content:space-between;gap:8px;padding:8px 14px;font-weight:700;border-top:2px solid var(--ink);font-size:12.5px}
+.tac .sum s{text-decoration:none;font-family:ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
+.tac .bal{text-align:center;padding:12px;border-top:3px double var(--ink)}
+.tac .bal s{display:block;text-decoration:none;font:700 9px/1 ui-monospace,Menlo,monospace;letter-spacing:.16em;color:var(--dim)}
+.tac .bal b{font-size:22px;font-family:ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums;color:var(--rd)}
+
+/* H · ПОТОК ПЛАТЕЖЕЙ */
+.flw{--bg:#0F1214;--ink:#E8EDEF;--dim:#6C7A80;--hair:#1E2427;--in:#2FBF71;--out:#E0574A;
+  background:var(--bg);color:var(--ink);font-family:-apple-system,"Segoe UI",Roboto,sans-serif}
+.flw .hd{padding:11px 14px;border-bottom:1px solid var(--hair);display:flex;align-items:baseline;gap:10px}
+.flw .hd b{font-size:14px;font-weight:700}
+.flw .hd s{text-decoration:none;margin-left:auto;font-size:10px;letter-spacing:.12em;color:var(--dim);text-transform:uppercase}
+.flw .chart{position:relative;height:170px;padding:14px 14px 0}
+.flw .axis{position:absolute;left:14px;right:14px;top:92px;height:1px;background:var(--dim);opacity:.55}
+.flw .cols{display:grid;grid-template-columns:repeat(8,1fr);gap:8px;height:156px;align-items:center}
+.flw .c{position:relative;height:156px}
+.flw .c i{position:absolute;left:12%;width:76%;border-radius:2px;display:block}
+.flw .c .up{bottom:78px;background:var(--in)}
+.flw .c .dn{top:79px;background:var(--out)}
+.flw .c u{position:absolute;bottom:-2px;left:0;right:0;text-align:center;font-size:9px;color:var(--dim);text-decoration:none;font-variant-numeric:tabular-nums}
+.flw .legend{display:flex;gap:16px;padding:10px 14px;border-top:1px solid var(--hair);font-size:11px;color:var(--dim)}
+.flw .legend span{display:flex;align-items:center;gap:6px}
+.flw .legend i{width:9px;height:9px;border-radius:2px;display:block}
+.flw .foot{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--hair)}
+.flw .foot div{padding:11px 14px;border-right:1px solid var(--hair)}
+.flw .foot div:last-child{border:0}
+.flw .foot s{display:block;text-decoration:none;font-size:9.5px;letter-spacing:.12em;color:var(--dim);text-transform:uppercase}
+.flw .foot b{font-size:18px;font-variant-numeric:tabular-nums}
+
+/* I · ДОСЬЕ КОНТРАГЕНТА */
+.dos{--pap:#FFFFFF;--ink:#101418;--dim:#6B747C;--hair:#E3E7EA;--rd:#C0342B;--gr:#177A4C;--warn:#B8770B;
+  background:var(--pap);color:var(--ink);font-family:-apple-system,"Segoe UI",Roboto,sans-serif}
+.dos .hd{padding:14px 16px;border-bottom:1px solid var(--hair);display:flex;gap:12px;align-items:flex-start}
+.dos .av{width:38px;height:38px;background:#101418;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex:none}
+.dos .hd b{display:block;font-size:15px;font-weight:700}
+.dos .hd s{display:block;text-decoration:none;font-size:11px;color:var(--dim);font-variant-numeric:tabular-nums;margin-top:2px}
+.dos .risk{margin-left:auto;font:700 9.5px/1 ui-monospace,Menlo,monospace;letter-spacing:.12em;background:#FBEAE8;color:var(--rd);padding:6px 8px;flex:none}
+.dos .big{padding:14px 16px 10px}
+.dos .big s{display:block;text-decoration:none;font-size:10px;letter-spacing:.13em;color:var(--dim);text-transform:uppercase}
+.dos .big b{font-size:30px;font-variant-numeric:tabular-nums;color:var(--rd);letter-spacing:-.02em}
+.dos .agebar{display:flex;height:9px;margin:0 16px}
+.dos .agebar i{display:block}
+.dos .agekey{display:flex;gap:12px;padding:8px 16px 12px;font-size:10px;color:var(--dim);flex-wrap:wrap}
+.dos .agekey span{display:flex;align-items:center;gap:5px}
+.dos .agekey i{width:8px;height:8px;display:block}
+.dos .rows{border-top:1px solid var(--hair)}
+.dos .r{display:flex;justify-content:space-between;padding:8px 16px;border-bottom:1px solid var(--hair);font-size:12px}
+.dos .r s{text-decoration:none;font-variant-numeric:tabular-nums;font-weight:600}
+.dos .acts{display:flex;gap:8px;padding:12px 16px}
+.dos .acts b{font-size:11.5px;font-weight:600;padding:8px 12px;background:#101418;color:#fff}
+.dos .acts u{font-size:11.5px;font-weight:600;padding:8px 12px;border:1px solid var(--hair);text-decoration:none;color:var(--ink)}
+
+/* J · ПРЕМИУМ-ФИНТЕХ */
+.fin{--pap:#FFFFFF;--soft:#F6F7F9;--ink:#0A0C10;--dim:#697586;--hair:#E7EAEE;--acc:#3B4FE4;--rd:#C42B36;--gr:#0F7A55;
+  background:var(--pap);color:var(--ink);font-family:-apple-system,"Segoe UI",Roboto,sans-serif}
+.fin .hd{padding:16px 18px 4px}
+.fin .hd s{text-decoration:none;font-size:11px;letter-spacing:.1em;color:var(--dim);text-transform:uppercase}
+.fin .hd b{display:block;font-size:34px;letter-spacing:-.03em;font-variant-numeric:tabular-nums;margin-top:6px}
+.fin .hd u{text-decoration:none;font-size:11.5px;color:var(--rd);font-weight:600;display:inline-block;margin-top:4px}
+.fin .spark{height:44px;margin:10px 18px 0;position:relative}
+.fin .spark svg{width:100%;height:44px;display:block}
+.fin .two{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--hair);margin-top:16px;border-top:1px solid var(--hair)}
+.fin .two div{background:var(--pap);padding:12px 18px}
+.fin .two s{display:block;text-decoration:none;font-size:10.5px;color:var(--dim);letter-spacing:.06em}
+.fin .two b{font-size:17px;font-variant-numeric:tabular-nums}
+.fin .lst{border-top:1px solid var(--hair)}
+.fin .li{display:flex;align-items:center;gap:10px;padding:10px 18px;border-bottom:1px solid var(--hair);font-size:12.5px}
+.fin .li em{font-style:normal;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fin .li s{text-decoration:none;font-variant-numeric:tabular-nums;font-weight:600}
+.fin .li q{quotes:none;font-size:10px;color:var(--dim);background:var(--soft);padding:3px 6px;border-radius:3px}
+.fin .cta{padding:12px 18px}
+.fin .cta b{display:inline-block;background:var(--acc);color:#fff;font-size:12px;font-weight:600;padding:9px 14px;border-radius:6px}
+
+.verdict{border:1px solid var(--phair);border-left:3px solid #B3261E;border-radius:8px;padding:18px 22px;margin-top:26px;background:var(--pg2)}
+.verdict h3{font-size:15px;margin-bottom:9px}
+.verdict p{color:var(--pdim);font-size:14px;max-width:80ch}
+.verdict p+p{margin-top:9px}
+.verdict b{color:var(--ptx)}
+</style>
+
+<h1>Взаиморасчёты — направления дизайна</h1>
+<p class="lede">Сейчас экран выглядит как шаблон админки: тёмно-синий сайдбар, белые карточки со
+скруглением, иконочный рельс, Inter. По нему нельзя понять, что он про деньги между юрлицами.
+Ниже — <b>семь</b> ДНК. Не палитры: разные формы, разная типографика, разный носитель.</p>
+<p class="lede">Работа тут — кто кому должен, сколько это висит и чем это закрыть. Ни одна из ДНК
+ниже не похожа на дашборд, потому что бухгалтер не смотрит на дашборд — он смотрит в книгу,
+в терминал, в акт или в календарь платежей.</p>
+
+<div class="rule"></div>
+
+<h2 class="grp">Первая тройка · <b>бумага и плотность</b></h2>
+<p class="grpnote">Три классических языка денег: гроссбух, торговый терминал и печатный документ.</p>
+
+<div class="panels">
+
+  <div class="panel">
+    <div class="phead"><span class="pk">D</span><span class="pname">Бухгалтерская книга</span>
+      <span class="pdna">Гроссбух · чёрное и красное</span></div>
+    <div class="pwhy">Разлинованная страница, цифры в колонку, <b>красным — что должны мы, чёрным —
+      что должны нам</b>, итог под двойной чертой. Бухгалтер читает без обучения.</div>
+    <div class="stage"><div class="cap">Сальдо по контрагентам</div>
+      <div class="m led">
+        <div class="hd"><b>Оборотно-сальдовая ведомость</b><s>НА 06.08.2026</s></div>
+        <table>
+          <tr><th>Контрагент</th><th>Дебет</th><th>Кредит</th><th>Сальдо</th></tr>
+          <tr><td>ТД «Овражки-Опт»</td><td>18 420 000</td><td>—</td><td>18 420 000</td></tr>
+          <tr><td>АО «Первая Логистическая»</td><td>12 100 000</td><td>4 300 000</td><td>7 800 000</td></tr>
+          <tr><td>ООО «Северянка-Ритейл»</td><td>—</td><td>212 400 000</td><td class="rd">(212 400 000)</td></tr>
+          <tr><td>Сеть «Домовой Двор»</td><td>17 880 000</td><td>263 000 000</td><td class="rd">(245 120 000)</td></tr>
+          <tr class="tot"><td>Итого</td><td>48 400 000</td><td>479 700 000</td><td class="rd">(431 300 000)</td></tr>
+        </table>
+        <div class="note">Сальдо свёрнуто по правилам учётной политики: в разрезе договора.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="phead"><span class="pk">E</span><span class="pname">Банковский терминал</span>
+      <span class="pdna">Плотность · янтарь на чёрном</span></div>
+    <div class="pwhy"><b>Максимум строк на экран, нулевой воздух</b>, карточек нет вообще.
+      Для того, кто открывает это на весь день. Минус: рядом со складским сканером читается
+      как его копия.</div>
+    <div class="stage"><div class="cap">Просрочка · живой экран</div>
+      <div class="m trm">
+        <div class="bar"><span><span class="blink"></span>ONLINE</span><b>ЧИСТАЯ −431.4 МЛН ₸</b><s>F2 СВЕРКА</s></div>
+        <div class="big3">
+          <div><s>ДОЛЖНЫ НАМ</s><b class="dn">48.4</b></div>
+          <div><s>ДОЛЖНЫ МЫ</s><b class="up">479.7</b></div>
+          <div><s>ПРОСРОЧКА &gt;90</s><b class="up">61.2</b></div>
+        </div>
+        <table>
+          <tr><th>КОНТРАГЕНТ</th><th>СУММА</th><th>ДНЕЙ</th><th>Δ 7Д</th></tr>
+          <tr><td>СЕТЬ «ДОМОВОЙ ДВОР»</td><td class="up">245 120 000</td><td>112</td><td class="up">+7.7%</td></tr>
+          <tr><td>ООО «СЕВЕРЯНКА-РИТЕЙЛ»</td><td class="up">212 400 000</td><td>94</td><td class="up">+2.1%</td></tr>
+          <tr><td>ТД «ОВРАЖКИ-ОПТ»</td><td class="dn">18 420 000</td><td>21</td><td class="dn">−4.0%</td></tr>
+          <tr><td>АО «ПЕРВАЯ ЛОГИСТИЧЕСКАЯ»</td><td class="dn">7 800 000</td><td>8</td><td class="dn">−1.2%</td></tr>
+          <tr><td>КАФЕ «ТИХИЙ ЧАС»</td><td class="dn">1 240 000</td><td>3</td><td>0.0%</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="phead"><span class="pk">F</span><span class="pname">Акт сверки</span>
+      <span class="pdna">Швейцарская печать · две колонки</span></div>
+    <div class="pwhy">Интерфейс <b>есть сам документ</b>. Две колонки лицом друг к другу, разница
+      в подвале крупно. Экран и распечатка выглядят одинаково.</div>
+    <div class="stage"><div class="cap">Сверка с контрагентом</div>
+      <div class="m act">
+        <div class="hd"><b>АКТ СВЕРКИ ВЗАИМНЫХ РАСЧЁТОВ</b><s>с 01.01.2026 по 06.08.2026 · сеть «Домовой Двор»</s></div>
+        <div class="two">
+          <div class="side"><h4>По нашим данным</h4>
+            <div class="row"><span>Сальдо на начало</span><s>182 400 000</s></div>
+            <div class="row"><span>Отгружено</span><s>96 220 000</s></div>
+            <div class="row"><span>Оплачено</span><s>33 500 000</s></div>
+            <div class="row"><span>Сальдо на конец</span><s>245 120 000</s></div></div>
+          <div class="spine"></div>
+          <div class="side"><h4>По данным контрагента</h4>
+            <div class="row"><span>Сальдо на начало</span><s>182 400 000</s></div>
+            <div class="row"><span>Отгружено</span><s>94 380 000</s></div>
+            <div class="row"><span>Оплачено</span><s>33 500 000</s></div>
+            <div class="row"><span>Сальдо на конец</span><s>243 280 000</s></div></div>
+        </div>
+        <div class="delta"><s>РАСХОЖДЕНИЕ</s><b>1 840 000 ₸</b></div>
+        <div class="sig"><div>От нашей организации</div><div>От контрагента</div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<h2 class="grp">Вторая тройка · <b>другие формы</b></h2>
+<p class="grpnote">Здесь меняется не оформление, а сама фигура экрана: буква Т, временная ось
+и карточка одного контрагента. Это самые непохожие друг на друга варианты из всех семи.</p>
+
+<div class="panels">
+
+  <div class="panel">
+    <div class="phead"><span class="pk">G</span><span class="pname">Т-счёт</span>
+      <span class="pdna">Двойная запись · буква Т · симметрия</span></div>
+    <div class="pwhy">Буквально <b>тот самый Т-счёт</b>, который рисуют от руки: жирная
+      вертикаль посередине, дебет слева, кредит справа, сальдо под двойной чертой. Ни один
+      шаблон админки так не выглядит, и любой бухгалтер узнаёт форму мгновенно.</div>
+    <div class="stage"><div class="cap">Контрагент · счёт 1210</div>
+      <div class="m tac">
+        <div class="hd"><b>Сеть «Домовой Двор»</b><s>БИН 070859806905 · счёт 1210 · на 06.08.2026</s></div>
+        <div class="tt">
+          <div class="col"><h5>Дебет</h5>
+            <div class="ln"><span>Сальдо на начало</span><s>182 400 000</s></div>
+            <div class="ln"><span>Акт № 1181</span><s>62 220 000</s></div>
+            <div class="ln"><span>Акт № 1204</span><s>34 000 000</s></div>
+            <div class="sum"><span>Оборот</span><s>278 620 000</s></div>
+          </div>
+          <div class="spine"></div>
+          <div class="col"><h5>Кредит</h5>
+            <div class="ln"><span>П/п № 4417</span><s>21 500 000</s></div>
+            <div class="ln"><span>П/п № 4502</span><s>12 000 000</s></div>
+            <div class="ln"><span>&nbsp;</span><s>&nbsp;</s></div>
+            <div class="sum"><span>Оборот</span><s>33 500 000</s></div>
+          </div>
+        </div>
+        <div class="bal"><s>САЛЬДО КОНЕЧНОЕ · ДЕБЕТОВОЕ</s><b>245 120 000 ₸</b></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="phead"><span class="pk">H</span><span class="pname">Поток платежей</span>
+      <span class="pdna">Ось времени · приход вверх, расход вниз</span></div>
+    <div class="pwhy">Экран отвечает не «сколько висит», а <b>«когда и чем закрывать»</b>.
+      Деньги легли на ось времени: вверх — что придёт нам, вниз — что платим мы. Кассовый
+      разрыв видно как провал, а не как строку в таблице.</div>
+    <div class="stage"><div class="cap">Платёжный календарь · 8 недель</div>
+      <div class="m flw">
+        <div class="hd"><b>Поток платежей</b><s>авг — сен 2026</s></div>
+        <div class="chart">
+          <div class="axis"></div>
+          <div class="cols">
+            <div class="c"><i class="up" style="height:22px"></i><i class="dn" style="height:48px"></i><u>06.08</u></div>
+            <div class="c"><i class="up" style="height:41px"></i><i class="dn" style="height:26px"></i><u>13.08</u></div>
+            <div class="c"><i class="up" style="height:14px"></i><i class="dn" style="height:63px"></i><u>20.08</u></div>
+            <div class="c"><i class="up" style="height:30px"></i><i class="dn" style="height:18px"></i><u>27.08</u></div>
+            <div class="c"><i class="up" style="height:55px"></i><i class="dn" style="height:22px"></i><u>03.09</u></div>
+            <div class="c"><i class="up" style="height:19px"></i><i class="dn" style="height:70px"></i><u>10.09</u></div>
+            <div class="c"><i class="up" style="height:36px"></i><i class="dn" style="height:31px"></i><u>17.09</u></div>
+            <div class="c"><i class="up" style="height:48px"></i><i class="dn" style="height:12px"></i><u>24.09</u></div>
+          </div>
+        </div>
+        <div class="legend">
+          <span><i style="background:#2FBF71"></i>придёт нам</span>
+          <span><i style="background:#E0574A"></i>платим мы</span>
+          <span>наведи на столбик — контрагенты недели</span>
+        </div>
+        <div class="foot">
+          <div><s>Кассовый разрыв</s><b>10.09</b></div>
+          <div><s>Придёт за 8 нед.</s><b>48,4 млн</b></div>
+          <div><s>Платим за 8 нед.</s><b>479,7 млн</b></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="phead"><span class="pk">I</span><span class="pname">Досье контрагента</span>
+      <span class="pdna">Кредитное дело · один экран — один контрагент</span></div>
+    <div class="pwhy">Не список, а <b>дело на контрагента</b>: сумма крупно, возраст долга
+      полосой, история и действия рядом. Так работает тот, кто звонит и выбивает, а не тот,
+      кто сводит ведомость. Список остаётся, но главным становится карточка.</div>
+    <div class="stage"><div class="cap">Карточка · просрочка 112 дней</div>
+      <div class="m dos">
+        <div class="hd">
+          <span class="av">ДД</span>
+          <span><b>Сеть «Домовой Двор»</b><s>БИН 070859806905 · договор 2026-14</s></span>
+          <span class="risk">112 ДНЕЙ</span>
+        </div>
+        <div class="big"><s>Должны мы</s><b>245 120 000 ₸</b></div>
+        <div class="agebar">
+          <i style="background:#177A4C;width:8%"></i><i style="background:#8FA524;width:12%"></i>
+          <i style="background:#B8770B;width:22%"></i><i style="background:#C0342B;width:58%"></i>
+        </div>
+        <div class="agekey">
+          <span><i style="background:#177A4C"></i>0–30</span><span><i style="background:#8FA524"></i>31–60</span>
+          <span><i style="background:#B8770B"></i>61–90</span><span><i style="background:#C0342B"></i>90+</span>
+        </div>
+        <div class="rows">
+          <div class="r"><span>Отгружено за период</span><s>96 220 000</s></div>
+          <div class="r"><span>Оплачено за период</span><s>33 500 000</s></div>
+          <div class="r"><span>Средний срок оплаты</span><s>74 дня</s></div>
+          <div class="r"><span>Есть встречный долг</span><s>да, 17 880 000</s></div>
+        </div>
+        <div class="acts"><b>Акт сверки</b><u>Написать</u><u>История</u></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<h2 class="grp">Отдельно · <b>если хочется современного, а не архивного</b></h2>
+<p class="grpnote">Все шесть выше — из мира бумаги и терминалов. Этот — из мира Stripe и Mercury:
+белое, воздух, одна краска, огромные табличные цифры. Тоже «не админка», но по-другому.</p>
+
+<div class="panels">
+  <div class="panel">
+    <div class="phead"><span class="pk">J</span><span class="pname">Премиум-финтех</span>
+      <span class="pdna">Воздух · один акцент · крупные цифры</span></div>
+    <div class="pwhy">Дорого выглядит не за счёт декора, а за счёт <b>пустого места и одной
+      краски</b>. Цифра — главный элемент композиции, всё остальное уходит в серый. Самый
+      «продающий» вариант для сайта и самый привычный современному директору.</div>
+    <div class="stage"><div class="cap">Чистая позиция</div>
+      <div class="m fin">
+        <div class="hd"><s>Чистая позиция</s><b>−431 359 821,98 ₸</b><u>↑ 7,7 % с 30.07.2026</u></div>
+        <div class="spark">
+          <svg viewBox="0 0 300 44" preserveAspectRatio="none">
+            <polyline points="0,30 40,28 80,25 120,18 160,20 200,14 240,17 300,8"
+              fill="none" stroke="#3B4FE4" stroke-width="2" vector-effect="non-scaling-stroke"/>
+          </svg>
+        </div>
+        <div class="two">
+          <div><s>Должны нам</s><b>48 377 725</b></div>
+          <div><s>Должны мы</s><b>479 737 547</b></div>
+        </div>
+        <div class="lst">
+          <div class="li"><em>Сеть «Домовой Двор»</em><q>112 дн</q><s>245 120 000</s></div>
+          <div class="li"><em>ООО «Северянка-Ритейл»</em><q>94 дн</q><s>212 400 000</s></div>
+          <div class="li"><em>ТД «Овражки-Опт»</em><q>21 дн</q><s>18 420 000</s></div>
+        </div>
+        <div class="cta"><b>Сформировать акт сверки</b></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="verdict">
+  <h3>Как я бы выбирал</h3>
+  <p><b>G «Т-счёт»</b> — самая смелая и самая «своя». Форма буквы Т не встречается ни в одном
+  шаблоне, читается бухгалтером мгновенно и не похожа ни на park, ни на складской сканер.
+  Хорошо работает как <i>экран одного контрагента</i>, но плохо — как список из 48 строк.</p>
+  <p><b>D «Бухгалтерская книга»</b> — самая безопасная для списка и главного экрана.
+  <b>H «Поток платежей»</b> — единственная, которая отвечает на вопрос «когда», а не «сколько»;
+  как главный экран для директора она сильнее всех остальных.</p>
+  <p>Практичная сборка: <b>D — список, G — карточка контрагента, F — печатная форма,
+  H — экран директора.</b> Это одна система, а не четыре, потому что все четыре живут на одной
+  бумаге и в одной типографике. <b>J</b> — альтернатива всему набору, если хочется современного
+  фин-теха вместо архивного; смешивать J с D нельзя, это разные миры.</p>
+  <p>E оставил бы в стороне: рядом со складским сканером на том же сайте она читается как его
+  копия — тоже тёмный моноширинный терминал.</p>
+</div>
