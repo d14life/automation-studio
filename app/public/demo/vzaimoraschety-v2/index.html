@@ -1,0 +1,1693 @@
+<!doctype html>
+<html lang="ru"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Взаиморасчёты — демо</title>
+<!-- пустая иконка: иначе браузер сам просит /favicon.ico — единственный внешний запрос страницы -->
+<link rel="icon" href="data:,">
+<script>
+/* тему ставим до первой отрисовки, иначе светлый кадр моргает в тёмной теме */
+document.documentElement.dataset.theme=localStorage.getItem("vzr_theme")||
+  (matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");
+</script>
+<style>
+/* Дизайн-система: premium fintech по образцу страницы котировок Coinbase.
+   Собственная реализация — без Tailwind, CDN и веб-шрифтов: приложение обязано
+   работать в контуре клиента без интернета. Отсюда системный шрифтовой стек
+   (тот же fallback, что у Coinbase), inline-SVG иконки и inline-SVG график.
+   Тема: data-theme на <html>, значение в localStorage vzr_theme. */
+:root{
+  color-scheme:light;
+  --surface:#eef0f3;  /* фон страницы */
+  --card:#fff;        /* панели */
+  --step:#f7f8fa;     /* наведение / зебра */
+  --inset:#f2f4f7;    /* утопленная область (раскрытие строки, поле поиска) */
+  --border:#dee1e7; --border-soft:#e8eaef;
+  --ink:#0a0b0d; --mut:#5b616e; --mut-2:#5b616e;
+  --accent:#0052ff; --on-acc:#fff; --blue-bg:#e7eeff;
+  --green:#098551; --green-bg:#e3f2eb; --green-tint:#0985511a;
+  --red:#cf202f; --red-bg:#fbe9ea;
+  --tip-bg:#0a0b0d; --tip-fg:#f5f7fa;
+  --age0:#dcefe6; --age1:#e2eaff; --age2:#fbeedd; --age3:#fbdfe1;
+  --shadow:0 1px 2px #0a0b0d0f,0 10px 30px #0a0b0d0f;
+  --r-sm:8px; --r-md:8px; --r-lg:16px;
+}
+html[data-theme="dark"]{
+  color-scheme:dark;
+  --surface:#0a0b0d; --card:#16181d; --step:#20232a; --inset:#101215;
+  --border:#2a2d35; --border-soft:#23262d;
+  --ink:#f5f7fa; --mut:#9aa1ae; --mut-2:#9aa1ae;
+  /* белый на #5B8CFF даёт всего 3.16:1 — на залитой акцентом кнопке текст тёмный */
+  --accent:#5b8cff; --on-acc:#0a0b0d; --blue-bg:#1b2438;
+  --green:#2bc48a; --green-bg:#11271f; --green-tint:#2bc48a29;
+  --red:#ff6b6b; --red-bg:#2c1719;
+  --tip-bg:#2a2d35; --tip-fg:#f5f7fa;
+  --age0:#123024; --age1:#182640; --age2:#33270f; --age3:#3a1a1d;
+  --shadow:0 1px 2px #0000005c,0 10px 30px #00000047;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--surface);color:var(--ink);
+  font:400 14px/1.5 -apple-system,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased}
+.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+.caps{font-size:13px;font-weight:500;letter-spacing:0;text-transform:none;color:var(--mut)}
+.mut{color:var(--mut)}
+.pos{color:var(--green)}.neg{color:var(--red)}.zero{color:var(--mut)}
+svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;
+  stroke-linecap:round;stroke-linejoin:round;flex:none}
+svg.i.sm{width:16px;height:16px}
+
+/* ── каркас ── */
+#app{display:flex;min-height:100vh}
+/* размер боковой панели задаём через flex-basis: у flex-элемента width перебивается
+   базисом, поэтому свёртка по width не срабатывает */
+aside{flex:0 0 260px;background:var(--card);color:var(--ink);display:flex;flex-direction:column;
+  position:sticky;top:0;height:100vh;min-width:0;overflow:hidden;
+  border-right:1px solid var(--border)}
+aside.tuck{flex:0 0 68px}
+aside.tuck .brand b,aside.tuck .brand span,aside.tuck nav button span,
+aside.tuck .foot button span,aside.tuck .sideextra{display:none}
+aside.tuck .brand{padding:24px 0 18px;text-align:center}
+aside.tuck nav button{justify-content:center;padding:12px 0}
+aside.tuck .foot{padding:16px 0;text-align:center}
+aside.tuck .foot button{width:100%;justify-content:center}
+.tuckbtn{flex:none}
+aside .brand{padding:26px 24px 20px}
+aside .brand b{display:block;font-size:18px;font-weight:600;color:var(--ink);letter-spacing:-.01em}
+aside .brand span{font-size:12px;color:var(--mut)}
+aside nav{padding:4px 12px;display:flex;flex-direction:column;gap:2px}
+aside nav button{display:flex;align-items:center;gap:12px;width:100%;padding:11px 14px;
+  background:none;border:0;border-radius:12px;
+  font:inherit;color:var(--mut);cursor:pointer;text-align:left}
+aside nav button:hover{background:var(--step);color:var(--ink)}
+aside nav button.on{background:var(--blue-bg);color:var(--accent);font-weight:600}
+/* блок под навигацией: пояснение, основное действие, сводка по просрочке */
+.sideextra{padding:24px 20px 20px;display:flex;flex-direction:column;gap:16px;flex:1;min-width:0}
+.sideabout{font-size:12px;line-height:1.55;color:var(--mut);margin:0}
+.sidecta{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;
+  padding:13px 18px;border-radius:999px;border:0;background:var(--accent);color:var(--on-acc);
+  font:600 13px/1 inherit;cursor:pointer;text-align:center}
+.sidecta:hover{filter:brightness(1.08)}
+.sidenote{background:var(--surface);border-radius:var(--r-lg);padding:14px 16px;cursor:pointer;
+  border:0;text-align:left;font:inherit;color:inherit;width:100%;display:block}
+html[data-theme="dark"] .sidenote{background:var(--step)}
+.sidenote:hover{filter:brightness(.98)}
+.sidenote .k{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--mut)}
+.sidenote .b{font-size:22px;font-weight:400;margin-top:6px;letter-spacing:-.01em}
+aside .foot{padding:16px 20px;border-top:1px solid var(--border);display:flex;
+  flex-direction:column;gap:14px;margin-top:auto}
+aside .who{display:flex;align-items:center;gap:10px;min-width:0}
+aside .who span{min-width:0}
+aside .who b{display:block;font-size:13px;color:var(--ink);font-weight:600;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+aside .who i{font-style:normal;font-size:12px;color:var(--mut)}
+aside.tuck .who span:last-child{display:none}
+aside.tuck .who{justify-content:center}
+aside .foot button{display:flex;align-items:center;gap:12px;width:100%;background:none;border:0;
+  font:inherit;color:var(--mut);cursor:pointer;padding:0}
+aside .foot button:hover{color:var(--ink)}
+
+main{flex:1;min-width:0;display:flex;flex-direction:column;background:var(--surface)}
+header{height:68px;flex:none;background:var(--card);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;padding:0 20px;position:sticky;top:0;z-index:20}
+header input[type=date]{padding:9px 8px}
+header .title{font-weight:600;font-size:15px;white-space:nowrap}
+header .sep{width:1px;height:24px;background:var(--border)}
+.stamp{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mut);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+#tools{display:flex;align-items:center;gap:8px}
+#tools .hint,header .hint{margin-left:0}
+.dot{width:7px;height:7px;border-radius:99px;background:var(--green);flex:none}
+.grow{flex:1}
+.avatar{width:34px;height:34px;border-radius:99px;background:var(--accent);color:var(--on-acc);
+  flex:none;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600}
+.wrap{padding:32px 24px 56px;max-width:1600px;width:100%}
+h1{font-size:28px;font-weight:600;letter-spacing:-.02em;margin:0 0 6px}
+h1+.sub{color:var(--mut);margin:0 0 32px;font-size:15px}
+h1.solo{margin-bottom:28px}
+
+/* ── элементы ── */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border-radius:999px;
+  border:1px solid var(--border);background:var(--card);color:var(--ink);font:500 14px/1.2 inherit;
+  cursor:pointer;text-decoration:none;white-space:nowrap}
+.btn:hover{background:var(--step)}
+.btn[disabled]{opacity:.4;cursor:default}
+.btn.dark{background:var(--accent);border-color:var(--accent);color:var(--on-acc)}
+.btn.dark:hover{background:var(--accent);filter:brightness(1.08)}
+.btn.icon{padding:0;width:36px;height:36px;justify-content:center}
+input,select{font:inherit;padding:9px 12px;border:1px solid var(--border);border-radius:var(--r-sm);
+  background:var(--card);color:var(--ink)}
+input:focus,select:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 3px var(--blue-bg)}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:999px;
+  border:1px solid var(--border);background:var(--card);font-size:13px;cursor:pointer;user-select:none}
+.chip.on{background:var(--accent);border-color:var(--accent);color:var(--on-acc)}
+/* сегмент-переключатель: ряд пилюль, активная залита */
+.seg{display:inline-flex;gap:2px;padding:4px;background:var(--inset);border-radius:999px}
+.seg .chip{border:0;background:none;color:var(--mut);font-weight:500}
+.seg .chip.on{background:var(--accent);color:var(--on-acc)}
+/* диапазоны графика: неактивные — просто текст, активный — пилюля с зелёной подложкой */
+.ranges{display:inline-flex;gap:4px;flex-wrap:wrap}
+.ranges button{border:0;background:none;font:600 16px/1 inherit;color:var(--ink);cursor:pointer;
+  padding:8px 14px;border-radius:999px}
+.ranges button:hover{background:var(--inset)}
+.ranges button.on{background:var(--green-tint);color:var(--ink)}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;
+  font-size:12px;font-weight:500;background:var(--inset);color:var(--mut);white-space:nowrap}
+.pill.owes_us{background:var(--green-bg);color:var(--green)}
+.pill.we_owe{background:var(--red-bg);color:var(--red)}
+/* валюта: одинаковая форма у всех строк, валютные — с акцентом */
+.pill.cur{min-width:54px;justify-content:center;white-space:nowrap;font-variant-numeric:tabular-nums}
+.pill.cur.fx{background:var(--blue-bg);color:var(--accent)}
+
+.card{background:var(--card);border-radius:var(--r-lg);overflow:hidden}
+.card .hd{display:flex;align-items:center;gap:10px;padding:20px 24px 16px}
+.card .hd b{font-size:16px;font-weight:600}
+.card .bd{padding:8px 24px 24px}
+
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;margin-bottom:28px}
+.kpi{background:var(--card);border-radius:var(--r-lg);padding:24px}
+.kpi .row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.kpi .v{font-size:28px;font-weight:400;letter-spacing:-.02em;margin:14px 0 6px}
+.kpi .badge{width:36px;height:36px;border-radius:999px;display:flex;align-items:center;
+  justify-content:center;flex:none}
+.kpi .badge.up{background:var(--red-bg);color:var(--red)}
+.kpi .badge.down{background:var(--green-bg);color:var(--green)}
+.kpi .trend{font-size:13px;display:flex;align-items:center;gap:6px;color:var(--mut)}
+.kpi .bar{height:4px;border-radius:99px;background:var(--inset);margin-top:18px;overflow:hidden}
+.kpi .bar i{display:block;height:100%;border-radius:99px}
+.kpi.act,.alert.act,.rank.act,.calrow.act,tr.cp.act,.avatar.act,.stat.act{cursor:pointer;
+  transition:.12s;user-select:none}
+.avatar.act:hover{filter:brightness(1.1)}
+.kpi.act:hover{box-shadow:var(--shadow)}
+.alert.act:hover,.rank.act:hover,.calrow.act:hover{background:var(--step)}
+.kpi .more{display:flex;align-items:center;gap:4px;margin-top:14px;font-size:12px;
+  font-weight:600;color:var(--accent);opacity:0;transition:.12s}
+.kpi.act:hover .more{opacity:1}
+
+#modal{position:fixed;inset:0;z-index:90;background:#0a0b0d99;display:flex;align-items:center;
+  justify-content:center}
+#modal[hidden]{display:none}
+#modal form{width:420px;background:var(--card);border-radius:var(--r-lg);padding:32px;
+  display:flex;flex-direction:column;gap:14px}
+#modal h3{margin:0 0 4px;font-size:20px;font-weight:600}
+#modal label{font-size:13px;font-weight:500;margin-bottom:-8px}
+.pager{display:flex;align-items:center;gap:6px}
+.pager button{min-width:36px;padding:7px 12px}
+.pager button.on{background:var(--accent);border-color:var(--accent);color:var(--on-acc)}
+
+.toolbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--card);
+  border-radius:var(--r-lg);padding:16px 20px;margin-bottom:24px}
+.search{display:flex;align-items:center;gap:10px;flex:1;min-width:240px;color:var(--mut);
+  border-radius:var(--r-sm);padding:0 14px;background:var(--inset)}
+.search input{border:0;background:none;padding:10px 0;flex:1;color:var(--ink)}
+.search input:focus{box-shadow:none}
+.search:focus-within{box-shadow:0 0 0 2px var(--accent)}
+
+.tblwrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:980px}
+table.narrow{min-width:700px}
+thead th{font-size:12px;font-weight:500;letter-spacing:0;text-transform:none;color:var(--mut);
+  background:none;padding:14px 12px;text-align:left;border-bottom:1px solid var(--border);
+  cursor:default;user-select:none;white-space:nowrap}
+/* кликабельны только сортируемые заголовки — остальные больше не притворяются кнопками */
+thead th.s{cursor:pointer}
+thead th.s:hover{color:var(--ink)}
+thead th.r,td.r{text-align:right}
+tbody td{padding:16px 12px;border-bottom:1px solid var(--border-soft);vertical-align:middle}
+/* имени контрагента нужна ширина: без неё оно ломается на три строки и разгоняет строку */
+tbody td:nth-child(2){min-width:195px}
+tbody tr.cp:hover{background:var(--step)}
+tbody tr.cp{cursor:pointer}
+tfoot td{padding:18px 12px;font-weight:600;border-top:1px solid var(--border)}
+.cpname{display:flex;align-items:center;gap:12px}
+.chev{transition:transform .15s;color:var(--mut-2)}
+.chev.open{transform:rotate(90deg)}
+.detail>td{background:var(--inset);padding:18px 16px 18px 48px}
+.detail .line{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 16px;
+  background:var(--card);border-radius:var(--r-sm);margin-bottom:8px}
+.detail .line>b{min-width:190px;font-weight:600}
+.detail .line .amt{margin-left:auto;font-weight:600}
+.detail .line .grow{color:var(--mut)}
+.detail .line.has-docs{cursor:pointer}
+.detail .line.has-docs:hover{background:var(--step)}
+.docs{margin:-4px 0 10px 34px;border-left:2px solid var(--border);padding-left:14px}
+.docline{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:8px 10px;
+  font-size:13px;color:var(--mut)}
+.docline:not(:last-child){border-bottom:1px solid var(--border-soft)}
+.tblfoot{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:16px 24px;
+  font-size:13px;color:var(--mut);flex-wrap:wrap}
+
+.age0{background:var(--age0)}.age1{background:var(--age1)}
+.age2{background:var(--age2)}.age3{background:var(--age3)}
+.age3.big{color:var(--red);font-weight:600}
+.legend{display:flex;align-items:center;gap:18px;flex-wrap:wrap;background:var(--card);
+  border-radius:999px;padding:8px 18px;font-size:13px;color:var(--mut)}
+.legend i{width:10px;height:10px;border-radius:99px;display:inline-block;margin-right:8px;
+  box-shadow:inset 0 0 0 1px var(--border)}
+
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+.cols3{display:grid;grid-template-columns:minmax(280px,360px) 1fr;gap:24px;align-items:start}
+/* без min-width:0 колонка растягивается по min-width:980px таблицы и выдавливает соседа
+   за экран; с ним таблица скроллится внутри .tblwrap, как и задумано */
+.cols>*,.cols3>*{min-width:0}
+@media(max-width:900px){.cols,.cols3{grid-template-columns:1fr}}
+
+.alert{background:var(--card);border-left:3px solid var(--red);
+  border-radius:12px;padding:16px 18px;margin-bottom:12px}
+.alert.info{border-left-color:var(--accent)}
+.alert b{display:block;margin-bottom:3px;font-weight:600}
+.alert .m{font-size:13px;color:var(--mut)}
+.alert .warn{font-size:13px;color:var(--red);font-weight:600}
+
+.rank{display:flex;align-items:center;gap:16px;padding:16px 24px}
+.rank .n{width:28px;height:28px;border-radius:var(--r-sm);background:var(--blue-bg);color:var(--accent);
+  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex:none}
+.rank .body{flex:1;min-width:0}
+.rank .top{display:flex;justify-content:space-between;gap:12px;margin-bottom:8px}
+.rank .track{height:6px;border-radius:99px;background:var(--inset);overflow:hidden}
+.rank .track i{display:block;height:100%;border-radius:99px;background:var(--green)}
+
+.calrow{display:flex;align-items:center;gap:16px;padding:16px 24px;
+  border-bottom:1px solid var(--border-soft)}
+.calrow:last-child{border-bottom:0}
+.calrow .when{width:96px;flex:none}
+.calrow .when .d{font-size:13px;font-weight:600}
+.calrow .arrow{width:34px;height:34px;border-radius:99px;display:flex;align-items:center;
+  justify-content:center;flex:none}
+.calrow .arrow.in{background:var(--green-bg);color:var(--green)}
+.calrow .arrow.out{background:var(--red-bg);color:var(--red)}
+.od{display:inline-block;margin-top:4px;padding:2px 8px;border-radius:999px;
+  background:var(--red-bg);color:var(--red);font-size:11px;font-weight:600}
+
+.toggle{position:relative;width:44px;height:24px;flex:none}
+.toggle input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer;z-index:2}
+.toggle span{position:absolute;inset:0;background:var(--border);border-radius:99px;transition:.15s}
+.toggle span::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;
+  background:var(--card);border-radius:99px;transition:.15s}
+.toggle input:checked+span{background:var(--green)}
+.toggle input:checked+span::after{transform:translateX(20px)}
+.star{color:var(--mut-2)}.star.on{color:var(--green)}
+.note{display:flex;gap:12px;background:var(--blue-bg);border-radius:12px;padding:16px 18px;
+  margin:16px 24px 24px;font-size:13px;color:var(--ink)}
+.userrow{display:flex;align-items:center;gap:12px;padding:14px 24px;
+  border-bottom:1px solid var(--border-soft)}
+
+/* ── дашборд: герой в духе страницы котировок ── */
+.hero{margin-bottom:36px}
+.herohead{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.hlabel{font-size:14px;color:var(--mut);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.hrow{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap}
+.hnum{font-size:40px;font-weight:400;letter-spacing:-.02em;line-height:1.15}
+.hdelta{display:inline-flex;align-items:baseline;gap:6px;font-size:18px;font-weight:400}
+.hdelta.pos{color:var(--green)}.hdelta.neg{color:var(--red)}
+.hsub{margin-top:14px;font-size:14px;color:var(--mut)}
+.chartbox{position:relative;margin-top:28px}
+.clegend{display:flex;gap:24px;flex-wrap:wrap;align-items:center;padding-top:14px;
+  font-size:13px;color:var(--mut)}
+.clegend i{width:9px;height:9px;border-radius:99px;display:inline-block;margin-right:8px}
+/* три блока показателей под графиком, разделены волосяными линиями */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid var(--border);
+  margin-bottom:36px}
+@media(max-width:900px){.stats{grid-template-columns:1fr}}
+.stat{padding:24px 28px;border-left:1px solid var(--border)}
+.stat:first-child{border-left:0;padding-left:0}
+.stat.act:hover{background:var(--card)}
+.stat h3{margin:0 0 18px;font-size:15px;font-weight:600}
+.statgrid{display:grid;grid-template-columns:1fr 1fr;gap:18px 16px}
+.dlabel{font-size:12px;color:var(--mut);border-bottom:1px dotted;padding-bottom:1px;
+  display:inline-block;opacity:.85}
+.dval{margin-top:7px;font-size:17px;font-weight:400;letter-spacing:-.01em}
+
+#notes{position:fixed;right:24px;top:78px;width:400px;max-height:70vh;overflow:auto;z-index:40;
+  background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);
+  box-shadow:var(--shadow)}
+#notes .n{display:flex;gap:12px;padding:16px 18px;border-bottom:1px solid var(--border-soft);
+  font-size:13px}
+#notes .n.act{cursor:pointer;user-select:none}
+#notes .n.act:hover{background:var(--step)}
+.bell{position:relative;background:none;border:0;padding:8px;cursor:pointer;color:var(--ink)}
+.bell b{position:absolute;top:2px;right:2px;min-width:16px;height:16px;padding:0 4px;
+  background:var(--red);color:#fff;font-size:10px;font-weight:700;border-radius:99px;
+  display:flex;align-items:center;justify-content:center}
+
+.err{color:var(--red);font-size:13px;min-height:18px}
+.empty{padding:32px 24px;text-align:center;color:var(--mut)}
+#chtip{position:absolute;display:none;z-index:5;pointer-events:none;background:var(--tip-bg);
+  color:var(--tip-fg);border-radius:12px;padding:12px 14px;font-size:12px;min-width:240px;
+  box-shadow:var(--shadow)}
+#chtip b{display:block;margin-bottom:8px;font-size:13px}
+#chtip div{display:flex;align-items:center;gap:8px;padding:3px 0}
+#chtip i{width:8px;height:8px;border-radius:8px;flex:none}
+#chtip span{margin-left:auto;font-weight:600;font-variant-numeric:tabular-nums}
+[data-tip]:not(.hint):not(.act):not(button):not(a):not(select){cursor:help}
+.hint{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;
+  border-radius:99px;background:var(--inset);color:var(--mut);font-size:10px;font-weight:600;
+  margin-left:6px;cursor:help;user-select:none;vertical-align:middle;flex:none;
+  font-variant-numeric:normal;letter-spacing:0;text-transform:none}
+.hint:hover{background:var(--accent);color:var(--on-acc)}
+#hinttip{position:fixed;display:none;z-index:80;max-width:320px;background:var(--tip-bg);
+  color:var(--tip-fg);border-radius:12px;padding:12px 14px;font:400 12px/1.5 inherit;letter-spacing:0;
+  text-transform:none;box-shadow:var(--shadow);pointer-events:none}
+#toast{position:fixed;right:24px;bottom:24px;z-index:60;display:flex;flex-direction:column;gap:10px}
+#toast .t{background:var(--tip-bg);color:var(--tip-fg);border-radius:12px;padding:16px 20px;
+  box-shadow:var(--shadow);display:flex;align-items:center;gap:14px;max-width:440px;
+  animation:tin .18s ease-out}
+#toast .t a{color:#7fd8b0;cursor:pointer;font-weight:600;white-space:nowrap}
+@keyframes tin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* Печать. Фильтры и заголовок экрана живут в .toolbar и header — если их перенести
+   в другой контейнер, это правило обязано быть обновлено, иначе они полезут в печать.
+   Тёмная тема на печать не уходит: принудительно возвращаем светлые токены. */
+@media print{
+  aside,header,.toolbar,.noprint{display:none}
+  html,html[data-theme="dark"]{--surface:#fff;--card:#fff;--step:#fff;--inset:#f2f4f7;
+    --border:#c8ccd4;--border-soft:#e2e5ea;--ink:#000;--mut:#444;--mut-2:#444;
+    --accent:#0052ff;--on-acc:#fff;--blue-bg:#e7eeff;--green:#098551;--green-bg:#e3f2eb;
+    --red:#cf202f;--red-bg:#fbe9ea;--age0:#dcefe6;--age1:#e2eaff;--age2:#fbeedd;--age3:#fbdfe1}
+}
+</style></head><body>
+
+<div id="app">
+  <aside>
+    <div class="brand"><b>Взаиморасчёты</b><span>расчёты с контрагентами</span></div>
+    <nav id="nav"></nav>
+    <div class="sideextra" id="sideextra"></div>
+    <div class="foot">
+      <div class="who"><span class="avatar" id="ava2"></span>
+        <span><b id="whoLogin"></b><i id="role"></i></span></div>
+      <button onclick="resetDemo()" data-tip="Сбросить демо-данные">
+      <svg class="i" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+      <span>Сбросить демо</span></button></div>
+  </aside>
+  <main>
+    <header>
+      <button class="btn icon tuckbtn" onclick="toggleTuck()" data-tip="Свернуть меню">
+        <svg class="i sm" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+      <button class="btn icon" id="back" onclick="goBack()" data-tip="Вернуться назад" hidden>
+        <svg class="i" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <span class="title" id="htitle">Взаиморасчёты</span>
+      <span class="sep"></span>
+      <span class="stamp" id="stamp"></span>
+      <button class="btn icon" id="themeBtn" onclick="toggleTheme()" data-tip="Светлая / тёмная тема"></button>
+      <span class="grow"></span>
+      <span id="tools"></span>
+      <button class="bell" onclick="toggleNotes()" data-tip="Уведомления">
+        <svg class="i" viewBox="0 0 24 24"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+        <b id="ncount" hidden></b></button>
+      <span class="avatar act" id="ava" onclick="openAbout()" data-tip="О демо"></span>
+    </header>
+    <div class="wrap" id="view"></div>
+  </main>
+</div>
+<div id="notes" hidden></div>
+<div id="toast"></div>
+<div id="hinttip"></div>
+<div id="modal" hidden><form onsubmit="return false">
+  <h3>О демо «Взаиморасчёты»</h3>
+  <div class="mut" style="font-size:13px;margin-top:-6px">Синтетические данные, всё считается в браузере</div>
+  <p style="margin:0;font-size:13px;line-height:1.5">Самостоятельная демонстрация: 48 условных
+    контрагентов из фикстуры проекта, ни сервера, ни базы данных нет — отчёты, акт сверки и
+    экспорт считаются прямо на этой странице. Правила счетов (какие счета 1210/3510/3310/1710
+    и с каким знаком формируют итог) можно менять в «Настройках» и сразу видеть эффект.</p>
+  <button type="button" class="btn dark" style="justify-content:center;padding:11px"
+    onclick="closeAbout()">Понятно</button>
+</form></div>
+
+<script>
+"use strict";
+const $=s=>document.querySelector(s);
+const fmt=v=>(v||0).toLocaleString("ru-RU",{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmt0=v=>Math.round(v||0).toLocaleString("ru-RU");
+const short=v=>{const a=Math.abs(v);
+  return a>=1e9?(v/1e9).toFixed(1)+" млрд":a>=1e6?(v/1e6).toFixed(1)+" млн":fmt(v)};
+const cls=v=>v>0?"pos":v<0?"neg":"zero";
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const ini=n=>n.replace(/[«"]/g,"").trim().split(/\s+/).slice(0,2).map(w=>w[0]).join("").toUpperCase();
+const orgName=(orgs,id)=>(orgs||[]).find(o=>o.id===id)?.name||id;
+// подсказка по наведению: hint("текст") -> значок «?»
+const hint=t=>`<span class="hint" data-tip="${esc(t)}">?</span>`;
+// подсказка без значка «?» — вешается прямо на символ
+const tip=t=>` data-tip="${esc(t)}"`;
+// План счетов РК: 1xxx — активы (нам должны / мы отдали вперёд), 3xxx — обязательства (должны мы)
+const ACCOUNTS={
+ "1210":"Краткосрочная дебиторская задолженность покупателей и заказчиков. Заказчик должен нам за подписанные акты и накладные.",
+ "3510":"Краткосрочные авансы полученные. Заказчик заплатил вперёд — мы должны ему работы или возврат денег.",
+ "3310":"Краткосрочная кредиторская задолженность поставщикам и подрядчикам. Мы должны за полученные материалы и услуги.",
+ "1710":"Краткосрочные авансы выданные. Мы заплатили поставщику вперёд — он должен нам поставку.",
+ "1280":"Прочая краткосрочная дебиторская задолженность: расчёты вне основной реализации.",
+ "3390":"Прочая краткосрочная кредиторская задолженность: обязательства вне основных поставок.",
+ "2110":"Долгосрочная дебиторская задолженность покупателей — расчёты со сроком больше года.",
+ "4110":"Долгосрочная кредиторская задолженность поставщикам — обязательства со сроком больше года.",
+};
+const accHint=a=>ACCOUNTS[a]?hint(ACCOUNTS[a]):"";
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape"&&!$("#modal").hidden)return closeAbout();
+  const typing=/^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName);
+  if(!typing&&(e.key==="Backspace"||(e.altKey&&e.key==="ArrowLeft"))){e.preventDefault();goBack()}
+});
+document.addEventListener("mouseover",e=>{
+  const h=e.target.closest?.("[data-tip]");if(!h)return;
+  const b=$("#hinttip");b.textContent=h.dataset.tip;b.style.display="block";
+  const r=h.getBoundingClientRect(),bb=b.getBoundingClientRect();
+  b.style.left=Math.max(8,Math.min(r.left-8,innerWidth-bb.width-8))+"px";
+  b.style.top=(r.bottom+8+bb.height>innerHeight?r.top-bb.height-8:r.bottom+8)+"px";
+});
+document.addEventListener("mouseout",e=>{
+  if(e.target.closest?.("[data-tip]"))$("#hinttip").style.display="none";
+});
+
+const ICON={
+  customers:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  suppliers:'<rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>',
+  aging:'<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M9.5 14.5l5 4M14.5 14.5l-5 4"/>',
+  dashboard:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
+  calendar:'<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+  settings:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.14.36.43.65.79.82H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+  search:'<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>',
+  refresh:'<path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/>',
+  excel:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/>',
+  doc:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/>',
+  chev:'<path d="M9 6l6 6-6 6"/>',
+  down:'<path d="M12 5v14"/><path d="M19 12l-7 7-7-7"/>',
+  up:'<path d="M12 19V5"/><path d="M5 12l7-7 7 7"/>',
+  warn:'<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  flip:'<path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/>',
+  bank:'<path d="M3 21h18M4 10h16M5 10V7l7-4 7 4v3M6 10v11M10 10v11M14 10v11M18 10v11"/>',
+  users:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>',
+  sync:'<path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  trash:'<path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>',
+  info:'<circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/>',
+  sun:'<circle cx="12" cy="12" r="4.2"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4"/>',
+  moon:'<path d="M20.5 14.3A8.6 8.6 0 0 1 9.7 3.5a8.6 8.6 0 1 0 10.8 10.8z"/>',
+  arrow:'<path d="M4 12h15"/><path d="M13 6l6 6-6 6"/>',
+};
+const svg=(k,c="i")=>`<svg class="${c}" viewBox="0 0 24 24">${ICON[k]}</svg>`;
+/* ── тема ── отдельный ключ vzr_theme, четыре существующих ключа не трогаем.
+   Цвета графика читаем из CSS-переменных: inline-SVG рисуется в JS, а токены живут в CSS. */
+const LS_THEME="vzr_theme";
+const cv=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const isDark=()=>document.documentElement.dataset.theme==="dark";
+function paintThemeBtn(){const b=$("#themeBtn");if(b)b.innerHTML=svg(isDark()?"sun":"moon","i sm")}
+function toggleTheme(){
+  const t=isDark()?"light":"dark";
+  document.documentElement.dataset.theme=t;
+  localStorage.setItem(LS_THEME,t);
+  paintThemeBtn();render();      // график перерисовываем: его цвета взяты из токенов
+}
+
+/* OPENS ON THE DASHBOARD. It used to open on Покупатели - a table - so the дашборд existed,
+   was fully built, and nobody ever saw it: you had to already know it was in the sidebar. The
+   dashboard is the screen that answers "should I care about this software" in one look, and it
+   is also what the card on the site shows, since that card is a live frame of this page. */
+let view="dashboard", sortKey="net", sortDir=-1, notes=[], agingSet="customers";
+let chartData=null;
+let debtorsMode="all", debtorsAll=false;   // руководителю важен факт долга, а не отчёт
+let histRange=2;                           // индекс в RANGES: период графика на дашборде
+let notesAll=false;
+let page=1;
+const nav=[];   // история переходов: возврат к предыдущему экрану с его фильтрами
+const SIDEBAR={open:"0 0 260px",tuck:"0 0 68px"};
+function applyTuck(tuck){
+  const a=document.querySelector("aside");
+  a.classList.toggle("tuck",tuck);
+  a.style.flex=tuck?SIDEBAR.tuck:SIDEBAR.open;   // размер ставим явно: надёжнее каскада
+  const b=document.querySelector("header .tuckbtn");
+  if(b)b.title=tuck?"Развернуть меню":"Свернуть меню";
+}
+function toggleTuck(){
+  const tuck=!document.querySelector("aside").classList.contains("tuck");
+  applyTuck(tuck);
+  localStorage.setItem("vzr_tuck",tuck?"1":"");
+}
+let PAGE_SIZE=50;     // ponytail: рисуем страницу, а не весь список — на 3000 строк DOM тормозит.
+                      // Сортировка и итоги считаются по всему набору.
+function chartTip(ev,i){
+  if(!chartData)return;
+  const {h,SER,money}=chartData, p=h[i], box=$("#chtip");
+  box.innerHTML=`<b>${p.date}</b>`+SER.map(([k,c,label,abs])=>
+    `<div><i style="background:${c}"></i>${label}<span>${money(abs?Math.abs(p[k]):p[k])} ₸</span></div>`).join("");
+  box.style.display="block";
+  const r=ev.currentTarget.ownerSVGElement.getBoundingClientRect();
+  box.style.left=Math.min(ev.clientX-r.left+14, r.width-250)+"px";
+  box.style.top=Math.max(ev.clientY-r.top-10,0)+"px";
+  const g=document.getElementById("ch-guide");
+  if(g){g.style.display="";g.setAttribute("x1",chartData.X(i));g.setAttribute("x2",chartData.X(i))}
+}
+function chartTipOff(){const b=$("#chtip");if(b)b.style.display="none";
+  const g=document.getElementById("ch-guide");if(g)g.style.display="none"}
+const state={q:"",date:"",hide_zero:false,only_debtors:false,org:""};
+const TABS=[["customers","Покупатели","customers"],["suppliers","Поставщики","suppliers"],
+  ["aging","Сроки долга","aging"],["dashboard","Дашборд","dashboard"],
+  ["calendar","Календарь","calendar"],["settings","Настройки","settings"]];
+// периоды графика: подпись, сколько недельных срезов показать, как назвать период в дельте
+const RANGES=[["1М",5,"месяц"],["3М",14,"квартал"],["6М",27,"полгода"],
+  ["Год",53,"год"],["Всё",999,"весь период"]];
+
+/* ═══════════════════════════════════════════════════════════════════════
+   ДАННЫЕ И ДВИЖОК РАСЧЁТА — порт backend/app.py + backend/calc.py +
+   mock1c/server.py в браузер. Нет сервера и базы — весь расчёт идёт здесь
+   на встроенной синтетической выгрузке (golden.json, 48 контрагентов).
+   Инварианты и формулы те же, что в исходном приложении:
+     net = acc_1210_dt - acc_3510_kt - acc_3310_kt  (покупатели, зачёт выключен по умолчанию)
+   ═══════════════════════════════════════════════════════════════════════ */
+const me={login:"demo",role:"admin"};
+const TODAY="2026-07-31";           // дата mock1c, на которую суммы точно равны golden.json
+const OUR_ORG_NAME="ТОО «Тумар Курылыс»";
+const OVERDUE_DAYS=30, PAY_TERM_DAYS=30;
+const POSITIVE_MEANS={customers:"owes_us",suppliers:"we_owe"};
+const round2=x=>Math.round((x+Number.EPSILON)*100)/100;
+const round4=x=>Math.round((x+Number.EPSILON)*10000)/10000;
+function todayISO(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`}
+function nowStamp(){const d=new Date(),p=n=>String(n).padStart(2,"0");
+  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`}
+
+// золотая фикстура — 48 синтетических контрагентов (mock1c/golden.json, без изменений)
+const GOLDEN=[
+ {"name":"Prime Company","bin":"161156608751","tax_mode":"Общеустановленный","starred":false,"acc_1210_dt":0.0,"acc_3510_kt":184370.96,"acc_3310_kt":0.0,"net_expected":-184370.96},
+ {"name":"ТОО «Нурлы-Инжиниринг Актобе»","bin":"050750270495","tax_mode":"—","starred":false,"acc_1210_dt":-10000000,"acc_3510_kt":0.0,"acc_3310_kt":0.0,"net_expected":-10000000.0},
+ {"name":"ТОО «Самал-Логистика Алматы»","bin":"010673171542","tax_mode":"—","starred":false,"acc_1210_dt":2911493.71,"acc_3510_kt":0.0,"acc_3310_kt":0.0,"net_expected":2911493.71},
+ {"name":"ТОО «Самал Инжиниринг»","bin":"210377674592","tax_mode":"—","starred":false,"acc_1210_dt":6875256.88,"acc_3510_kt":6865256.88,"acc_3310_kt":0.0,"net_expected":10000.0},
+ {"name":"АО «Сарыарка Снаб»","bin":"100609109169","tax_mode":"—","starred":false,"acc_1210_dt":0.0,"acc_3510_kt":63198.43,"acc_3310_kt":0.0,"net_expected":-63198.43},
+ {"name":"ТОО «Болашак Логистика»","bin":"041292357862","tax_mode":"Общеустановленный","starred":false,"acc_1210_dt":0.0,"acc_3510_kt":9887.67,"acc_3310_kt":0.0,"net_expected":-9887.67},
+ {"name":"ТОО «Дала Сервис»","bin":"251073030341","tax_mode":"—","starred":true,"acc_1210_dt":9407912.86,"acc_3510_kt":258907912.86,"acc_3310_kt":500000,"net_expected":-250000000.0},
+ {"name":"АО «Меруерт Инвест»","bin":"100693544965","tax_mode":"Общеустановленный","starred":false,"acc_1210_dt":0.0,"acc_3510_kt":12726.5,"acc_3310_kt":0.0,"net_expected":-12726.5},
+ {"name":"ТОО «Нурлы Development»","bin":"210692000172","tax_mode":"—","starred":true,"acc_1210_dt":500001.5,"acc_3510_kt":0.0,"acc_3310_kt":500000,"net_expected":1.5},
+ {"name":"Nova Industries","bin":"080972240061","tax_mode":"—","starred":false,"acc_1210_dt":0.0,"acc_3510_kt":12613.28,"acc_3310_kt":0.0,"net_expected":-12613.28},
+ {"name":"Vertex Logistics","bin":"230213791367","tax_mode":"—","starred":false,"acc_1210_dt":3137141.22,"acc_3510_kt":0.0,"acc_3310_kt":0.0,"net_expected":3137141.22},
+ {"name":"ТОО «Шапагат Групп»","bin":"231248621173","tax_mode":"Общеустановленный","starred":false,"acc_1210_dt":0.0,"acc_3510_kt":2000,"acc_3310_kt":0.0,"net_expected":-2000.0},
+ {"name":"ТОО «Жайлау Строй»","bin":"170199952672","tax_mode":"—","starred":false,"acc_1210_dt":0.0,"acc_3510_kt":2000,"acc_3310_kt":0.0,"net_expected":-2000.0},
+ {"name":"ТОО «Береке-Development Караганда»","bin":"141172961336","tax_mode":"—","starred":false,"acc_1210_dt":0.0,"acc_3510_kt":4912.82,"acc_3310_kt":0.0,"net_expected":-4912.82},
+ {"name":"ТОО «Алтын-Строй Актобе»","bin":"240849661193","tax_mode":"—","starred":false,"acc_1210_dt":5000000,"acc_3510_kt":5580455.83,"acc_3310_kt":0,"net_expected":-580455.83},
+ {"name":"ТОО «Алтын Снаб»","bin":"140979615869","tax_mode":"Общеустановленный","starred":false,"acc_1210_dt":3622.7,"acc_3510_kt":0.0,"acc_3310_kt":0.0,"net_expected":3622.7},
+ {"name":"ИП \"Тулегенов\"","bin":"250580452762","tax_mode":"—","starred":false,"acc_1210_dt":6217.47,"acc_3510_kt":6217.47,"acc_3310_kt":0.0,"net_expected":0.0},
+ {"name":"ТОО «Болашак Инжиниринг»","bin":"110988875029","tax_mode":"—","starred":false,"acc_1210_dt":1849853.55,"acc_3510_kt":0.0,"acc_3310_kt":0.0,"net_expected":1849853.55},
+ {"name":"Абенов М.М. ИП","bin":"040523158963","tax_mode":"—","starred":false,"acc_1210_dt":593401.08,"acc_3510_kt":0.0,"acc_3310_kt":0.0,"net_expected":593401.08},
+ {"name":"ТОО «Каратау Групп»","bin":"210539079074","tax_mode":"—","starred":false,"acc_1210_dt":500000,"acc_3510_kt":377639.38,"acc_3310_kt":0.0,"net_expected":122360.62},
+ {"name":"Summit Development","bin":"001198297437","tax_mode":"Общеустановленный","starred":false,"acc_1210_dt":371377.89,"acc_3510_kt":371377.89,"acc_3310_kt":0.0,"net_expected":0.0},
+ {"name":"ТОО «Береке-Трейд Актобе»","bin":"250921523838","tax_mode":"—","starred":false,"acc_1210_dt":500000,"acc_3510_kt":299999.0,"acc_3310_kt":0.0,"net_expected":200001.0},
+ {"name":"ТОО «Жайлау Снаб»","bin":"000567097411","tax_mode":"—","starred":false,"acc_1210_dt":2285.64,"acc_3510_kt":0.0,"acc_3310_kt":0.0,"net_expected":2285.64},
+ {"name":"ТОО «Болашак Инвест»","bin":"261222355180","tax_mode":"—","starred":false,"acc_1210_dt":0,"acc_3510_kt":0,"acc_3310_kt":0,"net_expected":0},
+ {"name":"Мукатов Ерлан Дарханович","bin":"190384895600","tax_mode":"Общеустановленный","starred":false,"acc_1210_dt":15156.63,"acc_3510_kt":0.0,"acc_3310_kt":0.0,"net_expected":15156.63},
+ {"name":"Оразалин T.А. ИП","bin":"201070228522","tax_mode":"—","starred":false,"acc_1210_dt":51140.14,"acc_3510_kt":0.0,"acc_3310_kt":0.0,"net_expected":51140.14},
+ {"name":"Nova Group","bin":"041086654273","tax_mode":"Общеустановленный","starred":false,"acc_1210_dt":3513552.65,"acc_3510_kt":0.0,"acc_3310_kt":0.0,"net_expected":3513552.65},
+ {"name":"ТОО «Отан-Сервис Алматы»","bin":"201138750748","tax_mode":"—","starred":false,"acc_1210_dt":7834.38,"acc_3510_kt":0.0,"acc_3310_kt":0.0,"net_expected":7834.38},
+ {"name":"Байжанов T.Н. ИП","bin":"180812904058","tax_mode":"—","starred":false,"acc_1210_dt":445515.34,"acc_3510_kt":0.0,"acc_3310_kt":0.0,"net_expected":445515.34},
+ {"name":"ТОО «Самал Development»","bin":"081049197937","tax_mode":"Общеустановленный","starred":false,"acc_1210_dt":0.0,"acc_3510_kt":13685.94,"acc_3310_kt":0.0,"net_expected":-13685.94},
+ {"name":"АО «Асыл Курылыс»","bin":"170764986160","tax_mode":"—","starred":false,"acc_1210_dt":8700.08,"acc_3510_kt":0.0,"acc_3310_kt":0.0,"net_expected":8700.08},
+ {"name":"ТОО «Отан Логистика»","bin":"200583475115","tax_mode":"—","starred":false,"acc_1210_dt":36744.92,"acc_3510_kt":0.0,"acc_3310_kt":0.0,"net_expected":36744.92},
+ {"name":"ТОО «Каратау Строй»","bin":"000789055226","tax_mode":"Общеустановленный","starred":true,"acc_1210_dt":34219.13,"acc_3510_kt":54534219.13,"acc_3310_kt":500000,"net_expected":-55000000.0},
+ {"name":"ТОО «Жайлау Групп»","bin":"070732552259","tax_mode":"—","starred":false,"acc_1210_dt":2000,"acc_3510_kt":0.0,"acc_3310_kt":0.0,"net_expected":2000.0},
+ {"name":"Summit Group","bin":"131094679839","tax_mode":"Общеустановленный","starred":false,"acc_1210_dt":500000,"acc_3510_kt":299999.0,"acc_3310_kt":0.0,"net_expected":200001.0},
+ {"name":"Vertex Trading","bin":"150316838131","tax_mode":"—","starred":false,"acc_1210_dt":30817138.96,"acc_3510_kt":0.0,"acc_3310_kt":0.0,"net_expected":30817138.96},
+ {"name":"ТОО «Шапагат-Курылыс Актобе»","bin":"200522847622","tax_mode":"—","starred":false,"acc_1210_dt":115276.08,"acc_3510_kt":115276.08,"acc_3310_kt":0.0,"net_expected":0.0},
+ {"name":"ТОО «Береке Инжиниринг»","bin":"191080344234","tax_mode":"Упрощенная декларация","starred":true,"acc_1210_dt":507614.52,"acc_3510_kt":150007614.52,"acc_3310_kt":500000,"net_expected":-150000000.0},
+ {"name":"ТОО «Меруерт Инжиниринг»","bin":"071090272271","tax_mode":"—","starred":false,"acc_1210_dt":0.0,"acc_3510_kt":2109.13,"acc_3310_kt":0.0,"net_expected":-2109.13},
+ {"name":"ТОО «Асыл Групп»","bin":"010251180582","tax_mode":"Общеустановленный","starred":false,"acc_1210_dt":0.0,"acc_3510_kt":18135.14,"acc_3310_kt":0.0,"net_expected":-18135.14},
+ {"name":"ИП \"Оразалин\"","bin":"210517976166","tax_mode":"Общеустановленный","starred":false,"acc_1210_dt":3644727.26,"acc_3510_kt":0.0,"acc_3310_kt":0.0,"net_expected":3644727.26},
+ {"name":"ТОО «Меруерт Групп»","bin":"090973863665","tax_mode":"Общеустановленный","starred":false,"acc_1210_dt":2000,"acc_3510_kt":0.0,"acc_3310_kt":0.0,"net_expected":2000.0},
+ {"name":"ТОО «Нурлы Инжиниринг»","bin":"180163266507","tax_mode":"—","starred":false,"acc_1210_dt":0.0,"acc_3510_kt":2173.31,"acc_3310_kt":0.0,"net_expected":-2173.31},
+ {"name":"Досмагамбетов Н.М. ИП","bin":"060150443039","tax_mode":"—","starred":false,"acc_1210_dt":500000,"acc_3510_kt":299999.0,"acc_3310_kt":0.0,"net_expected":200001.0},
+ {"name":"ТОО «Алтын-Групп Актобе»","bin":"210834888578","tax_mode":"—","starred":true,"acc_1210_dt":18457.32,"acc_3510_kt":15347735.37,"acc_3310_kt":2670721.95,"net_expected":-18000000.0},
+ {"name":"АО «Самал Сервис»","bin":"011133875015","tax_mode":"—","starred":false,"acc_1210_dt":74385.48,"acc_3510_kt":0.0,"acc_3310_kt":0.0,"net_expected":74385.48},
+ {"name":"Тулегенов Нурбол Нурболович","bin":"240466262670","tax_mode":"Общеустановленный","starred":false,"acc_1210_dt":2000,"acc_3510_kt":0.0,"acc_3310_kt":0.0,"net_expected":2000.0},
+ {"name":"Orion Development","bin":"260276906846","tax_mode":"Общеустановленный","starred":false,"acc_1210_dt":26666.22,"acc_3510_kt":0.0,"acc_3310_kt":0.0,"net_expected":26666.22}
+];
+// поставщики: в golden.json их нет, счета 3310/1710 для отчёта по поставщикам (mock1c/server.py)
+const SUPPLIERS=[
+ {name:"ТОО «КазСтройСнаб»",bin:"041140006612",tax_mode:"Общеустановленный",acc_3310_kt:48250000.0,acc_1710_dt:12000000.0},
+ {name:"ТОО «Бетон-Сервис Астана»",bin:"090640013305",tax_mode:"Общеустановленный",acc_3310_kt:31480500.0,acc_1710_dt:0.0},
+ {name:"ТОО «Арматура Казахстан»",bin:"120240009481",tax_mode:"Общеустановленный",acc_3310_kt:19700000.0,acc_1710_dt:4500000.0},
+ {name:"АО «КазТранс Логистика»",bin:"030740002119",tax_mode:"Общеустановленный",acc_3310_kt:0.0,acc_1710_dt:27300000.0},
+ {name:"ТОО «Техника-Лизинг KZ»",bin:"150340018827",tax_mode:"—",acc_3310_kt:8940000.0,acc_1710_dt:15600000.0},
+ {name:"ИП «Сарсенов А.Б.»",bin:"870514300922",tax_mode:"Упрощенная декларация",acc_3310_kt:3120000.0,acc_1710_dt:0.0},
+ {name:"ТОО «ЭнергоМонтаж Сервис»",bin:"070940005544",tax_mode:"—",acc_3310_kt:0.0,acc_1710_dt:6750000.0},
+ {name:"ТОО «СпецТехСнаб»",bin:"160540021170",tax_mode:"Общеустановленный",acc_3310_kt:14200000.0,acc_1710_dt:2300000.0},
+];
+const ORGS=[
+ {id:"org-tumar-main",name:"ТОО «Тумар Курылыс»",bin:"070859806905"},
+ {id:"org-tumar-pavlodar",name:"ТОО «Тумар-Строй Павлодар»",bin:"111036216653"},
+ {id:"org-tumar-eng",name:"ТОО «Тумар Инжиниринг»",bin:"260672166798"},
+];
+const RATES={USD:512.34,EUR:551.20,RUB:5.42};
+// счёт -> [тип, поле фикстуры], нужен для свёртки сальдо (mock1c/server.py ACCOUNTS)
+const ACCOUNT_DEF={"1210":["asset","acc_1210_dt"],"3510":["liability","acc_3510_kt"],
+  "3310":["liability","acc_3310_kt"],"1710":["asset","acc_1710_dt"]};
+const DEBT_SIDE_ACCOUNTS=new Set(["1210","3310"]);
+const ADVANCE_SIDE_ACCOUNTS=new Set(["3510","1710"]);
+
+// ponytail: FNV-1a вместо md5 — детерминированный разброс для демо-разбивки по договорам
+// и документам, не требует крипто-точности и не обязан совпадать с python-хэшем
+// оригинала (важна только повторяемость внутри браузера, не битовое совпадение).
+function hash32(str){
+  let h=0x811c9dc5;
+  for(let i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,0x01000193)}
+  return h>>>0;
+}
+function scale(date){
+  // затухание для прошлых дат — история для дашборда; на TODAY и позже = 1.0
+  // (сходится с golden.json, как и в mock1c/server.py)
+  if(date>=TODAY) return 1.0;
+  const days=Math.round((Date.parse(TODAY+"T00:00:00Z")-Date.parse(date+"T00:00:00Z"))/86400000);
+  const base=Math.max(0.3,1.0-days*0.002);
+  const factor=0.9+(hash32("scale|"+date)%21)/100;
+  return round4(base*factor);
+}
+function rateOf(currency,date){
+  if(currency==="KZT") return 1.0;
+  const base=RATES[currency];
+  return round4(base*(1+((hash32("rate|"+currency+"|"+date)%61)-30)/1000));
+}
+function orgOf(bin_){
+  const r=hash32("org|"+bin_)%10;
+  return r<7?ORGS[0].id:r<9?ORGS[1].id:ORGS[2].id;
+}
+function contractsOf(cp,hasDebt,hasAdvance){
+  const seed=hash32("ctr|"+cp.bin);
+  let n=1+seed%3;
+  if(hasDebt&&hasAdvance) n=Math.max(n,2);
+  const curs=["KZT","KZT","KZT","KZT","USD","EUR","RUB"];
+  const out=[];
+  for(let i=0;i<n;i++){
+    const s=hash32("ctr|"+cp.bin+"|"+i);
+    const cur=i?curs[s%7]:"KZT";
+    out.push({id:`dg-${cp.bin}-${i+1}`,
+      name:`Договор №${s%400+100} от ${2024+s%3}-${String(s%12+1).padStart(2,"0")}-${String(s%28+1).padStart(2,"0")}`,
+      currency:cur});
+  }
+  return out;
+}
+function splitAmount(amount,k,seed){
+  // разложить сумму на k неравных частей без потери копеек — веса из seed, остаток в последнюю часть
+  seed=seed>>>0;
+  if(k===1) return [round2(amount)];
+  const weights=[]; for(let i=0;i<k;i++) weights.push(1+((seed>>>(7*i))%90));
+  const totalW=weights.reduce((a,b)=>a+b,0);
+  const parts=[]; let left=round2(amount);
+  for(let i=0;i<k-1;i++){const p=round2(amount*weights[i]/totalW);parts.push(p);left=round2(left-p)}
+  parts.push(left);
+  return parts;
+}
+function documentsFor(cp,account,contract,amount,date){
+  const seed=hash32(`doc|${cp.bin}|${account}|${contract.id}`);
+  const n=1+seed%3;
+  const parts=splitAmount(amount,n,seed);
+  const base=Date.parse(date+"T00:00:00Z");
+  const kind=DEBT_SIDE_ACCOUNTS.has(account)?"Акт выполненных работ":"Платёжное поручение";
+  const out=[];
+  for(let i=0;i<parts.length;i++){
+    const age=5+((seed>>>(8*i))%186);
+    out.push({id:`doc-${cp.bin}-${account}-${contract.id}-${i+1}`,
+      name:`${kind} №${seed%900+100+i}`,
+      date:new Date(base-age*86400000).toISOString().slice(0,10),
+      amount:parts[i]});
+  }
+  return out;
+}
+function balances(accounts,date,withDocs,orgsFilter){
+  const k=scale(date);
+  const rows=[];
+  for(const cp of GOLDEN.concat(SUPPLIERS)){
+    const org=orgOf(cp.bin);
+    if(orgsFilter&&orgsFilter.length&&!orgsFilter.includes(org)) continue;
+    const amounts={};
+    for(const a of accounts) amounts[a]=round2((cp[ACCOUNT_DEF[a][1]]||0)*k);
+    const hasDebt=accounts.some(a=>DEBT_SIDE_ACCOUNTS.has(a)&&amounts[a]);
+    const hasAdv=accounts.some(a=>ADVANCE_SIDE_ACCOUNTS.has(a)&&amounts[a]);
+    const ctrs=contractsOf(cp,hasDebt,hasAdv);
+    for(const acc of accounts){
+      const amount=amounts[acc]||0;
+      if(!amount) continue;   // нулевые сальдо 1С не отдаёт
+      const kind=ACCOUNT_DEF[acc][0];
+      // долг — на первые договоры, аванс — на последний: разные договоры
+      const picked=(DEBT_SIDE_ACCOUNTS.has(acc)&&ctrs.length>1)?ctrs.slice(0,-1):[ctrs[ctrs.length-1]];
+      const splitSeed=hash32(`spl|${cp.bin}|${acc}`);
+      const parts=splitAmount(amount,picked.length,splitSeed);
+      picked.forEach((ctr,idx)=>{
+        const part=parts[idx], cur=ctr.currency, r=rateOf(cur,date);
+        const row={org,counterparty:{id:`cp-${cp.bin}`,name:cp.name,bin:cp.bin,tax_mode:cp.tax_mode||""},
+          contract:{id:ctr.id,name:ctr.name},account:acc,account_kind:kind,currency:cur,
+          dt:kind==="asset"?part:0, kt:kind==="liability"?part:0};
+        if(cur!=="KZT"){
+          const cval=round2(part/r);
+          row.dt_cur=kind==="asset"?cval:0; row.kt_cur=kind==="liability"?cval:0; row.rate=r;
+        }
+        if(withDocs) row.documents=documentsFor(cp,acc,ctr,part,date);
+        rows.push(row);
+      });
+    }
+  }
+  return rows;
+}
+
+/* ── калькулятор пар счетов (порт backend/calc.py) ── */
+const NO_CONTRACT="Без разреза по договорам";
+function folded(row){
+  if(row.account_kind==="asset") return row.dt-row.kt;
+  if(row.account_kind==="liability") return row.kt-row.dt;
+  throw new Error("неизвестный тип счёта: "+row.account_kind);
+}
+function calcCalculate(rows,rules,positiveMeans){
+  const byAccount={};
+  rules.forEach(r=>{byAccount[r.account]=[r.sign,r.side,r.analytics||"document"]});
+  const acc={};
+  for(const row of rows){
+    const rule=byAccount[row.account]; if(!rule) continue;
+    const [sign,side,analytics]=rule;
+    const value=folded(row), cp=row.counterparty;
+    let agg=acc[cp.id];
+    if(!agg) agg=acc[cp.id]={net:0,sides:{},detail:{},currencies:new Set(),orgs:new Set(),counterparty:cp};
+    agg.net+=sign*value;
+    agg.sides[side]=(agg.sides[side]||0)+value;
+    agg.currencies.add(row.currency); agg.orgs.add(row.org);
+    const contract=analytics==="counterparty"?NO_CONTRACT:row.contract.name;
+    const key=[row.org,row.account,contract,row.currency].join("");
+    let line=agg.detail[key];
+    if(!line) line=agg.detail[key]={contract,account:row.account,currency:row.currency,dt:0,kt:0,
+      amount_cur:0,rate:row.rate,folded:0,sign,side,analytics,documents:[]};
+    line.dt+=row.dt; line.kt+=row.kt;
+    line.amount_cur+=(row.dt_cur||0)+(row.kt_cur||0);
+    line.folded+=value;
+    if(analytics==="document"&&row.documents) line.documents=line.documents.concat(row.documents);
+  }
+  const pos=positiveMeans==="owes_us"?"owes_us":"we_owe";
+  const neg=positiveMeans==="owes_us"?"we_owe":"owes_us";
+  const out=[];
+  for(const cpId in acc){
+    const agg=acc[cpId], detail=Object.values(agg.detail);
+    detail.forEach(d=>{d.dt=round2(d.dt);d.kt=round2(d.kt);d.folded=round2(d.folded);
+      d.amount_cur=round2(d.amount_cur)||null});
+    // зачёт применяется только к тем, кто и так есть в этом отчёте
+    if(!detail.some(d=>d.side!=="offset")) continue;
+    const net=round2(agg.net), curs=[...agg.currencies].sort();
+    out.push({counterparty:agg.counterparty, net,
+      sides:Object.fromEntries(Object.entries(agg.sides).map(([k,v])=>[k,round2(v)])),
+      status: net>0?pos:net<0?neg:"closed",
+      currency: (curs.length===1&&curs[0]==="KZT")?"KZT":curs.filter(c=>c!=="KZT").join("/"),
+      contracts: new Set(detail.filter(d=>d.contract!==NO_CONTRACT).map(d=>d.contract)).size,
+      orgs:[...agg.orgs].sort(), detail});
+  }
+  out.sort((a,b)=>b.net-a.net);
+  return out;
+}
+function calcTotals(result){
+  const owed=result.filter(r=>r.status==="owes_us").reduce((s,r)=>s+Math.abs(r.net),0);
+  const weOwe=result.filter(r=>r.status==="we_owe").reduce((s,r)=>s+Math.abs(r.net),0);
+  return {owed_to_us:round2(owed), we_owe:round2(weOwe), net:round2(owed-weOwe),
+    sum_debt:round2(result.reduce((s,r)=>s+(r.sides.debt||0),0)),
+    sum_advance:round2(result.reduce((s,r)=>s+(r.sides.advance||0),0))};
+}
+
+/* ── правила счетов (порт таблицы rule_line + init_db seed) ── */
+const RULE_SETS=["customers","suppliers"], RULE_SIDES=["debt","advance","offset"],
+  ANALYTICS=["counterparty","contract","document"];
+const LS_RULES="vzr_rules_v1", LS_SYNC="vzr_sync_interval";
+function defaultRules(){
+  return [
+    {id:1,rule_set:"customers",account:"1210",sign:1,side:"debt",enabled:1,analytics:"document"},
+    {id:2,rule_set:"customers",account:"3510",sign:-1,side:"advance",enabled:1,analytics:"document"},
+    // зачёт «покупатель=поставщик»: выключен по умолчанию, как в оригинале
+    {id:3,rule_set:"customers",account:"3310",sign:-1,side:"offset",enabled:0,analytics:"document"},
+    {id:4,rule_set:"suppliers",account:"3310",sign:1,side:"debt",enabled:1,analytics:"document"},
+    {id:5,rule_set:"suppliers",account:"1710",sign:-1,side:"advance",enabled:1,analytics:"document"},
+  ];
+}
+let RULES=[], nextRuleId=6, histCache=null;
+function loadRules(){
+  try{const raw=JSON.parse(localStorage.getItem(LS_RULES)||"null");
+    RULES=(Array.isArray(raw)&&raw.length)?raw:defaultRules();
+  }catch(e){RULES=defaultRules()}
+  nextRuleId=1+Math.max(0,...RULES.map(r=>r.id));
+}
+function saveRules(){localStorage.setItem(LS_RULES,JSON.stringify(RULES));histCache=null}
+function ruleTuples(ruleSet){
+  return RULES.filter(r=>r.rule_set===ruleSet&&r.enabled)
+    .map(r=>({account:r.account,sign:r.sign,side:r.side,analytics:r.analytics||"document"}));
+}
+function allAccounts(){return [...new Set(RULES.map(r=>r.account))].sort()}
+function validateRuleFields(b){
+  const account=String(b.account||"").trim();
+  if(!/^\d{3,10}$/.test(account)) throw new Error("счёт: только цифры, от 3 до 10 знаков");
+  if(!RULE_SETS.includes(b.rule_set)) throw new Error("отчёт: допустимо "+RULE_SETS.join(" или "));
+  const sign=+b.sign;
+  if(![1,-1].includes(sign)) throw new Error("знак: только +1 или -1");
+  if(!RULE_SIDES.includes(b.side)) throw new Error("сторона: допустимо "+RULE_SIDES.join(", "));
+  const analytics=b.analytics||"document";
+  if(!ANALYTICS.includes(analytics)) throw new Error("разрез: допустимо "+ANALYTICS.join(", "));
+  // в реальном приложении это проверяет 1С при синхронизации — здесь проверяем
+  // по составу демо-фикстуры (mock1c/server.py ACCOUNTS)
+  if(!ACCOUNT_DEF[account]) throw new Error(
+    `в демо-наборе нет данных по счёту ${account} — доступны ${Object.keys(ACCOUNT_DEF).join(", ")}`);
+  return {account,rule_set:b.rule_set,sign,side:b.side,analytics,enabled:b.enabled?1:0};
+}
+
+/* ── отчёты (порт backend/app.py) ── */
+let lastSyncAt=nowStamp();
+function buildReport(ruleSet,date,q,hideZero,onlyDebtors,org){
+  const d=date||todayISO();
+  const accounts=allAccounts();
+  const rows=balances(accounts,d,true,org?[org]:null);
+  const rls=ruleTuples(ruleSet);
+  let result=calcCalculate(rows,rls,POSITIVE_MEANS[ruleSet]||"owes_us");
+  const total=result.length;
+  if(q){const qq=q.toLowerCase();
+    result=result.filter(r=>r.counterparty.name.toLowerCase().includes(qq)||r.counterparty.bin.includes(qq));}
+  if(hideZero) result=result.filter(r=>r.net!==0);
+  if(onlyDebtors) result=result.filter(r=>r.status==="owes_us");
+  return {as_of:lastSyncAt, report_date:d, source:"demo", org:org||null, orgs:ORGS,
+    total, direction:ruleSet, rows:result, totals:calcTotals(result)};
+}
+function buildAging(ruleSet,date){
+  const d=date||todayISO();
+  const rows=balances(allAccounts(),d,true,null);
+  const debtAccounts=new Set(RULES.filter(r=>r.rule_set===ruleSet&&r.enabled&&r.side==="debt").map(r=>r.account));
+  const todayMs=Date.parse(d+"T00:00:00Z");
+  const buckets=["0-30","31-60","61-90","90+"];
+  const out={};
+  for(const row of rows){
+    if(!debtAccounts.has(row.account)) continue;
+    const cp=row.counterparty;
+    let agg=out[cp.id];
+    if(!agg){agg={counterparty:cp};buckets.forEach(b=>agg[b]=0);agg.total=0;out[cp.id]=agg}
+    for(const doc of (row.documents||[])){
+      const age=Math.round((todayMs-Date.parse(doc.date+"T00:00:00Z"))/86400000);
+      const b=age<=30?"0-30":age<=60?"31-60":age<=90?"61-90":"90+";
+      agg[b]=round2(agg[b]+doc.amount); agg.total=round2(agg.total+doc.amount);
+    }
+  }
+  const result=Object.values(out).sort((a,b)=>b.total-a.total);
+  const tot={}; buckets.forEach(b=>tot[b]=round2(result.reduce((s,r)=>s+r[b],0)));
+  tot.total=round2(result.reduce((s,r)=>s+r.total,0));
+  tot.overdue=round2(result.reduce((s,r)=>s+r["31-60"]+r["61-90"]+r["90+"],0));
+  return {report_date:d, rows:result, totals:tot, overdue_days:OVERDUE_DAYS};
+}
+const HIST_WEEKS=104;   // ponytail: 105 недельных точек считаются ~35 мс и кэшируются — хватает
+                        // на все периоды графика, отдельного кэша по периоду не нужно
+function buildHistory(){
+  // недельные точки назад от сегодняшней даты + сегодня, как backfill() в app.py
+  const points=[]; const today=new Date(todayISO()+"T00:00:00Z");
+  for(let w=HIST_WEEKS;w>=0;w--){
+    const dt=new Date(today.getTime()-w*7*86400000);
+    const date=dt.toISOString().slice(0,10);
+    const rows=balances(allAccounts(),date,false,null);
+    const cust=calcTotals(calcCalculate(rows,ruleTuples("customers"),"owes_us"));
+    const supp=calcTotals(calcCalculate(rows,ruleTuples("suppliers"),"we_owe"));
+    points.push({date, owed_to_us:cust.owed_to_us, we_owe:cust.we_owe, net:cust.net, suppliers_net:supp.net});
+  }
+  return points;
+}
+function getHistory(){if(!histCache) histCache=buildHistory(); return histCache}
+function buildCalendar(){
+  const d=todayISO();
+  const rows=balances(allAccounts(),d,true,null);
+  const todayMs=Date.parse(d+"T00:00:00Z");
+  const items=[];
+  for(const [ruleSet,direction] of [["customers","in"],["suppliers","out"]]){
+    const debtAccounts=new Set(RULES.filter(r=>r.rule_set===ruleSet&&r.enabled&&r.side==="debt").map(r=>r.account));
+    for(const row of rows){
+      if(!debtAccounts.has(row.account)) continue;
+      for(const doc of (row.documents||[])){
+        const dueMs=Date.parse(doc.date+"T00:00:00Z")+PAY_TERM_DAYS*86400000;
+        // минус на долговом счёте — переплата контрагента, разворачиваем стрелку
+        const dDir=doc.amount>=0?direction:(direction==="in"?"out":"in");
+        items.push({due:new Date(dueMs).toISOString().slice(0,10), direction:dDir, set:ruleSet,
+          counterparty:row.counterparty.name, doc:doc.name, doc_date:doc.date,
+          amount:Math.abs(doc.amount), overdue_days:Math.max(0,Math.round((todayMs-dueMs)/86400000))});
+      }
+    }
+  }
+  items.sort((a,b)=>a.due<b.due?-1:a.due>b.due?1:0);
+  return {report_date:d, items};
+}
+function buildNotifications(){
+  const notesOut=[];
+  for(const [ruleSet,word,need] of [["customers","нам не платят","owes_us"],["suppliers","мы не платим","we_owe"]]){
+    const rep=buildReport(ruleSet,null,"",false,false,null);
+    const netByName={}; rep.rows.forEach(r=>netByName[r.counterparty.name]=r);
+    const ag=buildAging(ruleSet,null);
+    for(const r of ag.rows){
+      const overdue=round2(r["31-60"]+r["61-90"]+r["90+"]);
+      if(overdue<=0) continue;
+      const name=r.counterparty.name, row=netByName[name];
+      const opposite=!!row&&row.status!==need;
+      notesOut.push({kind:"overdue", set:ruleSet, name, amount:overdue, opposite,
+        net: row?row.net:null, text:`${name}: просрочено ${fmt(overdue)} ₸ — ${word}`});
+    }
+  }
+  notesOut.sort((a,b)=>(b.amount||0)-(a.amount||0));
+  // разворот знака: сравниваем сегодняшнюю точку истории с недельной давности
+  const hist=getHistory();
+  if(hist.length>=2){
+    const curDate=hist[hist.length-1].date, prevDate=hist[hist.length-2].date;
+    for(const ruleSet of ["customers","suppliers"]){
+      const rls=ruleTuples(ruleSet), pm=POSITIVE_MEANS[ruleSet];
+      const cur=calcCalculate(balances(allAccounts(),curDate,false,null),rls,pm);
+      const prev=calcCalculate(balances(allAccounts(),prevDate,false,null),rls,pm);
+      const prevMap={}; prev.forEach(r=>prevMap[r.counterparty.id]=r.net);
+      cur.forEach(row=>{
+        const cpid=row.counterparty.id;
+        if(cpid in prevMap && prevMap[cpid]*row.net<0){
+          notesOut.push({kind:"flip", set:ruleSet, name:row.counterparty.name,
+            text:`${row.counterparty.name}: позиция сменила знак (${fmt0(prevMap[cpid])} -> ${fmt0(row.net)})`});
+        }
+      });
+    }
+  }
+  return notesOut;
+}
+
+/* ── акт сверки (порт act_html) — открывается в новой вкладке, как исходная ссылка ── */
+function moneyAct(v){
+  const s=Math.abs(v).toFixed(2); const [i,f]=s.split(".");
+  return (v<0?"-":"")+i.replace(/\B(?=(\d{3})+(?!\d))/g," ")+"."+f;
+}
+function buildActHtml(ruleSet,cpId){
+  const d=state.date||todayISO();   // акт строится на выбранную дату отчёта, а не всегда на сегодня
+  const allRows=balances(allAccounts(),d,true,null);
+  const rows=allRows.filter(r=>r.counterparty.id===cpId);
+  const rls=ruleTuples(ruleSet);
+  const res=calcCalculate(rows,rls,POSITIVE_MEANS[ruleSet]).filter(r=>r.counterparty.id===cpId);
+  if(!res.length) return null;
+  const cp=res[0].counterparty;
+  const accounts=new Set(rls.map(r=>r.account));
+  const docs=[];
+  for(const row of rows){
+    if(!accounts.has(row.account)) continue;
+    for(const doc of (row.documents||[])) docs.push([doc.date,doc.name,row.account,row.dt?doc.amount:0,row.kt?doc.amount:0]);
+  }
+  docs.sort((a,b)=>a[0]<b[0]?-1:a[0]>b[0]?1:0);
+  const net=res[0].net;
+  const who=net>0?`Задолженность в пользу ${OUR_ORG_NAME}`
+    : net<0?`Задолженность в пользу ${cp.name}` : "Расчёты закрыты";
+  const rowsHtml=docs.map(([dt,n,a,d1,k1])=>
+    `<tr><td>${esc(dt)}</td><td>${esc(n)}</td><td>${esc(a)}</td>`+
+    `<td class=r>${moneyAct(d1)}</td><td class=r>${moneyAct(k1)}</td></tr>`).join("");
+  return `<!doctype html><meta charset=utf-8>
+<title>Акт сверки — ${esc(cp.name)}</title>
+<style>:root{color-scheme:light}
+body{font:14px/1.5 -apple-system,sans-serif;max-width:800px;margin:40px auto;padding:0 16px;
+background:#fff;color:#000}
+table{border-collapse:collapse;width:100%;margin:16px 0}td,th{border:1px solid #999;padding:4px 8px}
+.r{text-align:right;white-space:nowrap}h1{font-size:20px}.sign{margin-top:48px;display:flex;justify-content:space-between}
+@media print{.noprint{display:none}}</style>
+<button class=noprint onclick=print()>Печать</button>
+<h1>Акт сверки взаимных расчётов</h1>
+<p>между ${esc(OUR_ORG_NAME)} и <b>${esc(cp.name)}</b> (БИН/ИИН ${esc(cp.bin)})<br>
+по состоянию на ${esc(d)}. Данные ${esc(OUR_ORG_NAME)}.</p>
+<table><tr><th>Дата</th><th>Документ</th><th>Счёт</th><th>Дебет, ₸</th><th>Кредит, ₸</th></tr>
+${rowsHtml}</table>
+<p><b>${who}: ${moneyAct(Math.abs(net))} ₸</b></p>
+<p style="color:#666">Сальдо по данным контрагента заполняется контрагентом.
+Разбивка по документам — согласно учёту 1С на дату формирования. Демонстрационные данные.</p>
+<div class=sign><span>${esc(OUR_ORG_NAME)} ____________</span><span>${esc(cp.name)} ____________</span></div>`;
+}
+function openAct(ruleSet,cpId){
+  const html=buildActHtml(ruleSet,cpId);
+  if(html==null){toast("По этому контрагенту нет данных для акта сверки.");return}
+  const w=window.open("","_blank");
+  if(!w){toast("Браузер заблокировал всплывающее окно — разрешите всплывающие окна для акта сверки.");return}
+  w.document.open();w.document.write(html);w.document.close();
+}
+
+/* ── экспорт CSV (замена xlsx.py — Excel открывает ; с BOM без плагинов) ── */
+function csvCell(v){
+  if(typeof v==="number") return String(v).replace(".",",");
+  const s=String(v);
+  return /[;"\n]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s;
+}
+function exportCsv(ruleSet){
+  const rep=buildReport(ruleSet,state.date,state.q,state.hide_zero,state.only_debtors,state.org);
+  const head=["Контрагент","БИН/ИИН","Валюта","Договоров","Долг, ₸","Аванс, ₸","Итог, ₸","Статус"];
+  const statusRu={owes_us:"нам должны",we_owe:"мы должны",closed:"закрыто"};
+  const rows=[head, ...rep.rows.map(r=>[r.counterparty.name,r.counterparty.bin,r.currency,r.contracts,
+    r.sides.debt||0, r.sides.advance||0, r.net, statusRu[r.status]])];
+  const t=rep.totals;
+  rows.push(["ИТОГО","","","",t.sum_debt,t.sum_advance,round2(t.sum_debt-t.sum_advance),""]);
+  rows.push(["в том числе: должны нам","","","",t.owed_to_us,"","",""]);
+  rows.push(["в том числе: должны мы","","","",t.we_owe,"","",""]);
+  const csv=rows.map(r=>r.map(csvCell).join(";")).join("\r\n");
+  const blob=new Blob(["﻿"+csv],{type:"text/csv;charset=utf-8"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a"); a.href=url; a.download="report.csv"; a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
+/* ── интервал синхронизации (косметика: реального планировщика без сервера нет) ── */
+function getSyncInterval(){return +(localStorage.getItem(LS_SYNC)||30)}
+function saveInterval(v){localStorage.setItem(LS_SYNC,String(+v))}
+function refresh(){lastSyncAt=nowStamp();render();loadNotes()}
+
+function resetDemo(){
+  if(!confirm("Сбросить правила счетов и интервал синхронизации к значениям по умолчанию?")) return;
+  localStorage.removeItem(LS_RULES); localStorage.removeItem(LS_SYNC);
+  localStorage.removeItem("vzr_tuck"); localStorage.removeItem("vzr_seenNotes");
+  location.reload();
+}
+function openAbout(){$("#modal").hidden=false}
+function closeAbout(){$("#modal").hidden=true}
+
+/* ═══════════ интерфейс (тот же UI, что и в оригинале — только источник данных другой) ═══════════ */
+function boot(){
+  applyTuck(!!localStorage.getItem("vzr_tuck"));
+  paintThemeBtn();
+  $("#role").textContent="Демо-режим";
+  $("#whoLogin").textContent=me.login;
+  $("#ava").textContent=$("#ava2").textContent=me.login.slice(0,2).toUpperCase();
+  loadNotes();drawNav();render();
+}
+function drawNav(){
+  $("#nav").innerHTML=TABS.filter(([k])=>k!=="settings"||me.role==="admin")
+    .map(([k,t,ic])=>`<button class="${view===k?'on':''}" onclick="go('${k}')"
+      data-tip="${t}">${svg(ic)}<span>${t}</span></button>`).join("");
+  // под навигацией: что это за экран, основное действие и сводка по просрочке
+  $("#sideextra").innerHTML=`
+    <p class="sideabout">Свёрнутое сальдо по каждому контрагенту: долг минус аванс,
+      одна цифра вместо двух счетов. Источник — остатки 1С на выбранную дату.</p>
+    <button class="sidecta" onclick="startAct()"
+      data-tip="Открыть отчёт и выбрать контрагента для печатной формы акта">Сформировать акт сверки${svg("arrow","i sm")}</button>
+    <button class="sidenote" onclick="toggleNotes()" data-tip="Показать уведомления">
+      <span class="k">${svg("warn","i sm")}Требует внимания</span>
+      <span class="b num">${notes.length}</span></button>`;
+}
+function startAct(){
+  openReport({set:"customers",only_debtors:true});
+  toast("Значок акта — в конце строки контрагента. Откроется печатная форма в новой вкладке.");
+}
+function snapshotView(){return {view,page,sortKey,sortDir,agingSet,state:{...state}}}
+function go(v,keepHistory){
+  if(!keepHistory&&v!==view)nav.push(snapshotView());
+  view=v;drawNav();$("#notes").hidden=true;render();
+}
+function goBack(){
+  const p=nav.pop();if(!p)return;
+  view=p.view;page=p.page;sortKey=p.sortKey;sortDir=p.sortDir;agingSet=p.agingSet;
+  Object.assign(state,p.state);
+  drawNav();$("#notes").hidden=true;render();
+}
+function openReport(opts={}){        // клик по строке/карточке -> отчёт с нужным фильтром
+  const set=opts.set||"customers";
+  nav.push(snapshotView());          // чтобы можно было вернуться туда, откуда пришли
+  Object.assign(state,{q:"",only_debtors:false,hide_zero:false},opts);
+  if(opts.sort){sortKey=opts.sort;sortDir=opts.dir||-1}
+  page=1;
+  go(set,true);
+}
+
+const noteKey=x=>`${x.kind}|${x.text}`;
+function seenNotes(){try{return new Set(JSON.parse(localStorage.getItem("vzr_seenNotes")||"[]"))}
+  catch(e){return new Set()}}
+function markNotesSeen(){
+  localStorage.setItem("vzr_seenNotes",JSON.stringify(notes.map(noteKey)));
+  paintBadge();
+}
+function paintBadge(){
+  const seen=seenNotes(), fresh=notes.filter(x=>!seen.has(noteKey(x))).length;
+  $("#ncount").hidden=!fresh;$("#ncount").textContent=fresh;
+}
+function loadNotes(){notes=buildNotifications();paintBadge();drawNav()}   // счётчик в сайдбаре тоже
+function toggleNotes(){
+  const n=$("#notes");n.hidden=!n.hidden;
+  if(!n.hidden)markNotesSeen();      // открыли — счётчик гаснет, новые появятся снова
+  n.innerHTML=notes.length?notes.map(x=>
+    `<div class="n act" onclick='openReport({set:"${x.set||"customers"}",`+
+    `q:${esc(JSON.stringify(x.name||""))}});toggleNotes()' data-tip="Открыть контрагента">`+
+    `${svg(x.kind==="overdue"?"warn":"flip","i sm")}<span>${esc(x.text)}`+
+    `${x.opposite?`<br><span class="mut">по итогу позиция обратная — учтён аванс</span>`:""}`+
+    `</span></div>`).join("")
+    :'<div class="empty">Нет уведомлений</div>';
+}
+
+function toolbar(showExport){
+  $("#tools").innerHTML=`
+    <button class="btn icon" onclick="refresh()" data-tip="Обновить из 1С">${svg("refresh","i sm")}</button>${hint("В демо просто обновляет отметку времени последней синхронизации — данные пересчитываются на лету.")}
+    <input type="date" value="${state.date}" onchange="state.date=this.value;render()">${hint("Отчёт на любую дату. Демо пересчитывает остатки на выбранную дату по детерминированной модели затухания.")}
+    ${showExport?`<button class="btn dark" onclick="exportCsv('${view}')">${svg("excel","i sm")}Экспорт в Excel</button>${hint("Выгружает ровно то, что сейчас на экране — с учётом поиска, фильтров и выбранной даты. Файл CSV с разделителем «;» и BOM — открывается в Excel сразу.")}`:""}`;
+}
+
+function render(){
+  $("#htitle").textContent=(TABS.find(t=>t[0]===view)||[,"Взаиморасчёты"])[1];
+  $("#back").hidden=!nav.length;
+  if(view==="customers"||view==="suppliers")return renderReport();
+  if(view==="aging")return renderAging();
+  if(view==="dashboard")return renderDash();
+  if(view==="calendar")return renderCal();
+  if(view==="settings")return renderSettings();
+}
+
+/* ── Покупатели / Поставщики ── */
+function renderReport(){
+  toolbar(true);
+  const rep=buildReport(view, state.date, state.q, state.hide_zero, state.only_debtors, state.org);
+  $("#stamp").innerHTML=`<span class="dot"${tip("Зелёная точка: последняя синхронизация прошла успешно. Рядом время этого запроса.")}></span>Данные: ${esc(rep.as_of.replace("T"," "))}
+    &nbsp;·&nbsp; отчёт на ${esc(rep.report_date)}`+
+    hint("Слева — когда демо последний раз обновило отметку синхронизации. "+
+         "Справа — дата, на которую построен отчёт.");
+  const sorted=[...rep.rows].sort((a,b)=>{
+    const g=r=>sortKey==="name"?r.counterparty.name:sortKey==="debt"?(r.sides.debt||0)
+      :sortKey==="advance"?(r.sides.advance||0):r.net;
+    const va=g(a),vb=g(b);return (va>vb?1:va<vb?-1:0)*sortDir});
+  const pages=Math.max(1,Math.ceil(sorted.length/PAGE_SIZE));
+  if(page>pages)page=1;
+  const rows=sorted.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE);   // в DOM только страница
+  const t=rep.totals, mx=Math.max(t.owed_to_us,t.we_owe,1);
+  const st={owes_us:"Должны нам",we_owe:"Должны мы",closed:"Закрыто"};
+  const ar=k=>sortKey===k?(sortDir>0?" ↑":" ↓"):"";
+
+  $("#view").innerHTML=`
+  <h1>${view==="customers"?"Покупатели":"Поставщики"}</h1>
+  <p class="sub">Свёрнутое сальдо расчётов по каждому контрагенту на ${esc(rep.report_date)}.</p>
+  <div class="kpis">
+    <div class="kpi"><div class="row"><span class="caps">Должны нам${hint("Сумма по всем контрагентам, которые остались нам должны после зачёта их авансов. В бухгалтерии это называется дебиторская задолженность.")}</span>
+      <span class="badge down"${tip("Зелёная стрелка вниз: деньги приходят к нам. Сумма долгов контрагентов перед компанией.")}>${svg("down","i sm")}</span></div>
+      <div class="v pos num">${fmt(t.owed_to_us)} ₸</div>
+      <div class="trend mut">дебиторская задолженность</div>
+      <div class="bar"><i style="width:${t.owed_to_us/mx*100}%;background:var(--green)"></i></div></div>
+    <div class="kpi"><div class="row"><span class="caps">Должны мы${hint("Сумма по контрагентам, которые заплатили вперёд больше, чем мы им сдали. Мы должны им работы или возврат денег. В бухгалтерии — кредиторская задолженность.")}</span>
+      <span class="badge up"${tip("Красная стрелка вверх: деньги уходят от нас. Сумма наших долгов перед контрагентами.")}>${svg("up","i sm")}</span></div>
+      <div class="v neg num">${fmt(t.we_owe)} ₸</div>
+      <div class="trend mut">кредиторская задолженность</div>
+      <div class="bar"><i style="width:${t.we_owe/mx*100}%;background:var(--red)"></i></div></div>
+    <div class="kpi"><div class="row"><span class="caps">Чистая позиция${hint("Разница между тем, что должны нам, и тем, что должны мы. Минус означает, что в сумме мы должны больше, чем нам.")}</span>
+      <span class="badge ${t.net<0?'up':'down'}"${tip("Итоговая позиция компании: разница между тем, что должны нам, и тем, что должны мы. Красный фон — минус, в пользу контрагентов.")}>${svg("bank","i sm")}</span></div>
+      <div class="v num ${t.net>0?"pos":t.net<0?"neg":"zero"}">${fmt(t.net)} ₸</div>
+      <div class="trend mut">${t.net<0?"В пользу контрагентов":t.net>0?"В нашу пользу":"Расчёты закрыты"}</div></div>
+  </div>
+  <div class="toolbar">
+    <span class="search">${svg("search","i sm")}
+      <input placeholder="Контрагент или БИН/ИИН" value="${esc(state.q)}"
+        oninput="state.q=this.value;page=1;renderReport()"></span>
+    <select onchange="state.org=this.value;page=1;renderReport()" data-tip="Организация">
+      <option value="">Все организации</option>
+      ${(rep.orgs||[]).map(o=>`<option value="${esc(o.id)}"
+        ${state.org===o.id?"selected":""}>${esc(o.name)}</option>`).join("")}
+    </select>
+    <span class="chip ${state.hide_zero?"on":""}"
+      onclick="state.hide_zero=!state.hide_zero;page=1;renderReport()">Скрыть нулевые${hint("Убрать из списка контрагентов, у которых расчёты закрыты — итог ровно ноль.")}</span>
+    <span class="chip ${state.only_debtors?"on":""}"
+      onclick="state.only_debtors=!state.only_debtors;page=1;renderReport()">Только должники${hint("Оставить только тех, кто должен нам. Те, кому должны мы, скрываются.")}</span>
+    <span class="pill" data-tip="контрагентов после фильтров">${sorted.length} из ${rep.total}</span>
+  </div>
+  <div class="card"><div class="tblwrap"><table>
+    <thead><tr>
+      <th style="width:40px"></th>
+      <th class="s" onclick="sortBy('name')">Контрагент${ar("name")}</th>
+      <th>БИН/ИИН</th>
+      <th>Валюта${hint("Валюта договоров контрагента. Если договоры валютные — суммы в таблице всё равно приведены в тенге по курсу на дату отчёта.")}</th>
+      <th class="r">Дог.${hint("Сколько договоров у контрагента. Раскройте строку, чтобы увидеть сальдо по каждому отдельно.")}</th>
+      <th class="r s" onclick="sortBy('debt')">Долг (₸)${hint("Сколько контрагент должен нам по подписанным актам и накладным. Счёт 1210 у покупателей, 3310 у поставщиков.")}${ar("debt")}</th>
+      <th class="r s" onclick="sortBy('advance')">Аванс (₸)${hint("Предоплата, которую ещё не закрыли работами или поставкой. Счёт 3510 у покупателей, 1710 у поставщиков.")}${ar("advance")}</th>
+      <th class="r s" onclick="sortBy('net')">Итог (₸)${hint("Долг минус аванс — одна цифра вместо двух счетов. Зелёная: должны нам. Красная: должны мы.")}${ar("net")}</th>
+      <th>Статус</th><th style="width:48px"></th>
+    </tr></thead>
+    <tbody>${rows.map((r,i)=>`
+      <tr class="cp" onclick="toggleDetail(${i})">
+        <td><span class="chev" id="c${i}">${svg("chev","i sm")}</span></td>
+        <td><span class="cpname"><span class="avatar" style="width:28px;height:28px;font-size:10px;
+          background:var(--blue-bg);color:var(--accent)">${esc(ini(r.counterparty.name))}</span>
+          <span>${esc(r.counterparty.name)}
+            ${!state.org?`<div class="mut" style="font-size:12px">
+              ${esc((r.orgs||[]).map(o=>orgName(rep.orgs,o)).join(", "))}</div>`:""}
+          </span></span></td>
+        <td class="mut num">${esc(r.counterparty.bin)}</td>
+        <td><span class="pill cur ${r.currency==="KZT"?"":"fx"}"${tip(r.currency==="KZT"
+          ?"Все договоры контрагента в тенге, пересчёт не требуется."
+          :"У контрагента есть валютные договоры ("+r.currency+"). В таблице суммы приведены к тенге по курсу на дату отчёта, детали в раскрытии строки.")}
+          >${esc(r.currency)}</span></td>
+        <td class="r num mut">${r.contracts}</td>
+        <td class="r num">${fmt(r.sides.debt||0)}</td>
+        <td class="r num">${fmt(r.sides.advance||0)}</td>
+        <td class="r num ${r.status==="owes_us"?"pos":r.status==="we_owe"?"neg":"zero"}"
+          style="font-weight:600">${fmt(Math.abs(r.net))}</td>
+        <td><span class="pill ${r.status}"${tip(r.status==="owes_us"
+          ?"Итог положительный в нашу пользу: после вычета авансов контрагент остаётся должен нам."
+          :r.status==="we_owe"
+          ?"Итог в пользу контрагента: он заплатил вперёд больше, чем мы ему сдали, либо мы не расплатились."
+          :"Расчёты закрыты: долг и аванс полностью погасили друг друга.")}>${st[r.status]}</span></td>
+        <td class="noprint"><a class="btn icon" data-tip="Акт сверки"
+          onclick="event.stopPropagation();openAct('${view}','${r.counterparty.id}')"
+          ${tip("Печатная форма акта сверки по этому контрагенту: документы, итог, подписи. Откроется в новой вкладке.")}>${svg("doc","i sm")}</a></td>
+      </tr>
+      <tr class="detail" id="d${i}" hidden><td colspan="10">
+        ${r.detail.map((d,j)=>`<div class="line ${d.documents.length?"has-docs":""}"
+            ${d.documents.length?`onclick="toggleDocs(${i},${j})"`:""}>
+          ${d.documents.length?`<span class="chev" id="dc${i}_${j}">${svg("chev","i sm")}</span>`
+            :svg("doc","i sm")}
+          <b>${esc(d.contract)}</b><span class="mut">счёт ${esc(d.account)}${accHint(d.account)}</span>
+          ${d.currency!=="KZT"?`<span class="pill">${esc(d.currency)} по курсу ${fmt(d.rate)}</span>`:""}
+          ${d.amount_cur?`<span class="mut num">${fmt(d.amount_cur)} ${esc(d.currency)}</span>`:""}
+          <span class="mut num">Дт ${fmt(d.dt)} / Кт ${fmt(d.kt)}</span>
+          <span class="num amt">${d.sign>0?"+":"−"} ${fmt(Math.abs(d.folded))} ₸</span>
+        </div>
+        ${d.documents.length?`<div class="docs" id="dl${i}_${j}" hidden>
+          ${d.documents.map(doc=>`<div class="docline">
+            <span class="mut num" style="width:96px">${esc(doc.date)}</span>
+            <span style="flex:1;min-width:180px">${esc(doc.name)}</span>
+            <span class="num" style="margin-left:auto">${fmt(doc.amount)} ₸</span></div>`).join("")}
+        </div>`:""}`).join("")}
+        <div style="padding:4px 2px"><b class="num">Итог: ${fmt(r.net)} ₸</b></div>
+      </td></tr>`).join("")||`<tr><td colspan="10" class="empty">Ничего не найдено</td></tr>`}
+    </tbody>
+    <tfoot><tr>
+      <td colspan="5">Итого по отчёту${sorted.length>rows.length?" (по всем строкам, не только по странице)":""}</td>
+      <td class="r num">${fmt(t.sum_debt)}</td>
+      <td class="r num">${fmt(t.sum_advance)}</td>
+      <td class="r num ${t.net>0?"pos":t.net<0?"neg":"zero"}">${fmt(t.net)}</td><td colspan="2"></td>
+    </tr></tfoot></table></div>
+    <div class="tblfoot"><span>${svg("info","i sm")} Итог = долг − аванс</span>
+      ${hint("Развёрнутое сальдо: долг и аванс показаны отдельно по каждому контрагенту, а не одной свёрнутой суммой по счёту. Свернуть по счёту нельзя — потеряется, с кого требовать и кому платить. Свёртка делается только внутри одного контрагента, в колонке «Итог».")}
+      ${pages>1?`<span class="pager">
+        <button class="btn" ${page===1?"disabled":""} onclick="goPage(${page-1})">Назад</button>
+        ${Array.from({length:pages},(_,i)=>i+1)
+          .filter(n=>n===1||n===pages||Math.abs(n-page)<=2)
+          .map((n,i,a)=>(i&&n-a[i-1]>1?'<span class="mut">…</span>':"")+
+            `<button class="btn ${n===page?"on":""}" onclick="goPage(${n})">${n}</button>`).join("")}
+        <button class="btn" ${page===pages?"disabled":""} onclick="goPage(${page+1})">Вперёд</button>
+      </span>`:""}
+      <span>Показано ${rows.length?((page-1)*PAGE_SIZE+1):0}–${(page-1)*PAGE_SIZE+rows.length}
+        из ${sorted.length}${sorted.length!==rep.total?` (всего ${rep.total})`:""}</span></div>
+  </div>`;
+}
+function sortBy(k){sortDir=sortKey===k?-sortDir:-1;sortKey=k;page=1;renderReport()}
+function goPage(n){page=n;renderReport();document.querySelector("main").scrollTo({top:0})}
+function toggleDetail(i){const d=$("#d"+i);d.hidden=!d.hidden;$("#c"+i).classList.toggle("open",!d.hidden)}
+function toggleDocs(i,j){  // второй уровень: документы расчётов по договору
+  const d=$(`#dl${i}_${j}`);if(!d)return;
+  d.hidden=!d.hidden;$(`#dc${i}_${j}`).classList.toggle("open",!d.hidden);
+  event.stopPropagation();
+}
+
+/* ── Сроки долга ── */
+function renderAging(){
+  toolbar(false);
+  const ag=buildAging(agingSet, state.date);
+  $("#stamp").innerHTML=`<span class="dot"></span>Отчёт на ${esc(ag.report_date)}`;
+  const B=["0-30","31-60","61-90","90+"], T=ag.totals;
+  const pct=T.total?(T.overdue/T.total*100).toFixed(1):0;
+  $("#view").innerHTML=`
+  <h1>Сроки долга</h1>
+  <p class="sub">Анализ задолженности по периодам возникновения —
+    ${agingSet==="customers"?"покупатели":"поставщики"}.</p>
+  <div class="toolbar">
+    <span class="seg">
+      <span class="chip ${agingSet==="customers"?"on":""}"
+        onclick="agingSet='customers';renderAging()">Покупатели</span>
+      <span class="chip ${agingSet==="suppliers"?"on":""}"
+        onclick="agingSet='suppliers';renderAging()">Поставщики</span></span>
+    <span class="grow"></span>
+    <span class="legend">
+      <span class="caps">Легенда:</span>
+      <span><i style="background:var(--age0)"></i>0–30 дн.</span>
+      <span><i style="background:var(--age1)"></i>31–60 дн.</span>
+      <span><i style="background:var(--age2)"></i>61–90 дн.</span>
+      <span><i style="background:var(--age3)"></i>90+ дн.</span></span>
+  </div>
+  <div class="kpis">
+    <div class="kpi"><span class="caps">${agingSet==="customers"?"Всего должны нам (₸)":"Всего должны мы (₸)"}${hint(agingSet==="customers"
+        ?"Вся задолженность покупателей в пользу компании, разложенная ниже по возрасту документов."
+        :"Весь наш долг поставщикам, разложенный ниже по возрасту документов. Это то, что должны мы, а не нам.")}</span>
+      <div class="v num ${agingSet==="customers"?"pos":"neg"}">${fmt(T.total)}</div>
+      <div class="trend mut">Просрочка старше ${ag.overdue_days} дней</div></div>
+    <div class="kpi"><span class="caps">Просрочено (₸)${hint(`Долг по документам старше ${ag.overdue_days} дней. Срок считается от даты документа.`)}</span>
+      <div class="v neg num">${fmt(T.overdue)}</div>
+      <div class="trend neg">${pct}% от общего долга</div></div>
+    <div class="kpi"><span class="caps">Старше 90 дней (₸)${hint("Самая старая часть долга. Обычно требует отдельного решения: претензия, график погашения, резерв.")}</span>
+      <div class="v neg num">${fmt(T["90+"])}</div>
+      <div class="trend mut">Критический возраст</div></div>
+  </div>
+  <div class="card"><div class="tblwrap"><table>
+    <thead><tr><th>Контрагент</th>
+      ${B.map(b=>`<th class="r">${b} дней</th>`).join("")}<th class="r">Всего (₸)</th></tr></thead>
+    <tbody>${ag.rows.map(r=>`<tr class="cp act"
+      onclick='openReport({set:"${agingSet}",q:${esc(JSON.stringify(r.counterparty.name))}})'
+      data-tip="Открыть контрагента в отчёте">
+      <td>${esc(r.counterparty.name)}</td>
+      ${B.map((b,i)=>`<td class="r num ${r[b]?"age"+i:""} ${i===3&&r[b]?"big":""}"${r[b]?tip(
+        ["Свежий долг: документы не старше 30 дней, срок оплаты обычно ещё не наступил.",
+         "Просрочка до двух месяцев: пора напомнить.",
+         "Просрочка до трёх месяцев: требует отдельного разбора.",
+         "Критический возраст: старше 90 дней. Обычно уже нужны претензия, график погашения или резерв."][i]):""}>
+        ${r[b]?fmt(r[b]):"—"}</td>`).join("")}
+      <td class="r num" style="font-weight:700">${fmt(r.total)}</td></tr>`).join("")
+      ||`<tr><td colspan="6" class="empty">Долгов нет</td></tr>`}</tbody>
+    <tfoot><tr><td>Итого</td>
+      ${B.map((b,i)=>`<td class="r num ${i===3?"neg":""}">${fmt(T[b])}</td>`).join("")}
+      <td class="r num">${fmt(T.total)}</td></tr></tfoot></table></div></div>`;
+}
+
+/* ── Дашборд: страница котировок, а не сетка плиток ──
+   Крупная чистая позиция, дельта рядом на той же строке, большой график с точечной
+   заливкой и ряд периодов, затем три блока показателей через волосяные линии. */
+function renderDash(){
+  toolbar(false);
+  const H=getHistory();
+  const [rLabel,rN,rWord]=RANGES[histRange];
+  const h=H.slice(Math.max(0,H.length-rN));          // срез истории под выбранный период
+  const rep=buildReport("customers",null,"",false,false,null);
+  const repS=buildReport("suppliers",null,"",false,false,null);
+  $("#stamp").innerHTML=`<span class="dot"></span>Данные: ${esc(rep.as_of.replace("T"," "))}`;
+  const last=H[H.length-1]||{owed_to_us:0,we_owe:0,net:0}, prev=H[H.length-2]||last;
+  const first=h[0]||last;
+  const dlt=(a,b)=>b?((a-b)/Math.abs(b)*100):0;
+  const ru1=v=>Math.abs(v).toFixed(1).replace(".",",");
+  // сравниваем с предыдущей точкой графика и прямо называем её дату
+  const since=prev.date&&prev.date!==last.date
+    ?`с ${prev.date.split("-").reverse().join(".")}`:"с прошлого обновления";
+  const tr=(v,good)=>`<span class="num ${(v>=0)===good?"pos":"neg"}">${v>=0?"+":"−"}${ru1(v)} %</span>
+    <span class="mut" style="font-size:12px"> ${since}</span>`;
+  // чистая позиция выросла (ближе к нулю или в плюс) — хорошо, упала — плохо
+  const chg=last.net-first.net, chgPct=first.net?chg/Math.abs(first.net)*100:0;
+  // «должник» = тот, кто должен НАМ. У поставщиков это неотработанный аванс,
+  // поэтому берём по статусу, а не по знаку.
+  const debt=(res,set)=>res.rows.filter(r=>r.status==="owes_us")
+    .map(r=>({...r,set,amount:Math.abs(r.net)}));
+  const pools={customers:debt(rep,"customers"),suppliers:debt(repS,"suppliers")};
+  pools.all=[...pools.customers,...pools.suppliers];
+  const list=[...pools[debtorsMode]].sort((a,b)=>b.amount-a.amount);
+  const top=list.slice(0,debtorsAll?list.length:5), mx=list.length?list[0].amount:1;
+
+  /* ── график ── цвета берём из токенов темы, поэтому смена темы его перерисовывает */
+  const CW=1000,CH=460,PL=8,PR=104,PT=28,PB=44;
+  const MUT=cv("--mut"), GREEN=cv("--green"), RED=cv("--red"), BG=cv("--surface");
+  // ось знаковая: линия ПАДАЕТ, когда долг растёт, и совпадает со стрелкой дельты.
+  // Ноль обязательно попадает в диапазон — иначе непонятно, где «в нашу пользу».
+  const vals=h.map(p=>p.net);
+  const span=Math.max(Math.max(0,...vals)-Math.min(0,...vals),1);
+  const step=Math.pow(10,Math.floor(Math.log10(span)));
+  const lo=Math.floor(Math.min(0,...vals)/step)*step, hi=Math.ceil(Math.max(0,...vals)/step)*step;
+  const X=i=>PL+i*(CW-PL-PR)/Math.max(h.length-1,1);
+  const Y=v=>PT+(hi-v)/((hi-lo)||1)*(CH-PT-PB);
+  const lead=chg>=0?GREEN:RED;                             // цвет ведущей линии = знак дельты
+  const SER=[["net",lead,"Чистая позиция",0],
+             ["we_owe",RED,"Кредиторская задолженность",0],
+             ["owed_to_us",GREEN,"Дебиторская задолженность",0]];
+  const pts=(k,abs)=>h.map((p,i)=>`${X(i)},${Y(abs?Math.abs(p[k]):p[k])}`).join(" ");
+  const money=v=>v.toLocaleString("ru-RU",{maximumFractionDigits:0});
+  chartData={h,SER,X,money};
+  // подписи оси X отсчитываем ОТ последней точки, иначе последние две налезают друг на друга
+  const stride=Math.max(1,Math.ceil(h.length/8)), labelAt=new Set();
+  for(let i=h.length-1;i>=0;i-=stride) labelAt.add(i);
+  const chart=`<svg viewBox="0 0 ${CW} ${CH}" style="width:100%;height:auto;display:block"
+    aria-label="Динамика задолженности">
+    <defs>
+      <!-- фирменная точечная заливка: сетка 4×4, точка r=1, гаснет по вертикали -->
+      <pattern id="ch-dots" width="4" height="4" patternUnits="userSpaceOnUse">
+        <circle cx="2" cy="2" r="1" fill="#fff"/></pattern>
+      <!-- точки гаснут ПО МЕРЕ УДАЛЕНИЯ ОТ ЛИНИИ к нулевой оси: у нуля пусто, у линии плотно -->
+      <linearGradient id="ch-fade" x1="0" y1="${Y(0)}" x2="0"
+        y2="${last.net<0?CH-PB:PT}" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#fff" stop-opacity="0"/>
+        <stop offset=".45" stop-color="#fff" stop-opacity=".35"/>
+        <stop offset="1" stop-color="#fff" stop-opacity=".85"/></linearGradient>
+      <mask id="ch-fademask"><rect width="${CW}" height="${CH}" fill="url(#ch-fade)"/></mask>
+      <mask id="ch-dotmask">
+        <rect width="${CW}" height="${CH}" fill="url(#ch-dots)" mask="url(#ch-fademask)"/></mask>
+    </defs>
+    <path d="M${PL},${Y(0)} L${pts("net",0).replace(/ /g," L")} L${X(h.length-1)},${Y(0)} Z"
+      fill="${lead}" mask="url(#ch-dotmask)"/>
+    <line x1="${PL}" x2="${CW-PR}" y1="${Y(0)}" y2="${Y(0)}" stroke="${MUT}" stroke-opacity=".45"/>
+    <!-- на графике одна линия — чистая позиция; дебиторская и кредиторская показываются
+         в подсказке по наведению и в блоках показателей под графиком -->
+    <polyline fill="none" stroke="${lead}" stroke-width="2" stroke-linejoin="round"
+      stroke-linecap="round" points="${pts("net",0)}"/>
+    <circle cx="${X(h.length-1)}" cy="${Y(last.net)}" r="5"
+      fill="${lead}" stroke="${BG}" stroke-width="2"/>
+    ${[0,.25,.5,.75,1].map(f=>{const v=lo+(hi-lo)*f;
+      return `<text x="${CW-PR+18}" y="${Y(v)+4}" font-size="13"
+      fill="${MUT}">${Math.round(v/1e6).toLocaleString("ru-RU")} млн ₸</text>`}).join("")}
+    <line id="ch-guide" y1="${PT}" y2="${CH-PB}" stroke="${MUT}" stroke-dasharray="3 3"
+      style="display:none"/>
+    ${h.map((p,i)=>`<rect x="${X(i)-(CW-PL-PR)/Math.max(h.length-1,1)/2}" y="0"
+      width="${(CW-PL-PR)/Math.max(h.length-1,1)}" height="${CH-PB}" fill="transparent"
+      onmousemove="chartTip(event,${i})" onmouseleave="chartTipOff()"/>`).join("")}
+    ${h.map((p,i)=>labelAt.has(i)?`<text x="${X(i)}" y="${CH-14}"
+      font-size="13" fill="${MUT}" text-anchor="${i===h.length-1?"end":"middle"}">${p.date.slice(5).split("-")
+      .reverse().join(".")}.${p.date.slice(2,4)}</text>`:"").join("")}
+  </svg>`;
+
+  const dl=(t,tipText)=>`<span class="dlabel"${tip(tipText)}>${t}</span>`;
+
+  $("#view").innerHTML=`
+  <div class="hero">
+    <div class="herohead">
+      <div>
+        <div class="hlabel">Чистая позиция · ${esc(OUR_ORG_NAME)}${hint("Должны нам минус должны мы по всем контрагентам на сегодня. Минус означает, что в сумме мы должны больше, чем нам.")}</div>
+        <div class="hrow">
+          <span class="hnum num ${cls(last.net)}">${fmt(last.net)} ₸</span>
+          <span class="hdelta ${chg>=0?"pos":"neg"}"${tip("Насколько изменилась чистая позиция за выбранный период графика.")}>${svg(chg>=0?"up":"down","i sm")}<span class="num">${chg>=0?"+":"−"}${ru1(chgPct)} %</span> за ${rLabel}<span class="mut" style="font-size:13px"> (${rWord}, с ${(first.date||"").split("-").reverse().join(".")})</span></span>
+        </div>
+        <div class="hsub">Должны нам <span class="num pos">${short(last.owed_to_us)} ₸</span> ·
+          Должны мы <span class="num neg">${short(last.we_owe)} ₸</span> ·
+          <span class="num">${h.length}</span> недельных срезов</div>
+      </div>
+      <div class="ranges noprint">${RANGES.map(([lb],i)=>
+        `<button class="${i===histRange?"on":""}" onclick="histRange=${i};renderDash()"
+          data-tip="Период графика: ${lb}">${lb}</button>`).join("")}</div>
+    </div>
+    <div class="chartbox"><div id="chtip"></div>${chart}</div>
+    <div class="clegend"><span><i style="background:${lead}"></i>Чистая позиция: должны нам минус должны мы</span>
+      <span>наведите на график — подсказка покажет дебиторскую, кредиторскую и итог на дату среза</span></div>
+  </div>
+  <div class="stats">
+    <div class="stat act" onclick="openReport({only_debtors:true})"
+      data-tip="Показать контрагентов, которые должны нам">
+      <h3>Дебиторская задолженность</h3>
+      <div class="statgrid">
+        <div>${dl("Должны нам","Сумма по контрагентам, которые остались нам должны после зачёта их авансов.")}
+          <div class="dval num pos">${short(last.owed_to_us)} ₸</div></div>
+        <div>${dl("Изменение","Насколько изменилась дебиторская задолженность с прошлого недельного среза.")}
+          <div class="dval">${tr(dlt(last.owed_to_us,prev.owed_to_us),true)}</div></div>
+      </div></div>
+    <div class="stat act" onclick="openReport({sort:'net',dir:1})" data-tip="Показать, кому должны мы">
+      <h3>Кредиторская задолженность</h3>
+      <div class="statgrid">
+        <div>${dl("Должны мы","Сумма по контрагентам, которые заплатили вперёд больше, чем мы им сдали, либо которым мы не расплатились.")}
+          <div class="dval num neg">${short(last.we_owe)} ₸</div></div>
+        <div>${dl("Изменение","Насколько изменилась кредиторская задолженность с прошлого недельного среза.")}
+          <div class="dval">${tr(dlt(last.we_owe,prev.we_owe),false)}</div></div>
+      </div></div>
+    <div class="stat act" onclick="openReport()" data-tip="Открыть полный отчёт">
+      <h3>Итог по расчётам</h3>
+      <div class="statgrid">
+        <div>${dl("Чистая позиция","Разница между тем, что должны нам, и тем, что должны мы.")}
+          <div class="dval num ${cls(last.net)}">${short(last.net)} ₸</div></div>
+        <div>${dl("Должников","Сколько контрагентов остались должны нам по итогу — покупатели и поставщики вместе.")}
+          <div class="dval num">${pools.all.length}</div></div>
+      </div></div>
+  </div>
+  <div class="cols3">
+    <div><div class="caps" style="margin-bottom:14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <span style="white-space:nowrap">Требует внимания</span><span class="pill">${notes.length}</span>
+      <span class="mut">— просрочка в обе стороны</span>
+      ${notes.length>4?`<span class="grow"></span><a class="mut"
+        style="cursor:pointer" onclick="notesAll=${!notesAll};renderDash()">${notesAll?"свернуть":"показать все"}</a>`:""}
+      ${hint("Просрочка по документам старше 30 дней: акты подписаны и не оплачены. Авансы здесь намеренно не вычитаются — аванс привязан к своему договору и без письменного соглашения о зачёте просроченный долг не гасит. Если по итогу позиция обратная, на карточке стоит пометка. Нажмите карточку, чтобы открыть контрагента.")}</div>
+      <div>${(notesAll?notes:notes.slice(0,4)).map(n=>`<div class="alert act ${n.kind==="overdue"?"":"info"}"
+          onclick='openReport({set:"${n.set||"customers"}",q:${esc(JSON.stringify(n.name||""))}})'
+          data-tip="Открыть карточку контрагента">
+        <b>${esc(n.name||n.text.split(":")[0])}</b>
+        <div class="${n.kind==="overdue"?"warn":"m"}">${esc(n.text.split(":").slice(1).join(":").trim())}</div>
+        <div class="mut" style="font-size:12px;margin-top:4px">
+          ${n.set==="suppliers"?"поставщики":"покупатели"}${n.opposite
+            ?` · <b>но по итогу ${fmt(Math.abs(n.net))} ₸ ${n.set==="suppliers"
+              ?"должны нам":"должны мы"}</b> — есть аванс`:""}</div>
+      </div>`).join("")||'<div class="alert info"><b>Всё спокойно</b><div class="m">Просрочек нет</div></div>'}</div>
+    </div>
+    <div class="card"><div class="hd"><b>Должники</b><span class="mut" style="font-size:13px">— кто должен нам</span>${hint("Кто должен НАМ по итогу — долг минус аванс. Отличается от блока «Требует внимания» слева: там просрочка по актам без вычета авансов, здесь итоговая позиция. Переключателем можно посмотреть покупателей, поставщиков или всех сразу.")}<span class="grow"></span>
+      <span class="seg">
+        <span class="chip ${debtorsMode==="customers"?"on":""}"
+          onclick="debtorsMode='customers';renderDash()">Покупатели</span>
+        <span class="chip ${debtorsMode==="suppliers"?"on":""}"
+          onclick="debtorsMode='suppliers';renderDash()">Поставщики</span>
+        <span class="chip ${debtorsMode==="all"?"on":""}"
+          onclick="debtorsMode='all';renderDash()">Все</span></span></div>
+      ${top.map((r,i)=>`<div class="rank act"
+        onclick='openReport({set:"${r.set}",q:${esc(JSON.stringify(r.counterparty.name))}})'
+        data-tip="Открыть карточку контрагента"><span class="n">${i+1}</span>
+        <span class="body"><span class="top"><span>${esc(r.counterparty.name)}
+          ${debtorsMode==="all"?`<span class="mut" style="font-size:12px">·
+            ${r.set==="suppliers"?"поставщик":"покупатель"}</span>`:""}</span>
+          <b class="num pos">${fmt(r.amount)} ₸</b></span>
+          <span class="track"><i style="width:${r.amount/mx*100}%"></i></span></span></div>`).join("")
+        ||'<div class="empty">Должников нет</div>'}
+      ${list.length>5?`<div class="tblfoot"><span>показано ${top.length} из ${list.length}</span>
+        <a class="mut" style="cursor:pointer" onclick="debtorsAll=${!debtorsAll};renderDash()">
+          ${debtorsAll?"свернуть":"показать всех"}</a></div>`:""}
+    </div></div>`;
+}
+
+/* ── Календарь ── */
+function renderCal(){
+  toolbar(false);
+  const c=buildCalendar();
+  $("#stamp").innerHTML=`<span class="dot"></span>Отчёт на ${esc(c.report_date)}`;
+  const over=c.items.filter(i=>i.overdue_days>0), soon=c.items.filter(i=>!i.overdue_days);
+  const sum=a=>a.reduce((s,i)=>s+i.amount,0);
+  const row=i=>`<div class="calrow act"
+    onclick='openReport({set:"${i.set}",q:${esc(JSON.stringify(i.counterparty))}})'
+    data-tip="Открыть контрагента в отчёте">
+    <span class="when"><span class="d">${esc(i.due)}</span>
+      ${i.overdue_days?`<br><span class="od"${tip("Столько дней прошло с ожидаемого срока оплаты. Срок = дата документа плюс 30 дней.")}>+${i.overdue_days} дн</span>`:""}</span>
+    <span class="arrow ${i.direction==="in"?"in":"out"}"${tip(i.direction==="in"
+      ?"Стрелка вниз: деньги должны прийти нам. Это долг покупателя по подписанным актам."
+      :"Стрелка вверх: деньги должны уйти от нас. Это наш долг поставщику за полученные материалы.")}
+      >${svg(i.direction==="in"?"down":"up","i sm")}</span>
+    <span class="body" style="flex:1;min-width:0">
+      <div style="font-weight:600">${esc(i.counterparty)}</div>
+      <div class="mut" style="font-size:13px">${esc(i.doc)} от ${esc(i.doc_date)}</div></span>
+    <b class="num ${i.direction==="in"?"pos":"neg"}">${fmt(i.amount)} ₸</b></div>`;
+  $("#view").innerHTML=`
+  <h1>Календарь</h1>
+  <p class="sub">Ожидаемые поступления и платежи по срокам документов.</p>
+  <div class="toolbar">
+    <span class="pill we_owe">Просрочено: ${over.length} · на ${short(sum(over))} ₸</span>
+    <span class="pill owes_us">Ожидается: ${soon.length} · на ${short(sum(soon))} ₸</span>
+  </div>
+  <div class="cols">
+    <div class="card"><div class="hd">${svg("warn")}<b>Просрочено</b>${hint("Документы, у которых ожидаемый срок оплаты уже прошёл. Срок считается как дата документа плюс 30 дней.")}<span class="grow"></span>
+      <span class="pill we_owe">критично</span></div>
+      ${over.map(row).join("")||'<div class="empty">Просрочек нет</div>'}</div>
+    <div class="card"><div class="hd">${svg("clock")}<b>Ожидается</b>${hint("Платежи, срок которых ещё не наступил. Стрелка вниз — деньги придут нам, вверх — платим мы.")}<span class="grow"></span>
+      <span class="pill">в плане</span></div>
+      ${soon.map(row).join("")||'<div class="empty">Пусто</div>'}</div>
+  </div>`;
+}
+
+/* ── Настройки ── */
+function renderSettings(){
+  // отметка актуальности обязана быть видна на КАЖДОМ экране, включая настройки
+  $("#tools").innerHTML="";
+  $("#stamp").innerHTML=`<span class="dot"></span>Данные: ${esc(lastSyncAt.replace("T"," "))}`;
+  const rls=RULES, st={sync_interval_min:getSyncInterval()};
+  const side={debt:"Долг",advance:"Аванс",offset:"Зачёт"};
+  const ana={counterparty:"Только контрагент",contract:"Контрагент и договор",document:"Договор и документы расчётов"};
+  const signOpts=cur=>[1,-1].map(v=>`<option value="${v}" ${+cur===v?"selected":""}>${v>0?"+":"−"}</option>`).join("");
+  const sideOpts=cur=>Object.entries(side).map(([v,l])=>`<option value="${v}" ${cur===v?"selected":""}>${l}</option>`).join("");
+  const anaOpts=cur=>Object.entries(ana).map(([v,l])=>`<option value="${v}" ${cur===v?"selected":""}>${l}</option>`).join("");
+  $("#view").innerHTML=`
+  <h1>Настройки</h1>
+  <p class="sub">Учётные правила и расписание синхронизации. Демо считает всё в браузере —
+    экрана пользователей и журнала обращений здесь нет.</p>
+  <!-- одна колонка: таблице правил нужно ~1030px, иначе тумблер «Активен» уезжает под скролл -->
+  <div class="cols3" style="grid-template-columns:minmax(0,1fr)">
+    <div>
+      <div class="card" style="margin-bottom:20px">
+        <div class="hd"><b>Правила счетов</b>${hint("Формула отчёта, вынесенная в настройки. Каждая строка: какой счёт взять, в каком отчёте, с каким знаком. Приложение читает эту таблицу при каждом расчёте — поэтому новый счёт добавляется без программиста и без новой версии.")}</div>
+        <div class="tblwrap"><table class="narrow"><thead><tr><th>Отчёт</th><th>Счёт${hint("Номер счёта из плана счетов Казахстана. Первая цифра говорит о типе: 1 — актив (деньги, которые нам должны или которые мы отдали вперёд), 3 — обязательство (то, что должны мы). Наведите на конкретный номер, чтобы увидеть расшифровку.")}</th>
+          <th>Знак +/−${hint("Прибавить счёт к итогу или вычесть. Долг прибавляется, аванс вычитается.")}</th><th>Сторона${hint("В какую колонку отчёта попадёт сумма: «Долг» или «Аванс». Отдельный вид — «Зачёт» для случая, когда контрагент одновременно покупатель и поставщик.")}</th>
+          <th>Разрез аналитики${hint("Какое субконто ведётся на счёте. «Только контрагент» — остатки сворачиваются по контрагенту. «Контрагент и договор» — типовой случай. «Договор и документы расчётов» — даёт второй уровень раскрытия и акт сверки.")}</th>
+          <th class="r">Активен${hint("Выключенное правило не участвует в расчёте.")}</th><th style="width:40px"></th></tr></thead>
+        <tbody>${rls.map(r=>`<tr data-id="${r.id}" data-set="${r.rule_set}">
+          <td>${r.rule_set==="customers"?"Покупатели":"Поставщики"}</td>
+          <td><input class="f-acc num" style="width:110px" value="${esc(r.account)}"
+              onchange="editRule(${r.id})">${accHint(r.account)}</td>
+          <td><select class="f-sign" onchange="editRule(${r.id})">${signOpts(r.sign)}</select></td>
+          <td><select class="f-side" onchange="editRule(${r.id})">${sideOpts(r.side)}</select></td>
+          <td><select class="f-ana" onchange="editRule(${r.id})">${anaOpts(r.analytics)}</select></td>
+          <td class="r"><label class="toggle" style="display:inline-block">
+            <input class="f-en" type="checkbox" ${r.enabled?"checked":""}
+              onchange="toggleRule(${r.id},this.checked,'${r.rule_set}','${esc(r.account)}')"><span></span></label></td>
+          <td><button class="btn icon" onclick="delRule(${r.id},'${r.rule_set}','${esc(r.account)}')"
+              data-tip="Удалить правило">${svg("trash","i sm")}</button></td>
+        </tr>`).join("")}</tbody></table></div>
+        <div class="bd" style="padding-top:0">
+          <div class="caps" style="margin-bottom:10px">Добавить правило</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+            <select id="nr_set"><option value="customers">Покупатели</option><option value="suppliers">Поставщики</option></select>
+            <input id="nr_acc" placeholder="Счёт, напр. 1210" style="width:140px">
+            <select id="nr_sign">${signOpts(1)}</select>
+            <select id="nr_side">${sideOpts("debt")}</select>
+            <select id="nr_ana">${anaOpts("document")}</select>
+            <button class="btn dark" onclick="addRule()">${svg("plus","i sm")}Добавить</button>
+          </div>
+          <div class="err" id="rule_err"></div>
+        </div>
+        <div class="note">${svg("info","i sm")}<span>Строка со стороной <b>«Зачёт»</b> — это случай
+          «покупатель = поставщик»: контрагент должен нам за работы, а мы ему за материалы.
+          Включите её, чтобы итог сходился с ручной выгрузкой бухгалтерии. Состав счетов меняется
+          здесь же, правка кода не требуется. Демо принимает только счета 1210/3510/3310/1710 —
+          остальные есть в исходном приложении, но не в этой фикстуре.</span></div>
+      </div>
+      <div class="card"><div class="hd">${svg("sync")}<b>Расписание синхронизации</b>${hint("Как часто настоящее приложение само запрашивает остатки у 1С. В демо это косметическая настройка — данные и так всегда свежие, поскольку считаются на лету.")}</div>
+        <div class="bd">
+          <div class="caps" style="margin-bottom:8px">Интервал обновления</div>
+          <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+            <select onchange="saveInterval(this.value)">
+              ${[15,30,60,120,240].map(v=>`<option value="${v}"
+                ${st.sync_interval_min===v?"selected":""}>Каждые ${v} минут</option>`).join("")}
+            </select>
+            <button class="btn" onclick="refresh()">${svg("refresh","i sm")}Синхронизировать сейчас</button>
+            <span class="grow"></span><span class="pill owes_us"><span class="dot"></span>Демо-режим</span>
+          </div></div></div>
+    </div>
+    <div class="card"><div class="hd">${svg("info")}<b>О демо</b></div>
+      <div class="bd">
+        <p style="margin-top:0">Все цифры считаются на лету в браузере по 48 синтетическим
+          контрагентам исходного проекта (<code>golden.json</code>) — сервера и базы данных нет.</p>
+        <p class="mut" style="font-size:13px">Правила счетов и интервал синхронизации хранятся
+          в localStorage этой вкладки. Управление пользователями и журнал обращений в демо не
+          нужны — входа в систему здесь нет.</p>
+        <button class="btn" onclick="resetDemo()">${svg("trash","i sm")}Сбросить демо-данные</button>
+      </div>
+    </div>
+  </div>`;
+}
+function toast(text,linkText,onClick){
+  const d=document.createElement("div");d.className="t";
+  d.innerHTML=`<span style="flex:1">${text}</span>`;
+  if(linkText){const a=document.createElement("a");a.textContent=linkText;
+    a.onclick=()=>{d.remove();onClick()};d.appendChild(a)}
+  $("#toast").appendChild(d);setTimeout(()=>d.remove(),7000);
+}
+// общий путь для любого изменения правила: сохранить, обновить расчёт, показать тост, перерисовать экран
+function ruleChangeUI(msg,ruleSet){
+  saveRules();
+  loadNotes();
+  const s=ruleSet==="customers"?"Покупатели":ruleSet==="suppliers"?"Поставщики":"";
+  // изменение видно на другой вкладке — говорим об этом прямо и даём перейти
+  toast(s?`${msg} Отчёт «${s}» пересчитан.`:`${msg} Отчёты пересчитаны.`,
+        s?`Открыть ${s}`:null, s?()=>go(ruleSet):null);
+  renderSettings();
+}
+function toggleRule(id,en,ruleSet,account){
+  const r=RULES.find(x=>x.id===id); if(!r)return;
+  r.enabled=en?1:0;
+  ruleChangeUI(`Счёт ${account} ${en?"включён в расчёт":"исключён из расчёта"}.`,ruleSet);
+}
+function editRule(id){
+  const tr=$(`tr[data-id="${id}"]`);
+  const rule_set=tr.dataset.set,
+    account=tr.querySelector(".f-acc").value.trim(),
+    sign=+tr.querySelector(".f-sign").value,
+    side=tr.querySelector(".f-side").value,
+    analytics=tr.querySelector(".f-ana").value,
+    enabled=tr.querySelector(".f-en").checked;
+  try{
+    const f=validateRuleFields({rule_set,account,sign,side,analytics,enabled});
+    const r=RULES.find(x=>x.id===id); Object.assign(r,f);
+    ruleChangeUI("Правило изменено.",rule_set);
+  }catch(e){$("#rule_err").textContent=e.message}
+}
+function addRule(){
+  const rule_set=$("#nr_set").value, account=$("#nr_acc").value.trim(),
+    sign=+$("#nr_sign").value, side=$("#nr_side").value, analytics=$("#nr_ana").value;
+  try{
+    const f=validateRuleFields({rule_set,account,sign,side,analytics,enabled:true});
+    RULES.push({id:nextRuleId++, ...f});
+    ruleChangeUI("Правило добавлено.",rule_set);
+  }catch(e){$("#rule_err").textContent=e.message}
+}
+function delRule(id,ruleSet,account){
+  if(!confirm(`Удалить правило по счёту ${account}?`))return;
+  RULES=RULES.filter(r=>r.id!==id);
+  ruleChangeUI("Правило удалено.",ruleSet);
+}
+
+document.addEventListener("click",e=>{
+  const n=$("#notes");
+  if(!n.hidden&&!n.contains(e.target)&&!e.target.closest(".bell"))n.hidden=true;
+});
+loadRules();
+boot();
+</script></body></html>
