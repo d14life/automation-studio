@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Взаиморасчёты — что обязано пережить рестайл — Solutions101</title>
+<style>
+  :root{--bg:#0e202d;--panel:#132937;--ink:#F2F7F5;--soft:rgba(242,247,245,.86);
+    --faint:rgba(242,247,245,.58);--acc:#7FD8FF;--rule:rgba(242,247,245,.13)}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:var(--acc);text-decoration:none} a:hover{text-decoration:underline}
+  a:focus-visible,button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+  header{position:sticky;top:0;z-index:9;background:var(--bg);border-bottom:1px solid var(--rule);
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:0 clamp(14px,3vw,28px);min-height:52px}
+  .eyebrow{font:600 12px/1 ui-monospace,monospace;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--faint)}
+  .back{display:inline-flex;align-items:center;min-height:44px;padding:0 8px;font-size:14px}
+  main{max-width:860px;margin:0 auto;padding:clamp(24px,4vw,52px) clamp(14px,3vw,28px) 96px}
+  h1{font:700 clamp(28px,4.4vw,44px)/1.08 system-ui;letter-spacing:-.02em;margin:0 0 24px}
+  h2{font:700 clamp(21px,2.6vw,29px)/1.15 system-ui;letter-spacing:-.015em;
+    margin:44px 0 14px;padding-top:22px;border-top:1px solid var(--rule)}
+  h3{font:700 clamp(17px,1.9vw,21px)/1.25 system-ui;margin:30px 0 10px}
+  h4{font:700 16px/1.3 system-ui;margin:22px 0 8px;color:var(--soft)}
+  p{margin:0 0 15px;font-size:16.5px;line-height:1.62;color:var(--soft);max-width:68ch}
+  ul,ol{margin:0 0 16px;padding-left:22px}
+  li{font-size:16.5px;line-height:1.62;color:var(--soft);margin:0 0 7px;max-width:66ch}
+  blockquote{margin:0 0 16px;padding:12px 0 12px 18px;border-left:2px solid var(--acc);
+    color:var(--ink);font-size:17px;line-height:1.55}
+  hr{border:0;border-top:1px solid var(--rule);margin:32px 0}
+  code{font:500 14px/1.4 ui-monospace,monospace;background:var(--panel);
+    padding:2px 6px;border-radius:6px;color:var(--acc)}
+  .code{position:relative;margin:0 0 22px}
+  .code pre{margin:0;background:var(--panel);border:1px solid var(--rule);border-radius:14px;
+    padding:44px 16px 16px;overflow-x:auto;font:500 13.5px/1.62 ui-monospace,monospace;
+    color:var(--ink);white-space:pre-wrap;word-break:break-word}
+  .copy{position:absolute;top:8px;right:8px;min-height:32px;padding:0 14px;border-radius:9px;
+    background:#1a3648;color:var(--ink);border:1px solid var(--rule);cursor:pointer;
+    font:600 13px/1 system-ui;transition:transform .12s ease,background .12s ease}
+  .copy:hover{background:#20455b} .copy:active{transform:scale(.96)}
+  .copy.done{background:#1c5a45;border-color:#2f8b6b}
+  .tw{overflow-x:auto;margin:0 0 20px}
+  table{border-collapse:collapse;width:100%;font-size:15px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--rule);vertical-align:top;
+    line-height:1.5;color:var(--soft)}
+  th{color:var(--ink);font-weight:600;white-space:nowrap}
+  .grp{margin:0 0 34px}
+  .grp h2{border:0;padding:0;margin:0 0 4px}
+  .grp .note{color:var(--faint);font-size:14.5px;margin:0 0 14px}
+  .list{display:grid;gap:10px}
+  .item{display:block;padding:15px 17px;background:var(--panel);border:1px solid var(--rule);
+    border-radius:14px;color:var(--ink);transition:border-color .15s}
+  .item:hover{border-color:var(--acc);text-decoration:none}
+  .item b{display:block;font-size:16.5px;margin-bottom:3px}
+  .item span{color:var(--faint);font-size:14px}
+  @media (prefers-contrast:more){:root{--faint:rgba(242,247,245,.82);--rule:rgba(242,247,245,.4)}}
+</style>
+<header>
+  <a class="eyebrow" href="/docs/" style="color:var(--faint)">Solutions101 · документы</a>
+  <a class="back" href="/docs/">← ко всем</a>
+</header>
+<main><h1>Взаиморасчёты — что обязано пережить рестайл</h1>
+<p>Источник истины: <b>ТП Apex Studio, 26.07.2026</b> — <code>~/Downloads/Telegram Desktop/Техническое_предложение_Взаиморасчеты_Apex_Studio.pdf</code> (14 стр., основание — ТЗ 1.0 от 22.07.2026). Ниже — не пересказ ТП, а <b>приёмочный чеклист рестайла</b>: каждый пункт проверяется кликом после смены дизайна. Если пункт не проходит — рестайл не готов.</p>
+<p>Демо: <code>app/public/demo/vzaimoraschety/index.html</code> — один файл, 1490 строк, <b>ноль внешних запросов</b>.</p>
+<hr>
+<h2>0. Жёсткие ограничения (нарушение = переделка)</h2>
+<ul><li>[ ] <b>Ноль внешних запросов.</b> Никакого CDN, Google Fonts, внешних иконок и чарт-библиотек —</li></ul>
+<p>      приложение обязано работать в контуре клиента без интернета (причина записана в шапке файла).       Проверка: <code>performance.getEntriesByType('resource')</code> должен вернуть <code>[]</code>.</p>
+<ul><li>[ ] <b>Один файл.</b> Иконки — inline SVG (23 шт. в объекте <code>ICON</code>), график — inline SVG.</li><li>[ ] <b><code>tabular-nums</code></b> на каждой денежной ячейке, БИН/ИИН, счётчиках и тултипе графика</li></ul>
+<p>      (<code>.num{font-variant-numeric:tabular-nums;white-space:nowrap}</code>). Без него колонки сумм       перестают выравниваться — для бухгалтерского отчёта это дефект, а не мелочь.</p>
+<ul><li>[ ] <b>Десктоп-first.</b> ТП явно снимает мобильную адаптацию с этапа 1. Таблица держит</li></ul>
+<p>      <code>min-width:980px</code> внутри <code>.tblwrap{overflow-x:auto}</code> — горизонтальный скролл <b>внутри       контейнера</b>, а не резиновая ломающаяся сетка.</p>
+<ul><li>[ ] <b>Цветовое разделение направления долга</b> — прямое требование ТП 3.2-C. Палитру менять</li></ul>
+<p>      можно, семантику «зелёное = должны нам, красное = должны мы, серое = закрыто» — нельзя.</p>
+<h2>1. Экраны и навигация (порядок обязателен)</h2>
+<ul><li>[ ] Покупатели · Поставщики · Сроки долга · Дашборд · Календарь · Настройки</li><li>[ ] «Настройки» рендерятся <b>только</b> при <code>me.role === "admin"</code> (единственная реализация ролей)</li><li>[ ] Стартовый экран — <b>Дашборд</b>, не Покупатели</li><li>[ ] Свёртка сайдбара: ширина через <code>flex-basis</code> (<code>0 0 260px</code> / <code>0 0 68px</code>), продублирована в JS</li></ul>
+<p>      константами <code>SIDEBAR</code>. У flex-элемента <code>width</code> перебивается базисом — свёртка по <code>width</code>       не сработает.</p>
+<h2>2. Шапка</h2>
+<ul><li>[ ] <b>Метка актуальности <code>#stamp</code></b> — ТП 3.2-C: «постоянно видимая отметка актуальности данных».</li></ul>
+<p>      Зелёная точка + <code>Данные: …</code> + <code>отчёт на …</code>, видна на каждом экране.</p>
+<ul><li>[ ] Кнопка «Обновить из 1С», поле даты, «Экспорт в Excel» — полный набор только на</li></ul>
+<p>      Покупатели/Поставщики</p>
+<ul><li>[ ] Колокольчик со счётчиком непрочитанных · кнопка «‹ назад» (скрыта при пустом стеке)</li></ul>
+<h2>3. Отчёт — 10 колонок, заголовки дословно</h2>
+<p><code>(шеврон)</code> · <b>Контрагент</b> · <b>БИН/ИИН</b> · <b>Валюта</b> · <b>Дог.</b> · <b>Долг (₸)</b> · <b>Аванс (₸)</b> · <b>Итог (₸)</b> · <b>Статус</b> · <code>(иконка акта)</code></p>
+<ul><li>[ ] Сортировка: Контрагент, Долг, Аванс, Итог (по умолчанию Итог ↓)</li><li>[ ] Три KPI пересчитываются <b>по отфильтрованному набору</b>: Должны нам · Должны мы · Чистая позиция</li><li>[ ] Фильтры: поиск по названию и БИН/ИИН · организация · чип «Скрыть нулевые» · чип «Только должники»</li><li>[ ] Итоговая строка <code>tfoot</code> с пометкой <b>«(по всем строкам, не только по странице)»</b> —</li></ul>
+<p>      пометку убирать нельзя, это честность итогов при <code>PAGE_SIZE = 50</code></p>
+<ul><li>[ ] <b>Три уровня раскрытия:</b> контрагент → договор × счёт (знак вклада, Дт/Кт, курс, сумма</li></ul>
+<p>      в валюте) → документы расчётов. Это ТП 2.5 + 3.2-C + 3.6 одновременно.</p>
+<ul><li>[ ] Пустое состояние «Ничего не найдено»</li></ul>
+<h2>4. Расчёт — цифры и счета не трогать</h2>
+<p>Формулы ТП 2.3, дословно:</p>
+<div class="code"><button class="copy" data-for="c0" type="button">Скопировать</button><pre id="c0">Покупатели: Итог = (Дт 1210 − Кт 1210) − (Кт 3510 − Дт 3510)
+Поставщики: Итог = (Кт 3310 − Дт 3310) − (Дт 1710 − Кт 1710)</pre></div>
+<p>Свёртка: <code>актив (1210, 1710) → дт − кт</code>, <code>пассив (3310, 3510) → кт − дт</code>, <code>net = Σ sign × folded</code> по активным правилам.</p>
+<p>Правила по умолчанию — пять строк:</p>
+<div class="tw"><table><thead><tr><th>rule_set</th><th>Счёт</th><th>Знак</th><th>Сторона</th><th>Активен</th></tr></thead><tbody><tr><td>Покупатели</td><td>1210</td><td>+1</td><td>Долг</td><td>вкл</td></tr><tr><td>Покупатели</td><td>3510</td><td>−1</td><td>Аванс</td><td>вкл</td></tr><tr><td>Покупатели</td><td>3310</td><td>−1</td><td><b>Зачёт</b></td><td><b>ВЫКЛ</b></td></tr><tr><td>Поставщики</td><td>3310</td><td>+1</td><td>Долг</td><td>вкл</td></tr><tr><td>Поставщики</td><td>1710</td><td>−1</td><td>Аванс</td><td>вкл</td></tr></tbody></table></div>
+<ul><li>[ ] Правило «Зачёт» («покупатель = поставщик») остаётся <b>выключенным по умолчанию</b> —</li></ul>
+<p>      как в выгрузке клиента</p>
+<ul><li>[ ] Aging: <code>0-30 / 31-60 / 61-90 / 90+</code>, <code>OVERDUE_DAYS = 30</code>, срок считается от даты документа</li><li>[ ] <code>PAY_TERM_DAYS = 30</code> для календаря</li><li>[ ] <code>TODAY = "2026-07-31"</code>, <code>OUR_ORG_NAME = ТОО «Тумар Курылыс»</code>,</li></ul>
+<p>      <code>RATES = {USD:512.34, EUR:551.20, RUB:5.42}</code></p>
+<ul><li>[ ] Контрольные суммы (зачёт выкл): должны нам <b>48 377 725,08</b> · должны мы <b>479 737 547,06</b> ·</li></ul>
+<p>      чистая <b>−431 359 821,98</b>. После рестайла обязаны совпасть до копейки.</p>
+<ul><li>[ ] Глоссарий счетов в подсказках «?» (1210/3510/3310/1710/1280/3390/2110/4110) — это контракт,</li></ul>
+<p>      формулировки не переписывать</p>
+<h2>5. Печать и экспорт</h2>
+<ul><li>[ ] <b>Акт сверки</b> — самостоятельный HTML в новой вкладке (<code>buildActHtml</code> + <code>window.open</code>),</li></ul>
+<p>      своя кнопка «Печать», <code>@media print{.noprint{display:none}}</code>, таблица       <b>Дата · Документ · Счёт · Дебет, ₸ · Кредит, ₸</b>, вывод «Задолженность в пользу …»,       примечание про данные контрагента, подписи обеих сторон</p>
+<ul><li>[ ] <b>Печать основного экрана</b> — <code>@media print{aside,header,.toolbar,.noprint{display:none}}</code>.</li></ul>
+<p>      Рестайл, который переносит фильтры или заголовок в другой контейнер, <b>обязан обновить это       правило</b>, иначе они полезут в печать.</p>
+<ul><li>[ ] <b>Экспорт</b> — <code>report.csv</code>, разделитель <code>;</code>, UTF-8 BOM (иначе Excel открывает мастером</li></ul>
+<p>      импорта). Шапка и три итоговые строки (ИТОГО / в том числе должны нам / в том числе должны       мы) — часть критерия приёмки, менять нельзя. Экспорт учитывает поиск, чипы, организацию, дату.</p>
+<h2>6. Взаимодействие</h2>
+<ul><li>[ ] ~50 подсказок <code>data-tip</code> — это исполнение ТП 3.2-C «работа без предварительного обучения»</li><li>[ ] Клавиатура: Escape закрывает модал; Backspace и Alt+← — назад, с guard по</li></ul>
+<p>      <code>INPUT|SELECT|TEXTAREA</code> (иначе Backspace в поиске уводит со страницы)</p>
+<ul><li>[ ] Стек истории <code>nav</code> + <code>snapshotView()</code>: клик из «Сроки долга», «Календаря», «Требует</li></ul>
+<p>      внимания», «Должники» и уведомления ведёт в отчёт с подставленным контрагентом, а «‹»       возвращает экран <b>вместе с фильтрами</b></p>
+<ul><li>[ ] localStorage: <code>vzr_rules_v1</code>, <code>vzr_sync_interval</code>, <code>vzr_tuck</code>, <code>vzr_seenNotes</code> + «Сбросить демо»</li><li>[ ] Формат чисел <code>ru-RU</code>, всегда две дробные; «млн/млрд» только на дашборде; <code>₸</code> после суммы</li></ul>
+<h2>7. Ловушки, найденные при разборе</h2>
+<ul><li><b><code>toggleDocs</code> использует неявный глобальный <code>event</code></b> (строка 1133, <code>event.stopPropagation()</code>).</li></ul>
+<p>  Перевод на <code>addEventListener</code> без передачи события роняет третий уровень раскрытия с TypeError.   Весь UI на inline-<code>onclick</code> со строковой интерполяцией и <code>esc()</code> / <code>JSON.stringify</code> —   переходить на делегирование можно только целиком.</p>
+<ul><li>Все <code>th</code> имеют <code>cursor:pointer</code>, включая пустые и несортируемые — заголовки выглядят</li></ul>
+<p>  кликабельными и молча не работают. Рестайл — хороший момент это поправить.</p>
+<h2>8. Известные расхождения демо и ТП (не регресс рестайла, но знать)</h2>
+<div class="tw"><table><thead><tr><th>ТП требует</th><th>В демо</th></tr></thead><tbody><tr><td>Авторизация логин/пароль, роли admin и user (3.2-B)</td><td>Экрана входа нет, <code>me</code> захардкожен как admin</td></tr><tr><td>Журнал обращений к 1С и входов (3.2-B, 3.4)</td><td>Отсутствует; признано текстом в подзаголовке Настроек</td></tr><tr><td>Сортировка <b>по любой</b> колонке (3.2-C)</td><td>Только 4 из 8</td></tr><tr><td>Выгрузка в <b>Excel</b> (2.4, критерий №5)</td><td>CSV <code>;</code>+BOM, не .xlsx</td></tr><tr><td>Счета 1280/3390/2110/4110 (3.3, вопрос Б-2)</td><td>Есть в глоссарии, но валидатор их отклоняет</td></tr><tr><td>Просроченная задолженность <b>и лимиты</b> (2.4)</td><td>Просрочка есть, лимитов нет</td></tr><tr><td>Сходимость с ОСВ, расхождение 0 ₸ (критерии 1–2)</td><td>Не проверено — нет базы клиента</td></tr></tbody></table></div>
+<p>Смысловые баги, которые стоит починить заодно:</p>
+<ul><li>«Сроки долга» на вкладке <b>Поставщики</b> оставляет заголовок плитки <b>«Всего должны нам (₸)»</b>,</li></ul>
+<p>  хотя показывает наш долг поставщикам.</p>
+<ul><li><b>Акт сверки игнорирует выбранную дату отчёта</b> — <code>buildActHtml</code> строится на <code>todayISO()</code></li></ul>
+<p>  и всегда печатает «по состоянию на сегодня».</p>
+<ul><li>Метка <b>★</b> («покупатель = поставщик») есть в данных у 5 контрагентов и в CSS, но <b>не выводится</b></li></ul>
+<p>  — понять, к кому относится правило «Зачёт», по интерфейсу нельзя.</p></main>
+<script>
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('.copy'); if (!b) return;
+  const pre = document.getElementById(b.dataset.for); if (!pre) return;
+  navigator.clipboard.writeText(pre.textContent).then(() => {
+    b.textContent = 'Скопировано'; b.classList.add('done');
+    setTimeout(() => { b.textContent = 'Скопировать'; b.classList.remove('done') }, 1800);
+  }).catch(() => { b.textContent = 'Выделите вручную' });
+});
+</script>

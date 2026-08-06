@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Промпт: рестайл демо «Аренда спецтехники» (park) — Solutions101</title>
+<style>
+  :root{--bg:#0e202d;--panel:#132937;--ink:#F2F7F5;--soft:rgba(242,247,245,.86);
+    --faint:rgba(242,247,245,.58);--acc:#7FD8FF;--rule:rgba(242,247,245,.13)}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:var(--acc);text-decoration:none} a:hover{text-decoration:underline}
+  a:focus-visible,button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+  header{position:sticky;top:0;z-index:9;background:var(--bg);border-bottom:1px solid var(--rule);
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:0 clamp(14px,3vw,28px);min-height:52px}
+  .eyebrow{font:600 12px/1 ui-monospace,monospace;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--faint)}
+  .back{display:inline-flex;align-items:center;min-height:44px;padding:0 8px;font-size:14px}
+  main{max-width:860px;margin:0 auto;padding:clamp(24px,4vw,52px) clamp(14px,3vw,28px) 96px}
+  h1{font:700 clamp(28px,4.4vw,44px)/1.08 system-ui;letter-spacing:-.02em;margin:0 0 24px}
+  h2{font:700 clamp(21px,2.6vw,29px)/1.15 system-ui;letter-spacing:-.015em;
+    margin:44px 0 14px;padding-top:22px;border-top:1px solid var(--rule)}
+  h3{font:700 clamp(17px,1.9vw,21px)/1.25 system-ui;margin:30px 0 10px}
+  h4{font:700 16px/1.3 system-ui;margin:22px 0 8px;color:var(--soft)}
+  p{margin:0 0 15px;font-size:16.5px;line-height:1.62;color:var(--soft);max-width:68ch}
+  ul,ol{margin:0 0 16px;padding-left:22px}
+  li{font-size:16.5px;line-height:1.62;color:var(--soft);margin:0 0 7px;max-width:66ch}
+  blockquote{margin:0 0 16px;padding:12px 0 12px 18px;border-left:2px solid var(--acc);
+    color:var(--ink);font-size:17px;line-height:1.55}
+  hr{border:0;border-top:1px solid var(--rule);margin:32px 0}
+  code{font:500 14px/1.4 ui-monospace,monospace;background:var(--panel);
+    padding:2px 6px;border-radius:6px;color:var(--acc)}
+  .code{position:relative;margin:0 0 22px}
+  .code pre{margin:0;background:var(--panel);border:1px solid var(--rule);border-radius:14px;
+    padding:44px 16px 16px;overflow-x:auto;font:500 13.5px/1.62 ui-monospace,monospace;
+    color:var(--ink);white-space:pre-wrap;word-break:break-word}
+  .copy{position:absolute;top:8px;right:8px;min-height:32px;padding:0 14px;border-radius:9px;
+    background:#1a3648;color:var(--ink);border:1px solid var(--rule);cursor:pointer;
+    font:600 13px/1 system-ui;transition:transform .12s ease,background .12s ease}
+  .copy:hover{background:#20455b} .copy:active{transform:scale(.96)}
+  .copy.done{background:#1c5a45;border-color:#2f8b6b}
+  .tw{overflow-x:auto;margin:0 0 20px}
+  table{border-collapse:collapse;width:100%;font-size:15px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--rule);vertical-align:top;
+    line-height:1.5;color:var(--soft)}
+  th{color:var(--ink);font-weight:600;white-space:nowrap}
+  .grp{margin:0 0 34px}
+  .grp h2{border:0;padding:0;margin:0 0 4px}
+  .grp .note{color:var(--faint);font-size:14.5px;margin:0 0 14px}
+  .list{display:grid;gap:10px}
+  .item{display:block;padding:15px 17px;background:var(--panel);border:1px solid var(--rule);
+    border-radius:14px;color:var(--ink);transition:border-color .15s}
+  .item:hover{border-color:var(--acc);text-decoration:none}
+  .item b{display:block;font-size:16.5px;margin-bottom:3px}
+  .item span{color:var(--faint);font-size:14px}
+  @media (prefers-contrast:more){:root{--faint:rgba(242,247,245,.82);--rule:rgba(242,247,245,.4)}}
+</style>
+<header>
+  <a class="eyebrow" href="/docs/" style="color:var(--faint)">Solutions101 · документы</a>
+  <a class="back" href="/docs/">← ко всем</a>
+</header>
+<main><h1>Промпт: рестайл демо «Аренда спецтехники» (park)</h1>
+<p>Вставь всё, что ниже разделителя, в свежую сессию Claude Code, открытую в <code>~/solutions101</code>.</p>
+<hr>
+<p>Файл: <code>app/public/demo/park/index.html</code> — один самодостаточный файл, русское B2B-демо «Аренда спецтехники»: аналитика по парку, календарь занятости, экономика по каждой единице, печатные договор/акт/счёт. Работает без интернета, шрифты self-hosted.</p>
+<p>Задача: <b>сделать его профессиональным и при этом ярким</b>, со светлой и тёмной темой. Ничего из функциональности не терять. Прогнать демо кликами, а не глазами по коду — в репозитории есть навык <code>drive-demo</code>, используй его.</p>
+<h2>Что уже проверено (не переисследуй, начинай отсюда)</h2>
+<p>Информационный дизайн здесь <b>сильный</b>. Визуальный слой — нет, потому что в файле <b>две таблицы стилей</b>, и вторая (начинается на строке ~2228, физически <b>после <code>&lt;/html&gt;</code></b>) это декор, накрученный поверх рабочего инструмента.</p>
+<p>Конкретные улики, с фактическими значениями из файла:</p>
+<div class="tw"><table><thead><tr><th>Строка</th><th>Что</th><th>Почему это провал</th></tr></thead><tbody><tr><td>2292</td><td><code>.kpi .val{background:linear-gradient(180deg,#FFF,#C7D8E6);background-clip:text;color:transparent}</code></td><td>Градиентный текст на каждом KPI. Ничего не кодирует и убивает субпиксельное сглаживание на том единственном, что читают.</td></tr><tr><td>2241</td><td><code>body::before</code> — три <code>radial-gradient</code> <code>#7c4dff / #ff7a4d / #1fa2ff</code>, <code>blur(90px)</code>, <code>opacity:.42</code></td><td>Фиолетово-оранжевое сияние за учётной ведомостью. В комментарии честно написано, что скопировано с hero-секции 21st.dev.</td></tr><tr><td>2249</td><td><code>body::after</code> <code>feTurbulence</code>, <code>opacity:.055</code></td><td>Плёночное зерно на бухгалтерском экране.</td></tr><tr><td>2277</td><td><code>backdrop-filter:blur(18px) saturate(1.35)</code> на <code>.card,.kpi,.modal,.seg,#nav</code></td><td>Глассморфизм по умолчанию.</td></tr><tr><td>2286/2280</td><td><code>.btn{border-radius:999px}</code> + <code>.card,.kpi{border-radius:16px}</code></td><td>Таблетки-кнопки и 16px карточки поверх вменяемой базы 6–8px.</td></tr><tr><td>149/227</td><td><code>.kpi .k::before{width:3px}</code>, <code>.note::before{width:3px}</code></td><td>Боковая цветная полоска на каждом KPI и каждом алерте — на 17 карточках это уже обои.</td></tr><tr><td>1484</td><td>заливка столбика <code>linear-gradient(180deg,#F5A524,rgba(245,165,36,.3))</code></td><td>Градиент в столбиках: низ растворяется ровно там, где глаз меряет высоту.</td></tr></tbody></table></div>
+<p>Плюс <b>12 значений радиуса</b> (3,4,5,6,7,8,12,16,50%,999px) и <b>14 размеров шрифта</b> (10.5…26px, все сырыми пикселями) — то есть ни политики радиуса, ни типографической шкалы.</p>
+<p><b>Что НЕ является провалом и трогать не надо:</b> шрифты. Это не Inter — это self-hosted <b>Golos Text + JetBrains Mono</b> с кириллическим сабсетом. Правильный выбор для русского B2B.</p>
+<h2>Два бага, найденных кликами (почини оба)</h2>
+<ol><li><b><code>printDogovor()</code> падает с <code>ReferenceError: dayDiff is not defined</code></b> — строка 2087,</li></ol>
+<p>   а определён хелпер <code>daysBetween</code> (строка 344). <b>Кнопка печати договора не делает ничего.</b>    <code>printAct</code> и <code>printInvoice</code> работают. Договор — первый документ, который спрашивает директор.</p>
+<ol><li><b>Шрифты 404</b> при отдаче из папки <code>demo/</code> (<code>/fonts/*.woff2</code>) — сервер надо root'ить</li></ol>
+<p>   на <code>app/public</code>, иначе всё демо рендерится системным шрифтом, и все скриншоты врут.</p>
+<h2>Что сохранить любой ценой</h2>
+<ul><li><b>Календарь занятости</b> (<code>renderCal</code>) — лучший экран в демо. Липкая колонка единицы,</li></ul>
+<p>  микрополоска загрузки под названием, линия «сегодня», полые бруски брони с клиентом   и выручкой справа, штриховка для ремонта/ТО, легенда, объясняющая взаимодействие.   Ему почти ничего не нужно.</p>
+<ul><li><b>Достоверность документов.</b> В Акте посменная арифметика прописью (<code>8,0 ч × 2 400 + …</code>),</li></ul>
+<p>  сумма прописью с самопроверкой на 11 кейсах в консоли, залог, отсрочка. Это и есть   ценность демо.</p>
+<ul><li><b>Контраст уже чистый</b> — посчитано: <code>#FFF/#0E1013</code> 19.05:1, <code>--muted</code> 14.75:1,</li></ul>
+<p>  <code>--dim</code> 9.91:1, <code>--steel</code> 6.56:1, <code>--danger</code> 6.36:1, <code>--acc</code> 9.95:1. <b>Ноль провалов.</b>   Не потеряй это при рестайле.</p>
+<ul><li>Один синглтон <code>#tip</code> на все 300 ячеек теплокарты вместо нативного <code>title</code>.</li><li><code>@media print{@page{size:A4;margin:14mm}}</code>, <code>table.resp</code> со схлопыванием в карточки,</li></ul>
+<p>  alt+←/→, фолбэки на <code>prefers-reduced-motion</code> и <code>prefers-reduced-transparency</code>.</p>
+<h2>Графики — что чинить</h2>
+<p>Палитра категорий <code>SER = ['#3987e5','#d95926','#199e70','#c98500','#d55181','#9085e9']</code> <b>прошла валидатор dataviz</b> (полоса светлоты, порог цветности, разделимость при протанопии/тританопии ΔE ≥ 8.4, контраст ≥ 3:1). Её не трогай. Чинить надо остальное:</p>
+<ol><li><b>Оси не «оnice'ены».</b> Тиков-функции в файле нет вообще, тики считаются как <code>max·k/4</code>,</li></ol>
+<p>   поэтому ось Y читается <b>0 / 351 тыс / 701 тыс / 1,1 млн / 1,4 млн</b>. Никто не выпускает    <code>701 тыс</code>. Должно быть 0 / 400 тыс / 800 тыс / 1,2 млн.</p>
+<ol><li><b>Линия дублирует столбики.</b> Выручка 2 395 206 ₽ против результата 2 339 706 ₽ — <b>97,7 %</b>,</li></ol>
+<p>   поэтому зелёная линия липнет к вершинам столбиков (в июне маркер сидит ровно на кромке).    Интересна <b>разница</b> (расходы 55 500 ₽), а она сейчас невидима. Замени на столбик выручки    с тёмным сегментом расходов у основания, либо вынеси маржу % отдельным маленьким графиком.</p>
+<ol><li><b>Неполный период сравнивается как полный.</b> Период 98 дней, корзины май/июн/июл/<b>авг</b>,</li></ol>
+<p>   и август — это 6 дней из 31. Его столбик стоит рядом с полными месяцами без штриховки    и без пометки «неполный период». График говорит, что август обвалился. Он не обвалился.</p>
+<ol><li><b>Пончик место своё оправдывает</b> (6 категорий, часть-целое, есть точная легенда), но:</li></ol>
+<p>   в центре написано <b>2,4 млн</b> — дубль KPI ВЫРУЧКА в 40 пикселях выше; и <code>.lrow .lt{flex:1 1 auto}</code>    разносит подпись на x≈420, а число на x≈1370, оставляя <b>~800px пустоты</b> — строка перестаёт    читаться как строка. Плюс «Прочее 4 %» стоит выше «Компрессор 3 %»: катч-олл обязан быть    последним, остальное отсортировано по величине.</p>
+<ol><li><b>Теплокарта</b>: форма правильная (единица × период — это ровно вопрос владельца), но самый</li></ol>
+<p>   тёмный шаг рампы неотличим от панели, поэтому <b>0 % и «нет данных» сливаются</b>; заголовки    строк в <code>uppercase</code> — «КОМПРЕССОР 5 М³/МИН» капсом по-русски читается заметно хуже.</p>
+<ol><li><b>Светлой темы нет вообще</b> — только <code>@media print</code>, где акцент вычищается (<code>.doc *{color:#000}</code>),</li></ol>
+<p>   то есть бренд исчезает ровно на том артефакте, который клиент уносит с собой.</p>
+<ol><li><b>17 карточек алертов, 13 из них — одинаковое «Договор не закрыт».</b> Схлопни в одну строку</li></ol>
+<p>   со счётчиком и раскрытием.</p>
+<h2>Направление: «Диспетчерская доска» + «Приборная панель»</h2>
+<p>Выбрано направление <b>A с элементами B</b> (см. <code>docs/directions-park.html</code>).</p>
+<p><b>A даёт структуру:</b> герой экрана — не строка KPI, а <b>занятость по дням</b>. Каждая машина — дорожка, каждый заказ — брусок на ней. Дыры в дорожке и есть недозагрузка: 20 % загрузки в строке KPI надо осмыслить, те же 20 % дырявыми дорожками бьют сразу.</p>
+<p><b>B даёт фокус:</b> выбранная машина раскрывается <b>приборной панелью</b> — одно число во весь блок (моточасы), шкала под ним, три вторичных прибора (загрузка / выручка на единицу / расход) и строка предупреждений (ТО через N м/ч, страховка до …). Читается за полсекунды.</p>
+<p>Сборка: <b>слева-сверху доска на весь экран, снизу или справа — приборка выбранной единицы.</b> Клик по дорожке меняет приборку. Календарь <code>renderCal</code> уже почти этим и является — его надо не переписывать, а повысить в звании до главного экрана.</p>
+<h3>ЖЁСТКОЕ ТРЕБОВАНИЕ: не должно быть похоже на складской сканер</h3>
+<p>На том же сайте уже стоит <code>/demo/sklad/</code> — тёмный терминал: чистый нейтральный чёрный <code>#111214</code>, кислотный лайм <code>#D8F60A</code>, <b>всё капсом</b>, <b>всё моноширинным</b>, <code>border-radius: 0</code>, диагональная лента-шторка, плоские панели с разделителями в 2px. <b>Park обязан читаться как другой продукт.</b> Пять осей расхождения, соблюдать все пять:</p>
+<div class="tw"><table><thead><tr><th></th><th>Сканер (не повторять)</th><th>Park (делать так)</th></tr></thead><tbody><tr><td>Ground</td><td>Нейтральный чёрный <code>#111214</code></td><td><b>Тёплый графит</b> с оливково-коричневым подтоном <code>#12130F</code></td></tr><tr><td>Акцент</td><td>Кислотный лайм <code>#D8F60A</code></td><td><b>Янтарь</b> <code>#F5A524</code> — машинный, а не сигнальный</td></tr><tr><td>Шрифт</td><td>Моноширинный во всём</td><td><b>Golos Text</b> для текста, моноширинный <b>только для цифр</b></td></tr><tr><td>Регистр</td><td>Капс везде</td><td>Обычный регистр; капс только на микроподписях</td></tr><tr><td>Глубина</td><td>Плоско + разделители 2px</td><td><b>Тон, а не линия</b> — три ступени поверхности, границ почти нет</td></tr><tr><td>Радиус</td><td><code>0</code> везде</td><td><code>2px</code> на марках данных, <code>6px</code> на панелях и кнопках</td></tr></tbody></table></div>
+<p>Разница шрифта и регистра — самая заметная. Сканер кричит капсом; park должен говорить.</p>
+<p><b>Референс глубины:</b> Axiom (<code>axiom.co</code>) — тональные почти-чёрные поверхности, глубина <b>тоном, а не тенью</b>, единственный акцент строго под CTA и активное состояние, крупные внутренние отступы. <b>Стеклянный/аврора-слой отвергнут целиком.</b></p>
+<p>Концепция: <b>пульт управления площадкой, а не SaaS-дашборд.</b></p>
+<h3>Тёмные токены (тёплый графит, контраст посчитан)</h3>
+<div class="code"><button class="copy" data-for="c0" type="button">Скопировать</button><pre id="c0">--canvas    #0C0D0A   --surface  #14150F   --surface-2 #1C1E16
+--hairline  #2B2E24   (линейка, не текст — использовать редко, глубину даёт тон)
+--ink       #F2F1E8   16.9:1 на surface
+--ink-2     #ADAC9C    8.4:1
+--ink-3     #8D8C7E    5.8:1   ← брать этот; всё, что светлее 5:1, для мелкого не годится
+--accent    #F5A524    9.2:1;  текст на акценте #12140F = 9.08:1
+--red       #FF6B6B    6.5:1   --green #3FB980  7.3:1</pre></div>
+<p>Подтон важен: <code>#14150F</code> против <code>#111214</code> у сканера — разница в зелёно-жёлтую сторону, на глаз читается как «тёплое железо», а не «чёрный терминал».</p>
+<h3>Светлые токены (и для светлой темы, и для печатных форм)</h3>
+<div class="code"><button class="copy" data-for="c1" type="button">Скопировать</button><pre id="c1">--paper #FFFFFF  --canvas #F5F6F7  --hairline #D8DDE1
+--ink   #14181C  17.84:1 на paper · 16.49:1 на canvas
+--ink-2 #4C565F   7.49:1
+--ink-3 #636D76   5.28:1 на paper · 4.88:1 на canvas   (#6E7A84 проваливается на 4.39 — не брать)
+--accent #A85F00  4.88:1; белый на акценте тоже 4.88:1
+--red   #C2181D   6.10:1   --green #0F7A4E  5.37:1</pre></div>
+<h3>Типографика — оставить Golos Text + JetBrains Mono, починить применение</h3>
+<p>Фиксированная шкала, шесть ступеней, ratio ~1.15: <code>11/1.4 label · 12/1.45 caption · 13/1.5 body · 15/1.4 subhead · 19/1.25 title · 25/1.05 metric</code>. Моноширинный — <b>только для табличных цифр</b> (<code>font-variant-numeric:tabular-nums</code>), никогда для прозы и никогда для суффикса <code>млн</code>/<code>₽</code>. Трекинг заголовков от <code>-0.02em</code>. <b>Удалить <code>letter-spacing:.06em</code> у надзаголовков.</b></p>
+<h3>Отступы</h3>
+<p>База 4px: <code>4 · 8 · 12 · 16 · 24 · 32 · 48</code>. Заменить <code>padding:13px 15px 14px</code>, <code>margin:26px 0 11px</code>, <code>gap:9px/11px/12px/26px</code>.</p>
+<h3>Радиус — три значения, без исключений</h3>
+<ul><li><code>2px</code> — марки данных, ячейки теплокарты, столбики, чипы, бейджи</li><li><code>6px</code> — карточки, панели, поля, кнопки</li><li><code>999px</code> — <b>только</b> статусная точка и аватар</li></ul>
+<p>Удалить 3/4/5/7/8/12/16 и таблетки-кнопки.</p>
+<h3>Политика акцента — самый крупный рычаг</h3>
+<p><code>#F5A524</code> сейчас одновременно CTA, активная вкладка, серия столбиков, рампа теплокарты, брусок брони, ховер строки таблицы и микрополоска загрузки. <b>Семь работ = ноль сигнала.</b> Янтарь разрешён <b>только</b> на: (1) заливке главной кнопки, (2) активном состоянии навигации/сегмента, (3) линии «сегодня» в календаре. Всё остальное — плоская сталь <code>#616B77</code>, а для теплокарты отдельная последовательная рампа нейтральный→янтарь. Красный и зелёный — <b>только статус</b>, и всегда с иконкой и подписью, никогда цветом в одиночку.</p>
+<h2>Порядок работ (по отдаче на единицу труда)</h2>
+<ol><li><b>Поднять календарь занятости до главного экрана</b> и пристроить к нему приборку выбранной</li></ol>
+<p>   единицы (A + B). Это и есть смена ДНК; всё остальное ниже — гигиена. ~2 ч.</p>
+<ol><li><b>Удалить весь блок стилей после <code>&lt;/html&gt;</code></b> (строки 2228–2310). Одним удалением</li></ol>
+<p>   возвращается профессиональный регистр. ~10 мин.</p>
+<ol><li><b>Починить <code>dayDiff</code> → <code>daysBetween</code></b> (строка 2087). 2 мин.</li><li><b>Оnice'ить тики оси Y.</b> Убирает подпись дилетанта <code>701 тыс</code>. ~15 мин.</li><li><b>Ввести политику акцента.</b> Самый крупный скачок воспринимаемого качества. ~1 ч.</li><li><b>Починить строку легенды пончика</b>, отсортировать по величине с «Прочее» в конце,</li></ol>
+<p>   убрать дублирующее <code>2,4 млн</code> из центра. ~30 мин.</p>
+<ol><li><b>Схлопнуть 13 одинаковых алертов</b> в одну строку со счётчиком. ~30 мин.</li><li><b>Убрать надзаголовки капсом и боковые полоски.</b> ~30 мин.</li><li><b>Печатные формы</b>: блок реквизитов поставщика (р/с, БИК, банк, к/с), строка «НДС не</li></ol>
+<p>   облагается», расширить денежные колонки Счёта — на A4/10pt <code>2 400,00</code> и <code>61 200,00</code>    сейчас <b>переносятся посреди числа</b>, и это первое, что заметит бухгалтер. ~45 мин.</p>
+<h2>Приёмка</h2>
+<ul><li><b>Главный экран — доска занятости с приборкой выбранной единицы</b>, а не строка KPI</li><li><b>Поставить рядом два скриншота: park и <code>/demo/sklad/</code>.</b> Если они читаются как один</li></ul>
+<p>  продукт — направление не выполнено. Проверять по пяти осям из таблицы выше.</p>
+<ul><li>Обе темы, переключатель в шапке, выбор запоминается</li><li>Контраст: тело ≥ 4.5:1, крупный текст и края UI ≥ 3:1 — посчитать, не прикидывать</li><li>Ноль внешних запросов (<code>performance.getEntriesByType('resource')</code> → <code>[]</code>)</li><li>Печатается договор, акт и счёт; ни одно число не переносится посреди себя</li><li>Каждый экран прокликан в обеих темах, скриншоты приложены</li></ul>
+<p><b>Не проверялось и требует внимания:</b> мобильные брейкпоинты, состояния модалов и форм, экраны Наработка / Деньги / Клиенты / Данные, реальная разбивка на страницы при печати в PDF, состояния hover/tooltip/focus-visible, пустые состояния.</p></main>
+<script>
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('.copy'); if (!b) return;
+  const pre = document.getElementById(b.dataset.for); if (!pre) return;
+  navigator.clipboard.writeText(pre.textContent).then(() => {
+    b.textContent = 'Скопировано'; b.classList.add('done');
+    setTimeout(() => { b.textContent = 'Скопировать'; b.classList.remove('done') }, 1800);
+  }).catch(() => { b.textContent = 'Выделите вручную' });
+});
+</script>

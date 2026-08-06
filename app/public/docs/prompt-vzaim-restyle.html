@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Промпт: рестайл демо «Взаиморасчёты» (vzaimoraschety) — Solutions101</title>
+<style>
+  :root{--bg:#0e202d;--panel:#132937;--ink:#F2F7F5;--soft:rgba(242,247,245,.86);
+    --faint:rgba(242,247,245,.58);--acc:#7FD8FF;--rule:rgba(242,247,245,.13)}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:var(--acc);text-decoration:none} a:hover{text-decoration:underline}
+  a:focus-visible,button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+  header{position:sticky;top:0;z-index:9;background:var(--bg);border-bottom:1px solid var(--rule);
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:0 clamp(14px,3vw,28px);min-height:52px}
+  .eyebrow{font:600 12px/1 ui-monospace,monospace;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--faint)}
+  .back{display:inline-flex;align-items:center;min-height:44px;padding:0 8px;font-size:14px}
+  main{max-width:860px;margin:0 auto;padding:clamp(24px,4vw,52px) clamp(14px,3vw,28px) 96px}
+  h1{font:700 clamp(28px,4.4vw,44px)/1.08 system-ui;letter-spacing:-.02em;margin:0 0 24px}
+  h2{font:700 clamp(21px,2.6vw,29px)/1.15 system-ui;letter-spacing:-.015em;
+    margin:44px 0 14px;padding-top:22px;border-top:1px solid var(--rule)}
+  h3{font:700 clamp(17px,1.9vw,21px)/1.25 system-ui;margin:30px 0 10px}
+  h4{font:700 16px/1.3 system-ui;margin:22px 0 8px;color:var(--soft)}
+  p{margin:0 0 15px;font-size:16.5px;line-height:1.62;color:var(--soft);max-width:68ch}
+  ul,ol{margin:0 0 16px;padding-left:22px}
+  li{font-size:16.5px;line-height:1.62;color:var(--soft);margin:0 0 7px;max-width:66ch}
+  blockquote{margin:0 0 16px;padding:12px 0 12px 18px;border-left:2px solid var(--acc);
+    color:var(--ink);font-size:17px;line-height:1.55}
+  hr{border:0;border-top:1px solid var(--rule);margin:32px 0}
+  code{font:500 14px/1.4 ui-monospace,monospace;background:var(--panel);
+    padding:2px 6px;border-radius:6px;color:var(--acc)}
+  .code{position:relative;margin:0 0 22px}
+  .code pre{margin:0;background:var(--panel);border:1px solid var(--rule);border-radius:14px;
+    padding:44px 16px 16px;overflow-x:auto;font:500 13.5px/1.62 ui-monospace,monospace;
+    color:var(--ink);white-space:pre-wrap;word-break:break-word}
+  .copy{position:absolute;top:8px;right:8px;min-height:32px;padding:0 14px;border-radius:9px;
+    background:#1a3648;color:var(--ink);border:1px solid var(--rule);cursor:pointer;
+    font:600 13px/1 system-ui;transition:transform .12s ease,background .12s ease}
+  .copy:hover{background:#20455b} .copy:active{transform:scale(.96)}
+  .copy.done{background:#1c5a45;border-color:#2f8b6b}
+  .tw{overflow-x:auto;margin:0 0 20px}
+  table{border-collapse:collapse;width:100%;font-size:15px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--rule);vertical-align:top;
+    line-height:1.5;color:var(--soft)}
+  th{color:var(--ink);font-weight:600;white-space:nowrap}
+  .grp{margin:0 0 34px}
+  .grp h2{border:0;padding:0;margin:0 0 4px}
+  .grp .note{color:var(--faint);font-size:14.5px;margin:0 0 14px}
+  .list{display:grid;gap:10px}
+  .item{display:block;padding:15px 17px;background:var(--panel);border:1px solid var(--rule);
+    border-radius:14px;color:var(--ink);transition:border-color .15s}
+  .item:hover{border-color:var(--acc);text-decoration:none}
+  .item b{display:block;font-size:16.5px;margin-bottom:3px}
+  .item span{color:var(--faint);font-size:14px}
+  @media (prefers-contrast:more){:root{--faint:rgba(242,247,245,.82);--rule:rgba(242,247,245,.4)}}
+</style>
+<header>
+  <a class="eyebrow" href="/docs/" style="color:var(--faint)">Solutions101 · документы</a>
+  <a class="back" href="/docs/">← ко всем</a>
+</header>
+<main><h1>Промпт: рестайл демо «Взаиморасчёты» (vzaimoraschety)</h1>
+<p>Вставь всё, что ниже разделителя, в свежую сессию Claude Code, открытую в <code>~/solutions101</code>.</p>
+<hr>
+<p>Файл: <code>app/public/demo/vzaimoraschety/index.html</code> — один самодостаточный файл, 1490 строк, 110 КБ, без фреймворков. Русское B2B-демо «Взаиморасчёты»: одна цифра по каждому контрагенту — кто кому должен. Работает поверх 1С, считается всё в браузере на синтетических данных.</p>
+<p>Задача: <b>сменить ДНК дизайна на «бухгалтерскую книгу», со светлой и тёмной темой</b>, не потеряв ни одного требования. Прогнать демо кликами, а не глазами по коду — в репозитории есть навык <code>drive-demo</code>, используй его.</p>
+<p><b>Полный приёмочный чеклист лежит в <code>docs/VZAIM-RESTYLE-CHECKLIST.md</code> — прочитай его целиком до первой правки.</b> Он собран из ТП заказчика и из разбора самого демо. Ниже — только то, что касается дизайна.</p>
+<h2>Почему меняем</h2>
+<p>Сейчас это шаблон админки: тёмно-синий сайдбар, белые карточки со скруглением 8–12px, иконочный рельс, Inter. По экрану невозможно понять, что он про деньги между юрлицами — он выглядит как любая CRM. Рядом на сайте уже стоит складской терминал со своей резкой ДНК, и на его фоне это провал.</p>
+<h2>ДНК: «Бухгалтерская книга» (гроссбух)</h2>
+<p>Самая старая типографика денег, какая есть, и бухгалтер читает её без обучения: разлинованная страница, цифры в колонку, <b>красным — то, что должны мы, чёрным — то, что должны нам</b>, итог под двойной чертой. Карточек нет. Теней нет. Скруглений нет. Разделение — волосяными линейками, а не панелями.</p>
+<ul><li><b>Светлая тема — по умолчанию.</b> Это бумага. Тёмная — та же книга при настольной лампе,</li></ul>
+<p>  а не «инверсия ради инверсии».</p>
+<ul><li>Сайдбар перестаёт быть тёмно-синим блоком: становится узкой колонкой на той же бумаге,</li></ul>
+<p>  отделённой одной линейкой.</p>
+<ul><li>KPI-плитки превращаются в <b>шапку ведомости</b>: три числа в ряд под общей линейкой,</li></ul>
+<p>  без рамок и без заливки.</p>
+<ul><li>Таблица — главный и единственный герой экрана. Она получает всю ширину и всё внимание.</li></ul>
+<h3>Токены (контраст посчитан, проверь сам перед сдачей)</h3>
+<p><b>Светлая (по умолчанию)</b></p>
+<div class="code"><button class="copy" data-for="c0" type="button">Скопировать</button><pre id="c0">--paper    #FBFAF6      бумага, тёплая, не чистый белый
+--paper-2  #F3F1EA      подложка шапки таблицы и итоговой строки
+--ink      #14120E      17.6:1 на paper
+--ink-2    #55514A       7.4:1  вторичный текст
+--ink-3    #77736A       4.9:1  подписи, минимум для мелкого
+--rule     #14120E      линейка-разделитель разделов (тот же цвет, что текст)
+--hair     #DAD5C6      волосяная линейка строк таблицы
+--debit    #14120E      должны нам — чёрным
+--credit   #B3261E      должны мы — красным, 6.0:1
+--zero     #9A968C      закрыто — серым
+--accent   #7A5C00      единственный акцент, 5.9:1</pre></div>
+<p><b>Тёмная</b></p>
+<div class="code"><button class="copy" data-for="c1" type="button">Скопировать</button><pre id="c1">--paper    #131211      --paper-2  #1B1A17
+--ink      #EFEBE0      15.9:1     --ink-2 #A29C8E  7.2:1     --ink-3 #837D70  4.9:1
+--rule     #EFEBE0      --hair     #302E29
+--debit    #EFEBE0      --credit   #FF6B60  6.3:1   --zero #6E6960
+--accent   #E0B84A      9.4:1</pre></div>
+<p>Переключатель — в шапке, рядом с меткой актуальности. Выбор сохраняется в localStorage (добавь ключ <code>vzr_theme</code>, остальные четыре не трогай). Поддержи <code>prefers-color-scheme</code> как значение по умолчанию.</p>
+<h3>Типографика</h3>
+<p>Два семейства, оба системные — <b>никаких Google Fonts, это жёсткое ограничение</b> (см. ниже):</p>
+<ul><li>Текст и заголовки: <code>"Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif</code> —</li></ul>
+<p>  засечки дают бумажный регистр, которого сейчас нет.</p>
+<ul><li>Цифры и коды счетов: <code>ui-monospace, SFMono-Regular, Menlo, Consolas, monospace</code>.</li></ul>
+<p>Шкала, шесть ступеней: <code>11 · 12 · 13 · 15 · 19 · 25</code>. Никаких 10.5 и 13.5. Надзаголовки капсом с трекингом <code>.14em</code> разрешены <b>только</b> на шапках таблиц и на подписях разделов — не на всём подряд.</p>
+<h3>Радиус и тени</h3>
+<p><b><code>border-radius: 0</code> везде.</b> Единственное исключение — статусная точка и аватар (<code>999px</code>). Теней нет вообще: разделение линейкой или сменой подложки.</p>
+<h3>Итоговая строка</h3>
+<p>Под двойной чертой (<code>border-bottom: 3px double var(--rule)</code>), полужирным, на полступени крупнее строк. Это визуальный центр экрана — сейчас она теряется.</p>
+<h2>Чего нельзя терять (короткая версия, полная — в чеклисте)</h2>
+<ol><li><b>Ноль внешних запросов.</b> Никакого CDN, Google Fonts, внешних иконок и чарт-библиотек —</li></ol>
+<p>   приложение обязано работать в контуре клиента без интернета; причина записана в шапке файла.    Проверка: <code>performance.getEntriesByType('resource')</code> → <code>[]</code>. Иконки остаются inline SVG    (23 шт. в объекте <code>ICON</code>), график — inline SVG.</p>
+<ol><li><b><code>tabular-nums</code></b> на каждой денежной ячейке, БИН/ИИН, счётчиках и тултипе графика.</li></ol>
+<p>   Для бухгалтерского отчёта это не мелочь.</p>
+<ol><li><b>Семантика цвета</b> — прямое требование ТП 3.2-C: зелёное/чёрное = должны нам,</li></ol>
+<p>   красное = должны мы, серое = закрыто. Палитру меняем, семантику — нет.</p>
+<ol><li><b>Метка актуальности <code>#stamp</code></b> в шапке, видимая на каждом экране.</li><li><b>Печать.</b> <code>@media print{aside,header,.toolbar,.noprint{display:none}}</code> — если рестайл</li></ol>
+<p>   переносит фильтры или заголовок в другой контейнер, <b>обнови это правило</b>, иначе они    полезут в печать. Акт сверки — отдельный самодостаточный HTML со своим CSS    (<code>buildActHtml</code> + <code>window.open</code>); он <b>всегда светлый</b>, независимо от темы экрана.</p>
+<ol><li><b>Экспорт</b> <code>report.csv</code>, <code>;</code> + BOM, шапка и три итоговые строки — часть критерия приёмки.</li><li><b>Три уровня раскрытия</b> строки: контрагент → договор × счёт → документы расчётов.</li><li><b>~50 подсказок <code>data-tip</code></b> — это исполнение требования «работа без предварительного</li></ol>
+<p>   обучения». Не вычищай их ради чистоты вида.</p>
+<ol><li><b>Клавиатура</b>: Escape закрывает модал, Backspace и Alt+← — назад, с guard по</li></ol>
+<p>   <code>INPUT|SELECT|TEXTAREA</code>.</p>
+<ol><li><b>Десктоп-first.</b> ТП снимает мобильную адаптацию с этапа 1. Таблица держит</li></ol>
+<p>    <code>min-width:980px</code> внутри <code>.tblwrap{overflow-x:auto}</code> — скролл внутри контейнера,     а не резиновая сетка.</p>
+<ol><li><b>Контрольные суммы</b> после рестайла обязаны совпасть до копейки:</li></ol>
+<p>    должны нам <b>48 377 725,08</b> · должны мы <b>479 737 547,06</b> · чистая <b>−431 359 821,98</b>.</p>
+<h2>Ловушка, на которой легко упасть</h2>
+<p><code>toggleDocs</code> использует <b>неявный глобальный <code>event</code></b> (строка 1133, <code>event.stopPropagation()</code>). Весь UI построен на inline-<code>onclick</code> со строковой интерполяцией и <code>esc()</code> / <code>JSON.stringify</code>. Перевод на <code>addEventListener</code> без передачи события роняет третий уровень раскрытия с TypeError. Либо не трогай обработчики вообще, либо переводи их <b>целиком и разом</b>.</p>
+<p>Свёртка сайдбара задаётся через <code>flex-basis</code> (<code>aside{flex:0 0 260px}</code> / <code>.tuck{flex:0 0 68px}</code>) и продублирована в JS константами <code>SIDEBAR</code>: у flex-элемента <code>width</code> перебивается базисом, поэтому свёртка по <code>width</code> не сработает.</p>
+<h2>Смысловые баги — почини заодно</h2>
+<ol><li><b>«Сроки долга» на вкладке «Поставщики»</b> оставляет заголовок плитки</li></ol>
+<p>   <b>«Всего должны нам (₸)»</b>, хотя показывает наш долг поставщикам (130 361 221,95 ₸).</p>
+<ol><li><b>Акт сверки игнорирует выбранную дату отчёта</b> — <code>buildActHtml</code> строится на <code>todayISO()</code></li></ol>
+<p>   и всегда печатает «по состоянию на сегодня», даже если в шапке выбрана прошедшая дата.</p>
+<ol><li><b>Все <code>th</code> имеют <code>cursor:pointer</code></b>, включая пустые и несортируемые — заголовки выглядят</li></ol>
+<p>   кликабельными и молча не работают. Сортируются только Контрагент, Долг, Аванс, Итог.</p>
+<ol><li><b>Метка ★</b> («покупатель = поставщик») есть в данных у 5 контрагентов и в CSS</li></ol>
+<p>   (<code>.star / .star.on</code>), но <b>не выводится</b> — по интерфейсу нельзя понять, к кому относится    правило «Зачёт». Выведи её в строке отчёта.</p>
+<h2>График «Динамика задолженности»</h2>
+<p>Inline SVG 1000×300, три серии, 9 недельных срезов. Перекрась под обе темы и проверь, что линии различимы при протанопии — сейчас дебиторская <code>#00734f</code> и чистая позиция <code>#0a1a2b</code> в тёмной теме рискуют слиться. Тултип с датой и тремя суммами сохрани, <code>tabular-nums</code> в нём тоже.</p>
+<h2>Приёмка</h2>
+<ul><li>Обе темы, переключатель в шапке, выбор запоминается, <code>prefers-color-scheme</code> по умолчанию</li><li>Контраст: тело ≥ 4.5:1, крупный текст и края UI ≥ 3:1 — <b>посчитать, не прикинуть</b></li><li>Ноль внешних запросов</li><li>Все шесть экранов прокликаны в обеих темах, скриншоты приложены</li><li>Акт сверки печатается и остаётся светлым в тёмной теме</li><li>Контрольные суммы совпадают до копейки</li><li><code>docs/VZAIM-RESTYLE-CHECKLIST.md</code> пройден по пунктам, отчёт по каждому разделу</li></ul></main>
+<script>
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('.copy'); if (!b) return;
+  const pre = document.getElementById(b.dataset.for); if (!pre) return;
+  navigator.clipboard.writeText(pre.textContent).then(() => {
+    b.textContent = 'Скопировано'; b.classList.add('done');
+    setTimeout(() => { b.textContent = 'Скопировать'; b.classList.remove('done') }, 1800);
+  }).catch(() => { b.textContent = 'Выделите вручную' });
+});
+</script>

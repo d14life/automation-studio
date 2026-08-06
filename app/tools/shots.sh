@@ -14,7 +14,7 @@ set -euo pipefail
 PORT="${PORT:-5199}"
 CHROME="${CHROME:-/Applications/Google Chrome.app/Contents/MacOS/Google Chrome}"
 OUT="$(cd "$(dirname "$0")/.." && pwd)/public/shots"
-DEMOS=(park zapchasti vzaimoraschety sklad)
+DEMOS=(park zapchasti vzaimoraschety-v2 sklad)
 
 [ -x "$CHROME" ] || { echo "no Chrome at $CHROME - set CHROME=" >&2; exit 1; }
 curl -sf -o /dev/null "http://localhost:$PORT/" || { echo "no dev server on $PORT" >&2; exit 1; }
