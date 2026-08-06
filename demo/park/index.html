@@ -435,9 +435,14 @@ html.light{--cost:#C4CBD1}
 .chart svg text{font-family:var(--ui);letter-spacing:0}
 .chart .ax{fill:var(--dim);font-size:12px}
 .chart .dnum{fill:var(--text);font-size:30px;font-weight:600;font-family:var(--mono)}
-/* полоса-цель во всю высоту: попасть в неё курсором легче, чем в столбик шириной 8px */
-.hz{cursor:crosshair}
+/* полоса-цель во всю высоту: попасть в неё курсором легче, чем в столбик шириной 8px.
+   Она же и кнопка - клик по месяцу раскладывает его по типам техники в донате ниже. */
+.hz{cursor:pointer}
 .hz:hover{fill:var(--tint)}
+.hz.on{fill:var(--tint)}
+.hz:focus-visible{outline:2px solid var(--acc);outline-offset:-2px}
+.bg{transition:opacity .18s ease}
+.bg.off{opacity:.28}
 .crosshair{opacity:0;transition:opacity .12s ease}
 .chart svg:hover .crosshair{opacity:1}
 .lgs{display:flex;align-items:center;color:var(--dim);font-size:12.5px}
@@ -1758,14 +1763,16 @@ function trendChart(from,to){
     units.forEach((u,i)=>{const e=M[i][j];rev+=e.rev;net+=e.net;rent+=e.ut.rent;avail+=e.ut.avail;});
     return {...b,rev:r2(rev),net:r2(net),util:avail?rent/avail:0};
   });
-  return chartTrend(bk)+chartMix(units,M)+chartHeat(units,buckets,M);
+  const sel=selBk==null?-1:buckets.findIndex(b=>b.from===selBk);
+  return chartTrend(bk,sel)+chartMix(units,M,sel,sel<0?null:buckets[sel].label)+chartHeat(units,buckets,M);
 }
 
 /* ── 1. динамика: выручка столбцами, результат линией ───────────────────────
    Одна ось: обе величины в рублях. Две шкалы на одной картинке - самая частая ошибка в
    графиках и способ показать любую корреляцию, какую захочется. */
-function chartTrend(bk){
+function chartTrend(bk,sel){
   const W=1000,H=300,L=76,R=16,T=30,B=34, iw=W-L-R, ih=H-T-B;
+  if(sel==null) sel=-1;
   /* СТОЛБИК = ВЫРУЧКА, а нижний тёмный сегмент = расходы. Раньше поверх столбиков шла
      зелёная линия результата, и она была бесполезна: выручка 2 395 206 против результата
      2 339 706 - это 97,7%, поэтому линия липла к вершинам, а в июне маркер садился ровно на
@@ -1803,13 +1810,19 @@ function chartTrend(bk){
     /* НЕПОЛНЫЙ ПЕРИОД штрихуется и подписывается - иначе он сравнивается как полный */
     if(partial) s+='<rect x="'+x+'" y="'+yTop+'" width="'+w+'" height="'+Math.max(1,y0-yTop)+'" fill="url(#hatch)"/>'+
       '<text x="'+(x+w/2)+'" y="'+(yTop-40)+'" text-anchor="middle" class="ax pt">неполный</text>';
-    return s;}).join('');
+    /* ВЫБРАННЫЙ СТОЛБИК гасит остальные, а не подсвечивается сам: подсветка одного из семи
+       зелёных столбиков теряется, а провал остальных виден сразу и с любого расстояния. */
+    return '<g class="bg'+(sel>=0&&sel!==i?' off':'')+'">'+s+'</g>';}).join('');
   const step=Math.ceil(bk.length/12);
   const labs=bk.map((b,i)=>i%step?'':'<text x="'+cx(i)+'" y="'+(H-10)+'" text-anchor="middle" class="ax">'+esc(b.label)+(b.full===false?' *':'')+'</text>').join('');
+  /* Целевая полоса ещё и КЛИКАБЕЛЬНА: клик раскладывает этот месяц по типам техники в донате
+     ниже. Ключ - дата начала корзины, см. selBk. */
   const hit=bk.map((b,i)=>{const m=b.rev>0.004?Math.round(b.net/b.rev*100):0;
-    return '<rect class="hz" x="'+(L+i*bw)+'" y="'+T+'" width="'+bw+'" height="'+ih+'" fill="transparent"'+
+    return '<rect class="hz'+(sel===i?' on':'')+'" x="'+(L+i*bw)+'" y="'+T+'" width="'+bw+'" height="'+ih+'" fill="transparent"'+
+    ' data-bk="'+b.from+'" role="button" tabindex="0"'+
     ' data-tip="'+esc(b.label+(b.full===false?' · неполный период'+(b.days?' ('+b.days+' из '+b.span+' дн.)':''):'')+
-      ' · выручка '+money(b.rev)+' · расходы '+money(Math.max(0,b.rev-b.net))+' · результат '+money(b.net)+' ('+m+'%)')+'"/>';}).join('');
+      ' · выручка '+money(b.rev)+' · расходы '+money(Math.max(0,b.rev-b.net))+' · результат '+money(b.net)+' ('+m+'%)'+
+      ' · '+(sel===i?'клик — снять разбивку':'клик — разбивка по технике'))+'"/>';}).join('');
   const anyPartial=bk.some(b=>b.full===false);
   return '<div class="hd"><h2>Динамика за период</h2><span class="lgs">'+
       '<i class="lg" style="background:var(--ok)"></i>результат'+
@@ -1828,13 +1841,40 @@ function chartTrend(bk){
    немного. Типов техники девять; девять секторов не читаются, поэтому пять крупнейших плюс
    «прочее». Точные числа всё равно живут в таблице ниже, донат даёт пропорцию за один взгляд. */
 const SER=['#3987e5','#d95926','#199e70','#c98500','#d55181','#9085e9'];
-function chartMix(units,M){
+/* Заголовок секции живёт отдельной функцией, потому что он нужен и на пустом месяце, где
+   доната нет вовсе - а вместе с ним и кнопка выхода из разбивки. */
+function mixHead(sel,selLabel){
+  return '<div class="hd"><h2>Из чего сложилась выручка</h2>'+
+    (sel>=0
+      ? '<span class="tag acc">'+esc(selLabel||'')+'</span>'+
+        '<button class="btn sm" id="mixall">За весь период</button>'
+      : '<span class="lgn">клик по столбику выше — разбивка за месяц</span>')+
+    '</div>';
+}
+function chartMix(units,M,sel,selLabel){
   const by={};
-  units.forEach((u,i)=>{ by[u.type]=(by[u.type]||0)+M[i].reduce((a,e)=>a+e.rev,0); });
+  /* sel < 0 - весь период; иначе только одна корзина: тот же расчёт, просто по одной колонке
+     матрицы. Отдельного «месячного» прохода по данным нет и быть не должно - две ветки счёта
+     это два места, где цифры могут разойтись. */
+  units.forEach((u,i)=>{ const cols=sel>=0?[M[i][sel]]:M[i];
+    by[u.type]=(by[u.type]||0)+cols.reduce((a,e)=>a+e.rev,0); });
   let arr=Object.keys(by).map(t=>({t,v:r2(by[t])})).filter(x=>x.v>0).sort((a,b)=>b.v-a.v);
-  if(!arr.length) return '';
+  /* Пустой месяц не имеет права ПРОГЛОТИТЬ секцию: выбрав месяц без выручки, пользователь
+     остался бы без доната и без кнопки «за весь период» - то есть без выхода из разбивки. */
+  if(!arr.length) return sel<0?'' :
+    mixHead(sel,selLabel)+'<div class="card"><div class="dim">За '+esc(selLabel||'этот период')+
+      ' выручки не было — раскладывать нечего.</div></div>';
   if(arr.length>6){ const rest=arr.slice(5).reduce((a,x)=>a+x.v,0); arr=arr.slice(0,5).concat([{t:'Прочее',v:r2(rest)}]); }
   const tot=arr.reduce((a,x)=>a+x.v,0)||1;
+  /* ЦВЕТ ЗАКРЕПЛЁН ЗА ТИПОМ, а не за местом в списке. Пока цвет брался по индексу, «Самосвал»
+     был зелёным за весь период и жёлтым внутри июня - в июне он просто съезжал на строку
+     ниже. Для одного графика это мелочь, для двух состояний одного графика - ошибка чтения:
+     глаз считает цвет признаком сущности. Порядок берётся по ВСЕМУ периоду, поэтому он не
+     зависит от того, какой месяц выбран. */
+  const all={};
+  units.forEach((u,i)=>{ all[u.type]=(all[u.type]||0)+M[i].reduce((a,e)=>a+e.rev,0); });
+  const order=Object.keys(all).sort((a,b)=>all[b]-all[a]);
+  const colorOf=t=>{ const k=order.indexOf(t); return SER[k>=0&&k<SER.length-1?k:SER.length-1]; };
   const S=300, c=S/2, rO=140, rI=88;
   const pol=(r,a)=>[c+r*Math.cos(a),c+r*Math.sin(a)];
   let a0=-Math.PI/2, segs='';
@@ -1843,18 +1883,18 @@ function chartMix(units,M){
     const pad=Math.min(0.030,sweep*0.10);          // 2px-зазор между долями
     const s=a0+pad/2, e=a0+sweep-pad/2, big=(e-s)>Math.PI?1:0;
     if(e>s){ const[x1,y1]=pol(rO,s),[x2,y2]=pol(rO,e),[x3,y3]=pol(rI,e),[x4,y4]=pol(rI,s);
-      segs+='<path class="sl" d="M'+x1+' '+y1+'A'+rO+' '+rO+' 0 '+big+' 1 '+x2+' '+y2+'L'+x3+' '+y3+'A'+rI+' '+rI+' 0 '+big+' 0 '+x4+' '+y4+'Z" fill="'+SER[i]+'"'+
+      segs+='<path class="sl" d="M'+x1+' '+y1+'A'+rO+' '+rO+' 0 '+big+' 1 '+x2+' '+y2+'L'+x3+' '+y3+'A'+rI+' '+rI+' 0 '+big+' 0 '+x4+' '+y4+'Z" fill="'+colorOf(x.t)+'"'+
         ' data-tip="'+esc(x.t+' · '+money(x.v)+' · '+Math.round(frac*100)+'%')+'"/>'; }
     a0+=sweep;
   });
   const legend=arr.map((x,i)=>{ const p=x.v/tot;
-    return '<div class="lrow"><i style="background:'+SER[i]+'"></i>'+
+    return '<div class="lrow"><i style="background:'+colorOf(x.t)+'"></i>'+
     '<span class="lt">'+esc(x.t)+'</span>'+
-    '<span class="lbar"><b style="width:'+(p*100).toFixed(1)+'%;background:'+SER[i]+'"></b></span>'+
+    '<span class="lbar"><b style="width:'+(p*100).toFixed(1)+'%;background:'+colorOf(x.t)+'"></b></span>'+
     '<b class="num">'+Math.round(p*100)+'%</b>'+
     '<span class="num dim">'+money(x.v)+'</span></div>'; }).join('');
   /* легенда стоит в разметке ПЕРВОЙ: читается слева направо - от списка к итогу в кольце */
-  return '<div class="hd"><h2>Из чего сложилась выручка</h2></div>'+
+  return mixHead(sel,selLabel)+
     '<div class="card chart chart--mix">'+
       '<div class="lgd">'+legend+'</div>'+
       '<svg viewBox="0 0 '+S+' '+S+'" role="img" aria-label="Выручка по типам техники">'+segs+
@@ -2264,6 +2304,16 @@ function renderAnalytics(){
    '</tbody></table></div>';
   $$('#view [data-i]').forEach(b=>b.onclick=()=>is[+b.dataset.i].go());
   $$('#view [data-u],#view [data-u2]').forEach(el=>el.onclick=e=>{e.preventDefault();openUnit(el.dataset.u||el.dataset.u2)});
+  /* КЛИК ПО СТОЛБИКУ = разбивка этого месяца в донате. Повторный клик по тому же снимает
+     выбор, поэтому выйти из разбивки можно там же, где в неё вошли, а не только кнопкой.
+     Позиция прокрутки сохраняется руками: render() перерисовывает #view целиком, и без
+     этого страница прыгала бы в начало на каждом клике по графику. */
+  const drill=k=>{ const y=scrollY; selBk=(selBk===k?null:k); render(); scrollTo(0,y); };
+  $$('#view .hz').forEach(el=>{
+    el.onclick=()=>drill(el.dataset.bk);
+    el.onkeydown=e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); drill(el.dataset.bk); } };
+  });
+  if($('#mixall')) $('#mixall').onclick=()=>{ const y=scrollY; selBk=null; render(); scrollTo(0,y); };
   bindPeriod();
 }
 /* ═══════════ 17. Клиенты ═══════════ */
