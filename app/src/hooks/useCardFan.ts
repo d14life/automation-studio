@@ -20,7 +20,7 @@ export function useCardFan(): void {
        which is the entire job of the deck. */
     function cardW() {
       const avail = wrap!.clientWidth
-      return Math.round(Math.max(300, Math.min(620, avail / 2.45)))
+      return Math.round(Math.max(340, Math.min(940, avail / 1.62)))
     }
     /* 0.92 left a margin the fan did not need. At the full viewport width the cards can use the
        whole span, and every extra pixel here is a pixel of the next card's title that stops
