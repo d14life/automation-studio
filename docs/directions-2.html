@@ -1,0 +1,179 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8">
+<title>Складской сканер — направления D и E</title>
+<style>
+/* Judging page 4. A, B and C all shared one skeleton: header, big address, alert strip,
+   four-column telemetry, input at the bottom. D and E change the SKELETON - one is radial,
+   one is a horizontally-split physical tag. Same data in both. */
+*{box-sizing:border-box}
+body{margin:0;background:#141517;color:#e9eaec;
+  font:14px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+.page{max-width:1580px;margin:0 auto;padding:26px 22px 70px}
+h1{font-size:20px;font-weight:600;margin:0 0 4px;letter-spacing:-.01em}
+.sub{color:#9aa0a6;font-size:13px;margin:0 0 24px;max-width:840px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(460px,1fr));gap:24px;align-items:start}
+.col>h2{font-size:13px;letter-spacing:.09em;text-transform:uppercase;margin:0 0 4px}
+.col>.note{color:#9aa0a6;font-size:12.5px;margin:0 0 12px;min-height:62px}
+.tells{margin:12px 0 0;padding-left:16px;font-size:12px;color:#9aa0a6}
+.tells li{margin:3px 0}
+.mono{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+
+/* ═══════════ D · ПРИБОРНЫЙ КРУГ ════════════════════════════════════════
+   Geometry is radial. The task sits inside a ring; the ring itself IS the route progress.
+   Nothing is a stacked rectangle. Reads like an altimeter or a fuel gauge. */
+.d{background:#0C0E10;color:#E6EAEF;padding:26px 20px 22px;position:relative;overflow:hidden}
+.d::before{content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(120% 90% at 50% 0%,rgba(90,160,255,.07),transparent 60%)}
+.d .head{display:flex;justify-content:space-between;font-size:10.5px;letter-spacing:.12em;
+  color:#6B7684;text-transform:uppercase;margin-bottom:20px;position:relative}
+.gauge{position:relative;width:290px;height:290px;margin:0 auto}
+/* the ring: conic-gradient shows 2 of 4 steps complete */
+.gauge .ring{position:absolute;inset:0;border-radius:50%;
+  background:conic-gradient(#5AA0FF 0deg 180deg,#1B2028 180deg 360deg);
+  -webkit-mask:radial-gradient(circle,transparent 118px,#000 118px);
+          mask:radial-gradient(circle,transparent 118px,#000 118px)}
+.gauge .ticks{position:absolute;inset:0;border-radius:50%}
+.gauge .ticks i{position:absolute;left:50%;top:0;width:2px;height:11px;background:#2C333D;
+  transform-origin:50% 145px;margin-left:-1px}
+.gauge .core{position:absolute;inset:26px;border-radius:50%;background:#0C0E10;
+  border:1px solid #1B2028;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;text-align:center;padding:0 18px}
+.gauge .k{font-size:10px;letter-spacing:.14em;color:#6B7684;text-transform:uppercase}
+.gauge .addr{font-family:ui-monospace,Menlo,monospace;font-size:37px;font-weight:700;
+  letter-spacing:-.03em;margin:9px 0 7px;line-height:1}
+.gauge .goods{font-size:12px;color:#9AA6B4;line-height:1.3}
+.gauge .step{margin-top:11px;font-family:ui-monospace,Menlo,monospace;font-size:12px;
+  color:#5AA0FF;letter-spacing:.08em}
+.d .warn{margin:20px auto 0;max-width:330px;text-align:center;font-size:12.5px;color:#F0A93B;
+  padding:9px 12px;border-top:1px solid #1B2028;border-bottom:1px solid #1B2028}
+.d .dials{display:flex;justify-content:center;gap:26px;margin-top:18px}
+.d .dial{text-align:center}
+.d .dial .n{font-family:ui-monospace,Menlo,monospace;font-size:20px;
+  font-variant-numeric:tabular-nums}
+.d .dial .l{font-size:9.5px;letter-spacing:.13em;color:#6B7684;text-transform:uppercase;
+  margin-top:3px}
+.d .in{margin-top:20px;display:flex;justify-content:center}
+.d .in .pill{display:flex;align-items:center;gap:14px;border:1px solid #2C333D;
+  border-radius:999px;padding:5px 5px 5px 20px}
+.d .in .pill .v{font-family:ui-monospace,Menlo,monospace;font-size:16px;color:#6B7684;
+  letter-spacing:.06em}
+.d .in .pill .go{background:#5AA0FF;color:#0C0E10;border-radius:999px;padding:11px 22px;
+  font-weight:700;font-size:12.5px;letter-spacing:.06em}
+
+/* ═══════════ E · БАГАЖНАЯ БИРКА ════════════════════════════════════════
+   Geometry is a physical object split along its length: task panel, perforation, tear-off
+   stub carrying the telemetry sideways. Horizontal division, notched edges, no stacking. */
+.e{display:flex;background:#EFEDE6;color:#111;position:relative;min-height:330px;
+   font-family:ui-sans-serif,system-ui,-apple-system,sans-serif}
+/* notches punched out of the top and bottom at the perforation */
+.e .notch{position:absolute;width:22px;height:22px;border-radius:50%;background:#141517;
+  left:calc(68% - 11px)}
+.e .notch.t{top:-11px} .e .notch.b{bottom:-11px}
+.e .main{flex:0 0 68%;padding:22px 22px 20px;border-right:2px dashed #B9B4A6;
+  display:flex;flex-direction:column}
+.e .code{font-family:ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:.15em;
+  color:#7A7466;text-transform:uppercase}
+.e .addr{font-size:clamp(40px,5.4vw,60px);font-weight:900;letter-spacing:-.05em;
+  line-height:.86;margin:14px 0 0}
+.e .goods{margin-top:13px;font-size:15px;max-width:24ch;line-height:1.3}
+.e .warn{margin-top:auto;display:inline-block;align-self:flex-start;background:#111;
+  color:#EFEDE6;font-family:ui-monospace,Menlo,monospace;font-size:10.5px;
+  letter-spacing:.1em;padding:6px 10px;text-transform:uppercase}
+.e .in{margin-top:15px;display:flex;align-items:stretch;border:2px solid #111}
+.e .in .f{flex:1;padding:11px 12px;font-family:ui-monospace,Menlo,monospace;font-size:15px;
+  letter-spacing:.06em;color:#7A7466}
+.e .in .go{background:#111;color:#EFEDE6;padding:11px 20px;font-weight:800;font-size:12px;
+  letter-spacing:.1em;display:flex;align-items:center}
+/* the stub: telemetry printed sideways, like a real luggage tag */
+.e .stub{flex:1;padding:18px 12px;display:flex;flex-direction:column;justify-content:space-between;
+  align-items:center;background:#E5E2D8}
+.e .stub .rot{writing-mode:vertical-rl;transform:rotate(180deg);
+  font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:.18em;
+  text-transform:uppercase;color:#4A4638}
+.e .stub .big{font-family:ui-monospace,Menlo,monospace;font-size:30px;font-weight:700;
+  font-variant-numeric:tabular-nums;line-height:1}
+.e .stub .lbl{font-family:ui-monospace,Menlo,monospace;font-size:9px;letter-spacing:.13em;
+  color:#7A7466;text-transform:uppercase;margin-top:3px;text-align:center}
+/* barcode drawn with a repeating gradient - no image, no library */
+.e .stub .bc{width:100%;height:44px;background:repeating-linear-gradient(90deg,
+  #111 0 2px,transparent 2px 4px,#111 4px 7px,transparent 7px 9px,#111 9px 10px,
+  transparent 10px 13px)}
+</style></head><body><div class="page">
+
+<h1>Ещё два — меняется форма, а не краска</h1>
+<p class="sub">A, B и C делили один скелет: шапка, крупный адрес, полоса тревоги, четыре
+колонки телеметрии, ввод снизу. Здесь меняется сам скелет. D — радиальный, как приборная
+шкала. E — физический предмет, разорванный вдоль по перфорации.</p>
+
+<div class="grid">
+
+  <!-- ─────────── D ─────────── -->
+  <div class="col">
+    <h2>D · Приборная шкала</h2>
+    <p class="note">Геометрия круглая. Задание живёт внутри кольца, а само кольцо — это
+       прогресс по маршруту: два шага из четырёх закрашены. Ни одного составленного
+       прямоугольника. Читается как высотомер, а не как таблица.</p>
+    <div class="d">
+      <div class="head"><span>Складской сканер</span><span>ЗО-7057 · смена 1</span></div>
+      <div class="gauge">
+        <div class="ring"></div>
+        <div class="ticks">
+          <i style="transform:rotate(0deg)"></i><i style="transform:rotate(45deg)"></i>
+          <i style="transform:rotate(90deg)"></i><i style="transform:rotate(135deg)"></i>
+          <i style="transform:rotate(180deg)"></i><i style="transform:rotate(225deg)"></i>
+          <i style="transform:rotate(270deg)"></i><i style="transform:rotate(315deg)"></i>
+        </div>
+        <div class="core">
+          <div class="k">Идите к ячейке</div>
+          <div class="addr">A-05-3-04</div>
+          <div class="goods">Молоко «Заречье»<br>3,2% 900 мл</div>
+          <div class="step">ШАГ 2 / 4</div>
+        </div>
+      </div>
+      <div class="warn">Срок 08.08.2026 — 3 дня · партия по FEFO</div>
+      <div class="dials">
+        <div class="dial"><div class="n">1001</div><div class="l">артикул</div></div>
+        <div class="dial"><div class="n">3101</div><div class="l">партия</div></div>
+        <div class="dial"><div class="n">48</div><div class="l">учёт</div></div>
+      </div>
+      <div class="in"><div class="pill"><span class="v">A-05-3-04</span>
+        <span class="go">ВВОД</span></div></div>
+    </div>
+    <ul class="tells">
+      <li>кольцо = маршрут, а не отдельный индикатор</li>
+      <li>всё круглое: шкала, засечки, кнопка-пилюля</li>
+      <li>синий приборный вместо зелёного и красного</li>
+      <li>риск: круг тратит место, которого мало на телефоне</li>
+    </ul>
+  </div>
+
+  <!-- ─────────── E ─────────── -->
+  <div class="col">
+    <h2>E · Багажная бирка</h2>
+    <p class="note">Геометрия — физический предмет: панель задания, перфорация с высечками,
+       отрывной корешок с телеметрией боком и штрихкодом. Деление горизонтальное, а не
+       стопкой. Ближе всего к тому, что кладовщик реально держит в руках.</p>
+    <div class="e">
+      <span class="notch t"></span><span class="notch b"></span>
+      <div class="main">
+        <div class="code">ЗО-7057 · Смена 1 · Кузнецов И.С.</div>
+        <div class="addr">A-05-3-04</div>
+        <div class="goods">Молоко «Заречье» 3,2% 900 мл</div>
+        <div class="warn">Срок 08.08.2026 — 3 дня · FEFO</div>
+        <div class="in"><div class="f">A-05-3-04</div><div class="go">ВВОД</div></div>
+      </div>
+      <div class="stub">
+        <div class="rot">Арт 1001 · Партия 3101</div>
+        <div><div class="big">2/4</div><div class="lbl">шаг</div></div>
+        <div><div class="big">48</div><div class="lbl">учёт</div></div>
+        <div class="bc"></div>
+      </div>
+    </div>
+    <ul class="tells">
+      <li>деление вдоль, а не стопкой — форма предмета</li>
+      <li>высечки и перфорация: это бирка, а не карточка</li>
+      <li>корешок читается боком, как на настоящей бирке</li>
+      <li>штрихкод нарисован градиентом, без картинки</li>
+    </ul>
+  </div>
+
+</div></div></body></html>

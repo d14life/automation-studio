@@ -1,0 +1,2140 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<style>
+:root{--paper:#F1EFE9;--paper-2:#E5E2D8;--ink:#0B0B0B;--ink-2:#5B5B57;--rule:#0B0B0B;--hair:#C9C4B6;--alert:#C81A1A;--alert-ink:#F1EFE9;--ok:#1B7F3B;--ok-ink:#FFFFFF;--field:#FFFFFF;--acc:#4F5E00;--acc-fill:#D8F60A;--acc-ink:#0B0B0B;--warn:#9A6400;--warn-fill:#FFB020;--zebra:rgba(11,11,11,.035);--rule-w:2px;--macro:clamp(34px,4.6vw,62px);--glyph:clamp(64px,8vw,104px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#111214;--paper-2:#191B1E;--ink:#EDEDE8;--ink-2:#8C8F94;--rule:#EDEDE8;--hair:#2C2F33;--alert:#FF3B30;--alert-ink:#111214;--acc:#D8F60A;--acc-fill:#D8F60A;--acc-ink:#0B0D0B;--warn:#FFB020;--warn-fill:#FFB020;--zebra:rgba(255,255,255,.028);--ok:#3ECF6B;--ok-ink:#0B0D0B;--field:#0A0B0C}}
+:root[data-theme="dark"]{--paper:#111214;--paper-2:#191B1E;--ink:#EDEDE8;--ink-2:#8C8F94;--rule:#EDEDE8;--hair:#2C2F33;--alert:#FF3B30;--alert-ink:#111214;--acc:#D8F60A;--acc-fill:#D8F60A;--acc-ink:#0B0D0B;--warn:#FFB020;--warn-fill:#FFB020;--zebra:rgba(255,255,255,.028);--ok:#3ECF6B;--ok-ink:#0B0D0B;--field:#0A0B0C}
+html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);-webkit-font-smoothing:antialiased;transition:background 180ms cubic-bezier(.2,.7,.3,1)}
+*{box-sizing:border-box;border-radius:0}
+input,button,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+a{color:var(--ink);text-decoration:underline;text-underline-offset:2px}a:hover{color:var(--ink-2)}
+:focus-visible{outline:var(--rule-w) solid var(--alert);outline-offset:2px}
+::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:var(--hair)}::-webkit-scrollbar-track{background:var(--paper-2)}
+@keyframes flsh{0%{opacity:1}80%{opacity:1}100%{opacity:0}}
+@keyframes glyf{0%{transform:scale(.9);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes stepin{0%{opacity:0;transform:translateY(4px)}100%{opacity:1;transform:translateY(0)}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+@media print{:root{--paper:#FFFFFF;--paper-2:#F1EFE9;--ink:#0B0B0B;--ink-2:#5B5B57;--rule:#0B0B0B;--hair:#C9C4B6;--alert:#C81A1A;--alert-ink:#F1EFE9;--acc:#0B0B0B;--acc-fill:#FFFFFF;--acc-ink:#0B0B0B;--warn:#0B0B0B;--warn-fill:#FFFFFF;--zebra:transparent;--ok:#1B7F3B;--ok-ink:#FFFFFF;--field:#FFFFFF}body:has(#psheet) #app{display:none!important}#psheet{position:static!important;background:#fff!important;padding:0!important;overflow:visible!important}#pctl{display:none!important}@page{size:A4;margin:12mm}}
+</style>
+</helmet>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" fill="#F1EFE9"></rect><rect x="30" y="20" width="60" height="80" fill="#F1EFE9" stroke="#0B0B0B" stroke-width="4"></rect><rect x="30" y="20" width="60" height="10" fill="#0B0B0B"></rect><rect x="38" y="42" width="44" height="16" fill="#0B0B0B"></rect><rect x="38" y="64" width="30" height="5" fill="#5B5B57"></rect><rect x="38" y="73" width="38" height="5" fill="#5B5B57"></rect><rect x="38" y="86" width="44" height="8" fill="#C81A1A"></rect></svg></template>
+
+<div id="app" ref="{{ appRef }}" style="height:100vh;display:flex;flex-direction:column;background:var(--paper);color:var(--ink);font-family:system-ui,-apple-system,'Segoe UI',sans-serif;overflow:hidden">
+
+  <header style="flex:none;min-height:76px;display:flex;align-items:stretch;flex-wrap:{{ L.hdrWrap }};gap:0;background:var(--paper)">
+    <div style="display:flex;align-items:center;gap:11px;padding:{{ L.brandPad }};border-right:var(--rule-w) solid var(--rule)">
+      <div style="flex:none;width:12px;height:12px;background:var(--ink)"></div>
+      <div style="font:900 16px/1 system-ui;letter-spacing:.14em;text-transform:uppercase;display:{{ L.dDesk }}">СКЛАДСКОЙ СКАНЕР</div>
+      <div style="font:700 15px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.14em;color:var(--ink-2);padding-top:2px">WMS 2.4</div>
+    </div>
+    <button onClick="{{ goTerm }}" style-active="{{ press }}" style="min-height:{{ L.tabH }};padding:{{ L.tabPad }};font:900 19px/1 system-ui;letter-spacing:.16em;text-transform:uppercase;border-right:var(--rule-w) solid var(--rule);background:{{ tabTermBg }};color:{{ tabTermCol }}">ТЕРМИНАЛ</button>
+    <button onClick="{{ goOffice }}" style-active="{{ press }}" style="min-height:{{ L.tabH }};padding:{{ L.tabPad }};font:900 19px/1 system-ui;letter-spacing:.16em;text-transform:uppercase;border-right:var(--rule-w) solid var(--rule);background:{{ tabOffBg }};color:{{ tabOffCol }}">ОФИС</button>
+    <div style="flex:1"></div>
+    <div style="flex:{{ L.hdrRight }};min-width:0;overflow-x:auto;display:flex;align-items:center;gap:{{ L.hdrGap }};padding:{{ L.hdrPad }};font:600 13px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--ink-2)">
+      <span style="display:{{ L.dDesk }}">{{ opDate }}</span>
+      <div data-staff="1" style="position:relative;flex:0 1 auto;width:{{ L.selW }};min-width:{{ L.selMin }}">
+        <button onClick="{{ toggleStaff }}" title="Комплектовщик" style-active="{{ press }}" style="width:100%;min-height:{{ L.selH }};display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 10px;background:{{ staffBg }};border:var(--rule-w) solid var(--rule);font:900 15px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.04em;color:{{ staffCol }};text-align:left">
+          <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ who }}</span>
+          <span style="flex:none;font-size:11px">{{ staffCaret }}</span>
+        </button>
+        <sc-if value="{{ staffOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;top:calc(100% + 2px);left:0;right:0;z-index:40;display:flex;flex-direction:column;gap:2px;padding:2px;background:var(--rule);border:var(--rule-w) solid var(--rule);max-height:60vh;overflow:auto">
+            <sc-for list="{{ staffList }}" as="p" hint-placeholder-count="5">
+              <button onClick="{{ p.on }}" style-active="{{ press }}" style="display:flex;align-items:center;gap:8px;min-height:56px;padding:0 12px;background:{{ p.bg }};color:{{ p.col }};font:700 13px/1.2 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.06em;text-align:left">
+                <span style="flex:none;width:9px">{{ p.mark }}</span>
+                <span>{{ p.name }}</span>
+              </button>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+      <button onClick="{{ toggleTheme }}" title="Светлая / тёмная тема" style-active="{{ press }}" style="flex:none;min-height:{{ L.selH }};padding:12px 18px;border:var(--rule-w) solid var(--rule);font:900 15px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.12em;color:var(--ink)">{{ themeLabel }}</button>
+      <button onClick="{{ toggleMute }}" title="Звук" style-active="{{ press }}" style="flex:none;min-height:{{ L.selH }};padding:12px 18px;border:var(--rule-w) solid var(--rule);font:900 15px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.12em;color:{{ muteCol }}">{{ muteLabel }}</button>
+      <button onClick="{{ resetDemo }}" title="Пересоздать демо-данные" style-active="{{ press }}" style="display:{{ L.dDesk }};min-height:56px;padding:12px 18px;border:var(--rule-w) solid var(--rule);font:900 15px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.12em;color:var(--ink-2)">СБРОС</button>
+    </div>
+  </header>
+  <div style="flex:none;height:8px;background:repeating-linear-gradient(-45deg,var(--rule) 0 8px,var(--paper) 8px 16px)"></div>
+
+  <sc-if value="{{ isTerm }}" hint-placeholder-val="{{ true }}">
+  <div style="flex:none;display:{{ L.dPaneBar }};align-items:stretch;gap:2px;background:var(--rule);border-bottom:var(--rule-w) solid var(--rule)">
+    <sc-for list="{{ paneTabs }}" as="p" hint-placeholder-count="4">
+      <button onClick="{{ p.on }}" style-active="{{ press }}" style="flex:1;min-height:56px;padding:0 6px;background:{{ p.bg }};color:{{ p.col }};font:900 13.5px/1.2 system-ui;letter-spacing:.1em;text-transform:uppercase">{{ p.t }}</button>
+    </sc-for>
+  </div>
+  <div style="flex:1;min-height:0;display:grid;gap:{{ L.gap }};padding:{{ L.pad }};grid-template-columns:{{ L.cols }};grid-template-rows:{{ L.rows }};min-width:{{ L.minw }}">
+
+    <div style="min-height:0;display:{{ L.dTask }};flex-direction:column;background:var(--paper);border:var(--rule-w) solid var(--rule);overflow:hidden;position:relative">
+      <div style="flex:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;background:var(--acc-fill);color:var(--acc-ink)">
+        <div style="display:flex;align-items:center;gap:9px">
+          <div style="width:10px;height:10px;background:var(--acc-ink)"></div>
+          <div style="font:900 14px/1 system-ui;letter-spacing:.16em;text-transform:uppercase">{{ v.mode }}</div>
+        </div>
+        <div style="font:700 13px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.12em">{{ v.doc }}</div>
+      </div>
+
+      <div style="flex:1;min-height:0;overflow:auto;padding:16px 14px 8px">
+        <div style="font:700 13px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-2)">{{ v.bigLabel }}</div>
+        <div style="font-family:system-ui,-apple-system,'Segoe UI',sans-serif;font-weight:900;font-size:var(--macro);line-height:.84;letter-spacing:-.05em;text-transform:uppercase;font-variant-numeric:tabular-nums;color:{{ v.bigCol }};margin-top:8px;word-break:break-word">{{ v.big }}</div>
+        <sc-if value="{{ v.big2 }}" hint-placeholder-val="{{ true }}">
+          <div style="font:600 14px/1.3 system-ui;color:var(--ink);margin-top:12px;text-wrap:pretty">{{ v.big2 }}</div>
+        </sc-if>
+        <sc-if value="{{ v.big3 }}" hint-placeholder-val="{{ true }}">
+          <div style="display:inline-block;margin-top:10px;padding:8px 11px;background:{{ v.big3Bg }};color:{{ v.big3Col }};font:900 12px/1.15 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.12em;text-transform:uppercase">{{ v.big3 }}</div>
+        </sc-if>
+
+        <div style="display:flex;flex-direction:column;gap:2px;margin-top:16px;background:var(--rule);border:var(--rule-w) solid var(--rule)">
+          <sc-for list="{{ v.sub }}" as="r" hint-placeholder-count="3">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:8px 10px;background:var(--paper)">
+              <span style="font:700 12.5px/1.3 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2)">{{ r.k }}</span>
+              <span style="font:700 14px/1.2 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-variant-numeric:tabular-nums;letter-spacing:.02em;color:{{ r.c }};text-align:right">{{ r.v }}</span>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:8px;margin-top:14px">
+          <sc-for list="{{ v.list }}" as="b" hint-placeholder-count="0">
+            <button onClick="{{ b.on }}" style-active="{{ press }}" style="display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:60px;padding:12px 14px;text-align:left;background:{{ b.bg }};border:var(--rule-w) solid {{ b.bd }};color:{{ b.col }}">
+              <span style="display:flex;flex-direction:column;gap:5px">
+                <span style="font:900 14px/1.1 system-ui;letter-spacing:.02em;text-transform:uppercase">{{ b.t }}</span>
+                <span style="font:700 12.5px/1.35 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.1em;text-transform:uppercase;color:{{ b.subCol }}">{{ b.s }}</span>
+              </span>
+              <span style="font:900 14px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.06em;color:{{ b.tagCol }}">{{ b.tag }}</span>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="flex:none;background:var(--paper);border-top:var(--rule-w) solid var(--rule)">
+        <sc-if value="{{ v.prompt }}" hint-placeholder-val="{{ true }}">
+          <div style="padding:9px 14px;font:700 12.5px/1.3 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-2);border-bottom:1px solid var(--hair)">{{ v.prompt }}</div>
+        </sc-if>
+        <sc-if value="{{ v.input }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;gap:2px;background:var(--rule)">
+            <input value="{{ buf }}" onChange="{{ onBuf }}" onKeyDown="{{ onKey }}" ref="{{ inRef }}" placeholder="{{ v.ph }}" inputMode="{{ v.im }}" style="flex:1;min-width:0;height:68px;padding:0 14px;background:var(--field);border:0;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:30px;font-weight:900;letter-spacing:.02em;font-variant-numeric:tabular-nums;color:var(--ink);outline:none" />
+            <button onClick="{{ doScan }}" style-active="{{ press }}" style="flex:none;width:104px;height:68px;background:var(--acc-fill);color:var(--acc-ink);font:900 14px/1 system-ui;letter-spacing:.14em;text-transform:uppercase">{{ v.btn }}</button>
+          </div>
+        </sc-if>
+        <sc-if value="{{ v.pad }}" hint-placeholder-val="{{ false }}">
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:var(--rule);border-top:2px solid var(--rule)">
+            <sc-for list="{{ padKeys }}" as="k" hint-placeholder-count="12">
+              <button onClick="{{ k.on }}" style-active="{{ press }}" style="height:60px;background:var(--paper-2);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:20px;font-weight:900;font-variant-numeric:tabular-nums;color:var(--ink)">{{ k.t }}</button>
+            </sc-for>
+          </div>
+        </sc-if>
+        <div style="display:flex;gap:2px;background:var(--rule);border-top:2px solid var(--rule)">
+          <sc-for list="{{ v.acts }}" as="a" hint-placeholder-count="1">
+            <button onClick="{{ a.on }}" style-active="{{ press }}" style="flex:1;min-height:56px;padding:0 10px;background:{{ a.bg }};color:{{ a.col }};font:900 13.5px/1.2 system-ui;letter-spacing:.1em;text-transform:uppercase">{{ a.t }}</button>
+          </sc-for>
+        </div>
+      </div>
+
+      <sc-if value="{{ fl }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:24px;text-align:center;background:{{ fl.bg }};color:{{ fl.col }};animation:{{ fl.anim }}">
+          <div style="font-size:var(--glyph);line-height:.8;font-weight:900;animation:{{ fl.ganim }}">{{ fl.glyph }}</div>
+          <div style="font:900 15px/1.15 system-ui;letter-spacing:.1em;text-transform:uppercase;max-width:340px;text-wrap:pretty">{{ fl.head }}</div>
+          <div style="font-family:system-ui,-apple-system,sans-serif;font-weight:900;font-size:var(--macro);line-height:.84;letter-spacing:-.05em;font-variant-numeric:tabular-nums;word-break:break-word">{{ fl.addr }}</div>
+          <div style="font:600 11px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.1em;text-transform:uppercase;max-width:360px;text-wrap:pretty;opacity:.92">{{ fl.text }}</div>
+          <sc-if value="{{ fl.next }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:6px;padding:7px 12px;border:var(--rule-w) solid {{ fl.col }};font:700 11px/1.2 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.12em;text-transform:uppercase">{{ fl.next }}</div>
+          </sc-if>
+        </div>
+      </sc-if>
+    </div>
+
+    <div style="min-height:0;display:{{ L.dRoute }};flex-direction:column;gap:10px">
+      <div style="flex:none;display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap">
+        <div>
+          <div style="font:900 14px/1.1 system-ui;letter-spacing:.06em;text-transform:uppercase">{{ ctx.title }}</div>
+          <div style="font:700 12px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-2);margin-top:6px">{{ ctx.sub }}</div>
+        </div>
+        <div style="font:900 12.5px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.14em;text-transform:uppercase;background:{{ ctx.badgeBg }};color:{{ ctx.badgeCol }};border:var(--rule-w) solid {{ ctx.badgeBd }};padding:7px 10px">{{ ctx.badge }}</div>
+      </div>
+
+      <div style="flex:1;min-height:0;overflow:auto;background:var(--paper);border:1px solid var(--rule)">
+        <table style="width:100%;border-collapse:collapse;table-layout:{{ L.tbl }}">
+          <thead>
+            <tr>
+              <sc-for list="{{ ctx.head }}" as="h" hint-placeholder-count="5">
+                <th style="width:{{ h.w }};position:sticky;top:0;z-index:1;padding:9px {{ L.cellPad }};background:var(--paper-2);border-bottom:var(--rule-w) solid var(--rule);text-align:{{ h.a }};font:900 {{ L.thSz }} ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:{{ L.thLs }};text-transform:uppercase;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ h.t }}</th>
+              </sc-for>
+            </tr>
+          </thead>
+          <tbody>
+            <sc-for list="{{ ctx.rows }}" as="r" hint-placeholder-count="6">
+              <tr onClick="{{ r.on }}" style="background:{{ r.bg }};border-left:6px solid {{ r.bd }}">
+                <sc-for list="{{ r.cs }}" as="c" hint-placeholder-count="5">
+                  <td style="padding:9px {{ L.cellPad }};border-bottom:1px solid var(--hair);text-align:{{ c.a }};color:{{ c.c }};font-family:{{ c.f }};font-size:{{ c.z }}px;font-weight:{{ c.w }};white-space:{{ c.n }};overflow:hidden;text-overflow:ellipsis;overflow-wrap:anywhere">{{ c.t }}</td>
+                </sc-for>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+        <sc-if value="{{ ctx.empty }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:34px 18px;text-align:center;font:600 11px/1.8 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2);text-wrap:pretty">{{ ctx.empty }}</div>
+        </sc-if>
+      </div>
+
+      <div style="flex:none;display:grid;grid-template-columns:{{ L.kpiCols }};gap:2px;background:var(--rule);border:var(--rule-w) solid var(--rule)">
+        <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+          <div style="padding:10px 12px;background:var(--paper)">
+            <div style="font:700 12.5px/1.2 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2)">{{ k.k }}</div>
+            <div style="font-family:system-ui,-apple-system,sans-serif;font-size:30px;font-weight:900;letter-spacing:-.04em;font-variant-numeric:tabular-nums;color:{{ k.c }};margin-top:6px">{{ k.v }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="min-height:0;display:{{ L.dSide }};flex-direction:column;gap:10px">
+      <div style="flex:{{ L.fCodes }};min-height:0;display:{{ L.dCodes }};flex-direction:column;overflow:auto;background:var(--paper);border:var(--rule-w) solid var(--rule)">
+        <div style="flex:none;padding:8px 11px;background:var(--ink);color:var(--paper);font:900 12.5px/1.3 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.14em;text-transform:uppercase">ШТРИХКОДЫ ДЛЯ ДЕМО · КЛИК = СКАН</div>
+        <div style="display:flex;flex-direction:column;gap:2px;background:var(--rule);border-bottom:var(--rule-w) solid var(--rule)">
+          <sc-for list="{{ codes }}" as="c" hint-placeholder-count="3">
+            <button onClick="{{ c.on }}" style-active="{{ press }}" style="display:flex;flex-direction:column;gap:5px;min-height:56px;padding:9px 11px;text-align:left;background:{{ c.bg }};border-left:6px solid {{ c.bd }}">
+              <span style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%">
+                <span style="font:900 14px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.02em;font-variant-numeric:tabular-nums;color:{{ c.col }}">{{ c.code }}</span>
+                <span style="font:900 11.5px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.12em;text-transform:uppercase;color:{{ c.tagCol }}">{{ c.tag }}</span>
+              </span>
+              <span style="font:700 12.5px/1.35 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.06em;color:var(--ink-2)">{{ c.label }}</span>
+            </button>
+          </sc-for>
+        </div>
+        <sc-if value="{{ noCodes }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:14px 12px;font:700 12.5px/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2)">{{ noCodes }}</div>
+        </sc-if>
+      </div>
+      <div style="flex:1;min-height:0;display:{{ L.dLog }};flex-direction:column;background:var(--paper);border:var(--rule-w) solid var(--rule)">
+        <div style="flex:none;padding:8px 11px;background:var(--ink);color:var(--paper);font:900 12.5px/1.3 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.14em;text-transform:uppercase">ЖУРНАЛ СЕАНСА</div>
+        <div style="flex:1;min-height:0;overflow:auto">
+          <sc-for list="{{ jr }}" as="j" hint-placeholder-count="0">
+            <div style="display:flex;gap:8px;padding:7px 11px;border-bottom:1px solid var(--hair)">
+              <span style="flex:none;font:700 10px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.06em;font-variant-numeric:tabular-nums;color:var(--ink-2)">{{ j.t }}</span>
+              <span style="font:600 10px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.06em;color:{{ j.c }};text-wrap:pretty">{{ j.m }}</span>
+            </div>
+          </sc-for>
+          <sc-if value="{{ noJr }}" hint-placeholder-val="{{ true }}">
+            <div style="padding:14px 12px;display:flex;flex-direction:column;gap:7px">
+              <div style="font:900 13px/1.3 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--ink)">ЖУРНАЛ ПУСТ</div>
+              <div style="font:700 12.5px/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);text-wrap:pretty">Отсканируйте ячейку из списка справа — каждое действие смены появится здесь строкой.</div>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isOffice }}" hint-placeholder-val="{{ false }}">
+  <div style="flex:1;min-height:0;display:flex;flex-direction:column">
+    <div style="flex:none;display:flex;align-items:stretch;gap:0;overflow-x:auto;border-bottom:var(--rule-w) solid var(--rule);background:var(--paper)">
+      <sc-for list="{{ navs }}" as="n" hint-placeholder-count="5">
+        <button onClick="{{ n.on }}" style-active="{{ press }}" style="flex:none;min-height:60px;padding:16px 26px;font:900 16px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;background:{{ n.bg }};color:{{ n.col }}">{{ n.t }}</button>
+      </sc-for>
+      <div style="flex:1"></div>
+      <button onClick="{{ csvBtn }}" style-active="{{ press }}" style="padding:0 24px;font:900 15px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.14em;color:var(--ink);border-left:var(--rule-w) solid var(--rule)">↓ CSV</button>
+    </div>
+
+    <sc-if value="{{ isMap }}" hint-placeholder-val="{{ false }}">
+      <div style="flex:1;min-height:0;display:grid;grid-template-columns:{{ L.mapCols }};overflow:auto">
+        <div style="min-height:0;overflow:auto;padding:16px 18px 26px">
+          <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-bottom:16px">
+            <div style="font:900 14px/1 system-ui;letter-spacing:.06em;text-transform:uppercase">КАРТА СКЛАДА · {{ cellCount }} ЯЧЕЕК</div>
+            <div style="display:flex;align-items:center;gap:6px;font:700 13px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2)">
+              <span>ЗАНЯТО 0%</span>
+              <span style="width:26px;height:16px;background:var(--paper);outline:1px solid var(--hair)"></span>
+              <span style="width:26px;height:16px;background:color-mix(in srgb, var(--acc-fill) 24%, var(--paper))"></span>
+              <span style="width:26px;height:16px;background:color-mix(in srgb, var(--acc-fill) 50%, var(--paper))"></span>
+              <span style="width:26px;height:16px;background:color-mix(in srgb, var(--acc-fill) 76%, var(--paper))"></span>
+              <span style="width:26px;height:16px;background:var(--acc-fill)"></span>
+              <span>100%</span>
+              <span style="margin-left:8px;width:12px;height:12px;background:var(--alert)"></span><span>СРОК &lt; 7 ДН.</span>
+              <span style="margin-left:8px;width:12px;height:12px;outline:2px solid var(--alert)"></span><span>ВЫБРАНА</span>
+            </div>
+          </div>
+          <sc-for list="{{ zones }}" as="z" hint-placeholder-count="3">
+            <div style="margin-bottom:22px">
+              <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:9px;border-bottom:var(--rule-w) solid var(--rule);padding-bottom:6px">
+                <div style="font:900 13px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.1em;color:var(--ink)">{{ z.id }}</div>
+                <div style="font:900 12.5px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2)">{{ z.name }}</div>
+                <div style="font:700 13px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.1em;color:var(--ink-2)">{{ z.temp }} · ЗАНЯТОСТЬ {{ z.pct }}%</div>
+              </div>
+              <div style="display:flex;gap:14px;flex-wrap:wrap">
+                <sc-for list="{{ z.racks }}" as="rk" hint-placeholder-count="5">
+                  <div style="background:var(--paper)">
+                    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:5px">
+                      <span style="font:900 13px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.1em;color:var(--ink-2)">СТЕЛЛАЖ {{ rk.no }}</span>
+                      <span style="font:900 13px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px;font-weight:900;font-variant-numeric:tabular-nums;color:var(--ink-2)">{{ rk.pct }}%</span>
+                    </div>
+                    <div style="display:grid;grid-template-columns:repeat(4,42px);gap:2px;background:var(--rule);padding:2px">
+                      <sc-for list="{{ rk.cells }}" as="cc" hint-placeholder-count="12">
+                        <button onClick="{{ cc.on }}" title="{{ cc.ttl }}" style="height:42px;background:var(--paper);position:relative;outline:{{ cc.ring }};outline-offset:-2px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:15px;font-weight:900;color:{{ cc.col }}"><span style="position:absolute;inset:0;background:var(--acc-fill);opacity:{{ cc.fill }}"></span><span style="position:relative">{{ cc.t }}</span><sc-if value="{{ cc.warn }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:0;right:0;width:0;height:0;border-top:8px solid var(--alert);border-left:8px solid transparent"></span></sc-if></button>
+                      </sc-for>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+          <div style="display:flex;gap:14px;flex-wrap:wrap">
+            <sc-for list="{{ buffers }}" as="b" hint-placeholder-count="2">
+              <div style="padding:10px 14px;background:var(--paper);border:var(--rule-w) dashed var(--rule)">
+                <div style="font:900 13px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.1em;color:var(--ink)">{{ b.id }}</div>
+                <div style="font:700 12px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);margin-top:5px">{{ b.name }} · {{ b.qty }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="min-height:0;overflow:auto;border-left:var(--rule-w) solid var(--rule);background:var(--paper-2);padding:16px;min-width:0">
+          <div style="font:900 15px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-2)">ЯЧЕЙКА</div>
+          <div style="font-family:system-ui,-apple-system,sans-serif;font-size:var(--macro);font-weight:900;line-height:.84;letter-spacing:-.05em;color:var(--ink);margin-top:8px">{{ cd.id }}</div>
+          <div style="font:700 13.5px/1.7 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);margin-top:10px;text-wrap:pretty">{{ cd.meta }}</div>
+          <div style="display:flex;flex-direction:column;gap:2px;margin-top:14px;background:var(--rule);border:var(--rule-w) solid var(--rule)">
+            <sc-for list="{{ cd.lines }}" as="l" hint-placeholder-count="0">
+              <div style="padding:10px 12px;background:var(--paper);border-left:6px solid {{ l.bd }}">
+                <div style="font:900 17px/1.3 system-ui;color:var(--ink);text-wrap:pretty">{{ l.name }}</div>
+                <div style="display:flex;flex-wrap:wrap;align-items:center;gap:9px;margin-top:7px;font:700 13px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.06em;color:var(--ink-2)">
+                  <span>{{ l.art }}</span><span style="color:{{ l.expCol }}">{{ l.exp }}</span>
+                  <button onClick="{{ l.onLabel }}" style-active="{{ press }}" style="padding:5px 8px;border:var(--rule-w) solid var(--rule);font:900 11.5px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.1em;color:var(--ink)">ЭТИКЕТКА ТОВАРА</button>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:9px;background:var(--rule)">
+                  <span style="padding:10px 12px;background:var(--paper);font:700 12.5px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.12em;color:var(--ink-2)">СВОБОДНО<br /><b style="font:900 20px/1.15 system-ui;letter-spacing:-.03em;font-variant-numeric:tabular-nums;color:var(--ink)">{{ l.free }}</b></span>
+                  <span style="padding:10px 12px;background:var(--paper);font:700 12.5px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.12em;color:var(--ink-2)">РЕЗЕРВ<br /><b style="font:900 20px/1.15 system-ui;letter-spacing:-.03em;font-variant-numeric:tabular-nums;color:var(--ink)">{{ l.res }}</b></span>
+                  <span style="padding:10px 12px;background:var(--paper);font:700 12.5px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.12em;color:var(--ink-2)">В ОТБОРЕ<br /><b style="font:900 20px/1.15 system-ui;letter-spacing:-.03em;font-variant-numeric:tabular-nums;color:var(--ink)">{{ l.pick }}</b></span>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <sc-if value="{{ cd.empty }}" hint-placeholder-val="{{ true }}">
+            <div style="padding:16px 0;font:600 10px/1.7 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2);text-wrap:pretty">{{ cd.empty }}</div>
+          </sc-if>
+          <div style="display:flex;flex-direction:column;gap:2px;margin-top:14px;background:var(--rule);border:var(--rule-w) solid var(--rule)">
+            <button onClick="{{ cd.onCount }}" style-active="{{ press }}" style="min-height:56px;background:var(--ink);color:var(--paper);font:900 13px/1.2 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.12em;text-transform:uppercase">ПЕРЕСЧИТАТЬ В ТЕРМИНАЛЕ</button>
+            <button onClick="{{ cd.onLabel }}" style-active="{{ press }}" style="min-height:56px;background:var(--paper);color:var(--ink);font:900 13px/1.2 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.12em;text-transform:uppercase">ПЕЧАТЬ ЭТИКЕТКИ ЯЧЕЙКИ</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isDocs }}" hint-placeholder-val="{{ false }}">
+      <div style="flex:1;min-height:0;display:grid;grid-template-columns:{{ L.docCols }};overflow:auto">
+        <div style="min-height:0;overflow:auto;border-right:1px solid var(--rule)">
+          <sc-for list="{{ docList }}" as="d" hint-placeholder-count="8">
+            <button onClick="{{ d.on }}" style-active="{{ press }}" style="display:block;width:100%;text-align:left;padding:11px 14px;border-bottom:1px solid var(--hair);border-left:6px solid {{ d.bd }};background:{{ d.bg }}">
+              <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px">
+                <span style="font:900 13px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.04em;color:{{ d.col }}">{{ d.no }}</span>
+                <span style="font:900 11.5px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.12em;text-transform:uppercase;color:{{ d.stCol }}">{{ d.st }}</span>
+              </div>
+              <div style="font:700 12px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);margin-top:6px">{{ d.sub }}</div>
+            </button>
+          </sc-for>
+        </div>
+        <div style="min-height:0;overflow:auto;padding:18px 20px">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
+            <div>
+              <div style="font:900 16px/1.1 system-ui;letter-spacing:.04em;text-transform:uppercase">{{ dd.title }}</div>
+              <div style="font:600 10px/1.75 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2);margin-top:8px;white-space:pre-line">{{ dd.meta }}</div>
+            </div>
+            <button onClick="{{ dd.onPrint }}" style-active="{{ press }}" style="flex:none;min-height:56px;padding:13px 18px;background:var(--ink);color:var(--paper);font:900 13px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.14em;text-transform:uppercase">ПЕЧАТЬ A4</button>
+          </div>
+          <table style="width:100%;border-collapse:collapse;margin-top:16px">
+            <thead>
+              <tr>
+                <sc-for list="{{ dd.head }}" as="h" hint-placeholder-count="5">
+                  <th style="padding:8px 10px;background:var(--paper-2);border-bottom:var(--rule-w) solid var(--rule);text-align:{{ h.a }};font:900 12.5px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);white-space:nowrap">{{ h.t }}</th>
+                </sc-for>
+              </tr>
+            </thead>
+            <tbody>
+              <sc-for list="{{ dd.rows }}" as="r" hint-placeholder-count="4">
+                <tr>
+                  <sc-for list="{{ r.cs }}" as="c" hint-placeholder-count="5">
+                    <td style="padding:9px 10px;border-bottom:1px solid var(--hair);text-align:{{ c.a }};color:{{ c.c }};font-family:{{ c.f }};font-size:{{ c.z }}px;font-weight:{{ c.w }}">{{ c.t }}</td>
+                  </sc-for>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+          <div style="font:600 10px/1.8 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);margin-top:14px;padding-top:12px;border-top:var(--rule-w) solid var(--rule);white-space:pre-line;text-wrap:pretty">{{ dd.foot }}</div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isTable }}" hint-placeholder-val="{{ false }}">
+      <div style="flex:1;min-height:0;display:flex;flex-direction:column">
+        <div style="flex:none;display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 16px;border-bottom:var(--rule-w) solid var(--rule)">
+          <div style="font:900 19px/1 system-ui;letter-spacing:.06em;text-transform:uppercase">{{ tbl.title }}</div>
+          <div style="font:700 13px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2)">{{ tbl.sub }}</div>
+          <div style="flex:1"></div>
+          <sc-if value="{{ tbl.search }}" hint-placeholder-val="{{ false }}">
+            <input value="{{ q }}" onChange="{{ onQ }}" placeholder="ПОИСК: ТОВАР, АРТИКУЛ, ЯЧЕЙКА" style="width:{{ L.searchW }};max-width:100%;height:44px;padding:0 12px;background:var(--field);border:var(--rule-w) solid var(--rule);font:700 13px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.1em;color:var(--ink);outline:none" />
+          </sc-if>
+        </div>
+        <div style="flex:1;min-height:0;overflow:auto">
+          <table style="width:100%;border-collapse:collapse">
+            <thead>
+              <tr>
+                <sc-for list="{{ tbl.head }}" as="h" hint-placeholder-count="6">
+                  <th style="position:sticky;top:0;z-index:1;padding:14px 14px;background:var(--paper-2);border-bottom:var(--rule-w) solid var(--rule);text-align:{{ h.a }};font:900 15px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);white-space:nowrap">{{ h.t }}</th>
+                </sc-for>
+              </tr>
+            </thead>
+            <tbody>
+              <sc-for list="{{ tbl.rows }}" as="r" hint-placeholder-count="12">
+                <tr style="background:{{ r.bg }}">
+                  <sc-for list="{{ r.cs }}" as="c" hint-placeholder-count="6">
+                    <td style="padding:13px 14px;border-bottom:1px solid var(--hair);text-align:{{ c.a }};color:{{ c.c }};font-family:{{ c.f }};font-size:{{ c.z }}px;font-weight:{{ c.w }};white-space:{{ c.n }}">{{ c.t }}</td>
+                  </sc-for>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+          <sc-if value="{{ tbl.empty }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:40px 18px;text-align:center;font:600 11px/1.8 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2);text-wrap:pretty">{{ tbl.empty }}</div>
+          </sc-if>
+        </div>
+      </div>
+    </sc-if>
+  </div>
+  </sc-if>
+</div>
+
+<sc-if value="{{ pr }}" hint-placeholder-val="{{ false }}">
+<div id="psheet" style="position:fixed;inset:0;z-index:50;overflow:auto;background:var(--paper-2);padding:26px 0">
+  <div id="pctl" style="display:flex;gap:8px;justify-content:center;margin-bottom:18px">
+    <button onClick="{{ doPrint }}" style="padding:13px 22px;background:var(--ink);color:var(--paper);font:900 13.5px/1 system-ui;letter-spacing:.1em">ПЕЧАТЬ</button>
+    <button onClick="{{ closePrint }}" style="padding:13px 22px;background:var(--paper-2);color:var(--ink);font:900 13.5px/1 system-ui;letter-spacing:.1em">ЗАКРЫТЬ</button>
+  </div>
+  <sc-if value="{{ pr.isLabel }}" hint-placeholder-val="{{ false }}">
+  <div style="width:210mm;min-height:297mm;margin:0 auto;background:#FFFFFF;color:#0B0B0B;padding:16mm 15mm;font-family:'Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua','Hoefler Text',Georgia,'Noto Serif',serif">
+    <div style="font:600 8pt/1.3 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.14em;text-transform:uppercase;color:#5B5B57;margin-bottom:6mm">{{ pr.title }}</div>
+    <div style="width:96mm;border:2px solid #0B0B0B;padding:6mm">
+      <div style="font:600 8pt/1.2 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.12em;text-transform:uppercase;color:#5B5B57">{{ pr.org }}</div>
+      <div style="font:900 34pt/.9 system-ui,-apple-system,'Segoe UI',sans-serif;letter-spacing:-.04em;margin-top:5mm">{{ pr.big }}</div>
+      <div style="font:400 10.5pt/1.35 'Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua','Hoefler Text',Georgia,'Noto Serif',serif;margin-top:3mm;text-wrap:pretty">{{ pr.sub }}</div>
+      <svg viewBox="0 0 {{ pr.barW }} 42" preserveAspectRatio="none" style="display:block;width:84mm;height:20mm;margin-top:5mm">
+        <sc-for list="{{ pr.bars }}" as="b" hint-placeholder-count="20">
+          <rect x="{{ b.x }}" y="{{ b.y }}" width="{{ b.w }}" height="{{ b.h }}" fill="#000"></rect>
+        </sc-for>
+      </svg>
+      <div style="font:700 11pt/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.18em;margin-top:2mm">{{ pr.human }}</div>
+      <div style="font:600 8pt/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.08em;text-transform:uppercase;color:#5B5B57;margin-top:4mm;white-space:pre-line">{{ pr.meta2 }}</div>
+    </div>
+  </div>
+  </sc-if>
+  <sc-if value="{{ pr.isForm }}" hint-placeholder-val="{{ true }}">
+  <div style="width:210mm;min-height:297mm;margin:0 auto;background:#FFFFFF;color:#0B0B0B;padding:16mm 15mm;font-family:'Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua','Hoefler Text',Georgia,'Noto Serif',serif">
+    <sc-if value="{{ pr.warn }}" hint-placeholder-val="{{ false }}">
+      <div style="border:2px solid #C81A1A;color:#C81A1A;padding:3mm 4mm;margin-bottom:5mm;font:700 8.5pt/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.1em;text-transform:uppercase">{{ pr.warn }}</div>
+    </sc-if>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px;border-bottom:2px solid #0B0B0B;padding-bottom:8px">
+      <div>
+        <div style="font:900 10pt/1.3 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.1em;text-transform:uppercase">{{ pr.org }}</div>
+        <div style="font:600 7.5pt/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.08em;text-transform:uppercase;color:#5B5B57;white-space:pre-line">{{ pr.orgSub }}</div>
+      </div>
+      <div style="text-align:right;font:600 7.5pt/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.1em;text-transform:uppercase;color:#5B5B57;white-space:pre-line">{{ pr.form }}</div>
+    </div>
+    <div style="text-align:center;margin:14px 0 4px;font:900 17pt/1.15 system-ui,-apple-system,'Segoe UI',sans-serif;letter-spacing:-.02em;text-transform:uppercase">{{ pr.title }}</div>
+    <div style="text-align:center;font:400 10pt/1.4 'Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua','Hoefler Text',Georgia,'Noto Serif',serif;color:#5B5B57">{{ pr.subtitle }}</div>
+    <table style="width:100%;border-collapse:collapse;margin-top:14px;font:400 10pt/1.35 'Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua','Hoefler Text',Georgia,'Noto Serif',serif">
+      <tbody>
+        <sc-for list="{{ pr.meta }}" as="m" hint-placeholder-count="4">
+          <tr>
+            <td style="padding:3px 8px 3px 0;width:38%;color:#5B5B57">{{ m.k }}</td>
+            <td style="padding:3px 0;border-bottom:1px solid #C9C4B6;font-weight:700">{{ m.v }}</td>
+          </tr>
+        </sc-for>
+      </tbody>
+    </table>
+    <table style="width:100%;border-collapse:collapse;margin-top:16px;font:400 9.5pt/1.3 'Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua','Hoefler Text',Georgia,'Noto Serif',serif">
+      <thead>
+        <tr>
+          <sc-for list="{{ pr.head }}" as="h" hint-placeholder-count="6">
+            <th style="border:1px solid #0B0B0B;padding:5px 6px;background:#F1EFE9;text-align:{{ h.a }};font-weight:700">{{ h.t }}</th>
+          </sc-for>
+        </tr>
+      </thead>
+      <tbody>
+        <sc-for list="{{ pr.rows }}" as="r" hint-placeholder-count="5">
+          <tr>
+            <sc-for list="{{ r.cs }}" as="c" hint-placeholder-count="6">
+              <td style="border:1px solid #0B0B0B;padding:5px 6px;text-align:{{ c.a }};font-weight:{{ c.w }}">{{ c.t }}</td>
+            </sc-for>
+          </tr>
+        </sc-for>
+      </tbody>
+    </table>
+    <div style="margin-top:12px;font:400 10.5pt/1.5 'Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua','Hoefler Text',Georgia,'Noto Serif',serif;white-space:pre-line">{{ pr.foot }}</div>
+    <div style="display:flex;gap:30px;margin-top:34px;font:400 10pt/1.4 'Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua','Hoefler Text',Georgia,'Noto Serif',serif">
+      <sc-for list="{{ pr.signs }}" as="s" hint-placeholder-count="2">
+        <div style="flex:1">
+          <div style="border-bottom:1px solid #0B0B0B;height:20px"></div>
+          <div style="margin-top:4px;color:#5B5B57">{{ s.k }}</div>
+          <div style="font-weight:700">{{ s.v }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+  </sc-if>
+</div>
+</sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:1000}}">
+class Component extends DCLogic {
+  KEY = 'sklad_scanner_v1';
+  MK = 'sklad_scanner_mute';
+  TK = 'sklad_scanner_theme';
+  state = this.boot();
+
+  // ============ infra ============
+  mk(seed){ let a = seed >>> 0; return function(){ a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+  boot(){
+    let raw = null, db = null;
+    try { raw = localStorage.getItem(this.KEY); } catch(e) {}
+    if (raw) { try { db = JSON.parse(raw); } catch(e) { db = null; } }
+    // seed ONLY on "nothing is stored". A visitor's own data is never regenerated:
+    // the demo seed marks itself with demo:true, so only OUR stale seed is rebuilt.
+    if (!db) { db = this.gen(); this.persist(db); }
+    else if (db.demo === true && db.v !== 3) { db = this.gen(); this.persist(db); }
+    else if (!db.cells || !db.skus || !db.stock) { db = this.gen(); this.persist(db); }
+    let mute = false;
+    try { mute = localStorage.getItem(this.MK) === '1'; } catch(e) {}
+    let theme = 'dark';
+    try { const t = localStorage.getItem(this.TK); if (t === 'light' || t === 'dark' || t === 'auto') theme = t; } catch(e) {}
+    let ui = {};
+    try { ui = JSON.parse(localStorage.getItem('sklad_scanner_ui') || '{}') || {}; } catch(e) { ui = {}; }
+    const staff = db.staff || ['Кузнецов И.С.'];
+    const vw0 = typeof window !== 'undefined' && window.innerWidth ? window.innerWidth : 1440;
+    return { db: db, vw: vw0, pane: 'task', mute: mute, theme: theme, tab: 'term', ov: ui.ov || 'map', term: (ui.term && ui.term.mode === 'pick' && ui.term.doc) ? ui.term : { mode: 'pick', doc: 'ORD-0057', step: 'cell' }, buf: '', flash: null, sel: ui.sel || 'A-05-3-04', doc: null, print: null, q: '', jr: [], who: staff.indexOf(ui.who) >= 0 ? ui.who : staff[0] };
+  }
+  persist(db){ try { localStorage.setItem(this.KEY, JSON.stringify(db)); } catch(e) {} }
+  up(mut){ const db = this.state.db; mut(db); this.persist(db); this.setState({ db: Object.assign({}, db) }); }
+
+  p2(n){ return String(n).padStart(2, '0'); }
+  fd(s){ if (!s) return '—'; const p = String(s).slice(0, 10).split('-'); return p[2] + '.' + p[1] + '.' + p[0]; }
+  nf(n){ return Number(n || 0).toLocaleString('ru-RU'); }
+  today(){ const d = new Date(); d.setHours(0,0,0,0); return d; }
+  ld(){ const x = new Date(); return x.getFullYear() + '-' + this.p2(x.getMonth() + 1) + '-' + this.p2(x.getDate()); }
+  dleft(exp){ if (!exp) return null; return Math.round((new Date(exp + 'T00:00:00') - this.today()) / 86400000); }
+  now(){ const d = new Date(); return this.p2(d.getDate()) + '.' + this.p2(d.getMonth()+1) + ' ' + this.p2(d.getHours()) + ':' + this.p2(d.getMinutes()); }
+  clock(){ const d = new Date(); return this.p2(d.getHours()) + ':' + this.p2(d.getMinutes()) + ':' + this.p2(d.getSeconds()); }
+
+  cell(db, id){ return db.cells.find(c => c.id === id) || null; }
+  sku(db, id){ return db.skus.find(s => s.id === id) || null; }
+  bat(db, id){ return id ? (db.batches.find(b => b.id === id) || null) : null; }
+  skuByBc(db, code){ return db.skus.find(s => s.bc === code || s.art.toUpperCase() === String(code).toUpperCase()) || null; }
+  expOf(db, bid){ const b = this.bat(db, bid); return b ? b.exp : null; }
+
+  // ============ seed ============
+  gen(){
+    const R = this.mk(20260815);
+    const ri = (a, b) => a + Math.floor(R() * (b - a + 1));
+    const pk = a => a[Math.floor(R() * a.length)];
+    const p2 = n => this.p2(n);
+    const t0 = this.today();
+    const D = d => { const x = new Date(t0.getTime() + d * 86400000); return x.getFullYear() + '-' + p2(x.getMonth() + 1) + '-' + p2(x.getDate()); };
+
+    const p4 = n => String(10000 + n).slice(1);
+
+    const cells = [];
+    [['A', 0], ['B', 1000], ['C', 2000]].forEach(z => {
+      for (let r = 1; r <= 8; r++) for (let t = 1; t <= 3; t++) for (let p = 1; p <= 4; p++)
+        cells.push({ id: z[0] + '-' + p2(r) + '-' + t + '-' + p2(p), z: z[0], r: r, t: t, p: p, cap: t === 1 ? 240 : (t === 2 ? 160 : 120), d: z[1] + r * 100 + p * 10 + t });
+    });
+    cells.push({ id: 'ПР-01', z: 'R', r: 0, t: 0, p: 0, cap: 6000, d: -10 });
+    cells.push({ id: 'ОТ-01', z: 'S', r: 0, t: 0, p: 0, cap: 6000, d: -20 });
+
+    const SK = [
+      ['Молоко «Заречье» 3,2% 900 мл', 'Молочное', 'A', 'шт', 14],
+      ['Кефир «Заречье» 1% 500 мл', 'Молочное', 'A', 'шт', 10],
+      ['Сметана «Луговая» 20% 300 г', 'Молочное', 'A', 'шт', 21],
+      ['Творог «Луговая» 5% 200 г', 'Молочное', 'A', 'шт', 12],
+      ['Масло сливочное «Заречье» 82,5% 180 г', 'Молочное', 'A', 'шт', 60],
+      ['Сыр «Белогорье» полутвёрдый 250 г', 'Молочное', 'A', 'шт', 90],
+      ['Йогурт «Ясный День» клубника 290 г', 'Молочное', 'A', 'шт', 18],
+      ['Ряженка «Заречье» 4% 450 мл', 'Молочное', 'A', 'шт', 12],
+      ['Колбаса «Мясной Ряд» варёная 500 г', 'Гастрономия', 'A', 'шт', 25],
+      ['Сосиски «Мясной Ряд» молочные 450 г', 'Гастрономия', 'A', 'шт', 20],
+      ['Пельмени «Сытный Дом» 800 г', 'Заморозка', 'A', 'упак', 180],
+      ['Мука пшеничная «Полевица» 2 кг', 'Бакалея', 'B', 'шт', 365],
+      ['Рис длиннозёрный «Полевица» 900 г', 'Бакалея', 'B', 'шт', 540],
+      ['Гречка ядрица «Полевица» 800 г', 'Бакалея', 'B', 'шт', 480],
+      ['Макароны «Паста Мия» спагетти 450 г', 'Бакалея', 'B', 'шт', 540],
+      ['Сахар-песок «Сахарный Дол» 1 кг', 'Бакалея', 'B', 'шт', 730],
+      ['Соль пищевая «Белый Камень» 1 кг', 'Бакалея', 'B', 'шт', 0],
+      ['Масло подсолнечное «Золотой Луг» 1 л', 'Бакалея', 'B', 'шт', 300],
+      ['Тушёнка «Мясной Ряд» 340 г', 'Бакалея', 'B', 'шт', 730],
+      ['Сардина «Балтийский Улов» 240 г', 'Бакалея', 'B', 'шт', 730],
+      ['Чай чёрный «Тихий Час» 100 пак.', 'Бакалея', 'B', 'упак', 540],
+      ['Кофе «Утренний Пар» молотый 250 г', 'Бакалея', 'B', 'шт', 365],
+      ['Какао-напиток «Тёплый Вечер» 375 г', 'Бакалея', 'B', 'шт', 400],
+      ['Вода минеральная «Ключевая» 1,5 л', 'Напитки', 'B', 'шт', 365],
+      ['Сок «Садовый» яблочный 1 л', 'Напитки', 'B', 'шт', 270],
+      ['Лимонад «Дюшес-Классик» 1,5 л', 'Напитки', 'B', 'шт', 180],
+      ['Квас «Тарасов Двор» 2 л', 'Напитки', 'B', 'шт', 60],
+      ['Энергетик «Вольт» 0,45 л', 'Напитки', 'B', 'шт', 300],
+      ['Печенье «Сдобное Утро» 400 г', 'Кондитерские', 'B', 'шт', 180],
+      ['Вафли «Хрустик» 300 г', 'Кондитерские', 'B', 'шт', 150],
+      ['Конфеты «Вечерний Сад» 250 г', 'Кондитерские', 'B', 'шт', 210],
+      ['Шоколад «Тёмная Роща» 90 г', 'Кондитерские', 'B', 'шт', 270],
+      ['Пряники «Медовый Ряд» 350 г', 'Кондитерские', 'B', 'шт', 90],
+      ['Порошок стиральный «Свежесть-Про» 3 кг', 'Бытовая химия', 'C', 'шт', 0],
+      ['Гель для посуды «Блеск-Актив» 500 мл', 'Бытовая химия', 'C', 'шт', 0],
+      ['Средство чистящее «Санит-Плюс» 750 мл', 'Бытовая химия', 'C', 'шт', 0],
+      ['Мыло хозяйственное «Луч» 200 г', 'Бытовая химия', 'C', 'шт', 0],
+      ['Салфетки бумажные «Уют» 100 шт', 'Хозтовары', 'C', 'упак', 0],
+      ['Пакеты для мусора «Уют» 60 л, 20 шт', 'Хозтовары', 'C', 'упак', 0],
+      ['Перчатки нитриловые «Гардия» M', 'Хозтовары', 'C', 'упак', 0],
+      ['Сливки «Пастушья Долина» 20% 500 мл', 'Молочное', 'A', 'шт', 20],
+      ['Молоко топлёное «Заречье» 3,5% 900 мл', 'Молочное', 'A', 'шт', 16],
+      ['Сыр «Белогорье» твёрдый 400 г', 'Молочное', 'A', 'шт', 120],
+      ['Сыр плавленый «Луговая» 180 г', 'Молочное', 'A', 'шт', 90],
+      ['Биойогурт «Ясный День» натуральный 330 г', 'Молочное', 'A', 'шт', 21],
+      ['Айран «Крутой Берег» 500 мл', 'Молочное', 'A', 'шт', 14],
+      ['Творожный десерт «Ирисок» 120 г', 'Молочное', 'A', 'шт', 25],
+      ['Масло «Пастушья Долина» 72,5% 200 г', 'Молочное', 'A', 'шт', 45],
+      ['Сарделька «Мясной Ряд» 600 г', 'Гастрономия', 'A', 'шт', 18],
+      ['Ветчина «Мясной Ряд» рубленая 400 г', 'Гастрономия', 'A', 'шт', 30],
+      ['Карбонад «Крутой Берег» копчёный 350 г', 'Гастрономия', 'A', 'шт', 40],
+      ['Паштет «Мясной Ряд» печёночный 180 г', 'Гастрономия', 'A', 'шт', 120],
+      ['Сельдь «Северный Улов» филе 250 г', 'Гастрономия', 'A', 'упак', 30],
+      ['Форель «Речная Заводь» слабосолёная 150 г', 'Гастрономия', 'A', 'упак', 22],
+      ['Вареники «Сытный Дом» с картофелем 900 г', 'Заморозка', 'A', 'упак', 180],
+      ['Блины «Морозко-Плюс» с мясом 400 г', 'Заморозка', 'A', 'упак', 150],
+      ['Овощная смесь «Овражки» 400 г', 'Заморозка', 'A', 'упак', 365],
+      ['Мороженое «Ирисок» ванильное 450 г', 'Заморозка', 'A', 'упак', 270],
+      ['Тесто слоёное «Кузнецкая Пекарня» 500 г', 'Заморозка', 'A', 'упак', 180],
+      ['Хлеб «Хлебный Двор» бородинский 400 г', 'Хлебобулочные', 'A', 'шт', 4],
+      ['Батон «Кузнецкая Пекарня» нарезной 350 г', 'Хлебобулочные', 'A', 'шт', 3],
+      ['Лаваш «Пряный Путь» тонкий 200 г', 'Хлебобулочные', 'A', 'упак', 7],
+      ['Овсяные хлопья «Полевица» 500 г', 'Бакалея', 'B', 'шт', 365],
+      ['Перловка «Полевица» 800 г', 'Бакалея', 'B', 'шт', 480],
+      ['Пшено «Полевица» 700 г', 'Бакалея', 'B', 'шт', 300],
+      ['Горох колотый «Овражки» 800 г', 'Бакалея', 'B', 'шт', 540],
+      ['Фасоль белая «Овражки» 900 г', 'Бакалея', 'B', 'шт', 540],
+      ['Макароны «Паста Мия» перья 450 г', 'Бакалея', 'B', 'шт', 540],
+      ['Лапша «Паста Мия» яичная 400 г', 'Бакалея', 'B', 'шт', 300],
+      ['Мука ржаная «Полевица» 1 кг', 'Бакалея', 'B', 'шт', 240],
+      ['Крахмал картофельный «Полевица» 400 г', 'Бакалея', 'B', 'шт', 730],
+      ['Соль морская «Соляная Гряда» 500 г', 'Бакалея', 'B', 'шт', 0],
+      ['Сахар кусковой «Сахарный Дол» 500 г', 'Бакалея', 'B', 'шт', 730],
+      ['Масло оливковое «Золотой Луг» 500 мл', 'Бакалея', 'B', 'шт', 540],
+      ['Уксус яблочный «Пряный Путь» 500 мл', 'Бакалея', 'B', 'шт', 730],
+      ['Кетчуп «Пряный Путь» томатный 350 г', 'Соусы', 'B', 'шт', 365],
+      ['Майонез «Домовит» 67% 400 мл', 'Соусы', 'B', 'шт', 120],
+      ['Соус соевый «Пряный Путь» 250 мл', 'Соусы', 'B', 'шт', 730],
+      ['Горчица «Пряный Путь» столовая 180 г', 'Соусы', 'B', 'шт', 270],
+      ['Тушёнка «Крутой Берег» свиная 340 г', 'Консервы', 'B', 'шт', 730],
+      ['Шпроты «Северный Улов» 160 г', 'Консервы', 'B', 'шт', 730],
+      ['Горошек зелёный «Овражки» 400 г', 'Консервы', 'B', 'шт', 730],
+      ['Кукуруза «Овражки» сладкая 340 г', 'Консервы', 'B', 'шт', 730],
+      ['Варенье «Ягодный Склон» вишнёвое 400 г', 'Консервы', 'B', 'шт', 540],
+      ['Мёд «Медовый Ряд» цветочный 500 г', 'Кондитерские', 'B', 'шт', 730],
+      ['Зефир «Сдобное Утро» ванильный 250 г', 'Кондитерские', 'B', 'шт', 120],
+      ['Мармелад «Ягодный Склон» 300 г', 'Кондитерские', 'B', 'шт', 180],
+      ['Халва «Пряный Путь» подсолнечная 350 г', 'Кондитерские', 'B', 'шт', 150],
+      ['Сушки «Сдобное Утро» ванильные 300 г', 'Кондитерские', 'B', 'шт', 210],
+      ['Чипсы «Хрустик» со сметаной 130 г', 'Снеки', 'B', 'упак', 180],
+      ['Сухарики «Хрустик» бородинские 100 г', 'Снеки', 'B', 'упак', 150],
+      ['Орехи кешью «Кедровый Бор» 200 г', 'Снеки', 'B', 'упак', 270],
+      ['Семечки «Овражки» жареные 250 г', 'Снеки', 'B', 'упак', 180],
+      ['Изюм «Ягодный Склон» 200 г', 'Снеки', 'B', 'упак', 365],
+      ['Чай зелёный «Тихий Час» 50 пак.', 'Напитки', 'B', 'упак', 540],
+      ['Кофе «Утренний Пар» в зёрнах 1 кг', 'Напитки', 'B', 'шт', 365],
+      ['Кофе растворимый «Утренний Пар» 95 г', 'Напитки', 'B', 'шт', 730],
+      ['Компот «Ягодный Склон» вишнёвый 1 л', 'Напитки', 'B', 'шт', 270],
+      ['Морс «Ягодный Склон» клюквенный 1 л', 'Напитки', 'B', 'шт', 180],
+      ['Вода газированная «Ключевая» 0,5 л', 'Напитки', 'B', 'шт', 365],
+      ['Тоник «Аквабрайт» 1 л', 'Напитки', 'B', 'шт', 270],
+      ['Отбеливатель «Чистолин» 1 л', 'Бытовая химия', 'C', 'шт', 0],
+      ['Кондиционер «Свежесть-Про» 1 л', 'Бытовая химия', 'C', 'шт', 0],
+      ['Капсулы для стирки «Свежесть-Про» 30 шт', 'Бытовая химия', 'C', 'упак', 0],
+      ['Средство для стёкол «Аквабрайт» 500 мл', 'Бытовая химия', 'C', 'шт', 0],
+      ['Гель для труб «Санит-Плюс» 1 л', 'Бытовая химия', 'C', 'шт', 0],
+      ['Освежитель «Аквабрайт» 300 мл', 'Бытовая химия', 'C', 'шт', 0],
+      ['Мыло туалетное «Гигиос» 90 г', 'Гигиена', 'C', 'шт', 0],
+      ['Шампунь «Гигиос» травяной 400 мл', 'Гигиена', 'C', 'шт', 0],
+      ['Зубная паста «Гигиос» 100 мл', 'Гигиена', 'C', 'шт', 0],
+      ['Бумага туалетная «Уют» 8 рул.', 'Гигиена', 'C', 'упак', 0],
+      ['Полотенца бумажные «Уют» 2 рул.', 'Гигиена', 'C', 'упак', 0],
+      ['Губки для посуды «Домовит» 10 шт', 'Хозтовары', 'C', 'упак', 0],
+      ['Тряпка «Ясная Нить» микрофибра', 'Хозтовары', 'C', 'шт', 0],
+      ['Швабра «Домовит» с отжимом', 'Хозтовары', 'C', 'шт', 0],
+      ['Ведро «Домовит» 10 л', 'Хозтовары', 'C', 'шт', 0],
+      ['Плёнка пищевая «Пакуйка» 30 м', 'Упаковка', 'C', 'шт', 0],
+      ['Фольга «Пакуйка» 20 м', 'Упаковка', 'C', 'шт', 0],
+      ['Пакеты фасовочные «Пакуйка» 500 шт', 'Упаковка', 'C', 'упак', 0],
+      ['Скотч упаковочный «Стальград» 50 м', 'Упаковка', 'C', 'шт', 0],
+      ['Стретч-плёнка «Пакуйка» 1,5 кг', 'Упаковка', 'C', 'шт', 0],
+      ['Перчатки хозяйственные «Гардия» L', 'Хозтовары', 'C', 'упак', 0],
+      ['Нож канцелярский «Стальград» 18 мм', 'Инструменты', 'C', 'шт', 0],
+      ['Стяжки кабельные «Стальград» 200 мм, 100 шт', 'Инструменты', 'C', 'упак', 0]
+    ];
+    const ean = b => { let s = 0; for (let i = 0; i < 12; i++) s += (+b[i]) * (i % 2 ? 3 : 1); return b + String((10 - s % 10) % 10); };
+    const skus = SK.map((s, i) => ({ id: 'S' + (1001 + i), art: 'АРТ-' + (1001 + i), name: s[0], cat: s[1], z: s[2], u: s[3], sh: s[4], bc: ean('46' + String(1000000000 + i * 7919 + ri(0, 999))) }));
+
+    const batches = [];
+    let bn = 3100;
+    skus.forEach(s => {
+      if (!s.sh) return;
+      const n = s.sh > 200 ? 1 : 2;
+      for (let k = 0; k < n; k++) { bn++; batches.push({ id: 'B' + bn, s: s.id, code: 'П-' + bn, prod: D(-ri(2, 40)), exp: D(ri(Math.round(s.sh * 0.3), s.sh)) }); }
+    });
+
+    const stock = [];
+    let sn = 0;
+    const occ = {};
+    const add = (cid, sid, bid, q) => { sn++; occ[cid] = sid; stock.push({ id: 'K' + sn, c: cid, s: sid, b: bid, q: q, h: 0 }); return stock[stock.length - 1]; };
+    const clr = cid => { for (let i = stock.length - 1; i >= 0; i--) if (stock[i].c === cid) stock.splice(i, 1); delete occ[cid]; };
+    const bOf = sid => batches.filter(b => b.s === sid);
+
+    skus.forEach(s => {
+      const list = bOf(s.id).length ? bOf(s.id) : [null];
+      list.forEach(b => {
+        const pool = cells.filter(c => c.z === s.z && !occ[c.id]);
+        if (!pool.length) return;
+        const c = pool[Math.floor(R() * pool.length)];
+        add(c.id, s.id, b ? b.id : null, ri(4, Math.round(c.cap * 0.8 / 4)) * 4);
+      });
+    });
+    // deliberate imperfection 3: zone A racks 01..04 packed to ~96% -> putaway is pushed to the far rack
+    const za = skus.filter(s => s.z === 'A');
+    cells.filter(c => c.z === 'A' && c.r <= 4).forEach(c => {
+      if (!occ[c.id]) { const s = za[Math.floor(R() * za.length)]; const b = bOf(s.id); add(c.id, s.id, b.length ? b[0].id : null, Math.round(c.cap * 0.96)); }
+      else stock.filter(x => x.c === c.id).forEach(x => { x.q = Math.round(c.cap * 0.96); });
+    });
+
+    // bulk stock in zones B and C so the map reads like a working warehouse
+    [['B', 0.78], ['C', 0.7]].forEach(t => {
+      const zs = skus.filter(s => s.z === t[0]);
+      const zcells = cells.filter(c => c.z === t[0]);
+      const target = Math.round(zcells.length * t[1]);
+      let filled = zcells.filter(c => occ[c.id]).length;
+      zcells.forEach(c => {
+        if (filled >= target || occ[c.id]) return;
+        const s = zs[Math.floor(R() * zs.length)];
+        const b = bOf(s.id);
+        add(c.id, s.id, b.length ? b[Math.floor(R() * b.length)].id : null, Math.round(c.cap * (0.35 + R() * 0.6) / 4) * 4);
+        filled++;
+      });
+    });
+
+    // deliberate imperfection 2: FEFO — two batches of milk, the older one in the farthest cell
+    const milk = skus[0];
+    const mb = bOf(milk.id);
+    mb[0].exp = D(3); mb[0].code = 'П-3101'; mb[0].prod = D(-11);
+    mb[1].exp = D(16); mb[1].code = 'П-3102'; mb[1].prod = D(-2);
+    stock.filter(x => x.s === milk.id).forEach(x => { delete occ[x.c]; });
+    for (let i = stock.length - 1; i >= 0; i--) if (stock[i].s === milk.id) stock.splice(i, 1);
+    clr('A-05-3-04'); clr('A-01-1-01');
+    add('A-05-3-04', milk.id, mb[0].id, 48);
+    add('A-01-1-01', milk.id, mb[1].id, 180);
+
+    // deliberate imperfection 4: cheese short for order ЗО-7059
+    const chz = skus[5];
+    for (let i = stock.length - 1; i >= 0; i--) if (stock[i].s === chz.id) { delete occ[stock[i].c]; stock.splice(i, 1); }
+    clr('A-02-2-01'); clr('A-03-1-02');
+    add('A-02-2-01', chz.id, bOf(chz.id)[0].id, 40);
+    add('A-03-1-02', chz.id, bOf(chz.id)[1].id, 55);
+
+    // goods for the open pick order
+    const cook = skus[28], water = skus[23], honey = skus[32], gel = skus[34];
+    clr('B-01-1-02'); add('B-01-1-02', cook.id, bOf(cook.id)[0].id, 150);
+    clr('B-01-2-03'); add('B-01-2-03', water.id, bOf(water.id)[0].id, 220);
+
+    // deliberate imperfection 1: пересортица in B-02-1-03 (rice short, buckwheat over)
+    const rice = skus[12], grec = skus[13];
+    for (let i = stock.length - 1; i >= 0; i--) if (stock[i].s === rice.id || stock[i].s === grec.id) { delete occ[stock[i].c]; stock.splice(i, 1); }
+    clr('B-02-1-03'); clr('B-02-2-02');
+    const kr = add('B-02-1-03', rice.id, bOf(rice.id)[0].id, 96);
+    sn++; const kg = { id: 'K' + sn, c: 'B-02-1-03', s: grec.id, b: bOf(grec.id)[0].id, q: 60, h: 0 }; stock.push(kg);
+    add('B-02-2-02', grec.id, bOf(grec.id)[0].id, 120);
+    const phys = {}; phys[kr.id] = 89; phys[kg.id] = 67;
+
+    // buffer line waiting for putaway
+    add('ПР-01', honey.id, bOf(honey.id)[0].id, 120);
+    sn++; stock.push({ id: 'K' + sn, c: 'ПР-01', s: skus[3].id, b: bOf(skus[3].id)[0].id, q: 60, h: 0 });
+    // deliberate imperfection 5: C-03-2-02 — учёт 89, факт 84 (недостача −5), ждёт инвентаризации
+    clr('C-03-2-02');
+    const kgel = add('C-03-2-02', gel.id, null, 89);
+    phys[kgel.id] = 84;
+    // a closed act already in history, on another cell
+    clr('C-01-1-01'); add('C-01-1-01', skus[33].id, null, 96);
+
+    // top-up: zone A racks 01..04 must end up genuinely full, so putaway is forced to the far rack
+    const zaFill = za.filter(s => s.id !== milk.id && s.id !== chz.id);
+    cells.filter(c => c.z === 'A' && c.r <= 4 && !occ[c.id]).forEach(c => {
+      const s = zaFill[Math.floor(R() * zaFill.length)];
+      const b = bOf(s.id);
+      add(c.id, s.id, b.length ? b[0].id : null, Math.round(c.cap * 0.96));
+    });
+
+    const SUP = ['ООО «Ветлуга-Опт»', 'ООО «Сибпродукт-Т»', 'ТД «Красный Яр»', 'ООО «Донская Нива»', 'АО «Первая Логистическая»', 'ООО «Тёплый Стан-Трейд»', 'ООО «Камская Бакалея»', 'ТД «Заволжский Ряд»', 'ООО «Хлебный Путь»', 'АО «Северный Габарит»', 'ООО «Пятая Верста»', 'ТД «Овражки-Опт»', 'ООО «Морозко-Логистик»', 'АО «Кедровый Бор-Трейд»'];
+    const CLI = ['сеть «Домовой Двор»', 'магазин «ГастроПункт»', 'ООО «Северянка-Ритейл»', 'магазин «У Причала»', 'сеть «Три Корзины»', 'ООО «Полдень-Опт»', 'кафе «Тихий Час»', 'сеть «Ближний Ряд»', 'магазин «Крупяной Дом»', 'ООО «Вечерний Базар»', 'сеть «Шаговая Лавка»', 'столовая «Заводская 12»', 'ООО «Пристань-Торг»', 'магазин «Соседи-Плюс»', 'сеть «Городской Ларь»', 'ООО «Ярмарочный Двор»'];
+    const WHO = ['Кузнецов И.С.', 'Гайнутдинова Р.М.', 'Орлов Д.В.', 'Панкратова Е.А.', 'Шевчук Т.Л.', 'Ерохин В.Н.', 'Самойлова Л.И.', 'Абдулаев Т.Р.', 'Пряхина О.С.'];
+
+    const receipts = [];
+    for (let i = 1; i <= 60; i++) {
+      const open = i === 24 || i === 25;
+      const n = open ? ri(2, 3) : ri(1, 4);
+      const lines = [];
+      for (let k = 0; k < n; k++) { const s = pk(skus); if (lines.some(l => l.s === s.id)) continue; lines.push({ s: s.id, q: ri(2, 20) * 10, got: 0, c: null, cl: false }); }
+      const st = i === 25 ? 'В РАБОТЕ' : (i === 24 ? 'НОВЫЙ' : 'ЗАКРЫТ');
+      if (st === 'ЗАКРЫТ') lines.forEach(l => { l.got = l.q; });
+      if (st === 'В РАБОТЕ') lines[0].got = lines[0].q;
+      receipts.push({ id: 'PO-' + p4(i), no: 'ПО-' + (4000 + i), date: D(open ? 0 : -ri(2, 240)), sup: pk(SUP), who: pk(WHO), st: st, lines: lines });
+    }
+
+    const orders = [];
+    for (let i = 1; i <= 170; i++) {
+      const n = ri(1, 5);
+      const lines = [];
+      for (let k = 0; k < n; k++) { const s = pk(skus); if (lines.some(l => l.s === s.id)) continue; lines.push({ s: s.id, q: ri(1, 12) * 5, done: 0 }); }
+      const st = (i <= 56 || i >= 61) ? 'ОТГРУЖЕН' : 'НОВЫЙ';
+      if (st === 'ОТГРУЖЕН') lines.forEach(l => { l.done = l.q; });
+      const hist = st === 'ОТГРУЖЕН';
+      orders.push({ id: 'ORD-' + p4(i), no: 'ЗО-' + (7000 + i), date: D(hist ? -ri(1, 240) : 0), due: D(hist ? -ri(0, 235) : ri(0, 2)), cli: pk(CLI), who: WHO[i % WHO.length], st: st, prio: (!hist && i % 2) ? 'СРОЧНО' : 'ОБЫЧНЫЙ', lines: lines, plan: null });
+    }
+    const o57 = orders[56];
+    o57.lines = [{ s: milk.id, q: 60, done: 0 }, { s: cook.id, q: 40, done: 0 }, { s: water.id, q: 90, done: 0 }];
+    o57.cli = 'сеть «Домовой Двор»'; o57.prio = 'СРОЧНО'; o57.who = 'Кузнецов И.С.'; o57.due = D(0);
+    const o59 = orders[58];
+    o59.lines = [{ s: chz.id, q: 200, done: 0 }, { s: skus[8].id, q: 30, done: 0 }];
+    o59.cli = 'ООО «Северянка-Ритейл»'; o59.prio = 'СРОЧНО'; o59.due = D(0);
+
+    const log = [];
+    const db = { v: 3, demo: true, staff: WHO.slice(), cells: cells, skus: skus, batches: batches, stock: stock, phys: phys, receipts: receipts, orders: orders, moves: [], acts: [], log: log, seq: { mv: 1, act: 1 } };
+
+    // history log built from closed documents
+    receipts.filter(r => r.st === 'ЗАКРЫТ').forEach(r => r.lines.forEach(l => {
+      const s = this.sku(db, l.s);
+      const pool = cells.filter(c => c.z === s.z);
+      log.push({ ts: r.date + ' ' + p2(ri(8, 17)) + ':' + p2(ri(0, 59)), t: 'ПРИЁМКА', s: l.s, b: null, q: l.q, from: 'ПР-01', to: pool[Math.floor(R() * pool.length)].id, doc: r.no, who: r.who });
+    }));
+    orders.filter(o => o.st === 'ОТГРУЖЕН').forEach(o => o.lines.forEach(l => {
+      const s = this.sku(db, l.s);
+      const pool = cells.filter(c => c.z === s.z);
+      log.push({ ts: o.date + ' ' + p2(ri(8, 19)) + ':' + p2(ri(0, 59)), t: 'ОТБОР', s: l.s, b: null, q: -l.q, from: pool[Math.floor(R() * pool.length)].id, to: 'ОТ-01', doc: o.no, who: o.who });
+    }));
+    log.sort((a, b) => a.ts < b.ts ? 1 : -1);
+
+    // one closed inventory act in history (C-03-2-02: учёт 89, факт 84)
+    db.acts.push({ id: 'ACT-0001', no: 'ИНВ-' + (9000 + 1), date: D(-9), cell: 'C-01-1-01', who: 'Панкратова Е.А.', st: 'ПРИМЕНЁН', lines: [{ s: skus[33].id, b: null, book: 99, fact: 96 }] });
+    db.seq.act = 2;
+    log.unshift({ ts: D(-9) + ' 16:12', t: 'СПИСАНИЕ', s: skus[33].id, b: null, q: -3, from: 'C-01-1-01', to: '—', doc: 'ИНВ-9001', who: 'Панкратова Е.А.' });
+
+    // open the demo mid-task: build the route and close its first step
+    this.startPick(db, o57);
+    if (o57.plan && o57.plan.length) {
+      const p0 = o57.plan[0];
+      this.commitPick(db, o57, p0, p0.q);
+    }
+    return db;
+  }
+
+  // ============ stock math ============
+  loads(db){
+    const m = {};
+    db.stock.forEach(s => { const e = m[s.c] || (m[s.c] = { q: 0, ks: [], n: 0 }); e.q += s.q; e.n++; if (e.ks.indexOf(s.s) < 0) e.ks.push(s.s); });
+    return m;
+  }
+  fefo(db, skuId){
+    const bx = {};
+    db.batches.forEach(b => { bx[b.id] = b; });
+    return db.stock.filter(s => s.s === skuId && s.q > 0 && s.c !== 'ПР-01' && s.c !== 'ОТ-01').sort((a, b) => {
+      const ea = a.b && bx[a.b] ? bx[a.b].exp : '9999-99-99';
+      const eb = b.b && bx[b.b] ? bx[b.b].exp : '9999-99-99';
+      if (ea !== eb) return ea < eb ? -1 : 1;
+      const ca = this.cell(db, a.c), cb = this.cell(db, b.c);
+      return (ca ? ca.d : 0) - (cb ? cb.d : 0);
+    });
+  }
+  resOf(db){
+    const res = {};
+    db.orders.filter(o => o.st === 'НОВЫЙ').forEach(o => o.lines.forEach(l => {
+      let need = l.q - l.done;
+      this.fefo(db, l.s).forEach(st => {
+        if (need <= 0) return;
+        const av = st.q - st.h - (res[st.id] || 0);
+        if (av <= 0) return;
+        const take = Math.min(av, need);
+        res[st.id] = (res[st.id] || 0) + take;
+        need -= take;
+      });
+    }));
+    return res;
+  }
+  routeKey(db, cid){
+    const c = this.cell(db, cid);
+    if (!c) return 9e8;
+    const zi = { A: 0, B: 1, C: 2 }[c.z];
+    if (zi === undefined) return 9e8 - 1;
+    const pos = c.r % 2 === 1 ? c.p : 5 - c.p;
+    return zi * 10000 + c.r * 1000 + pos * 100 + c.t;
+  }
+  startPick(db, o){
+    const plan = [];
+    o.lines.forEach((l, li) => {
+      let need = l.q - l.done;
+      const chain = this.fefo(db, l.s);
+      const exps = chain.map(st => this.expOf(db, st.b)).filter(x => x);
+      chain.forEach((st, ci) => {
+        if (need <= 0) return;
+        const av = st.q - st.h;
+        if (av <= 0) return;
+        const take = Math.min(av, need);
+        const ex = this.expOf(db, st.b);
+        plan.push({ c: st.c, s: l.s, b: st.b, k: st.id, q: take, done: 0, li: li, fefo: !!(ex && exps.length > 1 && ex === exps[0] && ci === 0) });
+        st.h += take;
+        need -= take;
+      });
+      if (need > 0) plan.push({ c: null, s: l.s, b: null, k: null, q: need, done: 0, li: li, short: true });
+    });
+    plan.sort((a, b) => (a.short ? 1 : 0) - (b.short ? 1 : 0) || this.routeKey(db, a.c) - this.routeKey(db, b.c));
+    o.plan = plan;
+    o.st = 'В РАБОТЕ';
+  }
+  commitPick(db, o, p, qty){
+    o.who = this.state && this.state.who ? this.state.who : o.who;
+    const st = db.stock.find(x => x.id === p.k);
+    if (st) { st.q -= qty; st.h = Math.max(0, st.h - qty); }
+    p.done += qty;
+    if (qty < p.q) { const rest = p.q - qty; p.q = qty; if (st) st.h = Math.max(0, st.h - rest); p.cut = rest; }
+    o.lines[p.li].done += qty;
+    db.log.unshift({ ts: this.now(), t: 'ОТБОР', s: p.s, b: p.b, q: -qty, from: p.c, to: 'ОТ-01', doc: o.no, who: o.who });
+    this.clean(db);
+    if (o.plan.every(x => x.done >= x.q || x.short)) o.st = o.plan.some(x => x.short) ? 'СОБРАН С НЕДОБОРОМ' : 'СОБРАН';
+  }
+  clean(db){ for (let i = db.stock.length - 1; i >= 0; i--) if (db.stock[i].q <= 0) db.stock.splice(i, 1); }
+  // partial pick: look for the same goods in another cell, else close the line short
+  addTopUp(db, o, p, rest){
+    let need = rest, first = null;
+    const at = o.plan.indexOf(p) + 1;
+    const add = [];
+    this.fefo(db, p.s).forEach(st => {
+      if (need <= 0 || st.c === p.c) return;
+      const av = st.q - st.h;
+      if (av <= 0) return;
+      const take = Math.min(av, need);
+      st.h += take;
+      add.push({ c: st.c, s: p.s, b: st.b, k: st.id, q: take, done: 0, li: p.li, fefo: false, top: true });
+      need -= take;
+    });
+    if (need > 0) add.push({ c: null, s: p.s, b: null, k: null, q: need, done: 0, li: p.li, short: true });
+    o.plan.splice(at, 0, ...add);
+    first = add.find(x => x.c) || null;
+    o.st = o.plan.every(x => x.done >= x.q || x.short) ? (o.plan.some(x => x.short) ? 'СОБРАН С НЕДОБОРОМ' : 'СОБРАН') : 'В РАБОТЕ';
+    return first;
+  }
+  queue(db){
+    const rank = { 'СРОЧНО': 0 };
+    return db.orders.filter(o => o.st === 'НОВЫЙ' || o.st === 'В РАБОТЕ').sort((a, b) => (rank[a.prio] == null ? 1 : 0) - (rank[b.prio] == null ? 1 : 0) || (a.due < b.due ? -1 : a.due > b.due ? 1 : 0) || (a.no < b.no ? -1 : 1));
+  }
+  suggest(db, skuId, qty){
+    const sku = this.sku(db, skuId);
+    const load = this.loads(db);
+    const fit = c => {
+      const l = load[c.id];
+      if (c.z === 'R' || c.z === 'S') return false;
+      if (l && (l.ks.length > 1 || (l.ks.length === 1 && l.ks[0] !== skuId))) return false;
+      return c.cap - (l ? l.q : 0) >= qty;
+    };
+    const why = c => {
+      const l = load[c.id];
+      return [
+        { k: 'ЗОНА ХРАНЕНИЯ ТОВАРА', v: 'ЗОНА ' + c.z + ' · ' + this.zname(c.z) },
+        { k: 'СВОБОДНЫЙ ОБЪЁМ ЯЧЕЙКИ', v: (c.cap - (l ? l.q : 0)) + ' из ' + c.cap },
+        { k: 'БЛИЗОСТЬ К ЗОНЕ ПРИЁМКИ', v: 'СТЕЛЛАЖ ' + this.p2(c.r) + ' · ЯРУС ' + c.t }
+      ];
+    };
+    let pool = db.cells.filter(c => c.z === sku.z && fit(c)).sort((a, b) => a.d - b.d);
+    if (pool.length) {
+      const near = db.cells.filter(c => c.z === sku.z && c.r < pool[0].r && fit(c)).length;
+      return { c: pool[0].id, why: why(pool[0]), note: (pool[0].r >= 4 && !near) ? ('Стеллажи ' + sku.z + '-01…' + sku.z + '-' + this.p2(pool[0].r - 1) + ' заполнены') : '' };
+    }
+    pool = db.cells.filter(c => fit(c)).sort((a, b) => a.d - b.d);
+    if (pool.length) return { c: pool[0].id, why: why(pool[0]), note: 'Зона ' + sku.z + ' переполнена — резервное размещение' };
+    return { c: null, why: [], note: 'Нет свободной ячейки под ' + qty + ' ' + sku.u };
+  }
+  putStock(db, cid, sid, bid, qty){
+    const ex = db.stock.find(s => s.c === cid && s.s === sid && s.b === bid);
+    if (ex) ex.q += qty; else db.stock.push({ id: 'K' + (Date.now() % 1e7) + Math.floor(Math.random() * 999), c: cid, s: sid, b: bid, q: qty, h: 0 });
+  }
+
+  // ============ feedback ============
+  beep(kind){
+    if (this.state.mute) return;
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      this.ac = this.ac || new AC();
+      const ac = this.ac;
+      if (ac.state === 'suspended') ac.resume();
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.connect(g); g.connect(ac.destination);
+      const t = ac.currentTime;
+      if (kind === 'ok') { o.type = 'square'; o.frequency.setValueAtTime(1180, t); o.frequency.setValueAtTime(1560, t + 0.06); g.gain.setValueAtTime(0.05, t); g.gain.exponentialRampToValueAtTime(0.0008, t + 0.16); o.start(t); o.stop(t + 0.17); }
+      else if (kind === 'warn') { o.type = 'triangle'; o.frequency.setValueAtTime(640, t); g.gain.setValueAtTime(0.06, t); g.gain.exponentialRampToValueAtTime(0.0008, t + 0.3); o.start(t); o.stop(t + 0.31); }
+      else { o.type = 'sawtooth'; o.frequency.setValueAtTime(150, t); o.frequency.linearRampToValueAtTime(96, t + 0.34); g.gain.setValueAtTime(0.07, t); g.gain.exponentialRampToValueAtTime(0.0008, t + 0.36); o.start(t); o.stop(t + 0.37); }
+    } catch(e) {}
+  }
+  fb(kind, text){
+    this.beep(kind);
+    try { if (navigator.vibrate && !this.state.mute) navigator.vibrate(kind === 'ok' ? 28 : [70, 45, 70]); } catch(e) {}
+    const jr = [{ t: this.clock(), m: text, c: kind === 'ok' ? 'var(--ink)' : (kind === 'err' ? 'var(--alert)' : 'var(--alert)') }].concat(this.state.jr).slice(0, 60);
+    this.setState({ flash: { kind: kind, text: text }, jr: jr });
+    clearTimeout(this.ft);
+    this.ft = setTimeout(() => this.setState({ flash: null }), 1050);
+  }
+  ok(t){ this.fb('ok', t); }
+  bad(t){ this.fb('err', t); }
+  warn(t){ this.fb('warn', t); }
+
+  componentDidMount(){
+    this.wedge = { buf: '', t: 0 };
+    // a real scanner types a fast burst and ends with Enter (or Tab); accept it wherever focus is
+    this.onDocKey = e => {
+      if (this.state.tab !== 'term' || this.state.print) return;
+      const el = document.activeElement;
+      const inField = !!(el && (el.tagName === 'INPUT' || el.tagName === 'SELECT'));
+      const now = Date.now();
+      if (e.key === 'Enter' || e.key === 'Tab') {
+        if (inField) return;
+        const v = this.wedge.buf; this.wedge.buf = '';
+        if (v.length >= 3) { e.preventDefault(); this.focus(); this.scan(v); }
+        return;
+      }
+      if (inField) return;
+      // barcodes carry no spaces; a space means a human is typing prose somewhere else
+      if (e.key === ' ') { this.wedge.buf = ''; return; }
+      if (e.key && e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        if (now - this.wedge.t > 120) this.wedge.buf = '';   // 120ms: faster than hands, slower than a scanner
+        this.wedge.t = now;
+        this.wedge.buf += e.key;
+      }
+    };
+    document.addEventListener('keydown', this.onDocKey);
+    // the staff picker is a plain panel, so it needs its own dismiss
+    this.onDocDown = e => {
+      if (!this.state.staffOpen) return;
+      const host = e.target && e.target.closest ? e.target.closest('[data-staff]') : null;
+      if (!host) this.setState({ staffOpen: false });
+    };
+    document.addEventListener('mousedown', this.onDocDown);
+    this.applyTheme(this.state.theme);
+    this.onWinResize = () => { const w = this.rootW(); if (w && w !== this.state.vw) this.setState({ vw: w }); };
+    window.addEventListener('resize', this.onWinResize);
+    const el = this.rootEl || document.getElementById('app');
+    this.rootEl = el;
+    if (el && window.ResizeObserver) {
+      this.ro = new ResizeObserver(es => {
+        const w = Math.round(es[0].contentRect.width);
+        if (w && w !== this.state.vw) this.setState({ vw: w });
+      });
+      this.ro.observe(el);
+      const w0 = Math.round(el.getBoundingClientRect().width);
+      if (w0 && w0 !== this.state.vw) this.setState({ vw: w0 });
+    }
+    this.focus();
+  }
+  componentWillUnmount(){ if (this.onDocKey) document.removeEventListener('keydown', this.onDocKey); if (this.onDocDown) document.removeEventListener('mousedown', this.onDocDown); if (this.onWinResize) window.removeEventListener('resize', this.onWinResize); if (this.ro) this.ro.disconnect(); }
+  // auto = follow the OS; light and dark pin the token set declared in <helmet>
+  applyTheme(t){
+    try {
+      const r = document.documentElement;
+      if (t === 'auto') r.removeAttribute('data-theme');
+      else r.setAttribute('data-theme', t === 'light' ? 'light' : 'dark');
+    } catch(e) {}
+  }
+  rootW(){ const el = this.rootEl || document.getElementById('app'); return el ? Math.round(el.getBoundingClientRect().width) : (window.innerWidth || 1440); }
+  componentDidUpdate(){ this.focus(); this.persistUi(); }
+  persistUi(){
+    const S = this.state;
+    try { localStorage.setItem('sklad_scanner_ui', JSON.stringify({ tab: S.tab, ov: S.ov, term: S.term, sel: S.sel, who: S.who })); } catch(e) {}
+  }
+  focus(){ const el = this.inp; if (el && el.isConnected && document.activeElement !== el) { try { el.focus({ preventScroll: true }); } catch(e) {} } }
+  zname(z){ return { A: 'охлаждение', B: 'сухой склад', C: 'непродовольственная', R: 'буфер приёмки', S: 'зона отгрузки' }[z] || z; }
+
+  // ============ terminal flows ============
+  setTerm(t, extra){ this.setState(Object.assign({ term: t, buf: '' }, extra || {})); }
+  toMenu(){ this.setTerm({ mode: 'menu' }); }
+  curStep(o){ if (!o || !o.plan) return null; return o.plan.find(p => !p.short && p.done < p.q) || null; }
+  order(){ return this.state.db.orders.find(o => o.id === this.state.term.doc) || null; }
+  receipt(){ return this.state.db.receipts.find(r => r.id === this.state.term.doc) || null; }
+
+  scan(raw){
+    const code = String(raw == null ? this.state.buf : raw).trim();
+    if (!code) { this.warn('Пустой ввод. Отсканируйте код.'); return; }
+    const db = this.state.db, T = this.state.term;
+    const isCell = !!this.cell(db, code.toUpperCase());
+    const cid = code.toUpperCase();
+    if (T.mode === 'pick') return this.pickScan(cid, code, isCell);
+    if (T.mode === 'rec') return this.recScan(cid, code, isCell);
+    if (T.mode === 'put') return this.putScan(cid, code, isCell);
+    if (T.mode === 'move') return this.moveScan(cid, code, isCell);
+    if (T.mode === 'count') return this.countScan(cid, code, isCell);
+    this.warn('Выберите задание в меню.');
+    this.setState({ buf: '' });
+  }
+  num(){ const n = parseInt(String(this.state.buf).replace(/[^0-9]/g, ''), 10); return isNaN(n) ? null : n; }
+
+  // --- отбор ---
+  pickScan(cid, code, isCell){
+    const db = this.state.db, T = this.state.term, o = this.order(), p = this.curStep(o);
+    if (!o || !p) { this.warn('Задание завершено.'); return; }
+    if (T.step === 'cell') {
+      if (!isCell) { this.bad('Это не адрес ячейки. Нужна ' + p.c); this.setState({ buf: '' }); return; }
+      if (cid !== p.c) { this.bad('Не та ячейка. По маршруту — ' + p.c); this.setState({ buf: '' }); return; }
+      this.setTerm({ mode: 'pick', doc: o.id, step: 'item' });
+      this.ok('Ячейка ' + cid + ' подтверждена');
+      return;
+    }
+    if (T.step === 'item') {
+      const s = this.skuByBc(db, code);
+      if (!s) { this.bad('Штрихкод не найден в справочнике: ' + code); this.setState({ buf: '' }); return; }
+      if (s.id !== p.s) { this.bad('Не тот товар: ' + s.name + '. Нужен ' + this.sku(db, p.s).name); this.setState({ buf: '' }); return; }
+      this.setTerm({ mode: 'pick', doc: o.id, step: 'qty' });
+      this.ok('Товар подтверждён');
+      return;
+    }
+    if (T.step === 'qty') {
+      const n = this.num();
+      if (n === null) { this.bad('Введите количество цифрами'); return; }
+      if (n <= 0) { this.bad('Количество должно быть больше нуля'); return; }
+      if (n > p.q) { this.bad('Больше задания: по этой строке максимум ' + p.q + ' ' + this.sku(db, p.s).u); return; }
+      const less = n < p.q, rest = p.q - n;
+      let top = null;
+      this.up(d => {
+        const oo = d.orders.find(x => x.id === o.id);
+        const pp = oo.plan.find(x => x.k === p.k && x.li === p.li && x.done < x.q) || oo.plan.find(x => x.li === p.li);
+        this.commitPick(d, oo, pp, n);
+        if (rest > 0) top = this.addTopUp(d, oo, pp, rest);
+      });
+      const nx = this.curStep(this.state.db.orders.find(x => x.id === o.id));
+      this.setTerm({ mode: 'pick', doc: o.id, step: nx ? 'cell' : 'fin' });
+      if (less && top) this.warn('В ячейке меньше задания. Добор ' + top.q + ' из ' + top.c);
+      else if (less) this.warn('Товара больше нет ни в одной ячейке. Строка закрыта недобором: ' + rest);
+      else this.ok('Отобрано ' + n + ' ' + this.sku(db, p.s).u);
+      return;
+    }
+    this.warn('Задание завершено. Нажмите «В МЕНЮ».');
+  }
+
+  // --- приёмка ---
+  recScan(cid, code, isCell){
+    const db = this.state.db, T = this.state.term, r = this.receipt();
+    if (!r) { this.warn('Выберите приходный ордер.'); return; }
+    if (T.step === 'item') {
+      const s = this.skuByBc(db, code);
+      if (!s) { this.bad('Штрихкод не найден в справочнике: ' + code); this.setState({ buf: '' }); return; }
+      const li = r.lines.findIndex(l => l.s === s.id && l.got < l.q);
+      if (li < 0) { this.bad('Товара нет в ордере ' + r.no + ': ' + s.name); this.setState({ buf: '' }); return; }
+      this.setTerm({ mode: 'rec', doc: r.id, step: 'qty', li: li });
+      this.ok(s.name);
+      return;
+    }
+    if (T.step === 'qty') {
+      const l = r.lines[T.li];
+      const n = this.num();
+      if (n === null) { this.bad('Введите количество цифрами'); return; }
+      if (n <= 0) { this.bad('Количество должно быть больше нуля'); return; }
+      const left = l.q - l.got;
+      if (n > left) { this.bad('Больше заявленного: по ордеру осталось принять ' + left + ' ' + this.sku(db, l.s).u); return; }
+      const bid = (db.batches.filter(b => b.s === l.s)[0] || {}).id || null;
+      this.up(d => {
+        const rr = d.receipts.find(x => x.id === r.id);
+        rr.lines[T.li].got += n;
+        rr.lines[T.li].c = 'ПР-01';
+        this.putStock(d, 'ПР-01', l.s, bid, n);
+        d.log.unshift({ ts: this.now(), t: 'ПРИЁМКА', s: l.s, b: bid, q: n, from: 'ПОСТАВЩИК', to: 'ПР-01', doc: rr.no, who: this.state.who });
+        rr.who = this.state.who;
+        rr.st = this.recStatus(rr);
+      });
+      const rr = this.state.db.receipts.find(x => x.id === r.id);
+      const fin = rr.lines.every(x => x.got >= x.q || x.cl);
+      this.setTerm({ mode: 'rec', doc: r.id, step: fin ? 'fin' : 'item' });
+      this.ok('Принято ' + n + ' ' + this.sku(db, l.s).u + ' в буфер ПР-01');
+      return;
+    }
+    this.warn('Ордер закрыт. Нажмите «В МЕНЮ».');
+  }
+  recStatus(rr){
+    if (rr.lines.every(x => x.got >= x.q)) return 'ЗАКРЫТ';
+    if (rr.lines.every(x => x.got >= x.q || x.cl)) return 'ЗАКРЫТ С РАСХОЖДЕНИЕМ';
+    return 'В РАБОТЕ';
+  }
+  closeRecAll(){
+    const r = this.receipt();
+    if (!r) return;
+    const open = r.lines.filter(l => l.got < l.q && !l.cl).length;
+    if (!open) { this.warn('Расхождений нет — все строки приняты полностью.'); return; }
+    const diff = r.lines.filter(l => l.got < l.q).reduce((a, l) => a + (l.got - l.q), 0);
+    this.up(d => {
+      const rr = d.receipts.find(x => x.id === r.id);
+      rr.lines.forEach(l => { if (l.got < l.q) l.cl = true; });
+      rr.who = this.state.who;
+      rr.st = this.recStatus(rr);
+    });
+    this.setTerm({ mode: 'rec', doc: r.id, step: 'fin' });
+    this.warn('Ордер закрыт с расхождением ' + diff + ' ед. по ' + open + ' строк(ам).');
+  }
+  closeRecLine(){
+    const T = this.state.term, r = this.receipt();
+    if (!r) return;
+    const li = T.li != null ? T.li : r.lines.findIndex(l => l.got < l.q && !l.cl);
+    if (li < 0) { this.warn('Все строки ордера закрыты.'); return; }
+    const l = r.lines[li], diff = l.got - l.q, sku = this.sku(this.state.db, l.s);
+    this.up(d => {
+      const rr = d.receipts.find(x => x.id === r.id);
+      rr.lines[li].cl = true;
+      rr.who = this.state.who;
+      rr.st = this.recStatus(rr);
+    });
+    const rr2 = this.state.db.receipts.find(x => x.id === r.id);
+    const fin = rr2.lines.every(x => x.got >= x.q || x.cl);
+    this.setTerm({ mode: 'rec', doc: r.id, step: fin ? 'fin' : 'item' });
+    this.warn('Строка закрыта с расхождением ' + diff + ' ' + sku.u + ' — попадёт в приходный ордер и в расхождения.');
+  }
+
+  // --- размещение из буфера ---
+  putScan(cid, code, isCell){
+    const db = this.state.db, T = this.state.term;
+    const buf = db.stock.filter(s => s.c === 'ПР-01' && s.q > 0);
+    if (!buf.length) { this.warn('Буфер приёмки ПР-01 пуст'); return; }
+    if (T.step === 'item') {
+      const s = this.skuByBc(db, code);
+      if (!s) { this.bad('Штрихкод не найден: ' + code); this.setState({ buf: '' }); return; }
+      const line = buf.find(x => x.s === s.id);
+      if (!line) { this.bad('Этого товара нет в буфере ПР-01'); this.setState({ buf: '' }); return; }
+      const sg = this.suggest(db, s.id, line.q);
+      this.setTerm({ mode: 'put', step: 'cell', k: line.id, qty: line.q, sug: sg.c, note: sg.note, why: sg.why });
+      this.ok(s.name + ' · ' + line.q + ' ' + s.u);
+      return;
+    }
+    if (T.step === 'cell') {
+      if (!isCell) { this.bad('Это не адрес ячейки'); this.setState({ buf: '' }); return; }
+      const line = db.stock.find(x => x.id === T.k);
+      if (!line) { this.bad('Строка буфера не найдена'); return; }
+      const c = this.cell(db, cid), load = this.loads(db)[cid];
+      if (c.z === 'R' || c.z === 'S') { this.bad('Нельзя размещать в буферную зону ' + cid); this.setState({ buf: '' }); return; }
+      const psku = this.sku(db, line.s);
+      if (c.z !== psku.z) { this.bad(cid + ' — зона ' + c.z + ' (' + this.zname(c.z) + '), а «' + psku.name + '» хранится в зоне ' + psku.z + ' (' + this.zname(psku.z) + ')'); this.setState({ buf: '' }); return; }
+      if (load && (load.ks.length > 1 || load.ks[0] !== line.s)) { this.bad('В ячейке ' + cid + ' лежит другой товар: ' + this.sku(db, load.ks[0]).name); this.setState({ buf: '' }); return; }
+      if (c.cap - (load ? load.q : 0) < T.qty) { this.bad('В ' + cid + ' свободно ' + (c.cap - (load ? load.q : 0)) + ' из ' + c.cap); this.setState({ buf: '' }); return; }
+      const sid = line.s, bid = line.b, qty = T.qty;
+      this.up(d => {
+        const src = d.stock.find(x => x.id === T.k);
+        src.q -= qty;
+        this.putStock(d, cid, sid, bid, qty);
+        d.log.unshift({ ts: this.now(), t: 'РАЗМЕЩЕНИЕ', s: sid, b: bid, q: qty, from: 'ПР-01', to: cid, doc: '—', who: this.state.who });
+        this.clean(d);
+      });
+      this.setTerm({ mode: 'put', step: 'item' });
+      this.ok('Размещено ' + qty + ' в ' + cid);
+    }
+  }
+
+  // --- перемещение ---
+  moveScan(cid, code, isCell){
+    const db = this.state.db, T = this.state.term;
+    if (T.step === 'from') {
+      if (!isCell) { this.bad('Отсканируйте адрес ячейки-источника'); this.setState({ buf: '' }); return; }
+      const lines = db.stock.filter(s => s.c === cid && s.q > 0);
+      if (!lines.length) { this.bad('Ячейка ' + cid + ' пуста'); this.setState({ buf: '' }); return; }
+      this.setTerm({ mode: 'move', step: 'sel', from: cid });
+      this.ok('Ячейка ' + cid + ': ' + lines.length + ' позиц.');
+      return;
+    }
+    if (T.step === 'qty') {
+      const line = db.stock.find(x => x.id === T.k);
+      const n = this.num();
+      if (n === null) { this.bad('Введите количество цифрами'); return; }
+      if (n <= 0) { this.bad('Количество должно быть больше нуля'); return; }
+      const free = line.q - line.h;
+      if (n > free) { this.bad('Свободно только ' + free + ' (в отборе ' + line.h + ')'); return; }
+      this.setTerm({ mode: 'move', step: 'to', from: T.from, k: T.k, qty: n });
+      this.ok(n + ' — куда переместить?');
+      return;
+    }
+    if (T.step === 'to') {
+      if (!isCell) { this.bad('Это не адрес ячейки'); this.setState({ buf: '' }); return; }
+      if (cid === T.from) { this.bad('Ячейка-приёмник совпадает с источником'); this.setState({ buf: '' }); return; }
+      const line = db.stock.find(x => x.id === T.k), c = this.cell(db, cid), load = this.loads(db)[cid];
+      if (load && (load.ks.length > 1 || load.ks[0] !== line.s)) { this.bad('В ' + cid + ' лежит другой товар'); this.setState({ buf: '' }); return; }
+      if (c.cap - (load ? load.q : 0) < T.qty) { this.bad('В ' + cid + ' свободно ' + (c.cap - (load ? load.q : 0)) + ' из ' + c.cap); this.setState({ buf: '' }); return; }
+      const sid = line.s, bid = line.b, qty = T.qty, from = T.from;
+      let no = '';
+      this.up(d => {
+        const src = d.stock.find(x => x.id === T.k);
+        src.q -= qty;
+        this.putStock(d, cid, sid, bid, qty);
+        no = 'ПМ-' + (8000 + d.seq.mv);
+        d.moves.push({ id: 'MV-' + d.seq.mv, no: no, date: this.ld(), from: from, to: cid, s: sid, b: bid, q: qty, who: this.state.who, st: 'ПРОВЕДЁН' });
+        d.seq.mv++;
+        d.log.unshift({ ts: this.now(), t: 'ПЕРЕМЕЩЕНИЕ', s: sid, b: bid, q: qty, from: from, to: cid, doc: no, who: this.state.who });
+        this.clean(d);
+      });
+      this.setTerm({ mode: 'move', step: 'fin', doc: no, from: from, to: cid, qty: qty });
+      this.ok('Перемещено ' + qty + ': ' + from + ' → ' + cid);
+    }
+  }
+
+  // --- инвентаризация ---
+  countScan(cid, code, isCell){
+    const db = this.state.db, T = this.state.term;
+    if (T.step === 'cell') {
+      if (!isCell) { this.bad('Отсканируйте адрес ячейки'); this.setState({ buf: '' }); return; }
+      const lines = db.stock.filter(s => s.c === cid && s.q > 0).map(s => ({ k: s.id, s: s.s, b: s.b, book: s.q, fact: null }));
+      if (!lines.length) { this.warn('Ячейка ' + cid + ' по учёту пуста. Подтвердите факт.'); }
+      this.setTerm({ mode: 'count', step: 'fact', cell: cid, lines: lines, i: 0 });
+      if (lines.length) this.ok('Ячейка ' + cid + ' · позиций: ' + lines.length);
+      return;
+    }
+    if (T.step === 'fact') {
+      const n = this.num();
+      if (n === null) { this.bad('Введите фактическое количество цифрами'); return; }
+      if (n < 0) { this.bad('Отрицательное количество невозможно'); return; }
+      const lines = T.lines.slice();
+      lines[T.i] = Object.assign({}, lines[T.i], { fact: n });
+      const nx = T.i + 1;
+      this.setTerm({ mode: 'count', step: nx < lines.length ? 'fact' : 'res', cell: T.cell, lines: lines, i: nx < lines.length ? nx : T.i });
+      const d = n - T.lines[T.i].book;
+      if (d === 0) this.ok('Совпало: ' + n);
+      else this.warn('Расхождение ' + (d > 0 ? '+' : '') + d);
+      return;
+    }
+    this.warn('Пересчёт завершён — примените акт.');
+  }
+  simCount(){
+    const T = this.state.term, db = this.state.db;
+    const l = T.lines[T.i];
+    const st = db.stock.find(x => x.id === l.k);
+    const f = db.phys[l.k] != null ? db.phys[l.k] : (st ? st.q : 0);
+    this.setState({ buf: String(f) });
+  }
+  applyAct(){
+    const T = this.state.term;
+    let no = '';
+    this.up(d => {
+      no = 'ИНВ-' + (9000 + d.seq.act);
+      const lines = T.lines.map(l => ({ s: l.s, b: l.b, book: l.book, fact: l.fact == null ? l.book : l.fact }));
+      d.acts.push({ id: 'ACT-' + this.p2(d.seq.act), no: no, date: this.ld(), cell: T.cell, who: this.state.who, st: 'ПРИМЕНЁН', lines: lines });
+      d.seq.act++;
+      lines.forEach(l => {
+        const st = d.stock.find(x => x.c === T.cell && x.s === l.s && x.b === l.b);
+        const diff = l.fact - l.book;
+        if (st) st.q = l.fact; else if (l.fact > 0) this.putStock(d, T.cell, l.s, l.b, l.fact);
+        if (diff !== 0) d.log.unshift({ ts: this.now(), t: diff > 0 ? 'ОПРИХОДОВАНИЕ' : 'СПИСАНИЕ', s: l.s, b: l.b, q: diff, from: diff > 0 ? '—' : T.cell, to: diff > 0 ? T.cell : '—', doc: no, who: this.state.who });
+      });
+      if (d.phys) T.lines.forEach(l => { delete d.phys[l.k]; });
+      this.clean(d);
+    });
+    this.setTerm({ mode: 'count', step: 'done', cell: T.cell, lines: T.lines, doc: no, i: 0 });
+    this.ok('Акт ' + no + ' применён');
+  }
+
+  // ============ office ============
+  csv(name, head, rows){
+    const esc = v => { v = String(v == null ? '' : v); return /[";\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+    const txt = '\ufeff' + [head].concat(rows).map(r => r.map(esc).join(';')).join('\r\n');
+    const b = new Blob([txt], { type: 'text/csv;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(b);
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+  }
+  resetDemo(){
+    if (!window.confirm('Пересоздать демо-данные? Текущее состояние будет потеряно.')) return;
+    const db = this.gen();
+    this.persist(db);
+    this.setState({ db: db, tab: 'term', term: { mode: 'pick', doc: 'ORD-0057', step: 'cell' }, buf: '', jr: [], print: null, doc: null, sel: 'A-05-3-04' });
+  }
+
+  // ============ barcodes (hand-rolled, no library) ============
+  ean13(code){
+    const LA = ['0001101','0011001','0010011','0111101','0100011','0110001','0101111','0111011','0110111','0001011'];
+    const LB = ['0100111','0110011','0011011','0100001','0011101','0111001','0000101','0010001','0001001','0010111'];
+    const RC = ['1110010','1100110','1101100','1000010','1011100','1001110','1010000','1000100','1001000','1110100'];
+    const PAR = ['AAAAAA','AABABB','AABBAB','AABBBA','ABAABB','ABBAAB','ABBBAA','ABABAB','ABABBA','ABBABA'];
+    const d = String(code).replace(/[^0-9]/g, '');
+    if (d.length !== 13) return null;
+    let chk = 0;
+    for (let i = 0; i < 12; i++) chk += (+d[i]) * (i % 2 ? 3 : 1);
+    const ok = ((10 - chk % 10) % 10) === +d[12];
+    let m = '101';
+    const p = PAR[+d[0]];
+    for (let i = 1; i <= 6; i++) m += (p[i - 1] === 'A' ? LA : LB)[+d[i]];
+    m += '01010';
+    for (let i = 7; i <= 12; i++) m += RC[+d[i]];
+    m += '101';
+    return { mods: m, human: d[0] + '  ' + d.slice(1, 7) + '  ' + d.slice(7), valid: ok, kind: 'EAN-13' };
+  }
+  code128(text){
+    const P = ('212222 222122 222221 121223 121322 131222 122213 122312 132212 221213 221312 231212 112232 122132 122231 113222 123122 123221 223211 221132 221231 213212 223112 312131 311222 321122 321221 312212 322112 322211 212123 212321 232121 111323 131123 131321 112313 132113 132311 211313 231113 231311 112133 112331 132131 113123 113321 133121 313121 211331 231131 213113 213311 213131 311123 311321 331121 312113 312311 332111 314111 221411 431111 111224 111422 121124 121421 141122 141221 112214 112412 122114 122411 142112 142211 241211 221114 413111 241112 134111 111242 121142 121241 114212 124112 124211 411212 421112 421211 212141 214121 412121 111143 111341 131141 114113 114311 411113 411311 113141 114131 311141 411131 211412 211214 211232 2331112').split(' ');
+    const t = String(text).toUpperCase();
+    let sum = 104;
+    const sym = [104];
+    let pos = 0;
+    for (let i = 0; i < t.length; i++) {
+      const v = t.charCodeAt(i) - 32;
+      if (v < 0 || v > 94) continue;
+      pos++;
+      sym.push(v);
+      sum += v * pos;
+    }
+    sym.push(sum % 103);
+    sym.push(106);
+    let m = '';
+    sym.forEach(v => { const pat = P[v]; let bar = true; for (let i = 0; i < pat.length; i++) { m += (bar ? '1' : '0').repeat(+pat[i]); bar = !bar; } });
+    return { mods: m, human: t, valid: true, kind: 'Code 128B' };
+  }
+  bars(mods, guards){
+    const out = [];
+    let i = 0;
+    while (i < mods.length) {
+      if (mods[i] === '1') {
+        let j = i;
+        while (j < mods.length && mods[j] === '1') j++;
+        const tall = !guards || i < 3 || (i >= 45 && i < 50) || i >= mods.length - 3;
+        out.push({ x: i, w: j - i, y: 0, h: tall ? 42 : 36 });
+        i = j;
+      } else i++;
+    }
+    return out;
+  }
+
+  // ============ view builders ============
+  shift(){ const h = new Date().getHours(); return h >= 8 && h < 20 ? 'СМЕНА 1 · 08:00—20:00' : 'СМЕНА 2 · 20:00—08:00'; }
+  prWarn(st){
+    const fin = ['ЗАКРЫТ', 'ЗАКРЫТ С РАСХОЖДЕНИЕМ', 'ОТГРУЖЕН', 'ПРИМЕНЁН', 'ПРОВЕДЁН', 'СОБРАН', 'СОБРАН С НЕДОБОРОМ'];
+    return fin.indexOf(st) >= 0 ? '' : 'ДОКУМЕНТ РАСПЕЧАТАН ДО ЗАКРЫТИЯ ОПЕРАЦИИ · СТАТУС «' + st + '» · ЦИФРЫ ПРЕДВАРИТЕЛЬНЫЕ';
+  }
+  qtyRow(db, sku, n){ return n + ' ' + sku.u; }
+  cellTag(cid){ return cid || '—'; }
+
+  buildView(){
+    const db = this.state.db, T = this.state.term;
+    const A = 'var(--acc)', W = 'var(--ink)', M = 'var(--ink-2)', RD = 'var(--alert)', OK = 'var(--ok)';
+    const mkB = (t, s, on, tag, prim) => ({ t: t, s: s || '', on: on, tag: tag || '', bg: prim ? 'var(--paper-2)' : 'var(--paper-2)', bd: prim ? 'var(--rule)' : 'var(--hair)', col: W, subCol: M, tagCol: prim ? A : M });
+    const act = (t, on, kind) => ({ t: t, on: on, bg: kind === 'p' ? 'var(--acc-fill)' : 'var(--paper-2)', bd: kind === 'p' ? 'var(--acc-fill)' : (kind === 'd' ? 'var(--alert)' : 'var(--hair)'), col: kind === 'p' ? 'var(--acc-ink)' : (kind === 'd' ? 'var(--alert)' : W) });
+    const base = { mode: 'МЕНЮ', doc: '—', bigLabel: '', big: '', bigSz: 54, bigCol: A, big2: '', big3: '', big3Bg: 'var(--paper-2)', big3Col: A, sub: [], list: [], acts: [], prompt: '', ph: 'Штрихкод или адрес', btn: 'СКАН', input: true, pad: false, im: 'text' };
+
+    if (T.mode === 'menu' || !T.mode) {
+      const openO = db.orders.filter(o => o.st === 'НОВЫЙ' || o.st === 'В РАБОТЕ');
+      const openR = db.receipts.filter(r => r.st === 'НОВЫЙ' || r.st === 'В РАБОТЕ');
+      const buf = db.stock.filter(s => s.c === 'ПР-01' && s.q > 0);
+      return Object.assign(base, {
+        mode: 'ЗАДАНИЯ', doc: this.state.who + ' · ' + this.shift().split(' · ')[0].toLowerCase(),
+        bigLabel: 'ВЫБЕРИТЕ ОПЕРАЦИЮ', big: openO.length + ' / ' + openR.length, bigSz: 46,
+        big2: 'заказов на отбор / приходных ордеров в работе',
+        input: false,
+        list: [
+          mkB('ОТБОР', openO.length + ' заказ(ов) в очереди', () => this.setTerm({ mode: 'pick', step: 'sel' }), '→', true),
+          mkB('ПРИЁМКА', openR.length + ' ордер(ов) ожидает', () => this.setTerm({ mode: 'rec', step: 'sel' }), '→'),
+          mkB('РАЗМЕЩЕНИЕ', 'буфер ПР-01: ' + buf.length + ' позиц.', () => this.setTerm({ mode: 'put', step: 'item' }), '→'),
+          mkB('ПЕРЕМЕЩЕНИЕ', 'из ячейки в ячейку', () => this.setTerm({ mode: 'move', step: 'from' }), '→'),
+          mkB('ИНВЕНТАРИЗАЦИЯ', 'пересчёт по ячейке', () => this.setTerm({ mode: 'count', step: 'cell' }), '→')
+        ]
+      });
+    }
+
+    if (T.mode === 'pick') {
+      if (T.step === 'sel') {
+        const list = this.queue(db).map(o => mkB(o.no + ' · ' + o.cli, 'отгрузка ' + this.fd(o.due) + ' · отобрано ' + o.lines.reduce((a, l) => a + l.done, 0) + ' из ' + o.lines.reduce((a, l) => a + l.q, 0) + ' ед. · ' + o.st, () => { if (!o.plan) this.up(d => this.startPick(d, d.orders.find(x => x.id === o.id))); this.setTerm({ mode: 'pick', doc: o.id, step: 'cell' }); }, o.prio === 'СРОЧНО' ? 'СРОЧНО' : '', o.prio === 'СРОЧНО'));
+        return Object.assign(base, { mode: 'ОТБОР', doc: 'выбор заказа', bigLabel: 'ЗАКАЗЫ НА ОТБОР', big: String(list.length), bigSz: 50, big2: 'нажмите заказ, чтобы начать маршрут', input: false, list: list, acts: [act('В МЕНЮ', () => this.toMenu())] });
+      }
+      const o = this.order();
+      if (!o) return Object.assign(base, { mode: 'ОТБОР', big: '—', input: false, acts: [act('В МЕНЮ', () => this.toMenu())] });
+      const p = this.curStep(o);
+      const total = o.plan.filter(x => !x.short).length;
+      const doneN = o.plan.filter(x => !x.short && x.done >= x.q).length;
+      if (!p || T.step === 'fin') {
+        const shortLines = o.plan.filter(x => x.short);
+        return Object.assign(base, {
+          mode: 'ОТБОР ЗАВЕРШЁН', doc: o.no,
+          bigLabel: shortLines.length ? 'СОБРАНО С НЕДОБОРОМ' : 'ЗАКАЗ СОБРАН', big: '✓', bigSz: 88,
+          big2: o.no + ' · ' + o.cli,
+          big3: shortLines.length ? ('НЕ ХВАТИЛО ' + shortLines.reduce((a, x) => a + x.q, 0) + ' ЕД.') : 'ВСЕ СТРОКИ ЗАКРЫТЫ',
+          big3Bg: shortLines.length ? 'var(--paper-2)' : 'var(--paper-2)', big3Col: shortLines.length ? RD : A,
+          input: false,
+          sub: o.lines.map(l => ({ k: this.sku(db, l.s).name.slice(0, 26), v: l.done + ' / ' + l.q, c: l.done >= l.q ? A : RD, bd: l.done >= l.q ? A : RD })),
+          acts: [act('ПЕЧАТЬ ЛИСТА', () => this.setState({ tab: 'office', ov: 'docs', doc: { k: 'ord', id: o.id }, print: { k: 'ord', id: o.id } }), 'p'), act('В МЕНЮ', () => this.toMenu())]
+        });
+      }
+      const sku = this.sku(db, p.s), bt = this.bat(db, p.b), dl = this.dleft(bt ? bt.exp : null);
+      const stk = db.stock.find(x => x.id === p.k);
+      const sub = [
+        { k: 'МАРШРУТ', v: 'ШАГ ' + (doneN + 1) + ' ИЗ ' + total, c: A, bd: A },
+        { k: 'ТОВАР', v: sku.art, c: W, bd: 'var(--hair)' },
+        { k: 'ПАРТИЯ', v: bt ? (bt.code + ' · до ' + this.fd(bt.exp)) : 'без партии', c: dl != null && dl < 7 ? RD : W, bd: dl != null && dl < 7 ? RD : 'var(--hair)' },
+        { k: 'В ЯЧЕЙКЕ ПО УЧЁТУ', v: (stk ? stk.q : 0) + ' ' + sku.u, c: W, bd: 'var(--hair)' }
+      ];
+      if (T.step === 'cell') return Object.assign(base, { mode: 'ОТБОР', doc: o.no, bigLabel: 'ИДИТЕ К ЯЧЕЙКЕ', big: p.c, bigSz: 60, big2: sku.name, big3: p.fefo ? ('FEFO · СРОК ' + this.fd(bt.exp) + (dl != null ? (' · ' + dl + ' дн.') : '')) : '', big3Bg: 'var(--paper-2)', big3Col: RD, sub: sub, prompt: 'ОТСКАНИРУЙТЕ АДРЕС ЯЧЕЙКИ', ph: p.c, acts: [act('ПРЕРВАТЬ', () => { this.warn('Задание прервано. Отобранные строки сохранены, заказ вернулся в очередь.'); this.toMenu(); }, 'd'), act('ПРОПУСТИТЬ СТРОКУ', () => { this.up(d => { const oo = d.orders.find(x => x.id === o.id); const pp = this.curStep(oo); if (pp) { pp.short = true; const st = d.stock.find(y => y.id === pp.k); if (st) st.h = Math.max(0, st.h - (pp.q - pp.done)); } }); this.warn('Строка отложена как недобор'); }, 'd')] });
+      if (T.step === 'item') return Object.assign(base, { mode: 'ОТБОР', doc: o.no, bigLabel: 'СКАНИРУЙТЕ ТОВАР', big: sku.art, bigSz: 44, big2: sku.name, big3: 'ЯЧЕЙКА ' + p.c, sub: sub, prompt: 'ОТСКАНИРУЙТЕ ШТРИХКОД ТОВАРА', ph: sku.bc, acts: [act('НАЗАД', () => this.setTerm({ mode: 'pick', doc: o.id, step: 'cell' })), act('ПРЕРВАТЬ', () => { this.warn('Задание прервано. Отобранные строки сохранены.'); this.toMenu(); }, 'd')] });
+      return Object.assign(base, { mode: 'ОТБОР', doc: o.no, bigLabel: 'КОЛИЧЕСТВО, ' + sku.u.toUpperCase(), big: (this.state.buf || '0'), bigSz: 62, big2: sku.name, big3: 'ПО ЗАДАНИЮ ' + p.q + ' ' + sku.u, sub: sub, prompt: 'ВВЕДИТЕ КОЛИЧЕСТВО И НАЖМИТЕ ОК', ph: String(p.q), btn: 'ОК', pad: true, im: 'numeric', acts: [act('ВЗЯТЬ ВСЁ (' + p.q + ')', () => { this.setState({ buf: String(p.q) }, () => this.scan(String(p.q))); }, 'p'), act('НАЗАД', () => this.setTerm({ mode: 'pick', doc: o.id, step: 'item' }))] });
+    }
+
+    if (T.mode === 'rec') {
+      if (T.step === 'sel') {
+        const list = db.receipts.filter(r => r.st === 'НОВЫЙ' || r.st === 'В РАБОТЕ').map(r => mkB(r.no + ' · ' + r.sup, r.lines.length + ' строк · принято ' + r.lines.reduce((a, l) => a + l.got, 0) + ' из ' + r.lines.reduce((a, l) => a + l.q, 0) + ' ед. · ' + r.st, () => this.setTerm({ mode: 'rec', doc: r.id, step: 'item' }), '→', r.st === 'В РАБОТЕ'));
+        return Object.assign(base, { mode: 'ПРИЁМКА', doc: 'выбор ордера', bigLabel: 'ПРИХОДНЫЕ ОРДЕРА', big: String(list.length), bigSz: 50, big2: 'нажмите ордер, чтобы начать приёмку', input: false, list: list, acts: [act('В МЕНЮ', () => this.toMenu())] });
+      }
+      const r = this.receipt();
+      if (!r) return Object.assign(base, { mode: 'ПРИЁМКА', big: '—', input: false, acts: [act('В МЕНЮ', () => this.toMenu())] });
+      if (T.step === 'fin') {
+        const shorted = r.lines.filter(l => l.got < l.q);
+        return Object.assign(base, { mode: 'ПРИЁМКА ЗАВЕРШЕНА', doc: r.no, bigLabel: shorted.length ? 'ОРДЕР ЗАКРЫТ С РАСХОЖДЕНИЕМ' : 'ОРДЕР ЗАКРЫТ', big: '✓', bigSz: 88, big2: r.no + ' · ' + r.sup, big3: shorted.length ? ('НЕДОПОСТАВКА ' + shorted.reduce((a, l) => a + (l.q - l.got), 0) + ' ЕД.') : 'ВСЁ ПРИНЯТО В БУФЕР ПР-01', big3Bg: shorted.length ? 'var(--paper-2)' : 'var(--paper-2)', big3Col: shorted.length ? RD : A, input: false, sub: r.lines.map(l => ({ k: this.sku(db, l.s).name.slice(0, 26), v: l.got + ' / ' + l.q + (l.got < l.q ? ('  (' + (l.got - l.q) + ')') : ''), c: l.got >= l.q ? A : RD, bd: l.got >= l.q ? A : RD })).concat([{ k: 'ДАЛЬШЕ', v: 'РАЗМЕЩЕНИЕ ИЗ ПР-01', c: A, bd: A }]), acts: [act('ПЕЧАТЬ ОРДЕРА', () => this.setState({ tab: 'office', ov: 'docs', doc: { k: 'rec', id: r.id }, print: { k: 'rec', id: r.id } }), 'p'), act('РАЗМЕСТИТЬ', () => this.setTerm({ mode: 'put', step: 'item' }), 'p'), act('В МЕНЮ', () => this.toMenu())] });
+      }
+      const left = r.lines.filter(l => l.got < l.q);
+      if (T.step === 'item') return Object.assign(base, { mode: 'ПРИЁМКА', doc: r.no, bigLabel: 'СКАНИРУЙТЕ ТОВАР', big: String(left.reduce((a, l) => a + (l.q - l.got), 0)), bigSz: 58, big2: 'единиц осталось принять по ордеру ' + r.no + ' · товар ложится в буфер ПР-01', big3: r.sup, big3Bg: 'var(--paper-2)', big3Col: W, sub: left.slice(0, 4).map(l => ({ k: this.sku(db, l.s).name.slice(0, 24), v: (l.q - l.got) + ' ' + this.sku(db, l.s).u, c: W, bd: 'var(--hair)' })), prompt: 'ОТСКАНИРУЙТЕ ШТРИХКОД ПОСТУПИВШЕГО ТОВАРА', ph: left.length ? this.sku(db, left[0].s).bc : '', acts: [act('ЗАКРЫТЬ ОРДЕР С РАСХОЖДЕНИЕМ', () => this.closeRecAll(), 'd'), act('В МЕНЮ', () => this.toMenu())] });
+      const l = r.lines[T.li], sku = this.sku(db, l.s);
+      if (T.step === 'qty') return Object.assign(base, { mode: 'ПРИЁМКА', doc: r.no, bigLabel: 'КОЛИЧЕСТВО, ' + sku.u.toUpperCase(), big: (this.state.buf || '0'), bigSz: 62, big2: sku.name, big3: 'ПО ОРДЕРУ ОСТАЛОСЬ ' + (l.q - l.got), sub: [{ k: 'АРТИКУЛ', v: sku.art, c: W, bd: 'var(--hair)' }, { k: 'ЗОНА ХРАНЕНИЯ', v: 'ЗОНА ' + sku.z, c: A, bd: A }], prompt: 'СКОЛЬКО ФАКТИЧЕСКИ ПРИШЛО?', ph: String(l.q - l.got), btn: 'ОК', pad: true, im: 'numeric', acts: [act('ВСЁ ПО ОРДЕРУ (' + (l.q - l.got) + ')', () => { this.setState({ buf: String(l.q - l.got) }, () => this.scan(String(l.q - l.got))); }, 'p'), act('ЗАКРЫТЬ С РАСХОЖДЕНИЕМ', () => this.closeRecLine(), 'd'), act('НАЗАД', () => this.setTerm({ mode: 'rec', doc: r.id, step: 'item' }))] });
+      return Object.assign(base, { mode: 'ПРИЁМКА', doc: r.no, bigLabel: 'СКАНИРУЙТЕ ТОВАР', big: String(left.length), bigSz: 58, big2: 'строк осталось принять', prompt: 'ОТСКАНИРУЙТЕ ШТРИХКОД ТОВАРА', acts: [act('В МЕНЮ', () => this.toMenu())] });
+    }
+
+    if (T.mode === 'put') {
+      const buf = db.stock.filter(s => s.c === 'ПР-01' && s.q > 0);
+      if (T.step === 'cell') {
+        const line = db.stock.find(x => x.id === T.k) || {};
+        const sku = this.sku(db, line.s) || { name: '', u: '', z: '' };
+        return Object.assign(base, { mode: 'РАЗМЕЩЕНИЕ', doc: 'буфер ПР-01', bigLabel: 'ПРЕДЛАГАЕМАЯ ЯЧЕЙКА', big: T.sug || '—', bigSz: 52, big2: sku.name + ' · ' + T.qty + ' ' + sku.u, big3: T.note || ('ПОЧЕМУ ЭТА ЯЧЕЙКА — НИЖЕ'), big3Bg: T.note ? 'var(--paper-2)' : 'var(--paper-2)', big3Col: T.note ? RD : A, sub: (T.why || []).map(x => ({ k: x.k, v: x.v, c: W, bd: 'var(--hair)' })), prompt: 'ПОДТВЕРДИТЕ ИЛИ ОТСКАНИРУЙТЕ ДРУГУЮ ЯЧЕЙКУ', ph: T.sug, acts: [act('ПОДТВЕРДИТЬ ' + T.sug, () => this.scan(T.sug), 'p'), act('В МЕНЮ', () => this.toMenu())] });
+      }
+      return Object.assign(base, { mode: 'РАЗМЕЩЕНИЕ', doc: 'буфер ПР-01', bigLabel: 'В БУФЕРЕ ПРИЁМКИ', big: String(buf.reduce((a, s) => a + s.q, 0)), bigSz: 58, big2: buf.length ? 'единиц ждут размещения' : 'буфер пуст — размещать нечего', sub: buf.map(s => ({ k: this.sku(db, s.s).name.slice(0, 24), v: s.q + ' ' + this.sku(db, s.s).u, c: W, bd: 'var(--hair)' })), prompt: 'ОТСКАНИРУЙТЕ ТОВАР ИЗ БУФЕРА', ph: buf.length ? this.sku(db, buf[0].s).bc : '', acts: [act('В МЕНЮ', () => this.toMenu())] });
+    }
+
+    if (T.mode === 'move') {
+      if (T.step === 'from') return Object.assign(base, { mode: 'ПЕРЕМЕЩЕНИЕ', doc: 'новый документ', bigLabel: 'ЯЧЕЙКА-ИСТОЧНИК', big: '?', bigSz: 62, big2: 'Отсканируйте ячейку, из которой забираете товар', prompt: 'АДРЕС ЯЧЕЙКИ-ИСТОЧНИКА', ph: 'B-02-1-03', acts: [act('В МЕНЮ', () => this.toMenu())] });
+      if (T.step === 'sel') {
+        const lines = db.stock.filter(s => s.c === T.from && s.q > 0);
+        return Object.assign(base, { mode: 'ПЕРЕМЕЩЕНИЕ', doc: T.from, bigLabel: 'ЧТО ПЕРЕМЕЩАЕМ', big: T.from, bigSz: 46, big2: 'выберите позицию в ячейке', input: false, list: lines.map(s => { const sk = this.sku(db, s.s); const bt = this.bat(db, s.b); return mkB(sk.name, (bt ? bt.code + ' · до ' + this.fd(bt.exp) + ' · ' : '') + 'учёт ' + s.q + ' · в отборе ' + s.h, () => this.setTerm({ mode: 'move', step: 'qty', from: T.from, k: s.id }), String(s.q - s.h), true); }), acts: [act('НАЗАД', () => this.setTerm({ mode: 'move', step: 'from' })), act('В МЕНЮ', () => this.toMenu())] });
+      }
+      if (T.step === 'qty') {
+        const line = db.stock.find(x => x.id === T.k) || { q: 0, h: 0 };
+        const sku = this.sku(db, line.s) || { name: '', u: '' };
+        return Object.assign(base, { mode: 'ПЕРЕМЕЩЕНИЕ', doc: T.from, bigLabel: 'СКОЛЬКО, ' + String(sku.u).toUpperCase(), big: (this.state.buf || '0'), bigSz: 62, big2: sku.name, big3: 'СВОБОДНО ' + (line.q - line.h) + ' ИЗ ' + line.q, sub: [{ k: 'ИСТОЧНИК', v: T.from, c: A, bd: A }, { k: 'В ОТБОРЕ (НЕДОСТУПНО)', v: String(line.h), c: line.h ? 'var(--alert)' : W, bd: 'var(--hair)' }], prompt: 'ВВЕДИТЕ КОЛИЧЕСТВО', ph: String(line.q - line.h), btn: 'ОК', pad: true, im: 'numeric', acts: [act('ВСЁ СВОБОДНОЕ (' + (line.q - line.h) + ')', () => { const n = line.q - line.h; this.setState({ buf: String(n) }, () => this.scan(String(n))); }, 'p'), act('НАЗАД', () => this.setTerm({ mode: 'move', step: 'sel', from: T.from }))] });
+      }
+      if (T.step === 'to') {
+        const line = db.stock.find(x => x.id === T.k) || {};
+        const sku = this.sku(db, line.s) || { name: '', u: '' };
+        return Object.assign(base, { mode: 'ПЕРЕМЕЩЕНИЕ', doc: T.from + ' → ?', bigLabel: 'ЯЧЕЙКА-ПРИЁМНИК', big: '?', bigSz: 62, big2: sku.name + ' · ' + T.qty + ' ' + sku.u, sub: [{ k: 'ОТКУДА', v: T.from, c: W, bd: 'var(--hair)' }, { k: 'КОЛИЧЕСТВО', v: String(T.qty), c: A, bd: A }], prompt: 'ОТСКАНИРУЙТЕ АДРЕС ЯЧЕЙКИ-ПРИЁМНИКА', ph: 'B-03-2-01', acts: [act('НАЗАД', () => this.setTerm({ mode: 'move', step: 'qty', from: T.from, k: T.k })), act('В МЕНЮ', () => this.toMenu())] });
+      }
+      return Object.assign(base, { mode: 'ПЕРЕМЕЩЕНИЕ ГОТОВО', doc: T.doc, bigLabel: 'ПРОВЕДЕНО', big: '✓', bigSz: 88, big2: T.from + ' → ' + T.to + ' · ' + T.qty, big3: 'НАКЛАДНАЯ ' + T.doc, input: false, acts: [act('ПЕЧАТЬ НАКЛАДНОЙ', () => { const mv = db.moves[db.moves.length - 1]; this.setState({ tab: 'office', ov: 'docs', doc: { k: 'mv', id: mv.id }, print: { k: 'mv', id: mv.id } }); }, 'p'), act('В МЕНЮ', () => this.toMenu())] });
+    }
+
+    if (T.mode === 'count') {
+      if (T.step === 'cell') return Object.assign(base, { mode: 'ИНВЕНТАРИЗАЦИЯ', doc: 'пересчёт', bigLabel: 'ЯЧЕЙКА ДЛЯ ПЕРЕСЧЁТА', big: '?', bigSz: 62, big2: 'Отсканируйте ячейку. Учётное количество будет скрыто до ввода факта.', prompt: 'АДРЕС ЯЧЕЙКИ', ph: 'B-02-1-03', acts: [act('В МЕНЮ', () => this.toMenu())] });
+      if (T.step === 'fact') {
+        const l = T.lines[T.i], sku = this.sku(db, l.s), bt = this.bat(db, l.b);
+        return Object.assign(base, { mode: 'ПЕРЕСЧЁТ', doc: T.cell, bigLabel: 'ФАКТ, ' + sku.u.toUpperCase(), big: (this.state.buf || '0'), bigSz: 62, big2: sku.name, big3: 'ПОЗИЦИЯ ' + (T.i + 1) + ' ИЗ ' + T.lines.length + ' · УЧЁТ СКРЫТ', big3Bg: 'var(--paper-2)', big3Col: M, sub: [{ k: 'ЯЧЕЙКА', v: T.cell, c: A, bd: A }, { k: 'АРТИКУЛ', v: sku.art, c: W, bd: 'var(--hair)' }, { k: 'ПАРТИЯ', v: bt ? bt.code : 'без партии', c: W, bd: 'var(--hair)' }], prompt: 'ПОСЧИТАЙТЕ И ВВЕДИТЕ ФАКТ', ph: '0', btn: 'ОК', pad: true, im: 'numeric', acts: [act('СИМУЛЯЦИЯ ПЕРЕСЧЁТА', () => this.simCount(), 'd'), act('В МЕНЮ', () => this.toMenu())] });
+      }
+      if (T.step === 'res') {
+        const dof = l => (l.fact == null ? l.book : l.fact) - l.book;
+        const diff = T.lines.reduce((a, l) => a + dof(l), 0);
+        const nd = T.lines.filter(l => dof(l) !== 0).length;
+        const plus = T.lines.reduce((a, l) => a + Math.max(0, dof(l)), 0);
+        const minus = T.lines.reduce((a, l) => a + Math.min(0, dof(l)), 0);
+        return Object.assign(base, { mode: 'РАСХОЖДЕНИЯ', doc: T.cell, bigLabel: 'ИТОГ ПЕРЕСЧЁТА', big: nd ? (minus + ' / +' + plus) : '0', bigSz: nd ? 50 : 62, bigCol: nd ? RD : A, big2: nd ? ('Расхождения в ' + nd + ' из ' + T.lines.length + ' позиций' + (diff === 0 ? ' — пересортица: итог по количеству нулевой, но товары перепутаны' : ', итог ' + (diff > 0 ? '+' : '') + diff)) : 'Учёт совпал с фактом', big3: 'ЯЧЕЙКА ' + T.cell, input: false, sub: T.lines.map(l => ({ k: this.sku(db, l.s).name.slice(0, 22), v: l.book + ' → ' + (l.fact == null ? l.book : l.fact) + '  (' + (((l.fact == null ? l.book : l.fact) - l.book) > 0 ? '+' : '') + ((l.fact == null ? l.book : l.fact) - l.book) + ')', c: (l.fact == null ? l.book : l.fact) === l.book ? A : RD, bd: (l.fact == null ? l.book : l.fact) === l.book ? A : RD })), acts: [act('ПРИМЕНИТЬ АКТ', () => this.applyAct(), 'p'), act('ОТМЕНА', () => this.toMenu())] });
+      }
+      const ac = db.acts[db.acts.length - 1] || { no: '', lines: [] };
+      return Object.assign(base, { mode: 'АКТ ПРИМЕНЁН', doc: T.doc, bigLabel: 'ОСТАТКИ ИСПРАВЛЕНЫ', big: '✓', bigSz: 88, big2: 'Акт ' + T.doc + ' по ячейке ' + T.cell, big3: 'ПРОВОДКИ В ИСТОРИИ ДВИЖЕНИЙ', input: false, acts: [act('ПЕЧАТЬ АКТА', () => this.setState({ tab: 'office', ov: 'docs', doc: { k: 'act', id: ac.id }, print: { k: 'act', id: ac.id } }), 'p'), act('В МЕНЮ', () => this.toMenu())] });
+    }
+    return base;
+  }
+
+  // drop() keeps a subset of columns when the ctx table runs in fixed layout,
+  // so narrow widths lose the least useful column instead of truncating every cell.
+  drop(narrow, keepIdx, head, rows){
+    if (!narrow || !keepIdx) return { head: head, rows: rows };
+    return { head: keepIdx.map(i => head[i]), rows: rows.map(r => Object.assign({}, r, { cs: keepIdx.map(i => r.cs[i]) })) };
+  }
+  buildCtx(){
+    const db = this.state.db, T = this.state.term;
+    const vwc = this.state.vw || 1440;
+    const phone = vwc < 900;       // phone: 3 columns, the address must never be clipped
+    const narrow = vwc < 1360;     // phone, split view and narrow desktop: 4 columns
+    const mid = vwc < 1460;        // laptop: drop the row-number column so СТАТУС still fits
+    const A = 'var(--acc)', W = 'var(--ink)', M = 'var(--ink-2)', RD = 'var(--alert)', Y = 'var(--warn)', OK = 'var(--ok)';
+    const c = (t, o) => Object.assign({ t: t, a: 'left', c: W, f: 'system-ui,sans-serif', z: 14, w: '600', n: 'normal' }, o || {});
+    const mono = (t, o) => c(t, Object.assign({ f: 'ui-monospace,SFMono-Regular,Menlo,Consolas,monospace', w: '700', n: 'nowrap' }, o || {}));
+    const H = arr => arr.map(x => ({ t: x[0], a: x[1] || 'left' }));
+
+    if (T.mode === 'pick' && T.doc) {
+      const o = this.order();
+      if (o && o.plan) {
+        const cur = this.curStep(o);
+        return {
+          title: 'МАРШРУТ ОТБОРА · ' + o.no, sub: o.cli + ' · ' + o.who + ' · ' + this.fd(o.date) + ' · ' + o.lines.length + ' строк',
+          badge: o.st, badgeCol: o.st === 'В РАБОТЕ' ? A : (o.st.indexOf('НЕДОБОР') >= 0 ? RD : W),
+          head: H(phone ? [['ЯЧЕЙКА'], ['ТОВАР'], ['ВЗЯТО', 'right']] : (narrow ? [['ЯЧЕЙКА'], ['ТОВАР'], ['ПАРТИЯ'], ['ВЗЯТО', 'right']] : (mid ? [['ЯЧЕЙКА'], ['ТОВАР'], ['ПАРТИЯ / СРОК'], ['ОТОБРАНО / ЗАДАНИЕ', 'right'], ['СТАТУС', 'right']] : [['#', 'right'], ['ЯЧЕЙКА'], ['ТОВАР'], ['ПАРТИЯ / СРОК'], ['ОТОБРАНО / ЗАДАНИЕ', 'right'], ['СТАТУС', 'right']]))),
+          rows: o.plan.map((p, i) => {
+            const sk = this.sku(db, p.s), bt = this.bat(db, p.b), dl = this.dleft(bt ? bt.exp : null);
+            const isCur = cur === p;
+            const st = p.short ? 'НЕДОБОР' : (p.done >= p.q ? 'ГОТОВО' : (isCur ? 'СЕЙЧАС' : 'ОЖИДАНИЕ'));
+            return {
+              bg: isCur ? 'transparent' : 'transparent', bd: isCur ? A : (p.short ? RD : (p.done >= p.q ? 'var(--hair)' : 'transparent')),
+              on: null,
+              cs: ((narrow || mid) ? [] : [mono(String(i + 1), { a: 'right', c: M, z: 12.5 })]).concat([
+                mono(p.c || '—', { z: 17, c: isCur ? A : (p.short ? RD : W) }),
+                c((narrow || mid) ? sk.name.slice(0, 22) : sk.name, { c: p.done >= p.q ? M : W })
+              ]).concat(phone ? [] : [
+                mono(bt ? (bt.code + ' · ' + ((narrow || mid) ? this.fd(bt.exp).slice(0, 6) : this.fd(bt.exp)) + (p.fefo ? ' · FEFO' : '')) : '—', { z: 13, n: 'normal', c: p.fefo ? RD : (dl != null && dl < 7 ? Y : M) })
+              ]).concat([
+                mono(p.done + ' / ' + p.q, { a: 'right', z: 17, c: p.done >= p.q ? A : W })
+              ]).concat(narrow ? [] : [mono(st, { a: 'right', z: 12, c: st === 'СЕЙЧАС' ? A : (st === 'НЕДОБОР' ? RD : (st === 'ГОТОВО' ? 'var(--ink-2)' : M)) })])
+            };
+          })
+        };
+      }
+    }
+    if (T.mode === 'rec' && T.doc) {
+      const r = this.receipt();
+      if (r) return {
+        title: 'ПРИХОДНЫЙ ОРДЕР ' + r.no, sub: r.sup + ' · ' + this.fd(r.date) + ' · кладовщик ' + r.who,
+        badge: r.st, badgeCol: r.st === 'ЗАКРЫТ' ? W : A,
+        _cols: [1, 3, 4, 5],
+        head: H([['#', 'right'], ['ТОВАР'], ['АРТИКУЛ'], ['ЗАЯВЛЕНО', 'right'], ['ПРИНЯТО', 'right'], ['РАСХОЖДЕНИЕ', 'right'], ['СТАТУС', 'right']]),
+        rows: r.lines.map((l, i) => {
+          const sk = this.sku(db, l.s);
+          const d = l.got - l.q;
+          const st = l.got >= l.q ? 'ПРИНЯТА' : (l.cl ? 'РАСХОЖДЕНИЕ' : 'В РАБОТЕ');
+          return { bg: l.cl && d < 0 ? 'transparent' : 'transparent', bd: l.got >= l.q ? 'var(--hair)' : (l.cl ? RD : A), on: null, cs: [mono(String(i + 1), { a: 'right', c: M, z: 12.5 }), c(sk.name), mono(sk.art, { z: 13, c: M }), mono(String(l.q), { a: 'right', z: 17 }), mono(String(l.got), { a: 'right', z: 17, c: l.got >= l.q ? A : M }), mono(d === 0 ? '—' : String(d), { a: 'right', z: 17, c: d === 0 ? M : RD }), mono(st, { a: 'right', z: 12, c: st === 'ПРИНЯТА' ? 'var(--ink-2)' : (st === 'РАСХОЖДЕНИЕ' ? RD : A) })] };
+        })
+      };
+    }
+    if (T.mode === 'count' && T.lines) {
+      return {
+        title: 'ПЕРЕСЧЁТ ЯЧЕЙКИ ' + T.cell, sub: 'учётное количество скрыто до ввода факта · ' + T.lines.length + ' позиц.',
+        badge: T.step === 'fact' ? 'СЧИТАЕМ' : (T.step === 'res' ? 'РАСХОЖДЕНИЯ' : 'АКТ'), badgeCol: T.step === 'fact' ? A : RD,
+        _cols: [0, 2, 3, 4],
+        head: H([['ТОВАР'], ['ПАРТИЯ'], ['УЧЁТ', 'right'], ['ФАКТ', 'right'], ['РАЗНИЦА', 'right']]),
+        rows: T.lines.map((l, i) => {
+          const sk = this.sku(db, l.s), bt = this.bat(db, l.b);
+          const shown = l.fact != null || T.step !== 'fact';
+          const d = (l.fact == null ? l.book : l.fact) - l.book;
+          return { bg: i === T.i && T.step === 'fact' ? 'transparent' : 'transparent', bd: l.fact != null && d !== 0 ? RD : (l.fact != null ? A : 'transparent'), on: null, cs: [c(sk.name), mono(bt ? bt.code : '—', { z: 13, c: M }), mono(shown ? String(l.book) : '· · ·', { a: 'right', z: 17, c: shown ? W : M }), mono(l.fact == null ? '—' : String(l.fact), { a: 'right', z: 17, c: A }), mono(l.fact == null ? '' : ((d > 0 ? '+' : '') + d), { a: 'right', z: 17, c: d === 0 ? 'var(--ink-2)' : RD })] };
+        })
+      };
+    }
+    if (T.mode === 'move' && T.from) {
+      const lines = db.stock.filter(s => s.c === T.from && s.q > 0);
+      return {
+        title: 'ЯЧЕЙКА-ИСТОЧНИК ' + T.from, sub: (this.cell(db, T.from) ? ('вместимость ' + this.cell(db, T.from).cap + ' · зона ' + this.cell(db, T.from).z) : ''),
+        badge: T.to ? 'ПРОВЕДЕНО' : 'ПЕРЕМЕЩЕНИЕ', badgeCol: A,
+        _cols: [0, 2, 4],
+        head: H([['ТОВАР'], ['ПАРТИЯ / СРОК'], ['УЧЁТ', 'right'], ['В ОТБОРЕ', 'right'], ['ДОСТУПНО', 'right']]),
+        rows: lines.map(s => { const sk = this.sku(db, s.s), bt = this.bat(db, s.b); return { bg: s.id === T.k ? 'transparent' : 'transparent', bd: s.id === T.k ? A : 'transparent', on: null, cs: [c(sk.name), mono(bt ? (bt.code + ' · ' + this.fd(bt.exp)) : '—', { z: 13, c: M }), mono(String(s.q), { a: 'right', z: 17 }), mono(String(s.h), { a: 'right', z: 17, c: s.h ? Y : M }), mono(String(s.q - s.h), { a: 'right', z: 17, c: A })] }; })
+      };
+    }
+    if (T.mode === 'put') {
+      const lines = db.stock.filter(s => s.c === 'ПР-01' && s.q > 0);
+      return {
+        title: 'БУФЕР ПРИЁМКИ ПР-01', sub: 'товар принят, но не размещён · правило: свободная ячейка зоны хранения, ближайшая к приёмке',
+        badge: 'РАЗМЕЩЕНИЕ', badgeCol: A,
+        _cols: [0, 3, 4],
+        head: H([['ТОВАР'], ['АРТИКУЛ'], ['ЗОНА'], ['КОЛ-ВО', 'right'], ['ПРЕДЛОЖЕНИЕ', 'right']]),
+        rows: lines.map(s => { const sk = this.sku(db, s.s); const sg = this.suggest(db, s.s, s.q); return { bg: 'transparent', bd: s.id === T.k ? A : 'transparent', on: null, cs: [c(sk.name), mono(sk.art, { z: 13, c: M }), mono('ЗОНА ' + sk.z, { z: 13, c: M }), mono(String(s.q), { a: 'right', z: 17 }), mono(sg.c || 'НЕТ МЕСТА', { a: 'right', z: 16, c: sg.note ? RD : A })] }; }),
+        empty: lines.length ? '' : 'Буфер ПР-01 пуст — всё размещено по адресам.'
+      };
+    }
+    const openO = this.queue(db);
+    return {
+      title: 'ОЧЕРЕДЬ ЗАДАНИЙ', sub: 'сортировка: приоритет, затем срок отгрузки · ' + this.shift() + ' · ' + this.state.who,
+      badge: 'ТЕРМИНАЛ', badgeCol: A,
+      _cols: [0, 1, 2, 4],
+      head: H([['ДОКУМЕНТ'], [narrow ? 'КЛИЕНТ' : 'КОНТРАГЕНТ'], ['ОТГРУЗКА'], ['ПРИОРИТЕТ'], [narrow ? 'ВЗЯТО' : 'ОТОБРАНО', 'right'], ['СТАТУС', 'right']]),
+      rows: openO.map(o => {
+        const due = this.dleft(o.due);
+        const dueTxt = (due != null && due <= 0) ? (narrow ? 'СЕГОДНЯ' : this.fd(o.due) + ' · СЕГОДНЯ') : (narrow ? this.fd(o.due).slice(0, 5) : this.fd(o.due));
+        return { bg: 'transparent', bd: o.prio === 'СРОЧНО' ? RD : 'transparent', on: () => { if (!o.plan) this.up(d => this.startPick(d, d.orders.find(x => x.id === o.id))); this.setTerm({ mode: 'pick', doc: o.id, step: 'cell' }); }, cs: [mono(o.no, { z: 16 }), c(o.cli), mono(dueTxt, { z: 14, c: due != null && due <= 0 ? RD : M }), mono(o.prio, { z: 12, c: o.prio === 'СРОЧНО' ? RD : M, f: 'system-ui,sans-serif' }), mono(o.lines.reduce((a, l) => a + l.done, 0) + ' / ' + o.lines.reduce((a, l) => a + l.q, 0), { a: 'right', z: 16 }), mono(o.st, { a: 'right', z: 12, c: o.st === 'В РАБОТЕ' ? A : M })] };
+      })
+    };
+  }
+
+  buildCodes(){
+    const db = this.state.db, T = this.state.term;
+    const A = 'var(--acc)', W = 'var(--ink)', RD = 'var(--alert)', OK = 'var(--ok)';
+    const chip = (code, label, tag, kind) => ({ code: code, label: label, tag: tag, on: () => this.scan(code), bg: kind === 'ok' ? 'var(--paper-2)' : (kind === 'err' ? 'var(--paper-2)' : 'var(--paper-2)'), bd: kind === 'ok' ? 'var(--rule)' : (kind === 'err' ? 'var(--alert)' : 'var(--hair)'), col: kind === 'err' ? 'var(--alert)' : (kind === 'ok' ? A : W), tagCol: kind === 'err' ? RD : (kind === 'ok' ? A : 'var(--ink-2)') });
+    const other = (skuId) => db.skus.find(s => s.id !== skuId) || db.skus[0];
+    if (T.mode === 'pick' && T.doc) {
+      const o = this.order(), p = this.curStep(o);
+      if (!p) return [];
+      const sk = this.sku(db, p.s);
+      if (T.step === 'cell') { const wrong = db.cells.find(cc => cc.id !== p.c && cc.z === 'B'); return [chip(p.c, 'по маршруту', 'ВЕРНО', 'ok'), chip(wrong.id, 'другая ячейка', 'ОШИБКА', 'err'), chip(sk.bc, sk.name, 'НЕ ЯЧЕЙКА', 'err')]; }
+      if (T.step === 'item') { const w = other(sk.id); return [chip(sk.bc, sk.name, 'ВЕРНО', 'ok'), chip(w.bc, w.name, 'НЕ ТОТ ТОВАР', 'err')]; }
+      return [chip(String(p.q), 'количество по заданию', 'ВЕРНО', 'ok'), chip(String(p.q + 40), 'больше, чем в задании', 'ОШИБКА', 'err'), chip(String(Math.max(1, p.q - 5)), 'недобор', 'РАСХОЖДЕНИЕ', 'warn')];
+    }
+    if (T.mode === 'rec' && T.doc && T.step === 'item') {
+      const r = this.receipt();
+      const left = r.lines.filter(l => l.got < l.q);
+      const arr = left.slice(0, 2).map(l => { const s = this.sku(db, l.s); return chip(s.bc, s.name + ' · осталось ' + (l.q - l.got), 'В ОРДЕРЕ', 'ok'); });
+      const w = db.skus.find(s => !r.lines.some(l => l.s === s.id));
+      arr.push(chip(w.bc, w.name, 'НЕ В ОРДЕРЕ', 'err'));
+      return arr;
+    }
+    if ((T.mode === 'rec' || T.mode === 'put') && T.step === 'cell') {
+      const alt = db.cells.filter(cc => cc.id !== T.sug && (cc.z === 'A' || cc.z === 'B'))[7];
+      const full = db.cells.find(cc => cc.z === 'A' && cc.r === 1);
+      return [chip(T.sug, 'предложение системы', 'ВЕРНО', 'ok'), chip(alt.id, 'выбрать другую', 'ВРУЧНУЮ', 'warn'), chip(full.id, 'занятая ячейка', 'ОТКАЗ', 'err')];
+    }
+    if (T.mode === 'put' && T.step === 'item') {
+      const buf = db.stock.filter(s => s.c === 'ПР-01' && s.q > 0);
+      return buf.map(s => { const sk = this.sku(db, s.s); return chip(sk.bc, sk.name + ' · ' + s.q, 'В БУФЕРЕ', 'ok'); });
+    }
+    if (T.mode === 'move' && T.step === 'from') {
+      const busy = db.cells.filter(cc => cc.z !== 'R' && cc.z !== 'S' && db.stock.some(s => s.c === cc.id && s.q > 0));
+      const extra = busy.filter(cc => cc.id !== 'B-02-1-03' && cc.id !== 'A-01-1-01').slice(0, 1);
+      const empty = db.cells.find(cc => (cc.z === 'A' || cc.z === 'B' || cc.z === 'C') && !db.stock.some(s => s.c === cc.id));
+      const arr = [chip('B-02-1-03', 'ячейка с пересортицей', 'ПРИМЕР', 'ok'), chip('A-01-1-01', 'молоко, свежая партия', 'ПРИМЕР', 'ok')];
+      extra.forEach(cc => arr.push(chip(cc.id, this.sku(db, db.stock.find(s => s.c === cc.id).s).name, 'ПРИМЕР', 'ok')));
+      if (empty) arr.push(chip(empty.id, 'пустая ячейка', 'ОТКАЗ', 'err'));
+      return arr;
+    }
+    if (T.mode === 'move' && T.step === 'to') {
+      const line = db.stock.find(x => x.id === T.k) || {};
+      const sg = this.suggest(db, line.s, T.qty || 1);
+      const busy = db.cells.find(cc => cc.id !== T.from && cc.z !== 'R' && cc.z !== 'S' && db.stock.some(s => s.c === cc.id && s.s !== line.s && s.q > 0));
+      const arr = [];
+      if (sg.c) arr.push(chip(sg.c, 'свободная ячейка зоны ' + (this.sku(db, line.s) || {}).z, 'ВЕРНО', 'ok'));
+      if (busy) arr.push(chip(busy.id, 'занята другим товаром', 'ОТКАЗ', 'err'));
+      arr.push(chip(T.from, 'та же ячейка', 'ОТКАЗ', 'err'));
+      return arr;
+    }
+    if (T.mode === 'count' && T.step === 'cell') return [chip('C-03-2-02', 'здесь недостача: учёт 89, факт 84', 'ПРИМЕР', 'ok'), chip('B-02-1-03', 'здесь пересортица', 'ПРИМЕР', 'ok'), chip('A-05-3-04', 'молоко с истекающим сроком', 'ПРИМЕР', 'ok')];
+    if (T.mode === 'count' && T.step === 'fact') return [chip('0', 'ячейка пуста по факту', 'ФАКТ', 'warn')];
+    return [];
+  }
+
+  buildOffice(){
+    const db = this.state.db, S = this.state;
+    const BIG = 2.5;   // office tables are read across a room, not from a desk
+    const A = 'var(--acc)', W = 'var(--ink)', M = 'var(--ink-2)', RD = 'var(--alert)', Y = 'var(--warn)', OK = 'var(--ok)';
+    const res = this.resOf(db), load = this.loads(db);
+    // office tables are read across a room, not from a desk: every cell gets a step up
+    const c = (t, o) => { const r = Object.assign({ t: t, a: 'left', c: W, f: 'system-ui,sans-serif', z: 14, w: '600', n: 'normal' }, o || {}); r.z = r.z + 2.5; return r; };
+    const mono = (t, o) => c(t, Object.assign({ f: 'ui-monospace,SFMono-Regular,Menlo,Consolas,monospace', w: '700', n: 'nowrap' }, o || {}));
+    const H = arr => arr.map(x => ({ t: x[0], a: x[1] || 'left' }));
+    const out = { zones: [], buffers: [], cd: { id: '—', meta: '', lines: [], empty: '', onCount: () => {} }, docList: [], dd: { title: '', meta: '', head: [], rows: [], foot: '', onPrint: () => {} }, tbl: { title: '', sub: '', head: [], rows: [], search: false, empty: '' } };
+
+    // --- map ---
+    if (S.ov === 'map') {
+      const zn = { A: 'ОХЛАЖДЕНИЕ', B: 'СУХОЙ СКЛАД', C: 'НЕПРОДОВОЛЬСТВЕННАЯ' };
+      const zt = { A: '+2…+6 °C', B: '+12…+18 °C', C: '+5…+25 °C' };
+      ['A', 'B', 'C'].forEach(z => {
+        const zc = db.cells.filter(x => x.z === z);
+        const zq = zc.reduce((a, x) => a + (load[x.id] ? load[x.id].q : 0), 0);
+        const zcap = zc.reduce((a, x) => a + x.cap, 0);
+        const racks = [];
+        const rmax = zc.reduce((a, x) => Math.max(a, x.r), 0);
+        for (let r = 1; r <= rmax; r++) {
+          const rc = db.cells.filter(x => x.z === z && x.r === r).sort((a, b) => b.t - a.t || a.p - b.p);
+          const rq = rc.reduce((a, x) => a + (load[x.id] ? load[x.id].q : 0), 0);
+          const rcap = rc.reduce((a, x) => a + x.cap, 0);
+          racks.push({
+            no: this.p2(r), pct: Math.round(rq / rcap * 100),
+            cells: rc.map(x => {
+              const l = load[x.id];
+              const f = l ? Math.min(1, l.q / x.cap) : 0;
+              const warn = l ? db.stock.filter(s => s.c === x.id).some(s => { const d = this.dleft(this.expOf(db, s.b)); return d != null && d < 7; }) : false;
+              const nm = l && l.ks.length ? this.sku(db, l.ks[0]).name : 'пусто';
+              return {
+                id: x.id, on: () => this.setState({ sel: x.id }), warn: warn, t: x.t + '·' + x.p,
+                ttl: x.id + ' · ' + nm + (l ? (' · ' + l.q + ' из ' + x.cap) : ' · свободна'),
+                // five discrete steps read at a glance; a continuous ramp all looked alike
+                fill: f === 0 ? 0 : (f < 0.34 ? 0.24 : (f < 0.67 ? 0.5 : (f < 0.9 ? 0.76 : 1))),
+                ring: S.sel === x.id ? '3px solid var(--alert)' : 'none',
+                bd: S.sel === x.id ? 'var(--alert)' : (f === 0 ? 'var(--hair)' : 'var(--rule)'),
+                col: f === 0 ? 'var(--ink-2)' : (f < 0.34 ? 'var(--ink)' : 'var(--acc-ink)')
+              };
+            })
+          });
+        }
+        out.zones.push({ id: 'ЗОНА ' + z, name: zn[z], temp: zt[z], pct: Math.round(zq / zcap * 100), racks: racks });
+      });
+      ['ПР-01', 'ОТ-01'].forEach(id => {
+        const ls = db.stock.filter(s => s.c === id && s.q > 0);
+        out.buffers.push({ id: id, name: id === 'ПР-01' ? 'БУФЕР ПРИЁМКИ' : 'ЗОНА ОТГРУЗКИ', qty: ls.length ? (ls.length + ' позиц., ' + ls.reduce((a, s) => a + s.q, 0) + ' ед.') : 'пусто' });
+      });
+      const sc = this.cell(db, S.sel);
+      const sl = db.stock.filter(s => s.c === S.sel && s.q > 0);
+      out.cd = {
+        id: S.sel || '—',
+        meta: sc ? ('зона ' + sc.z + ' · стеллаж ' + this.p2(sc.r) + ' · ярус ' + sc.t + ' · место ' + this.p2(sc.p) + ' · вместимость ' + sc.cap + ' · занято ' + (load[S.sel] ? load[S.sel].q : 0)) : 'выберите ячейку на карте',
+        lines: sl.map(s => {
+          const sk = this.sku(db, s.s), bt = this.bat(db, s.b), dl = this.dleft(bt ? bt.exp : null);
+          return { name: sk.name, art: sk.art, onLabel: () => this.setState({ print: { k: 'lblSku', id: sk.id } }), bd: dl != null && dl < 7 ? RD : A, exp: bt ? ('до ' + this.fd(bt.exp) + (dl != null ? (' · ' + dl + ' дн.') : '')) : 'без срока', expCol: dl != null && dl < 7 ? RD : M, free: this.nf(s.q - (res[s.id] || 0) - s.h), res: this.nf(res[s.id] || 0), pick: this.nf(s.h) };
+        }),
+        empty: sl.length ? '' : (S.sel ? 'Ячейка свободна.' : 'Нажмите ячейку на карте.'),
+        onLabel: () => { if (S.sel) this.setState({ print: { k: 'lblCell', id: S.sel } }); },
+        canLabel: !!this.cell(db, S.sel),
+        onCount: () => { if (S.sel) this.setState({ tab: 'term', term: { mode: 'count', step: 'cell' }, buf: S.sel }); }
+      };
+      return out;
+    }
+
+    // --- docs ---
+    if (S.ov === 'docs') {
+      const cur = S.doc || { k: 'ord', id: db.orders.filter(o => o.st !== 'ОТГРУЖЕН')[0].id };
+      const stCol = st => st === 'ЗАКРЫТ' || st === 'ОТГРУЖЕН' || st === 'ПРИМЕНЁН' || st === 'ПРОВЕДЁН' ? 'var(--ink-2)' : (st.indexOf('НЕДОБОР') >= 0 ? RD : A);
+      const push = (k, id, no, st, sub) => out.docList.push({ on: () => this.setState({ doc: { k: k, id: id } }), no: no, st: st, sub: sub, bg: cur.k === k && cur.id === id ? 'var(--paper-2)' : 'transparent', col: cur.k === k && cur.id === id ? A : W, stCol: stCol(st) });
+      db.orders.filter(o => o.st !== 'ОТГРУЖЕН').forEach(o => push('ord', o.id, o.no, o.st, 'Отбор · ' + o.cli + ' · ' + this.fd(o.date)));
+      db.receipts.filter(r => r.st !== 'ЗАКРЫТ').forEach(r => push('rec', r.id, r.no, r.st, 'Приёмка · ' + r.sup + ' · ' + this.fd(r.date)));
+      db.acts.slice().reverse().forEach(a => push('act', a.id, a.no, a.st, 'Инвентаризация · ячейка ' + a.cell + ' · ' + this.fd(a.date)));
+      db.moves.slice().reverse().forEach(m => push('mv', m.id, m.no, m.st, 'Перемещение · ' + m.from + ' → ' + m.to + ' · ' + this.fd(m.date)));
+      db.orders.filter(o => o.st === 'ОТГРУЖЕН').slice(0, 30).forEach(o => push('ord', o.id, o.no, o.st, 'Отбор · ' + o.cli + ' · ' + this.fd(o.date)));
+      db.receipts.filter(r => r.st === 'ЗАКРЫТ').slice(0, 30).forEach(r => push('rec', r.id, r.no, r.st, 'Приёмка · ' + r.sup + ' · ' + this.fd(r.date)));
+      out.dd = this.docDetail(cur);
+      return out;
+    }
+
+    // --- stock ---
+    if (S.ov === 'stock') {
+      const q = S.q.trim().toLowerCase();
+      const rows = [];
+      db.stock.filter(s => s.q > 0).sort((a, b) => a.c < b.c ? -1 : 1).forEach(s => {
+        const sk = this.sku(db, s.s), bt = this.bat(db, s.b), dl = this.dleft(bt ? bt.exp : null);
+        if (q && (sk.name + ' ' + sk.art + ' ' + s.c + ' ' + (bt ? bt.code : '')).toLowerCase().indexOf(q) < 0) return;
+        const r0 = res[s.id] || 0;
+        const free = s.q - r0 - s.h;
+        rows.push({ bg: (dl != null && dl < 7) ? 'color-mix(in srgb, var(--alert) 12%, transparent)' : (rows.length % 2 ? 'var(--zebra)' : 'transparent'), cs: [
+          mono(s.c, { z: 16, c: A }),
+          c(sk.name),
+          mono(sk.art, { z: 13, c: M }),
+          mono(sk.cat, { z: 12.5, c: M, f: 'system-ui,sans-serif' }),
+          mono(bt ? bt.code : '—', { z: 13, c: M }),
+          mono(bt ? this.fd(bt.exp) : '—', { z: 14, c: dl == null ? M : (dl < 7 ? RD : (dl < 30 ? Y : M)) }),
+          mono(this.nf(free), { a: 'right', z: 17, c: free > 0 ? A : M }),
+          mono(this.nf(r0), { a: 'right', z: 16, c: r0 ? Y : M }),
+          mono(this.nf(s.h), { a: 'right', z: 16, c: s.h ? Y : M }),
+          mono(this.nf(s.q), { a: 'right', z: 15, c: M })
+        ] });
+      });
+      out.tbl = { title: 'ОСТАТКИ ПО ЯЧЕЙКАМ', sub: rows.length + ' строк · свободно / зарезервировано / в отборе', search: true, head: H([['ЯЧЕЙКА'], ['ТОВАР'], ['АРТИКУЛ'], ['КАТЕГОРИЯ'], ['ПАРТИЯ'], ['СРОК ГОДН.'], ['СВОБОДНО', 'right'], ['РЕЗЕРВ', 'right'], ['В ОТБОРЕ', 'right'], ['ВСЕГО', 'right']]), rows: rows, empty: rows.length ? '' : 'Ничего не найдено по запросу «' + S.q + '».' };
+      return out;
+    }
+
+    // --- diff ---
+    if (S.ov === 'diff') {
+      const rows = [];
+      db.acts.slice().reverse().forEach(a => a.lines.forEach(l => {
+        const d = l.fact - l.book;
+        if (!d) return;
+        rows.push({ bg: 'transparent', cs: [mono(a.no, { z: 15 }), mono(this.fd(a.date), { z: 14, c: M }), mono('ИНВЕНТАРИЗАЦИЯ', { z: 12, c: Y, f: 'system-ui,sans-serif' }), mono(a.cell, { z: 16, c: A }), c(this.sku(db, l.s).name), mono(this.nf(l.book), { a: 'right', z: 16 }), mono(this.nf(l.fact), { a: 'right', z: 16 }), mono((d > 0 ? '+' : '') + this.nf(d), { a: 'right', z: 17, c: RD }), c(a.who, { c: M, z: 13 })] });
+      }));
+      db.orders.forEach(o => {
+        if (!o.plan) return;
+        o.plan.filter(p => p.short || p.cut).forEach(p => {
+          const q = p.short ? p.q : p.cut;
+          rows.push({ bg: 'transparent', cs: [mono(o.no, { z: 15 }), mono(this.fd(o.date), { z: 14, c: M }), mono(p.short ? 'НЕТ ОСТАТКА' : 'НЕДОБОР ПРИ ОТБОРЕ', { z: 12, c: RD, f: 'system-ui,sans-serif' }), mono(p.c || '—', { z: 16, c: A }), c(this.sku(db, p.s).name), mono(this.nf(p.short ? 0 : p.q + p.cut), { a: 'right', z: 16 }), mono(this.nf(p.short ? 0 : p.q), { a: 'right', z: 16 }), mono('−' + this.nf(q), { a: 'right', z: 17, c: RD }), c(o.who, { c: M, z: 13 })] });
+        });
+      });
+      db.receipts.forEach(r => r.lines.forEach(l => {
+        if (l.got >= l.q || !l.cl) return;
+        rows.push({ bg: 'transparent', cs: [mono(r.no, { z: 15 }), mono(this.fd(r.date), { z: 14, c: M }), mono('НЕДОПОСТАВКА', { z: 12, c: Y, f: 'system-ui,sans-serif' }), mono('ПР-01', { z: 16, c: A }), c(this.sku(db, l.s).name), mono(this.nf(l.q), { a: 'right', z: 16 }), mono(this.nf(l.got), { a: 'right', z: 16 }), mono(this.nf(l.got - l.q), { a: 'right', z: 17, c: RD }), c(r.sup, { c: M, z: 13 })] });
+      }));
+      db.orders.filter(o => o.st === 'НОВЫЙ').forEach(o => o.lines.forEach(l => {
+        const avail = this.fefo(db, l.s).reduce((a, s) => a + (s.q - s.h), 0);
+        if (avail >= l.q - l.done) return;
+        rows.push({ bg: 'transparent', cs: [mono(o.no, { z: 15 }), mono(this.fd(o.date), { z: 14, c: M }), mono('НЕ ХВАТИТ ОСТАТКА', { z: 12, c: RD, f: 'system-ui,sans-serif' }), mono('—', { z: 16, c: M }), c(this.sku(db, l.s).name), mono(this.nf(l.q - l.done), { a: 'right', z: 16 }), mono(this.nf(avail), { a: 'right', z: 16 }), mono('−' + this.nf(l.q - l.done - avail), { a: 'right', z: 17, c: RD }), c(o.cli, { c: M, z: 13 })] });
+      }));
+      out.tbl = { title: 'РАСХОЖДЕНИЯ', sub: rows.length + ' строк · инвентаризация, недопоставка, недоборы, дефицит под заказы', head: H([['ДОКУМЕНТ'], ['ДАТА'], ['ТИП'], ['ЯЧЕЙКА'], ['ТОВАР'], ['УЧЁТ / НУЖНО', 'right'], ['ФАКТ / ЕСТЬ', 'right'], ['РАЗНИЦА', 'right'], ['ОТВЕТСТВЕННЫЙ']]), rows: rows, empty: rows.length ? '' : 'Расхождений нет.' };
+      return out;
+    }
+
+    // --- log ---
+    const rows = db.log.slice(0, 400).map((e, i) => {
+      const sk = this.sku(db, e.s);
+      // one colour per operation class, so the eye can find a kind of movement without reading
+      const tc = e.t === 'ПРИЁМКА' ? A : (e.t === 'ОТБОР' ? Y : (e.t === 'СПИСАНИЕ' ? RD : (e.t === 'ОПРИХОДОВАНИЕ' ? OK : W)));
+      return { bg: i % 2 ? 'var(--zebra)' : 'transparent', cs: [mono(e.ts, { z: 14, c: M }), mono(e.t, { z: 12, c: tc, f: 'system-ui,sans-serif' }), c(sk ? sk.name : '—'), mono(e.from, { z: 15, c: e.from === '—' ? M : W }), mono(e.to, { z: 15, c: e.to === '—' ? M : A }), mono((e.q > 0 ? '+' : '') + this.nf(e.q), { a: 'right', z: 17, c: e.q > 0 ? OK : Y }), mono(e.doc, { z: 14, c: M }), c(e.who, { c: M, z: 13 })] };
+    });
+    out.tbl = { title: 'ИСТОРИЯ ДВИЖЕНИЙ', sub: db.log.length + ' проводок · показаны последние ' + rows.length, head: H([['ВРЕМЯ'], ['ОПЕРАЦИЯ'], ['ТОВАР'], ['ОТКУДА'], ['КУДА'], ['КОЛ-ВО', 'right'], ['ДОКУМЕНТ'], ['СОТРУДНИК']]), rows: rows, empty: '' };
+    return out;
+  }
+
+  docDetail(cur){
+    const db = this.state.db;
+    const A = 'var(--acc)', W = 'var(--ink)', M = 'var(--ink-2)', RD = 'var(--alert)', OK = 'var(--ok)';
+    const c = (t, o) => { const r = Object.assign({ t: t, a: 'left', c: W, f: 'system-ui,sans-serif', z: 14, w: '600' }, o || {}); r.z = r.z + 2.5; return r; };
+    const mono = (t, o) => c(t, Object.assign({ f: 'ui-monospace,SFMono-Regular,Menlo,Consolas,monospace', w: '700' }, o || {}));
+    const H = arr => arr.map(x => ({ t: x[0], a: x[1] || 'left' }));
+    const onPrint = () => this.setState({ print: cur });
+    if (cur.k === 'ord') {
+      const o = db.orders.find(x => x.id === cur.id);
+      const src = o.plan || o.lines.map(l => ({ c: null, s: l.s, b: null, q: l.q, done: l.done, li: 0 }));
+      return {
+        title: 'ЗАКАЗ НА ОТБОР ' + o.no, onPrint: onPrint,
+        meta: 'Получатель: ' + o.cli + '\nДата: ' + this.fd(o.date) + ' · Приоритет: ' + o.prio + ' · Статус: ' + o.st + '\nКладовщик: ' + o.who + (o.plan ? '\nМаршрут построен по адресам, партии выбраны по FEFO' : '\nМаршрут ещё не построен'),
+        head: H([['ЯЧЕЙКА'], ['ТОВАР'], ['ПАРТИЯ'], ['СРОК'], ['ЗАДАНИЕ', 'right'], ['ОТОБРАНО', 'right']]),
+        rows: src.map(p => { const sk = this.sku(db, p.s), bt = this.bat(db, p.b); return { cs: [mono(p.c || '—', { c: A, z: 16 }), c(sk.name), mono(bt ? bt.code : '—', { z: 13, c: M }), mono(bt ? this.fd(bt.exp) : '—', { z: 14, c: M }), mono(this.nf(p.q), { a: 'right', z: 17 }), mono(this.nf(p.done), { a: 'right', z: 17, c: p.done >= p.q ? A : RD })] }; }),
+        foot: 'Заказано: ' + this.nf(o.lines.reduce((a, l) => a + l.q, 0)) + ' ед. · Отобрано: ' + this.nf(o.lines.reduce((a, l) => a + l.done, 0)) + ' ед.' + (o.plan && o.plan.some(p => p.short) ? '\nНе хватило остатка: ' + this.nf(o.plan.filter(p => p.short).reduce((a, p) => a + p.q, 0)) + ' ед.' : '')
+      };
+    }
+    if (cur.k === 'rec') {
+      const r = db.receipts.find(x => x.id === cur.id);
+      return {
+        title: 'ПРИХОДНЫЙ ОРДЕР ' + r.no, onPrint: onPrint,
+        meta: 'Поставщик: ' + r.sup + '\nДата: ' + this.fd(r.date) + ' · Статус: ' + r.st + '\nКладовщик: ' + r.who,
+        head: H([['ТОВАР'], ['АРТИКУЛ'], ['ЕД.'], ['ЗАЯВЛЕНО', 'right'], ['ПРИНЯТО', 'right'], ['РАСХОЖДЕНИЕ', 'right']]),
+        rows: r.lines.map(l => { const sk = this.sku(db, l.s); const d = l.got - l.q; return { cs: [c(sk.name), mono(sk.art, { z: 13, c: M }), c(sk.u, { c: M }), mono(this.nf(l.q), { a: 'right', z: 17 }), mono(this.nf(l.got), { a: 'right', z: 17, c: l.got >= l.q ? A : RD }), mono(d === 0 ? '—' : this.nf(d), { a: 'right', z: 17, c: d === 0 ? M : RD })] }; }),
+        foot: 'Заявлено: ' + this.nf(r.lines.reduce((a, l) => a + l.q, 0)) + ' ед. · Принято: ' + this.nf(r.lines.reduce((a, l) => a + l.got, 0)) + ' ед. · Расхождение: ' + this.nf(r.lines.reduce((a, l) => a + (l.got - l.q), 0)) + ' ед.\nПриёмка кладёт товар в буфер ПР-01, адресное размещение — отдельная операция.'
+      };
+    }
+    if (cur.k === 'act') {
+      const a = db.acts.find(x => x.id === cur.id);
+      const dif = a.lines.reduce((s, l) => s + (l.fact - l.book), 0);
+      return {
+        title: 'АКТ ИНВЕНТАРИЗАЦИИ ' + a.no, onPrint: onPrint,
+        meta: 'Ячейка: ' + a.cell + '\nДата: ' + this.fd(a.date) + ' · Статус: ' + a.st + '\nОтветственный: ' + a.who,
+        head: H([['ТОВАР'], ['ПАРТИЯ'], ['УЧЁТ', 'right'], ['ФАКТ', 'right'], ['РАЗНИЦА', 'right']]),
+        rows: a.lines.map(l => { const sk = this.sku(db, l.s), bt = this.bat(db, l.b); const d = l.fact - l.book; return { cs: [c(sk.name), mono(bt ? bt.code : '—', { z: 13, c: M }), mono(this.nf(l.book), { a: 'right', z: 17 }), mono(this.nf(l.fact), { a: 'right', z: 17 }), mono((d > 0 ? '+' : '') + this.nf(d), { a: 'right', z: 17, c: d === 0 ? M : RD })] }; }),
+        foot: 'Итог по акту: ' + (dif > 0 ? '+' : '') + this.nf(dif) + ' ед.' + (dif < 0 ? ' — списание' : (dif > 0 ? ' — оприходование' : ' — расхождений нет'))
+      };
+    }
+    const m = db.moves.find(x => x.id === cur.id) || db.moves[0];
+    if (!m) return { title: 'ПЕРЕМЕЩЕНИЙ ПОКА НЕТ', meta: 'Сделайте перемещение в терминале — здесь появится накладная.', head: [], rows: [], foot: '', onPrint: () => {} };
+    const sk = this.sku(db, m.s), bt = this.bat(db, m.b);
+    return {
+      title: 'НАКЛАДНАЯ НА ПЕРЕМЕЩЕНИЕ ' + m.no, onPrint: () => this.setState({ print: { k: 'mv', id: m.id } }),
+      meta: 'Откуда: ' + m.from + '  →  Куда: ' + m.to + '\nДата: ' + this.fd(m.date) + ' · Статус: ' + m.st + '\nКладовщик: ' + m.who,
+      head: H([['ТОВАР'], ['АРТИКУЛ'], ['ПАРТИЯ'], ['КОЛ-ВО', 'right']]),
+      rows: [{ cs: [c(sk.name), mono(sk.art, { z: 13, c: M }), mono(bt ? bt.code : '—', { z: 13, c: M }), mono(this.nf(m.q), { a: 'right', z: 17 })] }],
+      foot: 'Перемещено: ' + this.nf(m.q) + ' ' + sk.u
+    };
+  }
+
+  buildPrint(){
+    const S = this.state, db = S.db;
+    if (!S.print) return null;
+    const cur = S.print;
+    const org = 'ООО «Заречный Логистический Двор»';
+    const orgSub = 'склад «Заречный» · 606860, г. Ветлуга, ул. Складская, 7, корп. 2\nИНН 5203041870 · КПП 520301001 · ОГРН 1145203004712';
+    const R = (arr) => ({ cs: arr.map(x => ({ t: x[0], a: x[1] || 'left', w: x[2] || '400' })) });
+    const H = arr => arr.map(x => ({ t: x[0], a: x[1] || 'left' }));
+    if (cur.k === 'lblCell') {
+      const c0 = this.cell(db, cur.id);
+      if (!c0) return null;
+      const l = this.loads(db)[cur.id];
+      const bc = this.code128(cur.id);
+      return {
+        isLabel: true, org: org, title: 'ЭТИКЕТКА ЯЧЕЙКИ ' + cur.id,
+        big: cur.id, sub: 'ЗОНА ' + c0.z + ' · ' + this.zname(c0.z).toUpperCase(),
+        bars: this.bars(bc.mods, false), barW: bc.mods.length, human: bc.human,
+        meta2: 'Стеллаж ' + this.p2(c0.r) + ' · ярус ' + c0.t + ' · место ' + this.p2(c0.p) + '\nВместимость ' + c0.cap + ' ед. · занято ' + (l ? l.q : 0) + ' ед.\n' + bc.kind + ' · склад «Заречный»'
+      };
+    }
+    if (cur.k === 'lblSku') {
+      const s0 = this.sku(db, cur.id);
+      if (!s0) return null;
+      const bc = this.ean13(s0.bc);
+      if (!bc) return null;
+      const tot = db.stock.filter(x => x.s === s0.id).reduce((a, x) => a + x.q, 0);
+      return {
+        isLabel: true, org: org, title: 'ЭТИКЕТКА ТОВАРА ' + s0.art,
+        big: s0.art, sub: s0.name,
+        bars: this.bars(bc.mods, true), barW: bc.mods.length, human: bc.human,
+        meta2: 'Категория: ' + s0.cat + ' · зона хранения ' + s0.z + ' (' + this.zname(s0.z) + ')\nЕдиница: ' + s0.u + ' · на складе ' + this.nf(tot) + ' ' + s0.u + '\n' + bc.kind + (bc.valid ? ' · контрольная цифра верна' : ' · контрольная цифра НЕ совпадает')
+      };
+    }
+    if (cur.k === 'ord') {
+      const o = db.orders.find(x => x.id === cur.id);
+      const src = o.plan || o.lines.map(l => ({ c: null, s: l.s, b: null, q: l.q, done: l.done }));
+      return {
+        isForm: true, warn: this.prWarn(o.st), org: org, orgSub: orgSub, form: 'Форма ОЛ-1\nЛист 1 из 1', title: 'ОТБОРОЧНЫЙ ЛИСТ № ' + o.no, subtitle: 'от ' + this.fd(o.date) + ' · маршрут по адресам хранения, партии по FEFO',
+        meta: [{ k: 'Получатель', v: o.cli }, { k: 'Приоритет', v: o.prio }, { k: 'Статус', v: o.st }, { k: 'Кладовщик', v: o.who }],
+        head: H([['№', 'center'], ['Ячейка'], ['Товар'], ['Артикул'], ['Партия'], ['Срок годн.', 'center'], ['Задание', 'right'], ['Отобрано', 'right']]),
+        rows: src.map((p, i) => { const sk = this.sku(db, p.s), bt = this.bat(db, p.b); return R([[String(i + 1), 'center'], [p.c || '—', 'left', '700'], [sk.name], [sk.art], [bt ? bt.code : '—'], [bt ? this.fd(bt.exp) : '—', 'center'], [this.nf(p.q), 'right', '700'], [this.nf(p.done), 'right', '700']]); }),
+        foot: 'Итого заказано: ' + this.nf(o.lines.reduce((a, l) => a + l.q, 0)) + ' ед.  ·  Итого отобрано: ' + this.nf(o.lines.reduce((a, l) => a + l.done, 0)) + ' ед.' + (o.plan && o.plan.some(p => p.short) ? '\nНедобор (нет остатка): ' + this.nf(o.plan.filter(p => p.short).reduce((a, p) => a + p.q, 0)) + ' ед.' : ''),
+        signs: [{ k: 'Отобрал (подпись)', v: o.who }, { k: 'Проверил (подпись)', v: 'Гайнутдинова Р.М.' }]
+      };
+    }
+    if (cur.k === 'rec') {
+      const r = db.receipts.find(x => x.id === cur.id);
+      return {
+        isForm: true, warn: this.prWarn(r.st), org: org, orgSub: orgSub, form: 'Форма М-4\nЛист 1 из 1', title: 'ПРИХОДНЫЙ ОРДЕР № ' + r.no, subtitle: 'от ' + this.fd(r.date),
+        meta: [{ k: 'Поставщик', v: r.sup }, { k: 'Склад', v: 'Заречный' }, { k: 'Статус', v: r.st }, { k: 'Принял', v: r.who }],
+        head: H([['№', 'center'], ['Товар'], ['Артикул'], ['Ед.', 'center'], ['Заявлено', 'right'], ['Принято', 'right'], ['Расхождение', 'right']]),
+        rows: r.lines.map((l, i) => { const sk = this.sku(db, l.s); const d = l.got - l.q; return R([[String(i + 1), 'center'], [sk.name], [sk.art], [sk.u, 'center'], [this.nf(l.q), 'right'], [this.nf(l.got), 'right', '700'], [d === 0 ? '—' : this.nf(d), 'right', '700']]); }),
+        foot: 'Итого заявлено: ' + this.nf(r.lines.reduce((a, l) => a + l.q, 0)) + ' ед.  ·  Фактически принято: ' + this.nf(r.lines.reduce((a, l) => a + l.got, 0)) + ' ед.  ·  Расхождение: ' + this.nf(r.lines.reduce((a, l) => a + (l.got - l.q), 0)) + ' ед.\nТовар принят в буфер ПР-01; адресное размещение оформляется отдельно.',
+        signs: [{ k: 'Сдал (поставщик)', v: '' }, { k: 'Принял (кладовщик)', v: r.who }]
+      };
+    }
+    if (cur.k === 'act') {
+      const a = db.acts.find(x => x.id === cur.id);
+      const dif = a.lines.reduce((s, l) => s + (l.fact - l.book), 0);
+      return {
+        isForm: true, warn: this.prWarn(a.st), org: org, orgSub: orgSub, form: 'Форма ИНВ-3\nЛист 1 из 1', title: 'АКТ ИНВЕНТАРИЗАЦИИ № ' + a.no, subtitle: 'от ' + this.fd(a.date) + ' · ячейка ' + a.cell,
+        meta: [{ k: 'Ячейка (адрес хранения)', v: a.cell }, { k: 'Основание', v: 'Плановый пересчёт по адресу' }, { k: 'Статус', v: a.st }, { k: 'Ответственный', v: a.who }],
+        head: H([['№', 'center'], ['Товар'], ['Партия'], ['По учёту', 'right'], ['По факту', 'right'], ['Излишек', 'right'], ['Недостача', 'right']]),
+        rows: a.lines.map((l, i) => { const sk = this.sku(db, l.s), bt = this.bat(db, l.b); const d = l.fact - l.book; return R([[String(i + 1), 'center'], [sk.name], [bt ? bt.code : '—'], [this.nf(l.book), 'right'], [this.nf(l.fact), 'right', '700'], [d > 0 ? this.nf(d) : '—', 'right', '700'], [d < 0 ? this.nf(-d) : '—', 'right', '700']]); }),
+        foot: 'Итог по акту: ' + (dif > 0 ? '+' : '') + this.nf(dif) + ' ед.' + (dif < 0 ? ' (недостача — списание)' : (dif > 0 ? ' (излишек — оприходование)' : ' (расхождений нет)')) + '\nОстатки по ячейке приведены к фактическим значениям.',
+        signs: [{ k: 'Пересчёт выполнил', v: a.who }, { k: 'Утвердил', v: 'Орлов Д.В.' }]
+      };
+    }
+    const m = db.moves.find(x => x.id === cur.id);
+    if (!m) return null;
+    const sk = this.sku(db, m.s), bt = this.bat(db, m.b);
+    return {
+      isForm: true, warn: this.prWarn(m.st), org: org, orgSub: orgSub, form: 'Форма ТОРГ-13\nЛист 1 из 1', title: 'НАКЛАДНАЯ НА ВНУТРЕННЕЕ ПЕРЕМЕЩЕНИЕ № ' + m.no, subtitle: 'от ' + this.fd(m.date),
+      meta: [{ k: 'Откуда (ячейка)', v: m.from }, { k: 'Куда (ячейка)', v: m.to }, { k: 'Статус', v: m.st }, { k: 'Кладовщик', v: m.who }],
+      head: H([['№', 'center'], ['Товар'], ['Артикул'], ['Партия'], ['Ед.', 'center'], ['Количество', 'right']]),
+      rows: [R([['1', 'center'], [sk.name], [sk.art], [bt ? bt.code : '—'], [sk.u, 'center'], [this.nf(m.q), 'right', '700']])],
+      foot: 'Перемещено: ' + this.nf(m.q) + ' ' + sk.u + '. Остатки по ячейкам ' + m.from + ' и ' + m.to + ' изменены в момент проведения.',
+      signs: [{ k: 'Отпустил', v: m.who }, { k: 'Принял', v: 'Шевчук Т.Л.' }]
+    };
+  }
+
+  // ============ render ============
+  renderVals(){
+    const S = this.state, db = S.db;
+    const A = 'var(--acc)', W = 'var(--ink)', M = 'var(--ink-2)', RD = 'var(--alert)', OK = 'var(--ok)';
+    const v = this.buildView();
+    const ctx = this.buildCtx();
+    // fixed-layout widths can only carry a few columns; drop the rest rather than truncate all of them
+    const fixed = (S.vw || 1440) < 1240;
+    if (fixed && ctx._cols) {
+      const cut = this.drop(true, ctx._cols, ctx.head, ctx.rows);
+      ctx.head = cut.head; ctx.rows = cut.rows;
+    }
+    // fixed layout splits the container into EQUAL shares unless told otherwise, which clips
+    // the cell address — the one string that must never be truncated. Size the columns by content.
+    if (ctx.head) {
+      const W_ID = 118, W_NUM = 96, W_BATCH = 104;
+      ctx.head = ctx.head.map(h => {
+        if (!fixed) return Object.assign({}, h, { w: 'auto' });
+        const t = String(h.t || '');
+        if (t === 'ЯЧЕЙКА' || t === 'ДОКУМЕНТ') return Object.assign({}, h, { w: W_ID + 'px' });
+        if (t.indexOf('ПАРТИЯ') === 0) return Object.assign({}, h, { w: W_BATCH + 'px' });
+        if (h.a === 'right' || t === 'ОТГРУЗКА') return Object.assign({}, h, { w: W_NUM + 'px' });
+        return Object.assign({}, h, { w: 'auto' });
+      });
+    }
+    const off = this.buildOffice();
+    const load = this.loads(db);
+    const totCap = db.cells.filter(c => c.z !== 'R' && c.z !== 'S').reduce((a, c) => a + c.cap, 0);
+    const totQ = db.cells.filter(c => c.z !== 'R' && c.z !== 'S').reduce((a, c) => a + (load[c.id] ? load[c.id].q : 0), 0);
+    const expSoon = db.stock.filter(s => { const d = this.dleft(this.expOf(db, s.b)); return d != null && d < 7 && s.q > 0; }).length;
+    const diffN = db.acts.reduce((a, x) => a + x.lines.filter(l => l.fact !== l.book).length, 0) + db.orders.reduce((a, o) => a + (o.plan ? o.plan.filter(p => p.short || p.cut).length : 0), 0);
+    const padKeys = ['7', '8', '9', '4', '5', '6', '1', '2', '3', '0', '00', '⌫'].map(k => ({ t: k, on: () => { if (k === '⌫') this.setState({ buf: String(this.state.buf).slice(0, -1) }); else this.setState({ buf: (String(this.state.buf) + k).slice(0, 6) }); } }));
+    const navs = [['map', 'КАРТА СКЛАДА'], ['stock', 'ОСТАТКИ'], ['docs', 'ДОКУМЕНТЫ'], ['diff', 'РАСХОЖДЕНИЯ'], ['log', 'ИСТОРИЯ']].map(n => ({ t: n[1], on: () => this.setState({ ov: n[0] }), col: S.ov === n[0] ? A : 'var(--ink-2)', bd: S.ov === n[0] ? A : 'transparent' }));
+    const fl = S.flash ? { kind: S.flash.kind, text: S.flash.text, glyph: S.flash.kind === 'ok' ? '✓' : (S.flash.kind === 'err' ? '✕' : '!'), bg: S.flash.kind === 'ok' ? 'var(--acc-fill)' : (S.flash.kind === 'err' ? 'var(--alert)' : 'var(--warn-fill)'), col: S.flash.kind === 'ok' ? 'var(--acc-ink)' : (S.flash.kind === 'err' ? 'var(--alert-ink)' : 'var(--acc-ink)') } : null;
+    const codes = this.buildCodes();
+
+    // layout is computed, not media-queried: the root's own width drives it
+    const vw = S.vw || 1440;
+    // three tiers: full (3 columns) / split (task + one panel) / phone (one panel at a time).
+    // 452 + 430 + 296 + gaps + padding = 1240, so the 3-column set may only be used at >= 1240.
+    const full = vw >= 1240;
+    const mob = vw < 900;
+    const split = !full && !mob;
+    let pane = S.pane || 'task';
+    if (split && pane === 'task') pane = 'route';   // in split mode the task panel is always on screen
+    const vis = k => full || pane === k || (split && k === 'task');
+    const L = {
+      gap: mob ? '6px' : '12px', pad: mob ? '6px' : '12px',
+      cols: full ? '452px minmax(430px,1fr) 296px' : (mob ? 'minmax(0,1fr)' : '452px minmax(300px,1fr)'),
+      rows: 'minmax(0,1fr)',
+      minw: full ? '1240px' : '0',
+      radius: mob ? '10px' : '16px',
+      dTask: vis('task') ? 'flex' : 'none',
+      dRoute: vis('route') ? 'flex' : 'none',
+      dSide: (full || pane === 'codes' || pane === 'log') ? 'flex' : 'none',
+      dCodes: vis('codes') ? 'flex' : 'none',
+      dLog: vis('log') ? 'flex' : 'none',
+      fCodes: full ? 'none' : '1 1 auto',
+      kpiCols: vw < 1100 ? 'repeat(2,1fr)' : 'repeat(4,1fr)',
+      dPaneBar: full ? 'none' : 'flex',
+      dDesk: full ? 'inline-block' : 'none',
+      brandPad: mob ? '0 10px' : '0 18px',
+      tabPad: mob ? '0 18px' : '0 40px',
+      hdrPad: mob ? '0 8px' : '0 16px',
+      hdrGap: mob ? '7px' : '14px',
+      hdrWrap: 'nowrap',
+      hdrRight: '0 1 auto',
+      selW: mob ? '176px' : '240px', selMin: mob ? '168px' : '208px', selH: '56px', tabH: '100%',
+      tbl: full ? 'auto' : 'fixed',
+      cellPad: full ? '8px' : '5px', thSz: full ? '12.5px/1' : '11px/1', thLs: full ? '.12em' : '.02em',
+      mapCols: vw < 1100 ? 'minmax(0,1fr)' : 'minmax(0,1fr) 320px',
+      docCols: vw < 1100 ? 'minmax(0,1fr)' : '400px minmax(0,1fr)',
+      searchW: mob ? '100%' : '280px'
+    };
+    const paneTabs = (mob ? [['task', 'ЗАДАНИЕ'], ['route', 'МАРШРУТ'], ['codes', 'КОДЫ'], ['log', 'ЖУРНАЛ']] : [['route', 'МАРШРУТ'], ['codes', 'ШТРИХКОДЫ'], ['log', 'ЖУРНАЛ']]).map(p => ({
+      t: p[1], on: () => this.setState({ pane: p[0] }),
+      bg: pane === p[0] ? 'var(--acc-fill)' : 'var(--paper-2)', bd: pane === p[0] ? 'var(--acc-fill)' : 'var(--hair)', col: pane === p[0] ? 'var(--acc-ink)' : 'var(--ink-2)'
+    }));
+
+    return {
+      L: L, paneTabs: paneTabs, appRef: el => { this.rootEl = el; },
+      isTerm: S.tab === 'term', isOffice: S.tab === 'office',
+      goTerm: () => this.setState({ tab: 'term' }), goOffice: () => this.setState({ tab: 'office' }),
+      tabTermBg: S.tab === 'term' ? 'var(--acc-fill)' : 'transparent', tabTermCol: S.tab === 'term' ? 'var(--acc-ink)' : 'var(--ink-2)',
+      tabOffBg: S.tab === 'office' ? 'var(--acc-fill)' : 'transparent', tabOffCol: S.tab === 'office' ? 'var(--acc-ink)' : 'var(--ink-2)',
+      opDate: this.fd(this.ld()) + ' · ' + this.shift().split(' · ')[0], opUser: S.who,
+      who: S.who,
+      staffOpen: !!S.staffOpen, staffCaret: S.staffOpen ? '▲' : '▼',
+      staffBg: S.staffOpen ? 'var(--acc-fill)' : 'var(--paper-2)',
+      staffCol: S.staffOpen ? 'var(--acc-ink)' : 'var(--ink)',
+      toggleStaff: () => this.setState({ staffOpen: !S.staffOpen }),
+      staffList: (db.staff || [S.who]).map(p => ({
+        name: p, mark: p === S.who ? '●' : '',
+        bg: p === S.who ? 'var(--acc-fill)' : 'var(--paper)',
+        col: p === S.who ? 'var(--acc-ink)' : 'var(--ink)',
+        on: () => this.setState({ who: p, staffOpen: false })
+      })),
+      themeLabel: S.theme === 'light' ? 'ТЕМА · СВЕТ' : (S.theme === 'auto' ? 'ТЕМА · АВТО' : 'ТЕМА · ТЬМА'),
+      toggleTheme: () => {
+        const next = { dark: 'light', light: 'auto', auto: 'dark' }[S.theme || 'dark'];
+        this.applyTheme(next);
+        try { localStorage.setItem(this.TK, next); } catch(e) {}
+        this.setState({ theme: next });
+      },
+      mute: S.mute, muteLabel: S.mute ? 'ЗВУК ВЫКЛ' : 'ЗВУК ВКЛ', muteCol: S.mute ? 'var(--ink-2)' : A,
+      toggleMute: () => { const m = !S.mute; try { localStorage.setItem(this.MK, m ? '1' : '0'); } catch(e) {} this.setState({ mute: m }); },
+      resetDemo: () => this.resetDemo(),
+      v: v, ctx: ctx, fl: fl, codes: codes, noCodes: codes.length ? '' : 'На этом шаге сканировать нечего — используйте кнопки под панелью.',
+      jr: S.jr, noJr: S.jr.length ? false : true,
+      buf: S.buf, onBuf: e => this.setState({ buf: e.target.value }), onKey: e => { if (e.key === 'Enter' || e.key === 'Tab') { e.preventDefault(); this.scan(e.target.value); } }, inRef: el => { this.inp = el; },
+      doScan: () => this.scan(), padKeys: padKeys,
+      kpis: [
+        { k: 'ЗАНЯТОСТЬ СКЛАДА', v: Math.round(totQ / totCap * 100) + '%', c: A },
+        { k: 'ЗАКАЗЫ В РАБОТЕ', v: String(db.orders.filter(o => o.st === 'НОВЫЙ' || o.st === 'В РАБОТЕ').length), c: W },
+        { k: 'СРОК < 7 ДНЕЙ', v: String(expSoon), c: expSoon ? RD : W },
+        { k: 'РАСХОЖДЕНИЯ', v: String(diffN), c: diffN ? RD : W }
+      ],
+      ov: S.ov, navs: navs, isMap: S.ov === 'map', isDocs: S.ov === 'docs', isTable: S.ov === 'stock' || S.ov === 'diff' || S.ov === 'log',
+      zones: off.zones, buffers: off.buffers, cd: off.cd, docList: off.docList, dd: off.dd, tbl: off.tbl,
+      q: S.q, onQ: e => this.setState({ q: e.target.value }),
+      csvBtn: () => this.exportCsv(),
+      pr: this.buildPrint(), doPrint: () => window.print(), closePrint: () => this.setState({ print: null })
+    };
+  }
+
+  exportCsv(){
+    const db = this.state.db, S = this.state;
+    const res = this.resOf(db);
+    if (S.ov === 'log' || S.ov === 'docs') {
+      this.csv('istoriya-dvizhenij.csv', ['Время', 'Операция', 'Товар', 'Артикул', 'Откуда', 'Куда', 'Количество', 'Документ', 'Сотрудник'], db.log.map(e => { const s = this.sku(db, e.s); return [e.ts, e.t, s ? s.name : '', s ? s.art : '', e.from, e.to, e.q, e.doc, e.who]; }));
+      return;
+    }
+    if (S.ov === 'diff') {
+      const rows = [];
+      db.acts.forEach(a => a.lines.forEach(l => { if (l.fact !== l.book) rows.push([a.no, this.fd(a.date), 'Инвентаризация', a.cell, this.sku(db, l.s).name, l.book, l.fact, l.fact - l.book, a.who]); }));
+      db.receipts.forEach(r => r.lines.forEach(l => { if (l.got < l.q && l.cl) rows.push([r.no, this.fd(r.date), 'Недопоставка', 'ПР-01', this.sku(db, l.s).name, l.q, l.got, l.got - l.q, r.sup]); }));
+      db.orders.forEach(o => { if (o.plan) o.plan.filter(p => p.short || p.cut).forEach(p => rows.push([o.no, this.fd(o.date), p.short ? 'Нет остатка' : 'Недобор при отборе', p.c || '', this.sku(db, p.s).name, p.short ? 0 : p.q + p.cut, p.short ? 0 : p.q, -(p.short ? p.q : p.cut), o.who])); });
+      this.csv('rashozhdeniya.csv', ['Документ', 'Дата', 'Тип', 'Ячейка', 'Товар', 'Учёт', 'Факт', 'Разница', 'Ответственный'], rows);
+      return;
+    }
+    this.csv('ostatki-po-yachejkam.csv', ['Ячейка', 'Зона', 'Товар', 'Артикул', 'Категория', 'Партия', 'Срок годности', 'Свободно', 'Зарезервировано', 'В отборе', 'Всего', 'Ед.'], db.stock.filter(s => s.q > 0).map(s => { const sk = this.sku(db, s.s), bt = this.bat(db, s.b), c = this.cell(db, s.c); return [s.c, c ? c.z : '', sk.name, sk.art, sk.cat, bt ? bt.code : '', bt ? this.fd(bt.exp) : '', s.q - (res[s.id] || 0) - s.h, res[s.id] || 0, s.h, s.q, sk.u]; }));
+  }
+}
+</script>
+</body>
+</html>

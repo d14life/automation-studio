@@ -1,0 +1,185 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8">
+<title>Складской сканер — три палитры</title>
+<style>
+/* Not part of the product. A judging page: the SAME terminal panel rendered four times so the
+   only variable is colour. Self-contained, system fonts, no build step. */
+*{box-sizing:border-box}
+body{margin:0;background:#17181a;color:#e9eaec;
+  font:14px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+.page{max-width:1560px;margin:0 auto;padding:28px 24px 60px}
+h1{font-size:19px;font-weight:600;letter-spacing:-.01em;margin:0 0 4px}
+.sub{color:#9aa0a6;font-size:13px;margin:0 0 26px;max-width:760px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:20px}
+.col>h2{font-size:13px;letter-spacing:.08em;text-transform:uppercase;margin:0 0 3px;
+  color:#e9eaec}
+.col>.note{color:#9aa0a6;font-size:12px;margin:0 0 10px;min-height:46px}
+.mono{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+.meta{margin-top:9px;color:#7e848a;font-size:11.5px}
+.meta b{color:#b9bec4;font-weight:500}
+
+/* ── the panel. every colour is a variable, set per-theme below ───────────── */
+.term{background:var(--bg);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.bar{display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--bar);
+  border-bottom:1px solid var(--line)}
+.sq{width:10px;height:10px;border-radius:2px;background:var(--acc)}
+.bar .t{font-size:11px;letter-spacing:.1em;color:var(--ink);font-weight:600}
+.bar .v{margin-left:auto;font-size:10.5px;color:var(--dim);letter-spacing:.06em}
+.tab{font-size:10.5px;letter-spacing:.09em;padding:4px 9px;border-radius:4px;
+  background:var(--tabOn);color:var(--tabOnInk);font-weight:600}
+.body{padding:16px 15px 15px}
+.lbl{font-size:10.5px;letter-spacing:.11em;color:var(--dim);margin-bottom:7px}
+.addr{font-size:40px;line-height:1;font-weight:700;letter-spacing:-.02em;color:var(--acc)}
+.goods{margin-top:9px;color:var(--ink);font-size:14px}
+.fefo{display:inline-block;margin-top:9px;font-size:10.5px;letter-spacing:.06em;
+  padding:3px 8px;border-radius:3px;background:var(--warnBg);color:var(--warn);
+  border:1px solid var(--warnLine)}
+.rows{margin-top:14px;border-top:1px solid var(--line)}
+.row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);
+  font-size:12px}
+.row .k{color:var(--dim);letter-spacing:.05em}
+.row .v{color:var(--ink)}
+.row .v.hi{color:var(--acc);font-weight:600}
+.scan{margin-top:14px;display:flex;gap:8px}
+.fld{flex:1;background:var(--fld);border:1px solid var(--line);border-radius:6px;
+  padding:11px 12px;color:var(--dim);font-size:14px}
+.go{padding:11px 20px;border-radius:6px;background:var(--btn);color:var(--btnInk);
+  font-weight:700;font-size:12.5px;letter-spacing:.06em;display:flex;align-items:center}
+.chips{margin-top:11px;display:flex;gap:7px;flex-wrap:wrap}
+.chip{font-size:10.5px;padding:4px 8px;border-radius:4px;border:1px solid var(--line);
+  color:var(--dim)}
+.chip.ok{border-color:var(--accLine);color:var(--acc)}
+.chip.err{border-color:var(--errLine);color:var(--err)}
+
+/* ── 0. CURRENT ─────────────────────────────────────────────────────────── */
+.t0{--bg:#0d0f0d;--bar:#111411;--line:#2c312b;--ink:#e6ecdf;--dim:#8b9284;
+  --acc:#d8f60a;--accLine:#d8f60a;--tabOn:#d8f60a;--tabOnInk:#0d0f0d;
+  --btn:#d8f60a;--btnInk:#0d0f0d;--fld:#161a15;
+  --warn:#ff6b5e;--warnBg:rgba(255,107,94,.1);--warnLine:rgba(255,107,94,.4);
+  --err:#ff6b5e;--errLine:rgba(255,107,94,.45)}
+/* ── A. DISCIPLINED LIME ────────────────────────────────────────────────── */
+.t1{--bg:#0b0f0c;--bar:#0e130f;--line:rgba(255,255,255,.08);--ink:#e8ede4;--dim:#8a9384;
+  --acc:#b4d600;--accLine:rgba(180,214,0,.45);--tabOn:rgba(180,214,0,.14);--tabOnInk:#b4d600;
+  --btn:#b4d600;--btnInk:#0b0f0c;--fld:#0e130f;
+  --warn:#e8a33d;--warnBg:rgba(232,163,61,.09);--warnLine:rgba(232,163,61,.32);
+  --err:#e5675c;--errLine:rgba(229,103,92,.4)}
+/* ── B. COLD SIGNAL ─────────────────────────────────────────────────────── */
+.t2{--bg:#0f1113;--bar:#131619;--line:rgba(255,255,255,.09);--ink:#eef1f4;--dim:#858c93;
+  --acc:#e8edf2;--accLine:rgba(232,237,242,.3);--tabOn:rgba(232,237,242,.12);--tabOnInk:#eef1f4;
+  --btn:#e8edf2;--btnInk:#0f1113;--fld:#131619;
+  --warn:#e8a33d;--warnBg:rgba(232,163,61,.09);--warnLine:rgba(232,163,61,.32);
+  --err:#e5675c;--errLine:rgba(229,103,92,.4)}
+/* ── C. GREEN HOUSING ───────────────────────────────────────────────────── */
+.t3{--bg:#101410;--bar:#141913;--line:rgba(198,217,46,.13);--ink:#e4e9d8;--dim:#8b9179;
+  --acc:#c6d92e;--accLine:rgba(198,217,46,.45);--tabOn:rgba(198,217,46,.15);--tabOnInk:#c6d92e;
+  --btn:#c6d92e;--btnInk:#101410;--fld:#141913;
+  --warn:#e8a33d;--warnBg:rgba(232,163,61,.1);--warnLine:rgba(232,163,61,.34);
+  --err:#e5675c;--errLine:rgba(229,103,92,.4)}
+</style></head><body><div class="page">
+
+<h1>Складской сканер — одна и та же панель, четыре палитры</h1>
+<p class="sub">Меняется только цвет: разметка, размеры и текст одинаковые во всех четырёх.
+Смотрите на две вещи — сколько на экране акцента, и насколько он кричит.</p>
+
+<div class="grid">
+
+  <div class="col">
+    <h2>0 · Сейчас</h2>
+    <p class="note">Акцент делает шесть работ сразу: вкладка, адрес, кнопка, чипы, рамки,
+       цифры. Максимальная насыщенность на чистом чёрном.</p>
+    <div class="term t0">
+      <div class="bar"><span class="sq"></span><span class="t">СКЛАДСКОЙ СКАНЕР</span>
+        <span class="tab">ТЕРМИНАЛ</span><span class="v">СМЕНА 1</span></div>
+      <div class="body">
+        <div class="lbl">ИДИТЕ К ЯЧЕЙКЕ</div>
+        <div class="addr mono">A-05-3-04</div>
+        <div class="goods">Молоко «Заречье» 3,2% 900 мл</div>
+        <div class="fefo mono">FEFO · СРОК 08.08.2026 · 3 дн.</div>
+        <div class="rows">
+          <div class="row"><span class="k">МАРШРУТ</span><span class="v hi mono">ШАГ 2 ИЗ 4</span></div>
+          <div class="row"><span class="k">ТОВАР</span><span class="v mono">АРТ-1001</span></div>
+          <div class="row"><span class="k">В ЯЧЕЙКЕ ПО УЧЁТУ</span><span class="v mono">48 шт</span></div>
+        </div>
+        <div class="scan"><div class="fld mono">A-05-3-04</div><div class="go">СКАН</div></div>
+        <div class="chips"><span class="chip ok mono">A-05-3-04 верно</span>
+          <span class="chip err mono">B-01-1-01 ошибка</span></div>
+      </div>
+    </div>
+    <p class="meta"><b>#d8f60a</b> · насыщенность <b>0.93</b> · контраст <b>16.2:1</b></p>
+  </div>
+
+  <div class="col">
+    <h2>A · Дисциплинированный лайм</h2>
+    <p class="note">Тот же зелёный, на шаг глубже. Акцент только на адресе и кнопке —
+       всё остальное серые градации на зеленовато-чёрном.</p>
+    <div class="term t1">
+      <div class="bar"><span class="sq"></span><span class="t">СКЛАДСКОЙ СКАНЕР</span>
+        <span class="tab">ТЕРМИНАЛ</span><span class="v">СМЕНА 1</span></div>
+      <div class="body">
+        <div class="lbl">ИДИТЕ К ЯЧЕЙКЕ</div>
+        <div class="addr mono">A-05-3-04</div>
+        <div class="goods">Молоко «Заречье» 3,2% 900 мл</div>
+        <div class="fefo mono">FEFO · СРОК 08.08.2026 · 3 дн.</div>
+        <div class="rows">
+          <div class="row"><span class="k">МАРШРУТ</span><span class="v mono">ШАГ 2 ИЗ 4</span></div>
+          <div class="row"><span class="k">ТОВАР</span><span class="v mono">АРТ-1001</span></div>
+          <div class="row"><span class="k">В ЯЧЕЙКЕ ПО УЧЁТУ</span><span class="v mono">48 шт</span></div>
+        </div>
+        <div class="scan"><div class="fld mono">A-05-3-04</div><div class="go">СКАН</div></div>
+        <div class="chips"><span class="chip ok mono">A-05-3-04 верно</span>
+          <span class="chip err mono">B-01-1-01 ошибка</span></div>
+      </div>
+    </div>
+    <p class="meta"><b>#b4d600</b> · насыщенность <b>0.84</b> · контраст <b>11.9:1</b></p>
+  </div>
+
+  <div class="col">
+    <h2>B · Холодный сигнал</h2>
+    <p class="note">Приборная панель: почти белый как основной, зелёный остаётся только
+       для подтверждения скана. Самый премиальный, но зелёный уходит из образа.</p>
+    <div class="term t2">
+      <div class="bar"><span class="sq" style="background:#b4d600"></span><span class="t">СКЛАДСКОЙ СКАНЕР</span>
+        <span class="tab">ТЕРМИНАЛ</span><span class="v">СМЕНА 1</span></div>
+      <div class="body">
+        <div class="lbl">ИДИТЕ К ЯЧЕЙКЕ</div>
+        <div class="addr mono">A-05-3-04</div>
+        <div class="goods">Молоко «Заречье» 3,2% 900 мл</div>
+        <div class="fefo mono">FEFO · СРОК 08.08.2026 · 3 дн.</div>
+        <div class="rows">
+          <div class="row"><span class="k">МАРШРУТ</span><span class="v mono">ШАГ 2 ИЗ 4</span></div>
+          <div class="row"><span class="k">ТОВАР</span><span class="v mono">АРТ-1001</span></div>
+          <div class="row"><span class="k">В ЯЧЕЙКЕ ПО УЧЁТУ</span><span class="v mono">48 шт</span></div>
+        </div>
+        <div class="scan"><div class="fld mono">A-05-3-04</div><div class="go">СКАН</div></div>
+        <div class="chips"><span class="chip mono" style="border-color:rgba(180,214,0,.45);color:#b4d600">A-05-3-04 верно</span>
+          <span class="chip err mono">B-01-1-01 ошибка</span></div>
+      </div>
+    </div>
+    <p class="meta"><b>#e8edf2</b> · насыщенность <b>0.04</b> · контраст <b>16.9:1</b></p>
+  </div>
+
+  <div class="col">
+    <h2>C · Зелёный корпус</h2>
+    <p class="note">Зелёный уходит в сам корпус, как в литой пластик прибора. Сильнее всего
+       читается «это устройство», но зелёный оттенок лежит на всём экране.</p>
+    <div class="term t3">
+      <div class="bar"><span class="sq"></span><span class="t">СКЛАДСКОЙ СКАНЕР</span>
+        <span class="tab">ТЕРМИНАЛ</span><span class="v">СМЕНА 1</span></div>
+      <div class="body">
+        <div class="lbl">ИДИТЕ К ЯЧЕЙКЕ</div>
+        <div class="addr mono">A-05-3-04</div>
+        <div class="goods">Молоко «Заречье» 3,2% 900 мл</div>
+        <div class="fefo mono">FEFO · СРОК 08.08.2026 · 3 дн.</div>
+        <div class="rows">
+          <div class="row"><span class="k">МАРШРУТ</span><span class="v mono">ШАГ 2 ИЗ 4</span></div>
+          <div class="row"><span class="k">ТОВАР</span><span class="v mono">АРТ-1001</span></div>
+          <div class="row"><span class="k">В ЯЧЕЙКЕ ПО УЧЁТУ</span><span class="v mono">48 шт</span></div>
+        </div>
+        <div class="scan"><div class="fld mono">A-05-3-04</div><div class="go">СКАН</div></div>
+        <div class="chips"><span class="chip ok mono">A-05-3-04 верно</span>
+          <span class="chip err mono">B-01-1-01 ошибка</span></div>
+      </div>
+    </div>
+    <p class="meta"><b>#c6d92e</b> · насыщенность <b>0.67</b> · контраст <b>12.7:1</b></p>
+  </div>
+
+</div></div></body></html>
