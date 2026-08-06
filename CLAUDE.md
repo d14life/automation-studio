@@ -15,6 +15,17 @@ The v2 page (`app/src/v2/`) is a scroll-scrubbed DNA video header plus a content
   spec, the whiteboard, and Damir's decisions. Read before writing any copy.
 - **`docs/catalogue.md`, `docs/software-types.md`** — the 62 offers, already written.
 
+## The DNA strand's motion is LOCKED (2026-08-06)
+
+Damir signed the scrub off in these words: *"dna background is moving perfect now lock it
+this way bro important so no more fuck ups."*
+
+`RUNWAY`, `FPS`, `HALF_FRAME`, `SEEK_MS`, `EASE`, the `SRC_*` ladder and the rAF scrub loop
+in `app/src/v2/V2.tsx` are **closed**. A complaint that the header feels slow, long, jumpy
+or heavy is not permission to retune them — the last three passes at "optimising" that
+section each made it worse, one of them blanking the page. Restore point:
+`git show dna-locked:app/src/v2/V2.tsx`. Only Damir reopens it, in the same words.
+
 ## Branches — get this wrong and you wipe work
 
     react = source. main = deploy (built output at the repo root).
