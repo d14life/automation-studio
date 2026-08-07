@@ -64,6 +64,21 @@ a{color:var(--blue);}
 .set-sec-head{display:flex; align-items:baseline; gap:12px; padding:0 0 8px; border-bottom:2px solid var(--ink); margin-bottom:12px;}
 .set-sec-head h2{margin:0; font-size:15px; font-weight:800; letter-spacing:.06em; text-transform:uppercase;}
 .set-sec-note{font-size:12px; color:var(--ink-3);}
+.bell{position:relative; background:none; border:1px solid rgba(255,255,255,.25); color:var(--chrome-top-ink); width:34px; height:32px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer;}
+.bell-dot{position:absolute; top:-6px; right:-6px; min-width:17px; height:17px; padding:0 4px; background:var(--bad); color:#fff; font:700 10px/17px ui-monospace,monospace; text-align:center;}
+.notif-list{padding:14px 20px; display:flex; flex-direction:column; gap:8px; max-width:900px;}
+.notif{display:flex; gap:14px; align-items:flex-start; padding:11px 14px; border:1px solid var(--line); border-left:4px solid var(--ink-3); background:var(--paper); cursor:pointer;}
+.notif:hover{background:var(--surface);}
+.notif.crit{border-left-color:var(--bad);}
+.notif.warn{border-left-color:var(--brand);}
+.notif.info{border-left-color:var(--blue);}
+.notif-main{flex:1; min-width:0;}
+.notif-title{font-weight:700; font-size:13px;}
+.notif-body{font-size:12.5px; margin-top:2px;}
+.notif-note{font-size:11.5px; color:var(--ink-3); margin-top:3px;}
+.notif-right{text-align:right; flex:none;}
+.notif-at{display:block; font-size:11px; color:var(--ink-3);}
+.notif-act{font-size:11.5px; font-weight:600; color:var(--blue);}
 .side-logo{padding:16px 16px 14px; background:var(--chrome-logo-bg); color:var(--chrome-logo-ink);}
 .side-logo .name{font-size:19px; font-weight:700; letter-spacing:.03em; line-height:1;}
 .side-logo .sub{font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; margin-top:4px;}
@@ -764,7 +779,8 @@ const NAV = [
     {id:'calendar', label:'Контент-календарь', icon:'cal',  roles:['marketer','editor','admin']},                    // §1: «вести контент-календарь»
   ]},
   {group:'Репутация', items:[
-    {id:'mentions', label:'Лента упоминаний', icon:'mention', roles:['guard','admin']},                              // §5: таблица негативных комментариев + кнопка отработки
+    {id:'mentions', label:'Лента упоминаний', icon:'mention', roles:['guard','admin']},
+    {id:'notifications', label:'Уведомления', icon:'bell', roles:['marketer','editor','producer','guard','admin']},                              // §5: таблица негативных комментариев + кнопка отработки
   ]},
   {group:'Знания', items:[
     {id:'kb', label:'База знаний', icon:'book', roles:['marketer','editor','producer','guard','admin']},             // §2: «в базу знаний ботов и дашборда зашита номенклатура»
@@ -777,7 +793,7 @@ const NAV = [
 
 /* Built, working, and deliberately not in the navigation - no clause in the ТЗ asks for them.
    Kept because deleting working code to re-add it later is the expensive order of operations. */
-const CUT_NAV = ['queue','multichannel','log','monitoring','objections','scenarios','storyboards','tones','rubrics','users','notifications'];
+const CUT_NAV = ['queue','multichannel','log','monitoring','objections','scenarios','storyboards','tones','rubrics','users'];
 function routeAllowed(state, routeId){
   for(const g of NAV) for(const it of g.items) if(it.id===routeId) return it.roles.includes(state.currentRole);
   return true;
@@ -1097,6 +1113,11 @@ const UI = {
   mcSourceId:null,
   scenarioWizard:null, scenarioView:null,
 };
+
+/* ?view=... открывает нужный экран сразу — удобно для скриншотов и чтобы кинуть
+   коллеге ссылку прямо на нужный экран. Стояло выше объявления const UI и падало
+   в temporal dead zone — а собственный try/catchглушил, и ссылка молча не работала. */
+try{ const _v=new URLSearchParams(location.search).get('view'); if(_v) UI.route=_v; }catch(e){ console.warn('view param:', e); }
 function startOfWeek(ts){ const d=new Date(ts); const day=(d.getDay()+6)%7; d.setHours(0,0,0,0); d.setDate(d.getDate()-day); return d.getTime(); }
 
 function toast(msg, kind){
@@ -1161,6 +1182,7 @@ function renderTopbar(){
       <span>ОЧЕРЕДЬ ${queueN}</span>
     </div>
     <div class="topbar-right">
+      <button class="bell" data-act="opennav" data-id="notifications" title="Уведомления">${ICO.bell || '!'}${(()=>{const n=unreadCount(); return n?`<span class="bell-dot">${n>9?'9+':n}</span>`:'';})()}</button>
       <select class="user-select" data-act="switchuser" title="Переключатель роли (вместо входа)">${userOpts}</select>
       <button class="theme-btn" data-act="toggletheme" title="Переключить тему">${theme==='dark'?ICO.sun:ICO.moon}</button>
       <button class="reset-btn" data-act="resetdemo">Сбросить демо</button>
@@ -2207,16 +2229,77 @@ function renderUsers(){
 }
 VIEW_RENDERERS.users = renderUsers;
 
+/* УВЕДОМЛЕНИЯ — это не лента истории.
+   Раньше здесь просто перечислялись все переходы статусов: сто строк, в которых
+   ничего не требует действия. Уведомление обязано отвечать на два вопроса —
+   что сломалось и куда нажать. Поэтому каждое несёт важность, объект и переход.
+   Прочитанные помечаются в localStorage (kz_seen), иначе счётчик у колокольчика
+   врёт после первой же перезагрузки. */
+function buildNotifications(){
+  const out = [];
+  const seen = new Set(JSON.parse(localStorage.getItem('kz_seen') || '[]'));
+
+  state.posts.forEach(p=>{
+    if(p.status==='error'){
+      const attempts = p.attempts || 1;
+      out.push({
+        id:'err_'+p.id, at: p.scheduledAt || p.createdAt, level: attempts>=3?'crit':'warn',
+        title: attempts>=3 ? 'Публикация не удалась · нужна помощь' : 'Ошибка публикации',
+        body: p.title, note: p.errorReason || 'причина не записана',
+        action:'Открыть пост', route:'feed', postId:p.id,
+      });
+    }
+    if(p.status==='review'){
+      out.push({ id:'rev_'+p.id, at: p.createdAt, level:'info',
+        title:'Ждёт согласования', body:p.title, note:'нужен главред',
+        action:'Открыть', route:'feed', postId:p.id });
+    }
+  });
+
+  state.mentions.forEach(m=>{
+    if(isOverdue(m) && m.status!=='done'){
+      out.push({ id:'sla_'+m.id, at: m.at + m.slaMin*60000, level:'crit',
+        title:'Просрочен SLA · 30 минут', body:'Упоминание от '+m.author,
+        note:(m.text||'').slice(0,80), action:'Отработать', route:'mention/'+m.id });
+    }
+  });
+
+  state.channels.filter(c=>c.phase===1 && !c.connected).forEach(c=>{
+    out.push({ id:'ch_'+c.id, at: Date.now(), level:'warn',
+      title:'Канал не подключён', body:c.name, note:'посты в этот канал не уйдут',
+      action:'Настройки', route:'settings' });
+  });
+
+  state.bots.filter(b=>b.status!=='online').forEach(b=>{
+    out.push({ id:'bot_'+b.id, at: Date.now(), level:'warn',
+      title:'Бот офлайн', body:b.name, note:b.desc||'', action:'Настройки', route:'settings' });
+  });
+
+  out.sort((a,b)=> (a.level===b.level ? b.at-a.at : (a.level==='crit'?-1:b.level==='crit'?1:a.level==='warn'?-1:1)));
+  out.forEach(n=> n.unread = !seen.has(n.id));
+  return out;
+}
+function unreadCount(){ return buildNotifications().filter(n=>n.unread).length; }
+function markAllSeen(){
+  localStorage.setItem('kz_seen', JSON.stringify(buildNotifications().map(n=>n.id)));
+}
 function renderNotifications(){
-  const events = [];
-  state.posts.forEach(p=> p.history.forEach(h=> events.push({at:h.at, text:`«${p.title}» → ${STATUS_META[h.status]?STATUS_META[h.status].label:h.status}`, by:h.by})));
-  state.mentions.forEach(m=>{ if(isOverdue(m)) events.push({at:m.at+m.slaMin*60000, text:`Просрочено по SLA: упоминание ${m.id} (${m.author})`, by:'система'}); });
-  events.sort((a,b)=>b.at-a.at);
-  const head = `<div class="view-head"><div class="view-head-row"><div class="view-title">Уведомления</div><div class="view-sub">Последние события системы</div></div></div>`;
-  if(events.length===0) return head + `<div class="empty-state"><div class="big">Уведомлений нет</div></div>`;
-  return head + `<div style="padding:16px 20px; overflow:auto; flex:1; max-width:760px;">
-    ${events.slice(0,60).map(e=>`<div class="history-item"><span class="mono">${fmtDT(e.at)}</span> — ${esc(e.text)} <span class="mini-note">· ${esc(e.by)}</span></div>`).join('')}
-  </div>`;
+  const items = buildNotifications();
+  markAllSeen();
+  const head = `<div class="view-head"><div class="view-head-row"><div class="view-title">Уведомления</div>
+    <div class="view-sub">Только то, что требует действия</div></div></div>`;
+  if(!items.length) return head + `<div class="empty-state"><div class="big">Всё спокойно</div>
+    <div class="sub">Просрочек нет, каналы на связи, публикации проходят.</div></div>`;
+  return head + `<div class="notif-list">` + items.map(n=>`
+    <div class="notif ${n.level}" data-act="opennotif" data-route="${esc(n.route)}" ${n.postId?`data-post="${n.postId}"`:''}>
+      <div class="notif-main">
+        <div class="notif-title">${esc(n.title)}</div>
+        <div class="notif-body">${esc(n.body)}</div>
+        ${n.note?`<div class="notif-note">${esc(n.note)}</div>`:''}
+      </div>
+      <div class="notif-right"><span class="mono notif-at">${fmtDT(n.at)}</span>
+        <span class="notif-act">${esc(n.action)} →</span></div>
+    </div>`).join('') + `</div>`;
 }
 VIEW_RENDERERS.notifications = renderNotifications;
 
