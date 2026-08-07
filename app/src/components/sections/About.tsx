@@ -1,3 +1,4 @@
+import { RockLogo } from '@/rock3d'
 import { BorderBeamPanel } from '@/components/ui/border-beam-panel'
 import { ShinySurface } from '@/components/ui/shiny-button'
 import { GlowCard } from '@/components/ui/spotlight-card'
@@ -35,6 +36,12 @@ export function About() {
             </GlowCard></ShinySurface>
         </div>
       </div>
+      {/* Логотип из настоящего колотого камня: 188 обломков, собранных в
+          Блендере. Кликом в него бросают камень, обломки выбивает и они
+          возвращаются на место. Грузится только когда раздел подъехал к
+          экрану — см. src/rock3d/index.tsx. */}
+      <RockLogo />
+
       {/* ждут данных от Damir: состав команды и образование, число сданных проектов и клиентов */}
 
     </div></section>
