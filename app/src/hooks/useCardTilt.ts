@@ -5,8 +5,11 @@ import { useEffect } from 'react'
    pointer never reached full deflection. Here the range is the card's own half-size, so the
    corner IS the full tilt, and the angle is 18deg instead of 10. Roughly 2.5x the donor.
 
-   Written as CSS variables rather than framer-motion because .proj already carries the fan's
-   transform (--fx/--fy/--fr/--fs); the tilt has to compose with it, not replace it.
+   Written as CSS variables rather than framer-motion. It was originally because .proj also
+   carried the fan's transform and the tilt had to compose with it; the fan is gone, but the
+   reason holds twice over now - this page scrubs a video on every wheel event, and a spring
+   library reading scroll on the same thread is the last thing it needs. framer-motion IS
+   installed (v1 uses it); keeping it out of v2 is a choice, not an absence.
 
    The listener is capture-phase on window because useSpotlight stops propagation there to keep
    the tube scene off the cursor. Capture listeners on the same target all still run. */

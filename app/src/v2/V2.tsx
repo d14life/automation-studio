@@ -4,7 +4,7 @@ import type { FormEvent, ReactNode, RefObject } from 'react'
    they read .projects/.proj and write CSS variables - so they carry none of site.css with them,
    which is the whole reason v2 could take them without inheriting the stylesheet it was built
    to escape. */
-import { useCardFan } from '@/hooks/useCardFan'
+import { useDeckRail } from '@/hooks/useDeckRail'
 import { useCardTilt } from '@/hooks/useCardTilt'
 import { Btn3D } from './Btn3D'
 import './v2.css'
@@ -600,7 +600,11 @@ const DEMOS = [
    pointer-events:none stays. Without it the picture swallows the cursor, the fan never sees
    mouseenter and the tilt dies. The card is a link; the shot is scenery. */
 function DemoDeck() {
-  useCardFan()
+  /* THE FAN IS GONE. Six more demos land tomorrow, and a fan arranges N cards around a centre -
+     it was already stacking them at four. useDeckRail replaces it: the deck is a horizontal
+     strip, and the wheel drives it sideways while the cursor is over it and belongs to the page
+     everywhere else. The tenth demo costs what the second one did. */
+  useDeckRail()
   useCardTilt()
 
   /* The ResizeObserver that used to live here is gone with the iframes. It existed only to
@@ -608,7 +612,9 @@ function DemoDeck() {
      <img> with width:100% needs no arithmetic and no observer. */
 
   return (
-    <div className="projects">
+    /* the rail is scrollable, so it is a focus stop and needs a name and a role - a keyboard
+       reader arriving here is told it is a list of demos, and arrows move it */
+    <div className="projects" tabIndex={0} role="region" aria-label="Демо-версии наших систем">
       {DEMOS.map(([slug, t, d]) => (
         <a className="proj" href={`/demo/${slug}/`} key={slug}>
           <span className="proj__shot">
