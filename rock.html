@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Solutions 101 — камень</title>
+    <meta name="description" content="Логотип Solutions 101 из настоящего колотого камня: 188 обломков. Бросьте в него камень." />
+    <meta name="robots" content="noindex" />
+    <meta property="og:title" content="Solutions 101 — камень" />
+    <meta property="og:description" content="188 обломков настоящего камня. Кликните — и в слово прилетит камень." />
+    <link rel="icon" href="/favicon.svg" />
+    <style>
+      /* Страница-игрушка: сцена занимает экран целиком и ничего не прокручивает.
+         Отдельная от сайта именно поэтому — на сайте прокрутка принадлежит
+         странице, а здесь её нет вовсе. */
+      html, body { margin: 0; height: 100%; background: #0e202d; overscroll-behavior: none; }
+      #rock { position: fixed; inset: 0; }
+      /* touch-action: жест над сценой — её собственный. Без этого браузер на
+         трекпаде и телефоне сначала отдаёт своё пролистывание, и первое
+         движение сцена не получает. */
+      #rock > div, #rock canvas { touch-action: none; }
+    </style>
+    <script type="module" crossorigin src="/assets/rock-DyBBIiQM.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/jsx-runtime-B5yqYJvp.js">
+    <link rel="modulepreload" crossorigin href="/assets/client-qkPAuMPs.js">
+    <link rel="modulepreload" crossorigin href="/assets/preload-helper-Czpn1I53.js">
+  </head>
+  <body>
+    <div id="rock"></div>
+  </body>
+</html>
