@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import { useGLTF, useTexture } from '@react-three/drei'
 import * as THREE from 'three'
-import { CAMERA, DRAG, FLOAT, GROUND, LAYOUT, LAYOUT_3DAR, ROCK, THROW, WORDS } from './config'
+import { CAMERA, DRAG, FLOAT, GROUND, LAYOUT, LAYOUT_3DAR, ROCK, SEAM, THROW, WORDS } from './config'
 import { boxProjectUv } from './boxUv'
 import { groundVelocity, impulse, springVelocity } from './impact'
 
@@ -558,6 +558,10 @@ export function Words({ logo = 'solutions' }: { logo?: 'solutions' | '3dar' }) {
           p.home.y + p.out.y * k + p.kick.y,
           p.home.z + p.out.z * k + p.kick.z,
         )
+        // Усадка к своему центру — она и есть ширина трещины. Каждый кадр,
+        // а не один раз: обломок, слетавший на землю и вернувшийся, приходит
+        // домой с единичным масштабом.
+        p.obj.scale.setScalar(SEAM.shrink)
         p.obj.rotation.set(
           p.homeRot.x + p.twist.x,
           p.homeRot.y + p.twist.y,
@@ -871,7 +875,7 @@ function stepFree(p: Piece, w: Word, k: number, dt: number) {
     // Здесь ошибке накапливаться негде: гнездо задано числами, а не историей.
     p.obj.position.copy(p.home)
     p.obj.rotation.copy(p.homeRot)
-    p.obj.scale.set(1, 1, 1)
+    p.obj.scale.setScalar(SEAM.shrink)
     p.free = null
   }
 }
