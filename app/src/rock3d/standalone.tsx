@@ -13,6 +13,11 @@ import { createRoot } from 'react-dom/client'
 
 const Scene = lazy(() => import('./Scene').then((m) => ({ default: m.Scene })))
 
+/** Какой знак показывать. Берётся из адреса: /rock.html и /rock3dar.html —
+ *  разные страницы, но код у них один, и разводить их копированием файла
+ *  ради одного слова незачем. */
+const LOGO: 'solutions' | '3dar' = location.pathname.includes('3dar') ? '3dar' : 'solutions'
+
 function webglWorks() {
   try {
     const c = document.createElement('canvas')
@@ -65,8 +70,8 @@ function App() {
 
   return (
     <>
-      <Suspense fallback={<div style={MIDDLE}>Solutions 101</div>}>
-        <Scene />
+      <Suspense fallback={<div style={MIDDLE}>{LOGO === '3dar' ? '3DAR studio' : 'Solutions 101'}</div>}>
+        <Scene logo={LOGO} />
       </Suspense>
       <p style={HINT}>
         Клик — бросок · тяните — двигает · правая — разворот · колесо — размер
