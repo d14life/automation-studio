@@ -33,7 +33,7 @@ section each made it worse, one of them blanking the page. Restore point:
 **Commit on `react` FIRST, then deploy.** The deploy is:
 
 ```bash
-git checkout main && git checkout react -- app docs && rm -rf app/dist && cd app && npm run build && cd .. && cp app/dist/v2.html index.html && cp app/dist/v2.html app/dist/sw.js app/dist/dna-poster.jpg . && cp app/dist/assets/* assets/ && rsync -a --delete app/dist/demo/ demo/ && rsync -a app/dist/shots/ shots/ && git add -A && git commit -m "deploy: <what>" && git push origin main && git checkout react
+git checkout main && git checkout react -- app docs && rm -rf app/dist && cd app && npm run build && cd .. && cp app/dist/v2.html index.html && cp app/dist/v2.html app/dist/sw.js app/dist/dna-poster.jpg . && cp app/dist/assets/* assets/ && rsync -a app/dist/demo/ demo/ && rsync -a app/dist/shots/ shots/ && git add -A && git commit -m "deploy: <what>" && git push origin main && git checkout react
 ```
 
 Four parts of that line are not optional, and each one has already gone wrong:
@@ -59,6 +59,9 @@ Four parts of that line are not optional, and each one has already gone wrong:
 - **`rsync -a app/dist/demo/ demo/`** — `cp -r` merges unpredictably across nested asset
   folders. Deliberately **without** `--delete`: `/demo/ekran/` and `/demo/storozh/` are
   live pages that exist only on `main`, and `--delete` would silently unpublish them.
+  The one-liner above used to carry `--delete` here, contradicting this very paragraph;
+  on 7 August a deploy followed the line literally and unpublished both pages. The flag
+  is now gone from the line. `shots/` never had it, for the same reason.
   Removing a demo for real means deleting it from `app/public/demo` on `react` **and**
   `demo/` on `main`, in that order.
 
