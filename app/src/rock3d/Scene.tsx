@@ -4,7 +4,7 @@ import { OrbitControls } from '@react-three/drei'
 import { EffectComposer, Bloom, N8AO, Vignette } from '@react-three/postprocessing'
 import * as THREE from 'three'
 import { Words } from './Words'
-import { AO, CAMERA, GROUND, RENDER, RIG, SCENE, SHADOWMAP } from './config'
+import { AO, CAMERA, GROUND, LAYOUT_3DAR, RENDER, RIG, SCENE, SHADOWMAP } from './config'
 import { studioEnvironment } from './studioEnv'
 
 /**
@@ -47,7 +47,7 @@ function Studio() {
   return null
 }
 
-export function Scene() {
+export function Scene({ logo = 'solutions' }: { logo?: 'solutions' | '3dar' }) {
   return (
     <Canvas
       camera={{ fov: CAMERA.fov, position: [...CAMERA.path[0]] as [number, number, number] }}
@@ -107,7 +107,7 @@ export function Scene() {
       <Studio />
 
       <Suspense fallback={null}>
-        <Words />
+        <Words logo={logo} />
         {/* Тёмная равнина под словами. ОДНА плоскость на всю сцену: стык двух
             виден всегда, и убрать его не получается ничем. */}
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, GROUND.y, 0]} receiveShadow>
@@ -121,7 +121,9 @@ export function Scene() {
           принципиально: колесо над сценой обязано листать страницу. */}
       <OrbitControls
         makeDefault
-        target={CAMERA.orbitTarget as unknown as THREE.Vector3}
+        target={
+          (logo === '3dar' ? LAYOUT_3DAR.target : CAMERA.orbitTarget) as unknown as THREE.Vector3
+        }
         enablePan={false}
         enableZoom={false}
         enableDamping

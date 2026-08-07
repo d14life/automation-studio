@@ -21,6 +21,7 @@ export default defineConfig({
         main: fileURLToPath(new URL('./index.html', import.meta.url)),
         v2: fileURLToPath(new URL('./v2.html', import.meta.url)),
         rock: fileURLToPath(new URL('./rock.html', import.meta.url)),
+        rock3dar: fileURLToPath(new URL('./rock3dar.html', import.meta.url)),
       },
     },
   },

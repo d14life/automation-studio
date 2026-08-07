@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import { useGLTF, useTexture } from '@react-three/drei'
 import * as THREE from 'three'
-import { CAMERA, DRAG, FLOAT, GROUND, LAYOUT, ROCK, THROW, WORDS } from './config'
+import { CAMERA, DRAG, FLOAT, GROUND, LAYOUT, LAYOUT_3DAR, ROCK, THROW, WORDS } from './config'
 import { boxProjectUv } from './boxUv'
 import { groundVelocity, impulse, springVelocity } from './impact'
 
@@ -67,6 +67,9 @@ type Word = {
   /** Разворот правой кнопкой: поворот вокруг вертикали и наклон. */
   spin: number
   tilt: number
+  /** Завал на бок из раскладки. Мышью не меняется: это часть знака, а не поза.
+   *  Нужен «studio», которое в «3DAR studio» стоит стоймя. */
+  roll: number
   bobPhase: number
   /** Свой материал на слово — только ради подсветки выбранного. Общий на оба
    *  слова подсвечивал бы сразу оба. */
@@ -107,8 +110,8 @@ const UP = new THREE.Vector3(0, 1, 0)
  *     от чего избавлялись, чиня геометрию. Объём теперь даёт свет снаружи:
  *     рисующий с тенями, заполняющий, контровой и затенение в щелях.
  */
-export function Words() {
-  const gltf = useGLTF(WORDS.glb, WORDS.dracoPath)
+export function Words({ logo = 'solutions' }: { logo?: 'solutions' | '3dar' }) {
+  const gltf = useGLTF(logo === '3dar' ? WORDS.glb3dar : WORDS.glb, WORDS.dracoPath)
   const [colorMap, normalMap, roughnessMap] = useTexture([
     WORDS.colorMap,
     WORDS.normalMap,
@@ -190,8 +193,13 @@ export function Words() {
 
     const buildWord = (
       list: THREE.Object3D[],
-      layout: { position: readonly [number, number, number]; rotY: number; scale: number },
-      bobPhase: number,
+      layout: {
+        position: readonly [number, number, number]
+        rotY: number
+        roll: number
+        scale: number
+        bobPhase: number
+      },
     ): Word => {
       // Копия общего материала: текстуры и настройки те же по ссылке, свой
       // только объект — чтобы подсветить выбранное слово, не трогая соседнее.
@@ -268,18 +276,17 @@ export function Words() {
         scale: layout.scale,
         spin: layout.rotY,
         tilt: 0,
-        bobPhase,
+        roll: layout.roll,
+        bobPhase: layout.bobPhase,
         material,
       }
     }
 
-    const words = [
-      buildWord(listA, LAYOUT.solutions, 0),
-      buildWord(listB, LAYOUT.one01, Math.PI * 0.7),
-    ]
+    const plan = logo === '3dar' ? LAYOUT_3DAR : { a: LAYOUT.solutions, b: LAYOUT.one01 }
+    const words = [buildWord(listA, plan.a), buildWord(listB, plan.b)]
 
     return { words, flyingMaterial, flyingGeometry }
-  }, [gltf, colorMap, normalMap, roughnessMap])
+  }, [gltf, colorMap, normalMap, roughnessMap, logo])
 
   // ОДНА КНОПКА МЫШИ, ТРИ ЖЕСТА.
   //
@@ -485,8 +492,6 @@ export function Words() {
   }, [gl, camera, words, controls])
 
   useFrame(({ clock }, delta) => {
-    // Отладочная публикация сцены в window осталась в песочнице logo101-3d:
-    // здесь она не нужна, а process.env в браузерной сборке нет.
     const time = clock.elapsedTime
     // Потолок шага: вернувшаяся из сворачивания вкладка приносит кадр в
     // полсекунды, и без потолка он одним махом разносит и пружину, и падение.
@@ -510,7 +515,7 @@ export function Words() {
       // есть ровно так, как ждёт рука. На штатном порядке слово, развёрнутое
       // вбок, начинает от вертикального движения мыши заваливаться набок.
       w.group.rotation.order = 'YXZ'
-      w.group.rotation.set(w.tilt, w.spin, 0)
+      w.group.rotation.set(w.tilt, w.spin, w.roll)
       // Матрица группы обновляется СЕЙЧАС, а не движком перед отрисовкой:
       // ниже по ней переводят точки между мировыми и местными осями, и
       // отставшая на кадр матрица кладёт обломки мимо гнёзд.
