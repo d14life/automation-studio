@@ -20,7 +20,14 @@ The v2 page (`app/src/v2/`) is a scroll-scrubbed DNA video header plus a content
 Damir signed the scrub off in these words: *"dna background is moving perfect now lock it
 this way bro important so no more fuck ups."*
 
-`RUNWAY`, `FPS`, `HALF_FRAME`, `SEEK_MS`, `EASE`, the `SRC_*` ladder and the rAF scrub loop
+**Re-signed 2026-08-09 on new numbers.** He drove a slider panel over the clip
+(`~/Downloads/claude-sessions/2026-08-07/dna-handoff/standalone.html`) and pasted the result
+back. `RUNWAY` 3.85 → 2.676, `LOOP_SPEED` 1 → 1.5, `TURN_AT` 0.92 → 1, `SEEK_MS` 33 → 16, plus
+a two-gear `warp()`: black ×1.95 up to 9% destroyed, broken ×1.20 after. `SEEK_MS 16` reverses
+a measured cap and was flagged to him — it is his call, not a mistake to fix.
+
+`RUNWAY`, `FPS`, `HALF_FRAME`, `SEEK_MS`, `EASE`, `BREAK`/`BLACK_GAIN`/`BROKEN_GAIN`/`PIVOT`/
+`LOOP_COMP`, the `SRC_*` ladder and the rAF scrub loop
 in `app/src/v2/V2.tsx` are **closed**. A complaint that the header feels slow, long, jumpy
 or heavy is not permission to retune them — the last three passes at "optimising" that
 section each made it worse, one of them blanking the page. Restore point:

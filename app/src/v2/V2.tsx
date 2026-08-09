@@ -42,6 +42,12 @@ import './v2.css'
    the last three times this section was "optimised" it came back worse, once blanking the
    page. Restore point if it drifts anyway: `git show dna-locked:app/src/v2/V2.tsx`.
 
+   REOPENED AND RE-SIGNED 2026-08-09. He drove a slider panel over this exact clip and pasted
+   the result back: "yes make this for our main webpage now bro". RUNWAY 3.85 -> 2.676,
+   LOOP_SPEED 1 -> 1.5, TURN_AT 0.92 -> 1, SEEK_MS 33 -> 16, plus the gearing block below.
+   The lock stands on the NEW numbers. Same rule: they are somebody's taste expressed as
+   numbers, and a brief that says the header feels wrong is not permission to retune them.
+
    To unlock, get Damir to say so in the same words he used to lock it.
    ========================================================================================== */
 
@@ -50,7 +56,10 @@ import './v2.css'
 /* 3.85, not 5. His ask: the same scroll should move the strand 30% further, which is a
    shorter runway rather than a faster clip - the clip is scrubbed, it has no speed of its own.
    5 / 1.3 = 3.85. */
-const RUNWAY = 3.85
+/* 2.676, from the tuner. He set the gearing by hand on the real clip and pasted the block back
+   (see THE GEARING below); the runway is derived from it, not chosen - each zone buys its own
+   share of scroll, so making both zones quicker necessarily makes the header shorter. */
+const RUNWAY = 2.676
 
 /* THE THREE FEEL KNOBS. Everything about how the strand responds is one of these, so a
    "faster" or "slower" note changes a number here and nothing else.
@@ -78,7 +87,9 @@ const RUNWAY = 3.85
    100fps interpolation would let the gain sit at 0.55 and still show 50fps-per-scroll - and
    that is a ~76MB download, which is a separate decision for him rather than a silent one. */
 const SCROLL_GAIN = 1
-const LOOP_SPEED = 1
+/* 1.5 - his own call from the tuner: "all i need to do is just increase the idle drift". This
+   is the movement the strand has when nobody is scrolling. */
+const LOOP_SPEED = 1.5
 
 /* WHERE THE STRAND TURNS. 1 = the very last frame, which is a hard corner because the last
    frames are the calmest in the clip and a reversal there has nothing to hide behind. 0.92 is
@@ -86,8 +97,47 @@ const LOOP_SPEED = 1
    costs a reload rather than a deploy. */
 const TURN_AT = (() => {
   const q = parseFloat(new URLSearchParams(location.search).get('turn') || '')
-  return Number.isFinite(q) && q > 0.05 && q <= 1 ? q : 0.92
+  return Number.isFinite(q) && q > 0.05 && q <= 1 ? q : 1
 })()
+
+/* ---- THE GEARING. Scroll no longer maps to clip time in a straight line. ----------------
+   His ask, in his words: "when it black and nearly fully black (at most 20 percent destroyed)
+   from that point it goes faster then it was originaly and other parts where it not fully
+   black or more than 20 percent destroyed the speed goes as original".
+
+   These five numbers are not chosen, they are the output of a tuner he drove himself against
+   this exact clip - app/../claude-sessions/2026-08-07/dna-handoff/standalone.html, a sliders
+   panel over the same 40MB file (md5 verified identical to the deployed one). He pasted the
+   block back and said ship it. Do not "improve" them: they are somebody's taste, expressed in
+   numbers, which is the only form taste survives in.
+
+     black  x1.95  up to  9% destroyed (clip 0.431)
+     broken x1.20  after that
+
+   WHY THE ZONES DO NOT FIGHT. Each buys its own share of the runway - BREAK/BLACK_GAIN plus
+   (1-BREAK)/BROKEN_GAIN - so a zone's px-per-frame works out to run/(gain*TURN_AT*frames) and
+   the other gain cancels out of the algebra. Measured across a sweep of both: change one and
+   the other's rate does not move by a hundredth. What they share is the total runway, which is
+   the honest consequence of "this part is quicker" - quicker means less scrolling.
+
+   LOOP_COMP IS NOT OPTIONAL. The idle loop advances the LINEAR parameter, so without it the
+   drift picks up the warp's slope and the destroyed half crawls - he caught that by eye when
+   the numbers said the scroll rate was untouched, and he was right. 1/K restores both zones at
+   once: the slopes are BLACK_GAIN*K and BROKEN_GAIN*K, so dividing by K leaves exactly the two
+   gains. The speed bell has to be read off warp(lin) for the same reason - phase and clip
+   position were the same thing before the warp existed and are not any more. */
+const BREAK        = 0.431
+const BLACK_GAIN   = 1.95
+const BROKEN_GAIN  = 1.2
+const PIVOT        = 0.318
+const LOOP_COMP    = 1.4388
+/* scroll fraction in, clip fraction out. Two straight segments meeting at PIVOT, which is the
+   scroll position of the frame where the strand passes 9% destroyed. */
+function warp(p: number): number {
+  return p <= PIVOT ? (p / PIVOT) * BREAK
+                    : BREAK + ((p - PIVOT) / (1 - PIVOT)) * (1 - BREAK)
+}
+
 const HOLD_FADE = 0.08
 /* Frame rate is per tier, so it is declared with the tier below - seeking finer than one frame
    just decodes the same picture again, and the grid has to be the grid the file actually has. */
@@ -225,7 +275,11 @@ const HALF_FRAME = 0.5 / FPS
    runs at 24.
 
    The 25fps tiers are unaffected - their own 40ms interval is already slower than 33. */
-const SEEK_MS = Math.max(1000 / FPS, 33)
+/* 16, HIS CALL, AND IT REVERSES THE CAP THIS CONSTANT EXISTS FOR. 33ms was measured: every
+   frame is a keyframe, a seek costs ~10ms at 1440p, and 33 holds the decode duty cycle near
+   30% instead of 50%. He tuned 16 on this Mac and preferred it. Flagged at the time - the
+   Windows laptop that lagged is the machine this puts back at risk. One number to restore. */
+const SEEK_MS = 16
 
 /* The two sources need not be the same resolution - the browser takes the first it can decode,
    and that is the whole point. HEVC is roughly half the bytes, so where it is available a
@@ -993,10 +1047,18 @@ export default function V2() {
          at each turnaround and the reversal has no corner in it. The 0.55 floor stops it
          dwelling there, which was an earlier "it holds for half a second" complaint. */
       const tri = ((phase % 2) + 2) % 2          /* 0..2, one full there-and-back */
-      const bell = Math.max(Math.abs(Math.sin(tri * Math.PI)), 0.55)
-      if (!REDUCE) phase += dir * (Math.PI / (2 * el.duration)) * LOOP_SPEED * bell * dt * idle
+      const lin = tri <= 1 ? tri : 2 - tri       /* 0..1, the un-geared triangle */
+      /* THE BELL IS READ OFF THE CLIP, NOT THE PHASE. It slows the drift near each turnaround
+         so the reversal has no corner in it, and it was a function of phase back when phase
+         WAS the clip position. The gearing broke that equivalence: the same frame now sits at
+         a different phase and would get the wrong bell, which left the destroyed half drifting
+         off-speed even after LOOP_COMP had corrected the gearing. */
+      const bell = Math.max(Math.abs(Math.sin(warp(lin) * Math.PI)), 0.55)
+      /* LOOP_COMP undoes the warp's slope so each zone drifts at its own gain - see THE
+         GEARING above. Without it the destroyed half crawls. */
+      if (!REDUCE) phase += dir * (Math.PI / (2 * el.duration)) * LOOP_SPEED * LOOP_COMP * bell * dt * idle
       const t2 = ((phase % 2) + 2) % 2
-      pos = (t2 <= 1 ? t2 : 2 - t2) * TURN_AT
+      pos = warp(t2 <= 1 ? t2 : 2 - t2) * TURN_AT
 
       /* NEVER SEEK INTO A PART OF THE FILE THAT HAS NOT ARRIVED. This is the whole of his
          "I scrolled during the first two seconds and it froze and then took even longer".
