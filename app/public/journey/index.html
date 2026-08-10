@@ -63,6 +63,37 @@ img{display:block;max-width:100%}
 .pin{position:sticky;top:0;height:100lvh;min-height:100lvh;overflow:hidden;
      display:grid;place-items:center}
 
+/* ============================================================================
+   THE CAMERA MODEL. Damir, and it is the thing my whole structure got wrong:
+   this is ONE FLAT CANVAS WITH A CAMERA MOVING OVER IT, not a stack of
+   sections. The wheel zooms and rotates; nothing translates vertically between
+   the landing page, the box and the sphere. Later the camera moves down to the
+   images, right along them, then keeps going LEFT PAST THE START until they
+   read as a collage, then left and a bit down back to the front page.
+
+   A stack of sections cannot express "right, then left past the start". A
+   camera on a plane can, and it is also why the reference reads as a loop:
+   the landing page is simply passed twice.
+
+   #world is the plane. Scenes sit on it at fixed coordinates in vw/vh units.
+   One transform on #world moves the camera; scenes never move themselves.
+============================================================================ */
+#trip{position:relative;height:1100svh}
+#cam{position:sticky;top:0;height:100lvh;overflow:hidden;background:var(--bg)}
+#world{position:absolute;left:50%;top:50%;width:0;height:0;
+  transform-style:preserve-3d;will-change:transform}
+/* Scenes the camera TRAVELS ALONG need an extent, not a point. The rail sat at
+   world x=0 while the camera panned to x=2.2 across its stretch, so it rendered
+   110vw off-screen. --ww/--wh are the scene's size in viewport units; --wx/--wy
+   are the centre of that box on the plane. open and sphere are single-screen
+   (ww=1) which is exactly why those two worked while the rest did not. */
+.scene{position:absolute;left:0;top:0;
+  width:calc(var(--ww,1) * 100vw);height:calc(var(--wh,1) * 100lvh);
+  opacity:var(--vis,0);pointer-events:none;
+  translate:-50% -50%;display:grid;place-items:center;overflow:hidden;
+  /* placed by --wx / --wy, in viewport units, on the world plane */
+  margin-left:calc(var(--wx,0) * 100vw);margin-top:calc(var(--wy,0) * 100lvh)}
+
 /* Sub-windows. The whole trick behind "flowy": inside one beat, each element
    runs on its own slice of --p, and the slices OVERLAP. w(a,b) maps the beat's
    progress onto 0..1 across [a,b]. Written as a clamp so it saturates at both
@@ -336,7 +367,7 @@ img{display:block;max-width:100%}
    are visible at a time. The first pass had rounded 16/11 cards floating in a
    centred row with big gaps, which is a gallery strip, not this. */
 .rail{display:flex;gap:6px;align-items:stretch;height:100%;
-  transform:translate3d(calc(var(--e) * -58%),0,0)}
+  transform:translate3d(calc(var(--e) * -6%),0,0)}
 .rail figure{margin:0;flex:0 0 48vw;position:relative;overflow:hidden;background:var(--deep);
   display:grid;align-content:center}
 /* THE ONE HONEST DEVIATION. The reference's cards are full-bleed ARTWORK, so it
@@ -366,7 +397,7 @@ img{display:block;max-width:100%}
 .field-target{background:radial-gradient(130% 130% at 20% 12%, #2b6d95 0%, transparent 58%),
   linear-gradient(155deg,#1b4a6b 0%, var(--deep) 76%) !important}
 .field{position:absolute;inset:0;transform-style:preserve-3d;
-  transform:translateZ(calc(var(--p) * 2750px))}
+  transform:translateZ(calc(var(--p) * 900px))}
 .field div{position:absolute;left:50%;top:50%;border-radius:4px;overflow:hidden;
   background:linear-gradient(150deg,#1c445f,#0a1620);
   box-shadow:0 24px 60px -20px rgba(0,0,0,.85), inset 0 0 0 1px rgba(223,246,255,.07);
@@ -467,7 +498,7 @@ img{display:block;max-width:100%}
    rather than a cut between two things. Sizes are in card units and get
    multiplied by the card's scale, so the hero reads at ~2x these numbers. */
 .opener-page{position:absolute;inset:0;padding:0 7%;display:grid;align-content:center;
-  opacity:clamp(0, calc((.19 - var(--p)) / .11), 1);
+  opacity:clamp(0, calc((.26 - var(--p)) / .13), 1);
   /* The card morphs shape, so its X and Y scales differ and anything inside it
      would be stretched. Undo exactly that ratio here and the type stays true. */
   transform:scaleX(calc(var(--sy,1) / var(--sx,1)));transform-origin:left center}
@@ -478,7 +509,7 @@ img{display:block;max-width:100%}
 .opener-page .btn{font-size:5px;padding:.7em 1.5em;justify-self:start}
 /* the card's own face, arriving as the page leaves */
 .ring-card__face{position:absolute;inset:0;
-  opacity:clamp(0, calc((var(--p) - .15) / .11), 1)}
+  opacity:clamp(0, calc((var(--p) - .08) / .12), 1)}
 /* every card except the hero is only ever a face, so it must not fade */
 .ring-card:not(:first-child) .ring-card__face{opacity:1}
 
@@ -551,9 +582,12 @@ img{display:block;max-width:100%}
   </defs>
 </svg>
 
+<!-- ══ THE TRIP: one plane, one camera ═══════════════════════════════════ -->
+<section id="trip"><div id="cam"><div id="world">
+
 <!-- ══ BEAT 1 ══ the page that becomes the deck ═════════════════════════ -->
-<section class="stage" id="open" style="--h:420svh">
-  <div class="pin">
+<div class="scene" id="open" style="--wx:0;--wy:0;--ww:1;--wh:1">
+
     <div class="marquee" aria-hidden="true">
       <span>Автоматизируем бизнес-процессы. Быстро не значит плохо.</span>
       <span>Автоматизируем бизнес-процессы. Быстро не значит плохо.</span>
@@ -602,12 +636,14 @@ img{display:block;max-width:100%}
     <div class="swallow-cut swallow-cut--fill"><div class="swallow-glow"></div></div>
     <div class="swallow-seal"></div>
     <svg class="star star-core" viewBox="0 0 100 100" fill="#ffffff" aria-hidden="true"><use href="#s4"/></svg>
-  </div>
-</section>
+  
+</div>
+
+
 
 <!-- ══ BEAT 3 ══ the particle sphere ══════════════════════════════════════ -->
-<section class="stage" id="sphere" style="--h:240svh">
-  <div class="pin">
+<div class="scene" id="sphere" style="--wx:0;--wy:0;--ww:1;--wh:1">
+
     <canvas id="pts"></canvas>
     <!-- the same star that swallowed the deck, still burning at the centre.
          Continuity: it is never re-introduced, it simply never left. -->
@@ -618,12 +654,14 @@ img{display:block;max-width:100%}
       <p>Мы не пишем систему год. Первый рабочий контур собирается за недели,
          и вы им пользуетесь, пока мы достраиваем остальное.</p>
     </div>
-  </div>
-</section>
+  
+</div>
+
+
 
 <!-- ══ BEAT 4 ══ the rail ═════════════════════════════════════════════════ -->
-<section class="stage" id="rail" style="--h:230svh">
-  <div class="pin">
+<div class="scene" id="rail" style="--wx:1.1;--wy:1.15;--ww:3.2;--wh:1">
+
     <div class="rail">
       <figure><img src="/shots/park.jpg" alt="" width="1120" height="780" />
         <span class="meta">Календарь занятости, наработка по сменам, окупаемость парка</span>
@@ -638,17 +676,21 @@ img{display:block;max-width:100%}
         <span class="meta">FEFO, приёмка, размещение, слепой пересчёт</span>
         <figcaption><b>Складской терминал</b></figcaption></figure>
     </div>
-  </div>
-</section>
+  
+</div>
+
+
 
 <!-- ══ BEAT 5 ══ the field ════════════════════════════════════════════════ -->
-<section class="stage" id="field" style="--h:220svh">
-  <div class="pin"><div class="field" id="fieldWrap"></div></div>
-</section>
+<div class="scene" id="field" style="--wx:3.9;--wy:1.15;--ww:3.4;--wh:1">
+<div class="field" id="fieldWrap"></div>
+</div>
+
+
 
 <!-- ══ BEAT 6 ══ a card becomes the section, then is flown through ════════ -->
-<section class="stage" id="grow" style="--h:210svh">
-  <div class="pin">
+<div class="scene" id="grow" style="--wx:5.0;--wy:1.15;--ww:1;--wh:1">
+
     <div class="grow-card">
       <svg class="chrome" viewBox="0 0 100 100" fill="url(#chromeGrad)" aria-hidden="true"><use href="#s4"/></svg>
       <div class="grow-copy">
@@ -660,16 +702,23 @@ img{display:block;max-width:100%}
     </div>
     <div class="grow-flare"></div>
     <svg class="star grow-seed" viewBox="0 0 100 100" fill="#06121a" aria-hidden="true"><use href="#s4"/></svg>
-  </div>
-</section>
+  
+</div>
+
+
 
 <!-- ══ BEAT 7 ══ the answer panel ═════════════════════════════════════════ -->
-<section class="stage" id="answer" style="--h:170svh">
-  <div class="pin">
+<div class="scene" id="answer" style="--wx:5.0;--wy:1.15;--ww:1;--wh:1">
+
     <div class="panel"><h2>Системы, которые<span>считают за вас</span></h2></div>
     <div class="panel-flare"></div>
-  </div>
-</section>
+  
+</div>
+
+
+
+
+</div></div></section>
 
 <section class="end">
   <div>
@@ -702,24 +751,58 @@ img{display:block;max-width:100%}
    can see between 60 and 120Hz. ponytail: raise this to dt-based smoothing
    only if a 120Hz machine actually looks different.
 --------------------------------------------------------------------------- */
+const scenes = [...document.querySelectorAll('.scene')]
+const hud = document.getElementById('hud')
+const world = document.getElementById('world')
+
+/* ============================================================================
+   THE CAMERA PATH.
+
+   Keyframes over scroll progress 0..1. x/y are in viewport units on the world
+   plane, z is zoom (1 = a scene fills the viewport), rot is a roll in degrees.
+   The camera interpolates between them; each scene derives its own local
+   progress from the segment it owns, so every beat's internals keep working
+   unchanged.
+
+   Read off Damir's description of the reference:
+     landing page -> pull back to the 4-card box -> zoom INTO the star on a face
+     -> the sphere page -> DOWN to the images -> RIGHT along them -> keep going
+     LEFT past the start until they read as a collage -> left and a bit down,
+     back to the landing page.
+
+   Nothing translates vertically for the first three; the camera only zooms and
+   rolls. That is the whole reason a section stack could not express this.
+============================================================================ */
+const CAM = [
+  { p: 0.00, x: 0,    y: 0,    z: 2.60, rot: 0 },   // landing page, full bleed
+  { p: 0.13, x: 0,    y: 0,    z: 1.00, rot: 0 },   // pull back: the 4-card box
+  { p: 0.30, x: 0,    y: 0,    z: 1.00, rot: 0 },   // the box turns, camera still
+  { p: 0.42, x: 0,    y: 0,    z: 6.00, rot: 0 },   // zoom INTO the star on a face
+  { p: 0.52, x: 0,    y: 0,    z: 1.00, rot: 0 },   // out into the sphere page
+  { p: 0.60, x: 0,    y: 1.15, z: 1.00, rot: 0 },   // DOWN to the project images
+  { p: 0.72, x: 2.2,  y: 1.15, z: 1.00, rot: 0 },   // RIGHT along them
+  { p: 0.86, x: 5.0,  y: 1.15, z: 1.00, rot: 0 },   // keep going RIGHT: the collage
+  { p: 0.93, x: 5.0,  y: 1.15, z: 1.00, rot: 0 },   // a collage piece becomes a section
+  { p: 1.00, x: 5.0,  y: 1.15, z: 2.60, rot: 0 },   // zoom through it, back to the page
+]
+
+/* which scene owns which stretch of the path, so each keeps its own 0..1 */
+const OWNER = [
+  ['open',   0.00, 0.42],
+  ['sphere', 0.42, 0.60],
+  ['rail',   0.58, 0.74],
+  ['field',  0.70, 0.88],
+  ['grow',   0.84, 0.95],
+  ['answer', 0.92, 1.00],
+]
+
 const LAG = 0.12
 const clamp = (v, a, b) => v < a ? a : v > b ? b : v
-/* The two curves. easeInOutCubic for anything that travels or scales — it
-   leaves and arrives slowly. easeOutCubic for anything that ARRIVES — fast in,
-   settles. Nothing on the page uses raw linear except the field camera. */
 const easeInOut = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
 const easeOut = t => 1 - Math.pow(1 - t, 3)
 
-/* THE DECK DWELLS. In the reference the front card sits face-on for many frames
-   and then flicks to the next (f360-370 hold, f371 moves). A single continuous
-   sweep - which is what this had - spends most of its time at the in-between
-   angles where two cards are equally edge-on and the whole thing reads as a
-   jumble. That was the difference, not the geometry.
-
-   So the turn is stepped: N slots of 45deg, and inside each slot the card
-   rests for the first and last quarter and travels through the middle half.
-   You get time to actually read each card, which is the entire point of a deck
-   of products. */
+/* the deck dwells: 90deg slots, resting a quarter at each end. A continuous
+   sweep sits at the angles where two faces are equally edge-on. */
 function steppedTurn(t, slots) {
   const idx = t * slots
   const k = Math.floor(Math.min(idx, slots - 0.0001))
@@ -727,13 +810,67 @@ function steppedTurn(t, slots) {
   return (k + easeInOut(frac)) * -90
 }
 
-const stages = [...document.querySelectorAll('.stage')]
+let smoothP = 0, awake = 0
 
-/* Beat 1's scale factors are MEASURED, not hardcoded. An earlier pass wrote
-   2.88/2.08 for an 864px viewport and the card sat inset at every other size,
-   because .ring is min(26vw,300px) and its natural size moves with the
-   viewport. Read at rest and on resize, never per frame - measuring an element
-   while it is scaled would feed its own output back in. */
+function frame(force) {
+  const doc = document.documentElement
+  const range = doc.scrollHeight - innerHeight
+  const raw = range > 0 ? clamp(doc.scrollTop / range, 0, 1) : 0
+  /* damped, for the same reason as before: tracking the wheel 1:1 is what made
+     the first build read as mechanical. */
+  smoothP = force ? raw : smoothP + (raw - smoothP) * LAG
+  const p = smoothP
+
+  /* --- camera: find the segment and ease across it --- */
+  let i = 0
+  while (i < CAM.length - 2 && p > CAM[i + 1].p) i++
+  const a = CAM[i], b = CAM[i + 1]
+  const t = easeInOut(clamp((p - a.p) / (b.p - a.p), 0, 1))
+  const cx = a.x + (b.x - a.x) * t
+  const cy = a.y + (b.y - a.y) * t
+  const cz = a.z + (b.z - a.z) * t
+  const cr = a.rot + (b.rot - a.rot) * t
+  world.style.transform =
+    `scale(${cz.toFixed(4)}) rotate(${cr.toFixed(2)}deg) ` +
+    `translate3d(${(-cx * 100).toFixed(3)}vw, ${(-cy * 100).toFixed(3)}lvh, 0)`
+
+  /* --- each scene's own 0..1 over the stretch it owns --- */
+  for (const [id, s0, s1] of OWNER) {
+    const el = document.getElementById(id)
+    if (!el) continue
+    const lp = clamp((p - s0) / (s1 - s0), 0, 1)
+    /* Some scenes share a world coordinate on purpose - the star zooms INTO the
+       sphere page, so they sit in the same place. Visibility is a crossfade at
+       the edges of the stretch each one owns, not a position difference. */
+    /* THE CUTS WERE BAD because 0.03 is effectively a switch. The reference
+       never cuts - every seam has both scenes on screen at once. The owner
+       windows above now overlap, and the fades are wide enough to cross. */
+    const fadeIn  = clamp((p - s0) / 0.05, 0, 1)
+    const fadeOut = clamp((s1 - p) / 0.05, 0, 1)
+    el.style.setProperty('--vis', Math.min(fadeIn, fadeOut).toFixed(3))
+    el.style.setProperty('--p', lp.toFixed(4))
+    el.style.setProperty('--e', easeInOut(lp).toFixed(4))
+    el.style.setProperty('--o', easeOut(lp).toFixed(4))
+    if (id === 'open') {
+      const f  = clamp((lp - 0.05) / 0.33, 0, 1)
+      const fs = clamp((lp - 0.05) / 0.24, 0, 1)
+      const fe = easeInOut(fs)
+      el.style.setProperty('--sx', (RING.x - fe * (RING.x - 1)).toFixed(3))
+      el.style.setProperty('--sy', (RING.y - fe * (RING.y - 1)).toFixed(3))
+      el.style.setProperty('--swing', (Math.sin(f * Math.PI) * -34).toFixed(2) + 'deg')
+      el.style.setProperty('--spread', easeOut(clamp((lp - 0.40) / 0.22, 0, 1)).toFixed(4))
+      el.style.setProperty('--turn', steppedTurn(clamp((lp - 0.58) / 0.34, 0, 1), 2).toFixed(2) + 'deg')
+      el.style.setProperty('--sw', clamp((lp - 0.76) / 0.24, 0, 1).toFixed(4))
+    }
+  }
+
+  hud.textContent = String(Math.round(p * 100)).padStart(2, '0') + '%'
+  if (Math.abs(raw - smoothP) > 0.0004) awake = 90
+  if (awake > 0) { awake--; requestAnimationFrame(() => frame(false)) }
+}
+
+/* The ring's natural size drives the fold's scale factors; measured at rest and
+   on resize, never per frame (measuring it while scaled feeds its own output back). */
 const ringEl = document.querySelector('.ring')
 const RING = { x: 1, y: 1 }
 function measureRing() {
@@ -745,140 +882,29 @@ function measureRing() {
   if (r.width && r.height) { RING.x = innerWidth / r.width; RING.y = innerHeight / r.height }
 }
 measureRing()
-addEventListener('resize', measureRing)
-const hud = document.getElementById('hud')
-const smoothed = new WeakMap()
-let awake = 0
-
-function frame(force) {
-  const vh = innerHeight
-  let moving = false
-
-  for (const s of stages) {
-    const r = s.getBoundingClientRect()
-    /* Off screen with margin: skip the write entirely. Setting a custom
-       property invalidates style for the whole subtree, and seven of the eight
-       beats are always off screen. */
-    if (!force && (r.bottom < -vh || r.top > vh * 2)) continue
-
-    const span = r.height - vh
-    const raw = span > 0 ? clamp(-r.top / span, 0, 1) : (r.top < 0 ? 1 : 0)
-
-    const was = smoothed.has(s) ? smoothed.get(s) : raw
-    const now = force ? raw : was + (raw - was) * LAG
-    smoothed.set(s, now)
-    if (Math.abs(raw - now) > 0.0004) moving = true
-
-    s.style.setProperty('--p', now.toFixed(4))
-    s.style.setProperty('--e', easeInOut(now).toFixed(4))
-    s.style.setProperty('--o', easeOut(now).toFixed(4))
-
-    /* BEAT 1 IS THE ONE SPECIAL CASE, and it earns it. Four gestures overlap
-       here on four different windows: the zoom out of full bleed, the swing
-       that goes out and comes back, the deck spreading open, and the turn.
-       Written here rather than as four layers of nested clamp() in the CSS,
-       because the swing is a sine and the windows all differ - a named special
-       case with a comment beats CSS gymnastics nobody can read at 3am. */
-    if (s.id === 'open') {
-      /* SEQUENCED, NOT OVERLAPPING. These four used to run on top of each
-         other: the spread opened at .12 while the swing was still running to
-         .42, so the whole OPEN deck tilted 44 degrees and collapsed into a
-         fan of falling cards. In the reference the swing happens while the
-         card is still alone. Fold first, then open, then turn. */
-      const f  = clamp((now - 0.05) / 0.33, 0, 1)   // the swing
-      const fs = clamp((now - 0.05) / 0.24, 0, 1)   // the shrink, on a FASTER window   // the fold: page becomes card
-      /* 16:9 page at the start, 3:4 card at the end. The base card is 300x400,
-         so filling the viewport needs a wider X scale than Y, and that DIFFERENCE
-         is the shape morph: the page really does change proportion as it folds,
-         it does not just shrink. */
-      const fe = easeInOut(fs)
-      s.style.setProperty('--sx', (RING.x - fe * (RING.x - 1)).toFixed(3))
-      s.style.setProperty('--sy', (RING.y - fe * (RING.y - 1)).toFixed(3))
-      /* out to -44deg and back to 0: a card being dealt, not a poster spinning */
-      s.style.setProperty('--swing', (Math.sin(f * Math.PI) * -34).toFixed(2) + 'deg')
-      /* the deck opening IS the spread. Starts after the fold has begun. */
-      s.style.setProperty('--spread', easeOut(clamp((now - 0.40) / 0.22, 0, 1)).toFixed(4))
-      /* and only then does it turn. Finishes at .88 so the card is still for
-         the handoff. 95deg, not the 135 of the first pass - the reference turns
-         about two cards' worth, not three. */
-      s.style.setProperty('--turn',
-        steppedTurn(clamp((now - 0.44) / 0.28, 0, 1), 2).toFixed(2) + 'deg')
-      /* and the star grows out of the front card once the deck has parked */
-      s.style.setProperty('--sw', clamp((now - 0.76) / 0.24, 0, 1).toFixed(4))
-    }
-  }
-
-  const doc = document.documentElement
-  /* solo mode leaves the page exactly one viewport tall, so this divided by
-     zero and printed NaN% - visible in every A/B screenshot until now. */
-  const range = doc.scrollHeight - vh
-  hud.textContent = range > 0
-    ? String(Math.round(doc.scrollTop / range * 100)).padStart(2, '0') + '%'
-    : '00%'
-
-  /* Keep the loop alive only while something is still settling, plus a short
-     tail so a flick does not die mid-glide. An always-on rAF on a page this
-     size is a warm laptop with no visible cause. */
-  if (moving) awake = 90
-  if (awake > 0) { awake--; requestAnimationFrame(() => frame(false)) }
-}
+addEventListener('resize', () => { measureRing(); frame(true) })
 
 let pending = false
 addEventListener('scroll', () => {
   awake = 90
   if (!pending) { pending = true; requestAnimationFrame(() => { pending = false; frame(false) }) }
 }, { passive: true })
-addEventListener('resize', () => frame(true))
 frame(true)
 
-/* ---------------------------------------------------------------------------
-   SMOOTH SCROLL.
-
-   Damping the derived values got the elements gliding, but the PAGE was still
-   moving in wheel notches underneath them, and that is what still read as
-   mechanical. This is the Lenis idea in thirty lines: swallow the wheel, keep
-   a target scroll position, and ease the real scrollTop toward it every frame.
-
-   Real scrollTop, not a transform on a wrapper. A wrapper translate is the
-   other common way to do this and it silently breaks position:sticky, which is
-   what all eight beats are pinned with.
-
-   Not a library, per the ladder - lenis is ~10KB and would have to be vendored
-   into this file anyway, since a page in public/ cannot import from
-   node_modules and the page must make zero external requests to be deployable.
-
-   Keyboard, spacebar, Home/End and the scrollbar are all left alone: they go
-   through native scrolling, which still works, and hijacking them is how a
-   smooth-scroll script becomes an accessibility problem. */
-const SMOOTH = 0.085
-let target = scrollY, gliding = false
-
-function glide() {
-  const max = document.documentElement.scrollHeight - innerHeight
-  target = clamp(target, 0, max)
-  const d = target - scrollY
-  if (Math.abs(d) < 0.5) { scrollTo(0, target); gliding = false; return }
-  scrollTo(0, scrollY + d * SMOOTH)
-  requestAnimationFrame(glide)
-}
-
-/* Touch is left native. Phone scrolling already has momentum from the OS and
-   it is tuned better than anything done here; overriding it is how a page
-   starts feeling wrong on a phone specifically. */
-const fine = matchMedia('(pointer: fine)').matches
-const still = matchMedia('(prefers-reduced-motion: reduce)').matches
-
-if (fine && !still) {
-  addEventListener('wheel', (e) => {
-    if (e.ctrlKey) return                 // pinch zoom is not scrolling
-    e.preventDefault()
-    target = clamp(target + e.deltaY, 0, document.documentElement.scrollHeight - innerHeight)
-    if (!gliding) { gliding = true; requestAnimationFrame(glide) }
-  }, { passive: false })
-
-  /* Anything that scrolls the page by other means - keyboard, scrollbar drag,
-     the ?at= jump - must not be fought by a stale target. */
-  addEventListener('scroll', () => { if (!gliding) target = scrollY }, { passive: true })
+/* ?solo / ?at still work: solo parks the camera on one scene's stretch. */
+const q = new URLSearchParams(location.search)
+const P_AT = clamp(parseFloat(q.get('p')) || 0, 0, 1)
+const soloId = q.get('solo') || q.get('at')
+if (soloId) {
+  const own = OWNER.find(o => o[0] === soloId)
+  if (own) {
+    history.scrollRestoration = 'manual'
+    const doc = document.documentElement
+    const target = own[1] + (own[2] - own[1]) * P_AT
+    scrollTo(0, target * (doc.scrollHeight - innerHeight))
+    smoothP = target
+    frame(true)
+  }
 }
 
 /* ?bench=1 - time the canvas synchronously and write the result into the DOM so
@@ -914,52 +940,6 @@ if (new URLSearchParams(location.search).get('bench')) {
 
    force=true on frame() skips the damping, so the pose is exactly the one asked
    for rather than one lerp step toward it. */
-const q = new URLSearchParams(location.search)
-const P_AT = clamp(parseFloat(q.get('p')) || 0, 0, 1)
-
-if (q.get('solo')) {
-  const s = document.getElementById(q.get('solo'))
-  if (s) {
-    history.scrollRestoration = 'manual'
-    for (const other of stages) if (other !== s) other.style.display = 'none'
-    document.querySelector('.end').style.display = 'none'
-    s.style.height = '100svh'
-    const pin = s.querySelector('.pin')
-    pin.style.position = 'relative'
-    for (const [k, fn] of [['--p', v => v], ['--e', easeInOut], ['--o', easeOut]]) {
-      s.style.setProperty(k, fn(P_AT).toFixed(4))
-    }
-    if (s.id === 'open') {
-      const f  = clamp((P_AT - 0.05) / 0.33, 0, 1)   // the swing
-      const fs = clamp((P_AT - 0.05) / 0.24, 0, 1)   // the shrink, on a FASTER window
-      /* 16:9 page at the start, 3:4 card at the end. The base card is 300x400,
-         so filling the viewport needs a wider X scale than Y, and that DIFFERENCE
-         is the shape morph: the page really does change proportion as it folds,
-         it does not just shrink. */
-      const fe = easeInOut(fs)
-      s.style.setProperty('--sx', (RING.x - fe * (RING.x - 1)).toFixed(3))
-      s.style.setProperty('--sy', (RING.y - fe * (RING.y - 1)).toFixed(3))
-      s.style.setProperty('--swing', (Math.sin(f * Math.PI) * -34).toFixed(2) + 'deg')
-      s.style.setProperty('--spread', easeOut(clamp((P_AT - 0.40) / 0.22, 0, 1)).toFixed(4))
-      s.style.setProperty('--turn',
-        steppedTurn(clamp((P_AT - 0.44) / 0.28, 0, 1), 2).toFixed(2) + 'deg')
-      /* and the star grows out of the front card once the deck has parked */
-      s.style.setProperty('--sw', clamp((P_AT - 0.76) / 0.24, 0, 1).toFixed(4))
-    }
-    hud.textContent = q.get('solo') + ' ' + P_AT.toFixed(2)
-    /* frame() would immediately overwrite those three props from the real
-       scroll position, which in solo mode is always 0. */
-    stages.length = 0
-  }
-} else if (q.get('at')) {
-  const s = document.getElementById(q.get('at'))
-  if (s) {
-    history.scrollRestoration = 'manual'
-    scrollTo(0, s.offsetTop + (s.offsetHeight - innerHeight) * P_AT)
-    frame(true)
-  }
-}
-
 /* ---------------------------------------------------------------------------
    BEAT 5's cards, written from JS: 22 hand-typed divs of random coordinates in
    the markup is 22 lines of noise that say nothing. Deterministic positions —
