@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>camera rig — proving ground</title>
+<meta name="robots" content="noindex" />
+<style>
+/* ---------------------------------------------------------------------------
+   THE CAMERA RIG, ALONE.
+
+   Built as its own file on purpose. Three attempts at converting the 900-line
+   journey in place all ended blank, and each "fix" only uncovered the next
+   runtime error, because there was no way to tell which of forty changes broke
+   it. So: prove the engine against four coloured rectangles first, then port
+   the real scenes in one at a time against a rig that is known good.
+
+   The model, from Damir: one flat plane, a camera moving over it. The wheel
+   zooms and rotates; it does not translate the page vertically. Later the
+   camera goes DOWN to the images, RIGHT along them, and keeps going RIGHT into
+   the collage before zooming back into the landing page to close the loop.
+--------------------------------------------------------------------------- */
+*{box-sizing:border-box}
+html,body{margin:0;background:#0b1720;color:#F2F7F5;
+  font-family:Nunito,system-ui,sans-serif}
+html{scrollbar-width:none}
+html::-webkit-scrollbar{width:0;height:0}
+
+#trip{position:relative;height:900svh}
+#cam{position:sticky;top:0;height:100lvh;overflow:hidden;background:#0b1720}
+/* the plane. A zero-sized anchor at the viewport centre; scenes hang off it. */
+#world{position:absolute;left:50%;top:50%;width:0;height:0;will-change:transform}
+
+/* A scene is a tile on the plane. --wx/--wy locate its CENTRE in viewport
+   units; --ww/--wh are its size. The margin maths converts centre-based
+   coordinates into the top-left offset the box model wants. */
+.scene{position:absolute;left:0;top:0;
+  width:calc(var(--ww,1) * 100vw);height:calc(var(--wh,1) * 100lvh);
+  margin-left:calc((var(--wx,0) - var(--ww,1)/2) * 100vw);
+  margin-top:calc((var(--wy,0) - var(--wh,1)/2) * 100lvh);
+  display:grid;place-items:center;font-size:6vmin;font-weight:900;
+  outline:2px solid rgba(127,216,255,.35);outline-offset:-2px}
+
+#s_open  {background:#12384f}
+#s_sphere{background:#0f2a3a}
+#s_rail  {background:#16455e;font-size:4vmin}
+#s_field {background:#1b5878;font-size:4vmin}
+
+#hud{position:fixed;right:12px;top:10px;z-index:9;font:700 12px/1 ui-monospace,monospace;
+  background:rgba(11,23,32,.8);color:#DFF6FF;padding:7px 10px;border-radius:99px;
+  white-space:pre}
+</style>
+</head>
+<body>
+<div id="hud">boot</div>
+
+<section id="trip"><div id="cam"><div id="world">
+  <div class="scene" id="s_open"   style="--wx:0;--wy:0;--ww:1;--wh:1">OPEN</div>
+  <div class="scene" id="s_sphere" style="--wx:0;--wy:0;--ww:1;--wh:1">SPHERE</div>
+  <div class="scene" id="s_rail"   style="--wx:1.1;--wy:1.15;--ww:3.2;--wh:1">RAIL &mdash; a wide strip the camera pans along</div>
+  <div class="scene" id="s_field"  style="--wx:3.9;--wy:1.15;--ww:3.4;--wh:1">FIELD / COLLAGE &mdash; further right again</div>
+</div></div></section>
+
+<script>
+const clamp = (v,a,b) => v<a?a:v>b?b:v
+const easeInOut = t => t<.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2
+
+const world = document.getElementById('world')
+const hud = document.getElementById('hud')
+
+/* x/y in viewport units on the plane, z is zoom. */
+const CAM = [
+  { p:0.00, x:0,   y:0,    z:2.60 },  // landing page, full bleed
+  { p:0.16, x:0,   y:0,    z:1.00 },  // pull back: the deck is there
+  { p:0.34, x:0,   y:0,    z:1.00 },  // deck turns, camera still
+  { p:0.46, x:0,   y:0,    z:5.00 },  // zoom INTO the star on a face
+  { p:0.56, x:0,   y:0,    z:1.00 },  // out into the sphere page
+  { p:0.64, x:0,   y:1.15, z:1.00 },  // DOWN to the images
+  { p:0.76, x:2.2, y:1.15, z:1.00 },  // RIGHT along them
+  { p:0.90, x:5.0, y:1.15, z:1.00 },  // keep going RIGHT: the collage
+  { p:1.00, x:5.0, y:1.15, z:2.60 },  // zoom through a piece, back to the page
+]
+
+const LAG = 0.12
+let smoothP = 0, awake = 0
+
+function poseCamera(p) {
+  let i = 0
+  while (i < CAM.length - 2 && p > CAM[i+1].p) i++
+  const a = CAM[i], b = CAM[i+1]
+  const t = easeInOut(clamp((p - a.p) / (b.p - a.p), 0, 1))
+  const x = a.x + (b.x - a.x) * t
+  const y = a.y + (b.y - a.y) * t
+  const z = a.z + (b.z - a.z) * t
+
+  world.style.transform =
+    `scale(${z.toFixed(4)}) translate3d(${(-x*100).toFixed(3)}vw, ${(-y*100).toFixed(3)}lvh, 0)`
+
+  hud.textContent =
+    `p ${p.toFixed(3)}\nx ${x.toFixed(2)}  y ${y.toFixed(2)}  z ${z.toFixed(2)}`
+}
+
+function frame(force) {
+  const doc = document.documentElement
+  const range = doc.scrollHeight - innerHeight
+  const raw = range > 0 ? clamp(doc.scrollTop / range, 0, 1) : 0
+  smoothP = force ? raw : smoothP + (raw - smoothP) * LAG
+  poseCamera(smoothP)
+  if (Math.abs(raw - smoothP) > 0.0004) awake = 90
+  if (awake > 0) { awake--; requestAnimationFrame(() => frame(false)) }
+}
+
+/* When a pose is requested, the scroll-driven loop must not run at all: the
+   browser fires a scroll event on load, frame() then re-poses from scrollTop
+   (which is 0) and silently overwrites the requested pose. That is why five of
+   six headless captures came back identical. */
+const POSED = new URLSearchParams(location.search).has('p')
+let pending = false
+if (!POSED) addEventListener('scroll', () => {
+  awake = 90
+  if (!pending) { pending = true; requestAnimationFrame(() => { pending = false; frame(false) }) }
+}, { passive:true })
+addEventListener('resize', () => { if (!POSED) frame(true) })
+if (!POSED) frame(true)
+
+/* ?p=<0..1> parks the camera WITHOUT SCROLLING, and that distinction cost most
+   of a night. The earlier version did a programmatic scrollTo and then relied on
+   the screenshot catching up: the preview pane never repaints after a scripted
+   scroll, and headless --screenshot fires before it settles. Every "the scene is
+   blank" verdict was that, not the page - the DOM was correct the whole time
+   (elementFromPoint at the viewport centre returned the right scene).
+
+   So: pose the camera directly from the parameter and touch the scrollbar not at
+   all. What is on screen is then true at first paint, which is what a screenshot
+   can actually capture. */
+const q = new URLSearchParams(location.search)
+if (q.has('p')) {
+  const target = clamp(parseFloat(q.get('p')) || 0, 0, 1)
+  history.scrollRestoration = 'manual'
+  poseCamera(target)
+}
+</script>
+</body>
+</html>

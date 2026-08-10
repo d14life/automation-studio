@@ -1,0 +1,964 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Solutions101 — showroom</title>
+<meta name="robots" content="noindex" />
+<link rel="preload" href="/fonts/nunito-cyrillic.woff2" as="font" type="font/woff2" crossorigin />
+<style>
+@font-face{font-family:Nunito;font-style:normal;font-weight:300 900;font-display:swap;
+  src:url(/fonts/nunito-cyrillic.woff2) format('woff2');
+  unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:Nunito;font-style:normal;font-weight:300 900;font-display:swap;
+  src:url(/fonts/nunito-latin.woff2) format('woff2')}
+
+/* ---------------------------------------------------------------------------
+   PALETTE — lifted, not invented. --bg is v2.css's sampled #0e202d, ICE is
+   hooks/heroTuning.ts. No violet: the reference this is modelled on is violet
+   end to end, and that decision was reversed on this site long ago.
+   One accent (ICE), one radius scale (--r), one theme (dark) for the whole page.
+--------------------------------------------------------------------------- */
+:root{
+  --bg:#0b1720;          /* off-black, tinted toward the site's navy. Never #000 */
+  --deep:#070f16;
+  --ink:#F2F7F5;
+  --dim:#8fa6b4;
+  --ice-1:#DFF6FF;
+  --ice-2:#7FD8FF;
+  --ice-3:#5C82C9;
+  --r:20px;              /* the only corner radius on the page, except pills */
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:Nunito,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+html{scrollbar-width:none;-ms-overflow-style:none}
+html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none}
+img{display:block;max-width:100%}
+
+/* ---------------------------------------------------------------------------
+   THE ENGINE.
+
+   Every beat is a tall .stage with a .pin stuck to its top. The stage's extra
+   height IS that beat's scroll runway. Same pattern .v2stage/.v2pin already
+   uses for the DNA header, so it behaves identically on iOS (100lvh, not 100%)
+   and releases instead of pinning forever the way position:fixed does.
+
+   JS writes THREE numbers per stage and nothing else:
+     --p  linear progress, 0 to 1, damped (see the loop for why)
+     --e  the same progress through easeInOutCubic  — for scale and travel
+     --o  the same progress through easeOutCubic    — for things arriving
+
+   Two eased channels, not one, because the reference never runs two moves on
+   the same curve. A card that grows and a headline that lands are different
+   gestures; sharing a curve is exactly what made the first version feel like a
+   slideshow.
+
+   NOT registered @property. Trap 5.1 in docs/HANDOFF.md: animating a registered
+   custom property costs more than every other effect on the page combined.
+--------------------------------------------------------------------------- */
+
+
+
+/* Sub-windows. The whole trick behind "flowy": inside one beat, each element
+   runs on its own slice of --p, and the slices OVERLAP. w(a,b) maps the beat's
+   progress onto 0..1 across [a,b]. Written as a clamp so it saturates at both
+   ends instead of overshooting. */
+@supports (width: clamp(0px, 1px, 2px)) { /* documents the dependency; see JS fallback */ }
+
+/* one marquee on the page, and it belongs to beat 1 */
+.marquee{position:absolute;top:50%;left:0;translate:0 -50%;width:max-content;
+  display:flex;gap:.55em;white-space:nowrap;pointer-events:none;
+  font-size:clamp(80px,15vw,230px);font-weight:900;letter-spacing:-.045em;line-height:1;
+  color:transparent;-webkit-text-stroke:1.5px rgba(127,216,255,.42);
+  animation:mq 34s linear infinite;
+  /* FOCUS PULL, the third instance of this motif. In the reference the marquee
+     behind the deck is soft while the page is still folding and sharpens as the
+     card lands (f300-371). Same device as the hero entrance and the sphere
+     headline - blur-resolve is this reference's signature, not a one-off. */
+  filter:blur(calc((1 - clamp(0, (var(--p) - .18) / .28, 1)) * 9px));
+  opacity:clamp(.15, calc((var(--p) - .10) / .3), 1)}
+@keyframes mq{to{transform:translateX(-50%)}}
+
+.btn{display:inline-flex;align-items:center;gap:.5em;padding:.8em 1.5em;border-radius:999px;
+  font-weight:800;font-size:15px;text-decoration:none;border:0;cursor:pointer;
+  transition:transform .25s cubic-bezier(.16,1,.3,1), box-shadow .25s cubic-bezier(.16,1,.3,1)}
+.btn:hover{transform:translateY(-2px)}
+.btn:active{transform:scale(.98)}
+.btn--ice{background:var(--ice-1);color:#0b1720;box-shadow:0 8px 30px -10px rgba(223,246,255,.5)}
+.btn--ghost{color:var(--ice-1);box-shadow:inset 0 0 0 1px rgba(223,246,255,.28)}
+
+/* =========================================================================
+   BEAT 1 — THE PAGE THAT BECOMES THE DECK
+   ONE CARD, NOT TWO SECTIONS. Watched frame by frame at 60fps: the hero page
+   does not fly away and get replaced by a deck. It IS the deck's front card the
+   whole time. Its content crossfades from page to card while it rotates, and
+   the other seven spread out from behind it.
+
+   So the ring starts with --spread at 0: all eight cards collapsed into one
+   stack at the centre, zoomed up until the front one is full bleed. The fold
+   shrinks the zoom, swings the stack, and opens --spread, which IS the deck
+   forming. Then the turn takes over. Four values, four different windows, all
+   computed in the loop - see the `open` case there for why they are not CSS.
+
+   The deck also PARKS: the turn finishes before the beat does, so the hero card
+   is completely still for the handoff into the star. Flow needs rests as much
+   as it needs motion.
+   ========================================================================= */
+#open .pin{background:var(--bg)}
+
+/* THE ENTRANCE, and it is the actual beginning of the animation - frame 266,
+   4.42s in the recording. Missed it the first time because the hero LOOKS
+   static in a 12-up sheet; per frame it is anything but. Over ~10 frames the
+   page does three things at once:
+     focus pull      heavy blur resolving to sharp
+     brightness ramp dark to fully lit
+     scale settle    slightly small, easing up to rest
+   It arrives out of a radial glow rather than simply being there.
+
+   Time-driven, not scroll-driven: at scroll 0 there is no scroll to drive it.
+   filter and opacity only, so it never fights the JS transform on .ring. */
+@keyframes heroIn{
+  from{filter:blur(22px) brightness(.28);opacity:0;transform:scale(.94)}
+  60%{opacity:1}
+  to{filter:blur(0) brightness(1);opacity:1;transform:scale(1)}
+}
+@keyframes heroGlow{ from{opacity:.9;transform:scale(.5)} to{opacity:0;transform:scale(1.5)} }
+.ring-scene{animation:heroIn .95s cubic-bezier(.16,1,.3,1) both}
+/* the glow it comes out of */
+.hero-glow{position:absolute;width:90vmin;height:90vmin;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle, rgba(127,216,255,.35), transparent 62%);
+  animation:heroGlow 1.1s cubic-bezier(.16,1,.3,1) both}
+.ring-scene{position:absolute;inset:0;display:grid;place-items:center;
+  perspective:1150px;perspective-origin:50% 47%}
+/* THE DECK IS A CLOSED BOOK, NOT A CAROUSEL. This one took three passes to get
+   right and the frames settle it (see f360-371): there is ONE card, front,
+   centre, flat and fully readable, and the other seven are almost entirely
+   BEHIND it - all you see is a thin sliver down each edge.
+
+   THE CARDS MUST NOT INTERSECT, and for four passes they did. Put side by side
+   with f360-371 the difference is not subtle: the reference is one clean card
+   with two thin slivers, mine was six cards slicing through each other's faces.
+
+   N cards on a ring stop intersecting only when rad >= w / (2*tan(180/N)).
+   For N=8 that is 1.21*w - so 1.15x, 0.55x and 0.30x were ALL inside the
+   piercing zone, and no amount of tuning the radius was ever going to fix it.
+   Every one of those was a guess dressed up as arithmetic.
+
+   IT IS A BOX, NOT A RING. Damir's words: four cards in a square so they do not
+   intersect. That is why f366 shows one flat face and two THIN EDGE SLIVERS -
+   you are looking head-on at one wall of a square box and seeing the edges of
+   the two side walls.
+
+   Four faces at 90deg with the radius at exactly half the card width close into
+   a square: adjacent faces meet at their edges, so non-intersection is
+   automatic, not something to tune. Every radius I tried before was hunting for
+   a value that a 6- or 8-sided ring can never have.
+
+   The test below asserts the front card dominates, so this cannot regress
+   silently again.
+
+   Portrait 3:4, also off the frames, not the 16:11 landscape inherited from the
+   shape of the screenshots. */
+/* SIZE AND PROPORTION, MEASURED OFF f366 SIDE BY SIDE. On the reference's own
+   1342x958 the front card is 339 x 753 - a quarter of the width and 79% of the
+   HEIGHT, aspect 0.45. Mine was 3:4 at 43% of the height: far too squat and far
+   too small, floating in an empty frame. This is the first change made from an
+   actual A/B rather than from reading the frames, and it is the one that was
+   most obviously wrong the whole time. */
+.ring{position:relative;width:min(25vw,340px);aspect-ratio:9/20;transform-style:preserve-3d;
+  --rad:calc(var(--spread,1) * min(12.5vw,170px));
+  transform:scale(var(--sx,1), var(--sy,1)) rotateZ(var(--swing,0deg))
+            translateZ(calc(-1 * var(--rad))) rotateY(var(--turn,0deg))}
+/* The seven behind the hero card are not there until the deck opens. At
+   --spread 0 they are stacked in exactly the same place and would z-fight. */
+.ring-card:not(:first-child){opacity:clamp(0, calc((var(--spread,1) - .06) / .3), 1);
+  /* scenery, not subject: the slivers frame the front card, they do not compete
+     with it. Without this the edges read as clutter at every turn angle. */
+  filter:brightness(.4) saturate(.7)}
+.ring-card{position:absolute;inset:0;border-radius:var(--r);overflow:hidden;container-type:size;
+  background:var(--deep);
+  box-shadow:0 40px 80px -30px rgba(0,0,0,.85), inset 0 0 0 1px rgba(223,246,255,.09);
+  transform:rotateY(calc(var(--i) * 90deg)) translateZ(var(--rad))}
+/* The captures are light-UI dashboards on a dark page. Untreated they read as
+   four bright rectangles rather than one deck, so each gets a scrim tuned to
+   sit them into the page without hiding what they show. */
+/* Same tension as the rail, same resolution. The reference's cards are art
+   drawn FOR a 0.45 aspect; a 1120x780 capture cropped to that is a vertical
+   slice of a dashboard and reads as nothing. So the card keeps the reference's
+   tall silhouette and the capture sits in its top third at its own aspect,
+   poster-style, with the name under it. */
+.ring-card{display:grid;align-content:start}
+.ring-card img{width:100%;height:58cqh;object-fit:cover;object-position:top left}
+.ring-card__label{position:static;padding:18px 16px 0;background:none;
+  font-size:15px;line-height:1.3}
+/* The scrim was there to stop four bright dashboards competing for attention.
+   Now that only ONE card is ever the subject, the front card gets none of it -
+   it should read as crisply as the reference's does - and the neighbours carry
+   it instead, which is what makes the front card pop. */
+.ring-card:not(:first-child)::after{content:"";position:absolute;inset:0;
+  pointer-events:none;background:rgba(7,15,22,.55)}
+.ring-card:first-child{box-shadow:0 50px 90px -30px rgba(0,0,0,.9),
+  inset 0 0 0 1px rgba(223,246,255,.16)}
+/* The floor the deck turns on. Centred INSIDE its own box, not on the top edge:
+   an `ellipse at 50% 0%` is at full opacity along that edge, which draws a hard
+   horizontal line across the viewport instead of a glow. */
+.ring-floor{position:absolute;left:50%;top:50%;translate:-50% 0;
+  width:min(130vw,1600px);height:80vh;pointer-events:none;
+  background:radial-gradient(ellipse 55% 46% at 50% 42%, rgba(92,130,201,.22), transparent 68%)}
+.ring-card__label{position:absolute;left:0;right:0;bottom:0;padding:14px 16px;
+  background:linear-gradient(transparent,rgba(7,15,22,.94));color:var(--ice-1);
+  font-size:14px;font-weight:800;line-height:1.25}
+/* Empty slots. Visibly empty on purpose: an invented screenshot of a product
+   that does not exist yet is worse than an honest gap. */
+.ring-card--ph{background:var(--deep);display:grid;place-items:center;
+  box-shadow:inset 0 0 0 1px rgba(223,246,255,.14)}
+.ring-card--ph b{font-size:17px;font-weight:800;color:var(--dim)}
+.ring-card--ph i{position:absolute;left:16px;top:14px;font-style:normal;font-size:10px;
+  letter-spacing:.16em;text-transform:uppercase;color:#3f5b6b}
+
+/* The star lives on the front card and, in beat 2, eats the screen. */
+.star{position:absolute;left:50%;top:50%;translate:-50% -50%;transform-origin:50% 50%}
+.ring-card .star{top:28%}
+
+/* Holds until the beat is nearly over, then goes. The first version faded it
+   out across the first 40% of the runway, so the one clickable thing on the
+   screen was already ghosted before the deck had finished its first quarter turn. */
+.ring-cta{position:absolute;left:50%;bottom:3vh;translate:-50% 0;z-index:3;
+  opacity:clamp(0, calc(1 - var(--sw,0) / .18), 1)}
+
+/* =========================================================================
+   BEAT 2 — THE STAR SWALLOWS THE PAGE
+   Read off the reference frame by frame: it is not a mask and not one star.
+   A black star grows on its own curve while a smaller white one grows more
+   slowly inside it, reading as a light source; the particle sphere is already
+   fading up INSIDE the black star before the star has finished covering the
+   screen. Three overlapping windows, three different rates. That overlap is
+   the whole effect. A mask would repaint the viewport every frame; two scaled
+   <svg> elements stay on the compositor.
+   ========================================================================= */
+/* THE STAR IS A MASK, NOT A SHAPE. Read off the 60fps frames: the next section
+   is visible THROUGH the star from very early - you can see the sphere clipped
+   to the star's outline while the old page is still there in the corners. The
+   first attempt drew a solid star on top and it was invisible, because a dark
+   star on a dark page has nothing to contrast against.
+
+   Two masked layers, same star, one a few px larger than the other. The larger
+   one is ice, the smaller is the page's deep colour, so the difference between
+   them renders as a clean ice outline of exactly the star shape - which is what
+   makes the boundary legible here when the reference got it for free from a
+   white page. One mechanism, no size-matching arithmetic between a mask and a
+   transform.
+
+   mask-size is a repaint, and this is the one place on the page that spends
+   one: it is a single element, it is scroll-driven so it can only move as fast
+   as the wheel, and there is no transform that reproduces a growing hole. */
+
+.swallow-cut{position:absolute;inset:0;pointer-events:none;
+  --star:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='%23fff' d='M50 0 C54 38 62 46 100 50 C62 54 54 62 50 100 C46 62 38 54 0 50 C38 46 46 38 50 0Z'/%3E%3C/svg%3E");
+  /* squared: creeps for the first half of the beat, then rushes. The measured
+     motion energy of the reference does exactly this - the two quietest thirds
+     of a second in the whole clip are immediately before this beat's blowout,
+     which is the loudest. */
+  /* A STAR IS NOT A CIRCLE, AND THE CORNERS DECIDE THE SIZE. Its sides are
+     concave, so the boundary at 45deg sits at only ~0.35 of the half-width
+     (measured off the path: the curve's midpoint between the top and right
+     points lands 17.3 units from centre in a 100-unit box). The viewport
+     corner on this pane is 600px from centre, so the mask has to reach
+     600/0.347 = 1729 half, i.e. ~3460px, not the 2840px the first pass grew
+     to. Sized past that, and then closed out for real below. */
+  --size:calc(7vmin + var(--sw,0) * var(--sw,0) * 560vmin);
+  -webkit-mask:var(--star) center / var(--size) var(--size) no-repeat;
+  mask:var(--star) center / var(--size) var(--size) no-repeat}
+.swallow-cut--rim{background:var(--ice-2);--size:calc(7.9vmin + var(--sw,0) * var(--sw,0) * 566vmin)}
+.swallow-cut--fill{background:var(--deep)}
+/* THE GUARANTEE. The arithmetic above is right for this viewport, and a star
+   whose corners have not quite closed hands over to the next beat through four
+   pale triangles. Rather than trust the geometry at every aspect ratio, the
+   last 6% of the beat lays a plain full-bleed fill over the top. The mask does
+   the show; this makes the handoff true. */
+.swallow-seal{position:absolute;inset:0;pointer-events:none;background:var(--deep);
+  opacity:clamp(0, calc((var(--sw,0) - .90) / .10), 1)}
+/* what you see through the hole: the sphere's first light, already turning up
+   before the star is anywhere near covering the screen */
+.swallow-glow{position:absolute;width:80vmin;height:80vmin;border-radius:50%;
+  background:radial-gradient(circle, rgba(127,216,255,.30), transparent 62%);
+  opacity:clamp(0, calc((var(--sw,0) - .30) / .35), 1);
+  transform:scale(calc(.4 + var(--sw,0) * 1))}
+.star-core{width:min(9vmin,78px);height:min(9vmin,78px);
+  /* gated on --sw: without this it renders at full size through the entire deck
+     beat, which put TWO stars on screen at once. */
+  opacity:clamp(0, calc(var(--sw,0) / .06), 1);
+  transform:scale(calc(1 + var(--sw,0) * 4.5));
+  filter:drop-shadow(0 0 40px rgba(223,246,255,.9))}
+
+/* =========================================================================
+   BEAT 3 — THE PARTICLE SPHERE
+   2D canvas, not WebGL. ~4200 points holds 60fps and costs no library; this
+   page will eventually sit on a machine already decoding the DNA clip.
+   ========================================================================= */
+#sphere .pin{background:var(--deep)}
+#sphere canvas{position:absolute;inset:0;width:100%;height:100%}
+.sphere-star{width:min(5vmin,44px);height:min(5vmin,44px);
+  filter:drop-shadow(0 0 30px rgba(223,246,255,.8));
+  opacity:clamp(0, calc(1 - (var(--p) - .72) / .28), 1)}
+.split{position:absolute;inset:0;pointer-events:none}
+.split b{position:absolute;font-size:clamp(64px,13vw,210px);font-weight:900;
+  letter-spacing:-.045em;line-height:.92;
+  /* FOCUS PULL, exactly as the hero does it. f492-500: "limits" arrives heavily
+     blurred and sharpens as it rises. Blur-resolve is a recurring motif in this
+     reference, not a one-off on the entrance. */
+  filter:blur(calc((1 - clamp(0, (var(--p) - .04) / .26, 1)) * 16px))}
+/* The two halves of the line travel at different rates and in different
+   directions. Same reason as everything else here: synchronised is a slideshow. */
+.split .a{left:5vw;top:10vh;translate:0 calc(var(--e) * -7vh);
+  opacity:clamp(0, calc(var(--p) / .18), 1)}
+.split .b{right:5vw;bottom:13vh;text-align:right;color:var(--dim);
+  translate:0 calc(var(--e) * -17vh);
+  opacity:clamp(0, calc((var(--p) - .06) / .18), 1)}
+.split p{position:absolute;left:5vw;bottom:16vh;max-width:33ch;font-size:17px;line-height:1.6;
+  color:#a9bfcc;opacity:clamp(0, calc((var(--p) - .10) / .18), 1);
+  translate:0 calc((1 - var(--o)) * 3vh)}
+
+/* =========================================================================
+   BEAT 4 — THE RAIL
+   Scrolling down drives it sideways. Same idea as useDeckRail in V2.tsx, done
+   here with one translate so this page carries no imports. The cards lean
+   slightly into the travel, which is what stops a horizontal strip reading as
+   a filmstrip on a conveyor.
+   ========================================================================= */
+#rail .pin{background:var(--deep);place-items:stretch;perspective:1400px}
+/* FULL BLEED, EDGE TO EDGE. Read off f109-120: the cards are the full height of
+   the viewport with no vertical margin, square corners, and a hairline gap. Two
+   are visible at a time. The first pass had rounded 16/11 cards floating in a
+   centred row with big gaps, which is a gallery strip, not this. */
+.rail{display:flex;gap:6px;align-items:stretch;height:100%;
+  transform:translate3d(calc(var(--e) * -58%),0,0)}
+.rail figure{margin:0;flex:0 0 48vw;position:relative;overflow:hidden;background:var(--deep);
+  display:grid;align-content:center}
+/* THE ONE HONEST DEVIATION. The reference's cards are full-bleed ARTWORK, so it
+   can crop them to a tall portrait and lose nothing. Mine are product captures,
+   1120x780 landscape - cropped to a portrait card they become an unreadable
+   zoom into a corner of a dashboard. So the CARD keeps the reference's shape
+   (full height, edge to edge, square corners) and the capture sits inside it at
+   its own aspect. Same silhouette, content that can actually be read. */
+.rail img{width:100%;height:100%;object-fit:cover;object-position:top left;
+  filter:saturate(.9) brightness(.86)}
+/* the small meta line, top left, and the name, bottom left - both inside the card */
+.rail .meta{position:absolute;left:22px;top:20px;font-size:11.5px;letter-spacing:.04em;
+  color:rgba(242,247,245,.72);z-index:2}
+.rail figcaption{position:absolute;left:0;right:0;bottom:0;padding:26px 22px;
+  background:linear-gradient(transparent,rgba(7,15,22,.9));color:var(--ink)}
+.rail figcaption b{display:block;font-size:clamp(24px,3.2vw,42px);line-height:1.05;
+  letter-spacing:-.03em;font-weight:800}
+
+/* =========================================================================
+   BEAT 5 — THE FIELD
+   Cards scattered through Z; scroll dollies the camera forward. Linear on
+   purpose: a camera that eases is a camera that stalls, and this is the one
+   move in the page that should feel like constant travel.
+   ========================================================================= */
+#field .pin{background:var(--deep);perspective:820px}
+/* the destination, wearing the same skin as the section it becomes */
+.field-target{background:radial-gradient(130% 130% at 20% 12%, #2b6d95 0%, transparent 58%),
+  linear-gradient(155deg,#1b4a6b 0%, var(--deep) 76%) !important}
+.field{position:absolute;inset:0;transform-style:preserve-3d;
+  transform:translateZ(calc(var(--p) * 2750px))}
+.field div{position:absolute;left:50%;top:50%;border-radius:4px;overflow:hidden;
+  background:linear-gradient(150deg,#1c445f,#0a1620);
+  box-shadow:0 24px 60px -20px rgba(0,0,0,.85), inset 0 0 0 1px rgba(223,246,255,.07);
+  transform:translate3d(calc(var(--x) * 1px - 50%), calc(var(--y) * 1px - 50%), calc(var(--z) * 1px))}
+.field img{width:100%;height:100%;object-fit:cover;object-position:top left}
+
+/* =========================================================================
+   BEAT 6 — A CARD BECOMES THE SECTION
+   The card the camera was heading for stops being a card. It arrives at the
+   size it left the field at and lands full bleed, its radius flattening out as
+   it goes. The copy fades up while it is STILL growing, and the last 12% of the
+   beat is a zoom-through: the section rushes past the camera and blows out to
+   a radial glow, which is where beat 7 comes from. That handoff is read off the
+   reference, where the previous section does not cross-fade, it is flown through.
+   ========================================================================= */
+#grow .pin{background:var(--deep)}
+.grow-card{position:absolute;width:100vw;height:100lvh;
+  border-radius:calc(var(--r) * (1 - var(--e)));overflow:hidden;
+  background:radial-gradient(130% 130% at 20% 12%, #2b6d95 0%, transparent 58%),
+             linear-gradient(155deg,#1b4a6b 0%, var(--deep) 76%);
+  box-shadow:0 60px 120px -50px rgba(0,0,0,.9);
+  transform:scale(calc(.30 + min(1, var(--e) / .72) * .70 + max(0, var(--p) - .88) * 9))}
+.grow-copy{position:absolute;left:7%;top:50%;translate:0 -50%;max-width:29ch;
+  opacity:clamp(0, calc((var(--p) - .30) / .28), 1)}
+.grow-copy h2{font-size:clamp(42px,6.4vw,96px);line-height:1.0;letter-spacing:-.04em;
+  margin:0 0 .38em;font-weight:900}
+.grow-copy h2 span{display:block;color:var(--dim)}
+.grow-copy p{font-size:17px;line-height:1.6;color:#bcd0dc;margin:0 0 1.7em;max-width:31ch}
+.chrome{position:absolute;right:-7%;top:50%;translate:0 -50%;width:54%;
+  filter:drop-shadow(0 40px 70px rgba(0,0,0,.55));
+  transform:rotate(calc(var(--o) * 8deg))}
+/* THE TINY STAR IN THE FLARE. f286-300: as the section blows out to a radial
+   glow there is a small DARK star at the dead centre - the next section seen
+   from very far away, already on its way in. It is the detail that makes the
+   handoff read as flying through rather than cross-fading. */
+.grow-seed{position:absolute;left:50%;top:50%;translate:-50% -50%;
+  width:min(9vmin,74px);height:min(9vmin,74px);pointer-events:none;
+  opacity:clamp(0, calc((var(--p) - .88) / .08), 1);
+  transform:scale(calc(.25 + max(0, var(--p) - .88) * 5))}
+/* the blow-out that beat 7 emerges from */
+.grow-flare{position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(circle at 50% 50%, rgba(127,216,255,.5), transparent 55%);
+  opacity:clamp(0, calc((var(--p) - .86) / .14), 1)}
+
+/* =========================================================================
+   BEAT 7 — THE ANSWER PANEL
+   Arrives out of the flare rather than sliding in: it starts oversized and
+   settles back, which is what an object flying toward the camera and stopping
+   looks like.
+   ========================================================================= */
+#answer .pin{background:var(--deep)}
+.panel{width:100vw;height:100lvh;border-radius:0;overflow:hidden;
+  position:relative;display:grid;align-content:center;justify-items:start;padding:0 12%;
+  background:radial-gradient(130% 130% at 80% 16%, #2b6d95 0%, transparent 56%),
+             linear-gradient(205deg,#1b4a6b 0%, var(--deep) 74%);
+  box-shadow:0 60px 120px -50px rgba(0,0,0,.9);
+  transform:scale(calc(1.22 - var(--o) * .22));
+  opacity:clamp(0, calc(var(--p) / .2), 1)}
+.panel h2{font-size:clamp(42px,6.4vw,96px);line-height:1.0;letter-spacing:-.045em;margin:0;
+  text-align:left;max-width:15ch;font-weight:900}
+.panel h2 span{color:var(--dim)}
+.panel-flare{position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(circle at 50% 50%, rgba(127,216,255,.5), transparent 55%);
+  opacity:clamp(0, calc(1 - var(--p) / .18), 1)}
+
+/* =========================================================================
+   BEAT 1 — THE OPENING FOLD
+
+   THIS IS WHERE THE JOURNEY STARTS, and getting that wrong cost a rebuild.
+   The screen recording had its first seconds cut off, so the deck looked like
+   the opening and this move looked like the ending. It is the other way round:
+   the site opens on a full-bleed hero page, and the first thing scrolling does
+   is fold that page into a card in the deck. Everything after is the deck's
+   journey. The reference closes the loop by flying back into the same page at
+   the end, which is why it reads as a cycle rather than a list.
+
+   The panel does not shrink in place, it SWINGS: origin low and just left of
+   centre, so it reads as a card being dealt rather than a poster spinning. The
+   deck it lands in arrives late and from underneath, on its own window.
+   Nothing lines up, which is the point.
+   ========================================================================= */
+#open .pin{background:var(--bg);perspective:1500px}
+/* Origin low and just left of centre: enough to swing, not so much that the
+   card walks out of frame. An earlier pass used 22%/86% and it drifted into
+   the left third by mid-beat. */
+.opener{width:min(92vw,1240px);aspect-ratio:16/9;border-radius:calc(var(--r) * var(--e) + 2px);
+  overflow:hidden;position:relative;
+  transform-style:preserve-3d;transform-origin:42% 94%;
+  background:radial-gradient(130% 130% at 80% 16%, #2b6d95 0%, transparent 56%),
+             linear-gradient(205deg,#1b4a6b 0%, var(--deep) 74%);
+  box-shadow:0 60px 120px -50px rgba(0,0,0,.9);
+  transform:rotateZ(calc(var(--e) * -46deg)) rotateY(calc(var(--e) * 30deg))
+            scale(calc(1 - var(--e) * .74))}
+/* THE CROSSFADE THAT MAKES IT ONE OBJECT. Both layers live inside the front
+   card. The page layer is what you land on; the card layer is what the deck
+   gets. They swap over the middle of the fold, while the card is still turning,
+   which is the whole reason the reference reads as a page BECOMING a card
+   rather than a cut between two things. Sizes are in card units and get
+   multiplied by the card's scale, so the hero reads at ~2x these numbers. */
+.opener-page{position:absolute;inset:0;padding:0 7%;display:grid;align-content:center;
+  opacity:clamp(0, calc((.19 - var(--p)) / .11), 1);
+  /* The card morphs shape, so its X and Y scales differ and anything inside it
+     would be stretched. Undo exactly that ratio here and the type stays true. */
+  transform:scaleX(calc(var(--sy,1) / var(--sx,1)));transform-origin:left center}
+.opener-page h1{font-size:23px;line-height:.98;letter-spacing:-.045em;margin:0 0 .34em;
+  font-weight:900}
+.opener-page h1 span{display:block;color:var(--dim)}
+.opener-page p{font-size:5.2px;line-height:1.6;color:#bcd0dc;margin:0 0 1.4em;max-width:34ch}
+.opener-page .btn{font-size:5px;padding:.7em 1.5em;justify-self:start}
+/* the card's own face, arriving as the page leaves */
+.ring-card__face{position:absolute;inset:0;
+  opacity:clamp(0, calc((var(--p) - .15) / .11), 1)}
+/* every card except the hero is only ever a face, so it must not fade */
+.ring-card:not(:first-child) .ring-card__face{opacity:1}
+
+/* The closing screen. Not a beat: the place the journey puts you down. */
+.end{min-height:100svh;display:grid;place-items:center;background:var(--bg);
+  text-align:center;padding:10vh 6vw}
+.end h2{font-size:clamp(34px,5.2vw,68px);line-height:1.03;letter-spacing:-.04em;margin:0 0 .45em;
+  font-weight:900;max-width:16ch}
+.end p{font-size:16px;color:#a9bfcc;max-width:46ch;margin:0 auto 2.2em;line-height:1.6}
+.end div{display:grid;place-items:center;gap:0}
+.end .row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+
+.hud{position:fixed;right:14px;top:12px;z-index:99;font-size:11px;letter-spacing:.1em;
+  font-weight:800;padding:6px 10px;border-radius:999px;background:rgba(11,23,32,.75);
+  color:var(--ice-1);backdrop-filter:blur(8px);font-variant-numeric:tabular-nums;
+  box-shadow:inset 0 0 0 1px rgba(223,246,255,.14)}
+
+@media (max-width:768px){
+  .ring{width:min(74vw,340px);--rad:min(78vw,360px)}
+  .split .a{left:6vw;top:8vh}
+  .split .b{right:6vw;bottom:22vh}
+  .split p{left:6vw;bottom:8vh;max-width:88vw}
+  .grow-copy{left:8%;right:8%;max-width:none;top:auto;bottom:9%;translate:0 0}
+  .chrome{right:-24%;top:32%;width:78%;opacity:.5}
+  .rail figure{flex:0 0 82vw}
+}
+
+/* ---------------------------------------------------------------------------
+   REDUCED MOTION. The whole page is scroll-driven motion, so the honest
+   fallback is not "less animation" — it is to freeze every beat at a readable
+   pose and let the page be an ordinary stack of sections.
+--------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce){
+  .stage{height:auto;min-height:100svh}
+  .pin{position:relative}
+  .marquee{animation:none}
+  .ring-scene,.hero-glow{animation:none}
+  .hero-glow{opacity:0}
+  .ring{transform:none;width:min(90vw,560px)}
+  .ring-card{transform:none;position:relative;inset:auto}
+  .ring-card:not(:first-child){display:none}
+  .ring-cta{opacity:1}
+  .star-bloom{transform:scale(1)}
+  .star-core{transform:scale(1)}
+  .swallow-glow{opacity:1;transform:none}
+  .swallow-wash{opacity:0}
+  .rail{transform:none;overflow-x:auto;padding:0 6vw}
+  .field{transform:none}
+  .field div{position:relative;left:auto;top:auto;transform:none;margin:8px;display:inline-block}
+  .grow-card,.panel,.opener{transform:none;opacity:1}
+  .opener-copy{opacity:1}
+  .grow-copy,.split p,.split b,.fold-deck{opacity:1;translate:0 0;transform:none}
+  .grow-flare,.panel-flare{opacity:0}
+}
+
+/* ---- THE PLANE. Proven in cam.html before anything real was put on it. ----
+   The stages and their .pin survive untouched, so every `#beat .pin{...}` rule
+   still applies - stripping .pin is what silently killed the scenes in the
+   previous three attempts. Only the outer shell is new. */
+#trip{position:relative;height:900svh}
+#cam{position:sticky;top:0;height:100lvh;overflow:hidden;background:var(--bg)}
+#world{position:absolute;left:50%;top:50%;width:0;height:0;will-change:transform}
+.stage{position:absolute;left:0;top:0;
+  width:calc(var(--ww,1) * 100vw);height:calc(var(--wh,1) * 100lvh);
+  margin-left:calc((var(--wx,0) - var(--ww,1)/2) * 100vw);
+  margin-top:calc((var(--wy,0) - var(--wh,1)/2) * 100lvh);
+  opacity:var(--vis,0)}
+.pin{position:absolute;inset:0;overflow:hidden;display:grid;place-items:center}
+/* the camera pans these now; their old self-scroll would double the movement */
+.rail{transform:none !important}
+</style>
+</head>
+<body>
+<div class="hud" id="hud">00%</div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="s4" viewBox="0 0 100 100">
+    <path d="M50 0 C54 38 62 46 100 50 C62 54 54 62 50 100 C46 62 38 54 0 50 C38 46 46 38 50 0Z"/>
+  </symbol>
+  <defs>
+    <linearGradient id="chromeGrad" x1="0" y1="0" x2=".9" y2="1">
+      <stop offset="0" stop-color="#ffffff"/><stop offset=".38" stop-color="#DFF6FF"/>
+      <stop offset=".66" stop-color="#5C82C9"/><stop offset="1" stop-color="#0b1720"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<section id="trip"><div id="cam"><div id="world">
+<section class="stage" id="open" style="--wx:0;--wy:0;--ww:1;--wh:1">
+<div class="pin">
+    <div class="marquee" aria-hidden="true">
+      <span>Автоматизируем бизнес-процессы. Быстро не значит плохо.</span>
+      <span>Автоматизируем бизнес-процессы. Быстро не значит плохо.</span>
+    </div>
+
+    <div class="ring-floor" aria-hidden="true"></div>
+    <div class="hero-glow" aria-hidden="true"></div>
+    <div class="ring-scene">
+      <div class="ring">
+        <div class="ring-card" style="--i:0">
+          <div class="ring-card__face">
+            <img src="/shots/park.jpg" alt="" width="1120" height="780" fetchpriority="high" />
+            <svg class="star" width="88" height="88" viewBox="0 0 100 100" fill="#fff" aria-hidden="true"><use href="#s4"/></svg>
+            <span class="ring-card__label">Аренда спецтехники</span>
+          </div>
+          <div class="opener-page">
+            <h1>Софт под ваш<span>процесс</span></h1>
+            <p>Внутренние системы на заказ: склад, взаиморасчёты, парк техники, каталог.
+               Собираем под то, как вы работаете сейчас.</p>
+            <a class="btn btn--ice" href="#/request">Обсудить задачу</a>
+          </div>
+        </div>
+        <div class="ring-card" style="--i:1">
+          <img src="/shots/zapchasti.jpg" alt="" width="1120" height="780" />
+          <span class="ring-card__label">Магазин автозапчастей</span>
+        </div>
+        <div class="ring-card" style="--i:2">
+          <img src="/shots/vzaimoraschety-v2.jpg" alt="" width="1120" height="780" />
+          <span class="ring-card__label">Взаиморасчёты с контрагентами</span>
+        </div>
+        <div class="ring-card" style="--i:3">
+          <img src="/shots/sklad.jpg" alt="" width="1120" height="780" />
+          <span class="ring-card__label">Складской терминал</span>
+        </div>
+      </div>
+    </div>
+
+    <a class="btn btn--ice ring-cta" href="#/works">Смотреть решения</a>
+
+    <!-- THE STAR COMES OUT OF THE FRONT CARD. Not a section you scroll into:
+         in the reference (f456-479) the deck is still on screen, the page is
+         still light, and the cards are still visible at the edges while the
+         star grows out of the card and swallows everything. Same pin, same
+         beat, driven by --sw over the last quarter of it. -->
+    <div class="swallow-cut swallow-cut--rim"></div>
+    <div class="swallow-cut swallow-cut--fill"><div class="swallow-glow"></div></div>
+    <div class="swallow-seal"></div>
+    <svg class="star star-core" viewBox="0 0 100 100" fill="#ffffff" aria-hidden="true"><use href="#s4"/></svg>
+  </div>
+</section>
+<section class="stage" id="sphere" style="--wx:0;--wy:0;--ww:1;--wh:1">
+<div class="pin">
+    <canvas id="pts"></canvas>
+    <!-- the same star that swallowed the deck, still burning at the centre.
+         Continuity: it is never re-introduced, it simply never left. -->
+    <svg class="star sphere-star" viewBox="0 0 100 100" fill="#fff" aria-hidden="true"><use href="#s4"/></svg>
+    <div class="split">
+      <b class="a">Быстро</b>
+      <b class="b">не значит<br />плохо</b>
+      <p>Мы не пишем систему год. Первый рабочий контур собирается за недели,
+         и вы им пользуетесь, пока мы достраиваем остальное.</p>
+    </div>
+  </div>
+</section>
+<section class="stage" id="rail" style="--wx:1.1;--wy:1.15;--ww:3.2;--wh:1">
+<div class="pin">
+    <div class="rail">
+      <figure><img src="/shots/park.jpg" alt="" width="1120" height="780" />
+        <span class="meta">Календарь занятости, наработка по сменам, окупаемость парка</span>
+        <figcaption><b>Аренда спецтехники</b></figcaption></figure>
+      <figure><img src="/shots/zapchasti.jpg" alt="" width="1120" height="780" />
+        <span class="meta">Подбор по VIN, каталог на 40 000 позиций</span>
+        <figcaption><b>Магазин автозапчастей</b></figcaption></figure>
+      <figure><img src="/shots/vzaimoraschety-v2.jpg" alt="" width="1120" height="780" />
+        <span class="meta">Свёрнутое сальдо, акт сверки одной кнопкой</span>
+        <figcaption><b>Взаиморасчёты</b></figcaption></figure>
+      <figure><img src="/shots/sklad.jpg" alt="" width="1120" height="780" />
+        <span class="meta">FEFO, приёмка, размещение, слепой пересчёт</span>
+        <figcaption><b>Складской терминал</b></figcaption></figure>
+    </div>
+  </div>
+</section>
+<section class="stage" id="field" style="--wx:3.9;--wy:1.15;--ww:3.4;--wh:1">
+<div class="pin"><div class="field" id="fieldWrap"></div></div>
+</section>
+<section class="stage" id="grow" style="--wx:5.0;--wy:1.15;--ww:1;--wh:1">
+<div class="pin">
+    <div class="grow-card">
+      <svg class="chrome" viewBox="0 0 100 100" fill="url(#chromeGrad)" aria-hidden="true"><use href="#s4"/></svg>
+      <div class="grow-copy">
+        <h2>Только практика<span>ноль теории</span></h2>
+        <p>Каждая система собрана под конкретный процесс конкретной компании.
+           Не платформа с сотней настроек, а инструмент под одну работу.</p>
+        <a class="btn btn--ice" href="#/request">Обсудить задачу</a>
+      </div>
+    </div>
+    <div class="grow-flare"></div>
+    <svg class="star grow-seed" viewBox="0 0 100 100" fill="#06121a" aria-hidden="true"><use href="#s4"/></svg>
+  </div>
+</section>
+<section class="stage" id="answer" style="--wx:5.0;--wy:1.15;--ww:1;--wh:1">
+<div class="pin">
+    <div class="panel"><h2>Системы, которые<span>считают за вас</span></h2></div>
+    <div class="panel-flare"></div>
+  </div>
+</section>
+</div></div></section>
+
+<section class="end">
+  <div>
+    <h2>Ваш процесс станет следующей карточкой</h2>
+    <p>Расскажите, что отнимает время. Покажем, как это выглядит в работе, до того как вы что-то заплатите.</p>
+    <div class="row">
+      <a class="btn btn--ice" href="#/request">Оставить заявку</a>
+      <a class="btn btn--ghost" href="#/works">Смотреть решения</a>
+    </div>
+  </div>
+</section>
+
+<script>
+const clamp = (v,a,b) => v<a?a:v>b?b:v
+const easeInOut = t => t<.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2
+const easeOut = t => 1 - Math.pow(1-t,3)
+function steppedTurn(t, slots) {
+  const idx = t * slots
+  const k = Math.floor(Math.min(idx, slots - 0.0001))
+  const frac = clamp((idx - k - 0.25) / 0.5, 0, 1)
+  return (k + easeInOut(frac)) * -90
+}
+
+const world = document.getElementById('world')
+const hud = document.getElementById('hud')
+
+const CAM = [
+  { p:0.00, x:0,   y:0,    z:2.60 },
+  { p:0.16, x:0,   y:0,    z:1.00 },
+  { p:0.34, x:0,   y:0,    z:1.00 },
+  { p:0.46, x:0,   y:0,    z:5.00 },
+  { p:0.56, x:0,   y:0,    z:1.00 },
+  { p:0.64, x:0,   y:1.15, z:1.00 },
+  { p:0.76, x:2.2, y:1.15, z:1.00 },
+  { p:0.90, x:5.0, y:1.15, z:1.00 },
+  { p:1.00, x:5.0, y:1.15, z:2.60 },
+]
+const OWNER = [['open',0,0.46],['sphere',0.46,0.64],['rail',0.62,0.78],
+               ['field',0.74,0.92],['grow',0.88,0.97],['answer',0.94,1.00]]
+
+const ringEl = document.querySelector('.ring')
+const RING = { x:1, y:1 }
+function measureRing() {
+  if (!ringEl) return
+  const prev = ringEl.style.transform
+  ringEl.style.transform = 'none'
+  const r = ringEl.getBoundingClientRect()
+  ringEl.style.transform = prev
+  if (r.width && r.height) { RING.x = innerWidth/r.width; RING.y = innerHeight/r.height }
+}
+measureRing()
+
+function poseCamera(p) {
+  let i = 0
+  while (i < CAM.length - 2 && p > CAM[i+1].p) i++
+  const a = CAM[i], b = CAM[i+1]
+  const t = easeInOut(clamp((p-a.p)/(b.p-a.p), 0, 1))
+  const x = a.x+(b.x-a.x)*t, y = a.y+(b.y-a.y)*t, z = a.z+(b.z-a.z)*t
+  world.style.transform =
+    `scale(${z.toFixed(4)}) translate3d(${(-x*100).toFixed(3)}vw, ${(-y*100).toFixed(3)}lvh, 0)`
+
+  for (const [id, s0, s1] of OWNER) {
+    const el = document.getElementById(id); if (!el) continue
+    const lp = clamp((p-s0)/(s1-s0), 0, 1)
+    el.style.setProperty('--vis',
+      Math.min(clamp((p-s0)/0.05,0,1), clamp((s1-p)/0.05,0,1)).toFixed(3))
+    el.style.setProperty('--p', lp.toFixed(4))
+    el.style.setProperty('--e', easeInOut(lp).toFixed(4))
+    el.style.setProperty('--o', easeOut(lp).toFixed(4))
+    if (id === 'open') {
+      const f = clamp((lp-0.05)/0.33,0,1), fs = clamp((lp-0.05)/0.24,0,1)
+      const fe = easeInOut(fs)
+      el.style.setProperty('--sx', (RING.x - fe*(RING.x-1)).toFixed(3))
+      el.style.setProperty('--sy', (RING.y - fe*(RING.y-1)).toFixed(3))
+      el.style.setProperty('--swing', (Math.sin(f*Math.PI)*-34).toFixed(2)+'deg')
+      el.style.setProperty('--spread', easeOut(clamp((lp-0.40)/0.22,0,1)).toFixed(4))
+      el.style.setProperty('--turn', steppedTurn(clamp((lp-0.58)/0.34,0,1),2).toFixed(2)+'deg')
+      el.style.setProperty('--sw', clamp((lp-0.76)/0.24,0,1).toFixed(4))
+    }
+  }
+  hud.textContent = String(Math.round(p*100)).padStart(2,'0') + '%'
+}
+
+const LAG = 0.12
+let smoothP = 0, awake = 0
+function frame(force) {
+  const doc = document.documentElement
+  const range = doc.scrollHeight - innerHeight
+  const raw = range > 0 ? clamp(doc.scrollTop/range, 0, 1) : 0
+  smoothP = force ? raw : smoothP + (raw - smoothP)*LAG
+  poseCamera(smoothP)
+  if (Math.abs(raw - smoothP) > 0.0004) awake = 90
+  if (awake > 0) { awake--; requestAnimationFrame(() => frame(false)) }
+}
+
+/* ?p=<0..1> poses the camera and LOCKS OUT the scroll loop. Without the lockout
+   the load-time scroll event re-poses from scrollTop and overwrites it, which is
+   what made five of six verification captures identical. */
+const POSED = new URLSearchParams(location.search).has('p')
+let pending = false
+if (!POSED) {
+  addEventListener('scroll', () => {
+    awake = 90
+    if (!pending) { pending = true; requestAnimationFrame(() => { pending = false; frame(false) }) }
+  }, { passive:true })
+  addEventListener('resize', () => { measureRing(); frame(true) })
+  frame(true)
+} else {
+  history.scrollRestoration = 'manual'
+  poseCamera(clamp(parseFloat(new URLSearchParams(location.search).get('p'))||0, 0, 1))
+}
+
+/* ---------------------------------------------------------------------------
+   BEAT 5's cards, written from JS: 22 hand-typed divs of random coordinates in
+   the markup is 22 lines of noise that say nothing. Deterministic positions —
+   a seeded walk, not Math.random — so the composition is identical on every
+   load and a screenshot of it means something.
+--------------------------------------------------------------------------- */
+const SHOTS = ['/shots/park.jpg', '/shots/zapchasti.jpg', '/shots/vzaimoraschety-v2.jpg', '/shots/sklad.jpg']
+const wrap = document.getElementById('fieldWrap')
+let seed = 20260810
+const rnd = () => (seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff
+
+/* 14, NOT 22. Counted off f181-192: about six cards are on screen at any moment,
+   widely spaced, sharp-cornered and face-on - the camera dollies, nothing
+   rotates. 22 packed into a narrow radius read as a swarm rather than a flight
+   through a room. Spread wider and deeper so the same six-at-a-time holds. */
+const FIELD_N = 14
+for (let i = 0; i < FIELD_N; i++) {
+  const d = document.createElement('div')
+  const w = 320 + rnd() * 520
+  d.style.width = w + 'px'
+  d.style.height = w * 0.69 + 'px'
+  /* Held off the centre line: a card dead ahead is a card you fly into, and it
+     fills the screen with one blurred texture on the way past. */
+  const ang = rnd() * Math.PI * 2
+  const rad = 520 + rnd() * 700
+  d.style.setProperty('--x', Math.round(Math.cos(ang) * rad))
+  d.style.setProperty('--y', Math.round(Math.sin(ang) * rad * .72))
+  d.style.setProperty('--z', Math.round(-3400 * (i / FIELD_N) - rnd() * 120))
+  /* Every third card carries a real capture; the rest are ice panels. A field
+     of identical screenshots reads as a bug, not as depth. */
+  if (i % 3 === 0) {
+    const img = document.createElement('img')
+    img.src = SHOTS[(i / 3 | 0) % SHOTS.length]
+    img.alt = ''
+    d.appendChild(img)
+  }
+  wrap.appendChild(d)
+}
+/* THE TARGET IS ALREADY IN THE FIELD. In the reference the chrome card that
+   becomes the next section is visible the whole way through the flight, dead
+   ahead and growing - you can see where you are going. It was appearing from
+   nowhere at the start of `grow`, which is the same continuity break as the
+   deck-arriving-from-nowhere. Sits on the centre line, nearest, and it is the
+   one card allowed to be dead ahead because it is the destination. */
+const fieldTarget = document.createElement('div')
+fieldTarget.className = 'field-target'
+fieldTarget.style.width = '760px'
+fieldTarget.style.height = '470px'
+fieldTarget.style.setProperty('--x', 90)
+fieldTarget.style.setProperty('--y', 40)
+fieldTarget.style.setProperty('--z', -3450)
+wrap.appendChild(fieldTarget)
+
+
+/* ---------------------------------------------------------------------------
+   BEAT 3's sphere. ~4200 points on a Fibonacci sphere, projected by hand.
+   Deliberately not three.js: the library is 775KB, this is 30 lines, and the
+   page it will eventually join is already decoding a video.
+
+   ponytail: 2D canvas. If a real device cannot hold 60fps here, the upgrade is
+   three.js (already in the repo) or the trick the ribbons use — film it once
+   and play the clip. Do not reach for either until a measurement says so.
+--------------------------------------------------------------------------- */
+const cv = document.getElementById('pts')
+const cx = cv.getContext('2d', { alpha: false })
+/* 4200 rendered as a faint dot-field next to the reference's dense shell.
+   14000 1px rects in a 2D canvas is still nothing - the cost here is the
+   per-point maths, and it is a dozen multiplies. */
+const N = (() => {
+  /* scaled to canvas area: 20000 suits a desktop, a 390pt phone has about a
+     fifth of the pixels and no business plotting a desktop's worth of points. */
+  const area = innerWidth * innerHeight
+  return Math.max(6000, Math.min(20000, Math.round(area / 64)))
+})()
+const P = new Float32Array(N * 3)
+for (let i = 0; i < N; i++) {
+  /* Fibonacci sphere: even coverage without the pole clustering you get from
+     two uniform random angles. */
+  const y = 1 - (i / (N - 1)) * 2
+  const r = Math.sqrt(1 - y * y)
+  const th = i * 2.399963229728653
+  P[i * 3] = Math.cos(th) * r
+  P[i * 3 + 1] = y
+  P[i * 3 + 2] = Math.sin(th) * r
+}
+
+let dpr = 1, W = 0, H = 0
+function size() {
+  dpr = Math.min(devicePixelRatio || 1, 2)
+  W = cv.clientWidth * dpr
+  H = cv.clientHeight * dpr
+  cv.width = W
+  cv.height = H
+}
+size()
+addEventListener('resize', size)
+
+const sphereStage = document.getElementById('sphere')
+
+/* BATCHED BY COLOUR BUCKET, and this was a real measurement, not a guess.
+   Timing draw() synchronously (the only way, since rAF is frozen in the preview
+   pane) the naive version cost median 11.5ms and p95 71.7ms per frame against a
+   16.7ms budget - it did NOT hold 60fps and nothing on screen would have told me.
+
+   The cost was 20000 fillStyle assignments per frame: each one is a CSS colour
+   string parsed from scratch. Quantising alpha into 8 buckets x 2 colours means
+   16 fillStyle changes per frame instead of 20000, with the points collected
+   into preallocated arrays so nothing allocates in the loop. */
+const BUCKETS = 8
+const PAL_FRONT = [], PAL_BACK = []
+for (let i = 0; i < BUCKETS; i++) {
+  const a = (i + 0.5) / BUCKETS
+  PAL_FRONT.push('rgba(223,246,255,' + a.toFixed(3) + ')')
+  PAL_BACK.push('rgba(92,130,201,' + (a * 0.75).toFixed(3) + ')')
+}
+/* two sets of buckets (front/back), each a flat x,y list plus a count */
+const BX = Array.from({ length: BUCKETS * 2 }, () => new Float32Array(N * 2))
+const BN = new Int32Array(BUCKETS * 2)
+
+/* Visibility via IntersectionObserver, not getBoundingClientRect. The old check
+   forced a layout read inside the rAF loop on every frame - the single most
+   likely source of the frame spikes, and free to remove. */
+let sphereVisible = false
+new IntersectionObserver(es => { sphereVisible = es[0].isIntersecting },
+  { rootMargin: '10% 0px' }).observe(sphereStage)
+
+let t = 0
+function draw() {
+  requestAnimationFrame(draw)
+  if (!sphereVisible) return
+
+  const p = parseFloat(sphereStage.style.getPropertyValue('--p')) || 0
+  t += 0.0035
+
+  cx.fillStyle = '#070f16'
+  cx.fillRect(0, 0, W, H)
+  BN.fill(0)
+
+  const R = Math.min(W, H) * 0.285
+  const blow = 1 + p * p * 2.6
+  const sin = Math.sin(t), cos = Math.cos(t)
+  const fade = 1 - p * 0.72
+
+  for (let i = 0; i < N; i++) {
+    const x0 = P[i * 3], y0 = P[i * 3 + 1], z0 = P[i * 3 + 2]
+    const x1 = x0 * cos - z0 * sin
+    const z1 = x0 * sin + z0 * cos
+    const k = 2.6 / (2.6 + z1 * blow)
+    const sx = W / 2 + x1 * blow * R * k
+    const sy = H / 2 + y0 * blow * R * k
+    if (sx < 0 || sx > W || sy < 0 || sy > H) continue
+    const az = z1 < 0 ? -z1 : z1
+    const limb = Math.pow(1 - az, 1.35)
+    let a = (0.5 + 1.15 * k) * fade * limb
+    if (a <= 0.02) continue
+    if (a > 1) a = 1
+    let b = (a * BUCKETS) | 0
+    if (b >= BUCKETS) b = BUCKETS - 1
+    if (z1 <= 0) b += BUCKETS
+    const n = BN[b]
+    BX[b][n * 2] = sx
+    BX[b][n * 2 + 1] = sy
+    BN[b] = n + 1
+  }
+
+  for (let b = 0; b < BUCKETS * 2; b++) {
+    const n = BN[b]
+    if (!n) continue
+    cx.fillStyle = b < BUCKETS ? PAL_FRONT[b] : PAL_BACK[b - BUCKETS]
+    const arr = BX[b]
+    for (let j = 0; j < n; j++) cx.fillRect(arr[j * 2], arr[j * 2 + 1], dpr, dpr)
+  }
+}
+draw()
+</script>
+</body>
+</html>
