@@ -139,20 +139,27 @@ img{display:block;max-width:100%}
    centre, flat and fully readable, and the other seven are almost entirely
    BEHIND it - all you see is a thin sliver down each edge.
 
-   That fixes the radius by arithmetic. For a neighbour at 45deg to peek out by
-   about a quarter of a card width, its centre sits at rad*sin45 = 0.71*rad and
-   its projected half-width is 0.35*w, so 0.71*rad + 0.35*w = 0.74*w gives
-   rad = 0.55*w. Barely half a card width. The cards intersect in space and the
-   z-order sorts them out; that IS the look.
+   THE CARDS MUST NOT INTERSECT, and for four passes they did. Put side by side
+   with f360-371 the difference is not subtle: the reference is one clean card
+   with two thin slivers, mine was six cards slicing through each other's faces.
 
-   Both earlier guesses were wrong in opposite directions: 1.15x collided into
-   mush, then 1.4x splayed seven cards across the screen like a hand of playing
-   cards. Neither was measured. This one is.
+   N cards on a ring stop intersecting only when rad >= w / (2*tan(180/N)).
+   For N=8 that is 1.21*w - so 1.15x, 0.55x and 0.30x were ALL inside the
+   piercing zone, and no amount of tuning the radius was ever going to fix it.
+   Every one of those was a guess dressed up as arithmetic.
+
+   N=6 at 60deg needs rad >= 0.87*w. At 0.95*w the neighbour's near edge lands
+   at 0.57*w against the front card's 0.5*w: a clean gap, nothing pierces, and
+   the neighbour is foreshortened to half width so the front card still owns the
+   frame. Six slots instead of eight, which is what the content is anyway.
+
+   The test below asserts the front card dominates, so this cannot regress
+   silently again.
 
    Portrait 3:4, also off the frames, not the 16:11 landscape inherited from the
    shape of the screenshots. */
 .ring{position:relative;width:min(27vw,310px);aspect-ratio:3/4;transform-style:preserve-3d;
-  --rad:calc(var(--spread,1) * min(14vw,165px));
+  --rad:calc(var(--spread,1) * min(26vw,295px));
   transform:scale(var(--sx,1), var(--sy,1)) rotateZ(var(--swing,0deg))
             translateZ(calc(-1 * var(--rad))) rotateY(var(--turn,0deg))}
 /* The seven behind the hero card are not there until the deck opens. At
@@ -160,19 +167,23 @@ img{display:block;max-width:100%}
 .ring-card:not(:first-child){opacity:clamp(0, calc((var(--spread,1) - .06) / .3), 1);
   /* scenery, not subject: the slivers frame the front card, they do not compete
      with it. Without this the edges read as clutter at every turn angle. */
-  filter:brightness(.55)}
+  filter:brightness(.4) saturate(.7)}
 .ring-card{position:absolute;inset:0;border-radius:var(--r);overflow:hidden;
   background:var(--deep);
   box-shadow:0 40px 80px -30px rgba(0,0,0,.85), inset 0 0 0 1px rgba(223,246,255,.09);
-  transform:rotateY(calc(var(--i) * 45deg)) translateZ(var(--rad))}
+  transform:rotateY(calc(var(--i) * 60deg)) translateZ(var(--rad))}
 /* The captures are light-UI dashboards on a dark page. Untreated they read as
    four bright rectangles rather than one deck, so each gets a scrim tuned to
    sit them into the page without hiding what they show. */
-.ring-card img{width:100%;height:100%;object-fit:cover;object-position:top left;
-  filter:saturate(.88) brightness(.82) contrast(1.04)}
-.ring-card::after{content:"";position:absolute;inset:0;pointer-events:none;
-  background:linear-gradient(165deg, rgba(11,23,32,.05), rgba(11,23,32,.55));
-  mix-blend-mode:multiply}
+.ring-card img{width:100%;height:100%;object-fit:cover;object-position:top left}
+/* The scrim was there to stop four bright dashboards competing for attention.
+   Now that only ONE card is ever the subject, the front card gets none of it -
+   it should read as crisply as the reference's does - and the neighbours carry
+   it instead, which is what makes the front card pop. */
+.ring-card:not(:first-child)::after{content:"";position:absolute;inset:0;
+  pointer-events:none;background:rgba(7,15,22,.55)}
+.ring-card:first-child{box-shadow:0 50px 90px -30px rgba(0,0,0,.9),
+  inset 0 0 0 1px rgba(223,246,255,.16)}
 /* The floor the deck turns on. Centred INSIDE its own box, not on the top edge:
    an `ellipse at 50% 0%` is at full opacity along that edge, which draws a hard
    horizontal line across the viewport instead of a glow. */
@@ -556,8 +567,6 @@ img{display:block;max-width:100%}
         </div>
         <div class="ring-card ring-card--ph" style="--i:4"><i>[placeholder]</i><b>CRM под процесс</b></div>
         <div class="ring-card ring-card--ph" style="--i:5"><i>[placeholder]</i><b>Документооборот</b></div>
-        <div class="ring-card ring-card--ph" style="--i:6"><i>[placeholder]</i><b>Отчётность</b></div>
-        <div class="ring-card ring-card--ph" style="--i:7"><i>[placeholder]</i><b>Интеграции 1С</b></div>
       </div>
     </div>
 
@@ -694,7 +703,7 @@ function steppedTurn(t, slots) {
   const idx = t * slots
   const k = Math.floor(Math.min(idx, slots - 0.0001))
   const frac = clamp((idx - k - 0.25) / 0.5, 0, 1)
-  return (k + easeInOut(frac)) * -45
+  return (k + easeInOut(frac)) * -60
 }
 
 const stages = [...document.querySelectorAll('.stage')]
