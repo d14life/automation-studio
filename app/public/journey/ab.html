@@ -1,0 +1,34 @@
+<!doctype html><meta charset=utf-8><title>A/B</title>
+<style>
+  /* Reference frame and the live page, same size, side by side, in ONE capture.
+     Headless screenshotting died in this environment, so the browser pane is the
+     only route left - and one screenshot per beat is far cheaper than two. */
+  *{margin:0;box-sizing:border-box}
+  body{background:#111;display:grid;grid-template-columns:1fr 1fr;gap:4px;height:100vh;overflow:hidden}
+  .side{position:relative;overflow:hidden}
+  img{width:100%;height:100%;border:0;display:block;object-fit:contain;background:#000}
+  /* The iframe must render at the REFERENCE's own 1342x958 and then be scaled to
+     fit, or the page reflows responsively at half width and the layout being
+     compared is not the layout that ships. */
+  iframe{width:1342px;height:958px;border:0;display:block;background:#000;
+    transform-origin:top left;position:absolute;left:0;top:0}
+  b{position:absolute;left:6px;bottom:4px;font:700 13px system-ui;padding:3px 7px;border-radius:4px}
+  .r b{background:#ffd24a;color:#000} .m b{background:#7FD8FF;color:#000}
+</style>
+<div class="side r"><img id="ref"><b id="rl"></b></div>
+<div class="side m"><iframe id="live"></iframe><b id="ml"></b></div>
+<script>
+  const q = new URLSearchParams(location.search)
+  const f = q.get('f'), p = q.get('p')
+  document.getElementById('ref').src = `/refs/a${String(f).padStart(4,'0')}.png`
+  const live = document.getElementById('live')
+  live.src = `/journey/showroom.html?p=${p}`   // particles ON: they are the beat
+  const fit = () => {
+    const side = live.parentElement.getBoundingClientRect()
+    const k = Math.min(side.width / 1342, side.height / 958)
+    live.style.transform = `scale(${k})`
+  }
+  live.addEventListener('load', fit); addEventListener('resize', fit); fit()
+  document.getElementById('rl').textContent = `REF f${f}`
+  document.getElementById('ml').textContent = `MINE p=${p}`
+</script>
