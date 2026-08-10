@@ -1,0 +1,848 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Solutions101 — скролл-путешествие</title>
+<meta name="robots" content="noindex" />
+<link rel="preload" href="/fonts/nunito-cyrillic.woff2" as="font" type="font/woff2" crossorigin />
+
+<style>
+@font-face{font-family:Nunito;font-style:normal;font-weight:300 900;font-display:swap;
+  src:url(/fonts/nunito-cyrillic.woff2) format('woff2');
+  unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:Nunito;font-style:normal;font-weight:300 900;font-display:swap;
+  src:url(/fonts/nunito-latin.woff2) format('woff2')}
+
+/* ---------------------------------------------------------------------------
+   PALETTE — lifted, not invented. --bg is v2.css's sampled #0e202d, ICE is
+   hooks/heroTuning.ts. No violet: the reference this is modelled on is violet
+   end to end, and that decision was reversed on this site long ago.
+   One accent (ICE), one radius scale (--r), one theme (dark) for the whole page.
+--------------------------------------------------------------------------- */
+:root{
+  --bg:#0b1720;          /* off-black, tinted toward the site's navy. Never #000 */
+  --deep:#070f16;
+  --ink:#F2F7F5;
+  --dim:#8fa6b4;
+  --ice-1:#DFF6FF;
+  --ice-2:#7FD8FF;
+  --ice-3:#5C82C9;
+  --r:20px;              /* the only corner radius on the page, except pills */
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:Nunito,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+html{scrollbar-width:none;-ms-overflow-style:none}
+html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none}
+img{display:block;max-width:100%}
+
+/* ---------------------------------------------------------------------------
+   THE ENGINE.
+
+   Every beat is a tall .stage with a .pin stuck to its top. The stage's extra
+   height IS that beat's scroll runway. Same pattern .v2stage/.v2pin already
+   uses for the DNA header, so it behaves identically on iOS (100lvh, not 100%)
+   and releases instead of pinning forever the way position:fixed does.
+
+   JS writes THREE numbers per stage and nothing else:
+     --p  linear progress, 0 to 1, damped (see the loop for why)
+     --e  the same progress through easeInOutCubic  — for scale and travel
+     --o  the same progress through easeOutCubic    — for things arriving
+
+   Two eased channels, not one, because the reference never runs two moves on
+   the same curve. A card that grows and a headline that lands are different
+   gestures; sharing a curve is exactly what made the first version feel like a
+   slideshow.
+
+   NOT registered @property. Trap 5.1 in docs/HANDOFF.md: animating a registered
+   custom property costs more than every other effect on the page combined.
+--------------------------------------------------------------------------- */
+.stage{position:relative;height:var(--h,300svh)}
+.pin{position:sticky;top:0;height:100lvh;min-height:100lvh;overflow:hidden;
+     display:grid;place-items:center}
+
+/* Sub-windows. The whole trick behind "flowy": inside one beat, each element
+   runs on its own slice of --p, and the slices OVERLAP. w(a,b) maps the beat's
+   progress onto 0..1 across [a,b]. Written as a clamp so it saturates at both
+   ends instead of overshooting. */
+@supports (width: clamp(0px, 1px, 2px)) { /* documents the dependency; see JS fallback */ }
+
+/* one marquee on the page, and it belongs to beat 1 */
+.marquee{position:absolute;top:50%;left:0;translate:0 -50%;width:max-content;
+  display:flex;gap:.55em;white-space:nowrap;pointer-events:none;
+  font-size:clamp(64px,12.5vw,190px);font-weight:900;letter-spacing:-.045em;line-height:1;
+  color:transparent;-webkit-text-stroke:1px rgba(127,216,255,.22);
+  animation:mq 34s linear infinite}
+@keyframes mq{to{transform:translateX(-50%)}}
+
+.btn{display:inline-flex;align-items:center;gap:.5em;padding:.8em 1.5em;border-radius:999px;
+  font-weight:800;font-size:15px;text-decoration:none;border:0;cursor:pointer;
+  transition:transform .25s cubic-bezier(.16,1,.3,1), box-shadow .25s cubic-bezier(.16,1,.3,1)}
+.btn:hover{transform:translateY(-2px)}
+.btn:active{transform:scale(.98)}
+.btn--ice{background:var(--ice-1);color:#0b1720;box-shadow:0 8px 30px -10px rgba(223,246,255,.5)}
+.btn--ghost{color:var(--ice-1);box-shadow:inset 0 0 0 1px rgba(223,246,255,.28)}
+
+/* =========================================================================
+   BEAT 1 — THE RING
+   Cards on a cylinder, landscape because the real product captures are
+   landscape (1120x780). The ring turns on one rotateY, so eight cards cost one
+   composited transform. The turn runs on --e, so it eases in and settles out
+   instead of starting and stopping at full speed.
+   ========================================================================= */
+#ring .pin{background:var(--bg)}
+.ring-scene{position:absolute;inset:0;display:grid;place-items:center;
+  perspective:1150px;perspective-origin:50% 47%}
+/* 8 cards at 45deg apart need radius >= w/(2*tan(22.5)) = 1.21w just to stop
+   touching, and about 1.6w before there is air between them. At 1.14w the ring
+   read as a flat filmstrip - that was the first version's real problem, not the
+   colours. */
+/* THE DECK PARKS. At 60fps the reference holds the front card completely still
+   for the whole star transition - the ring finishes turning first, then there
+   is a rest, and only then does the next beat start. The first version rotated
+   right up to the handoff and it read as relentless. Flow needs rests as much
+   as it needs motion, so the turn saturates at 82% of the runway and the last
+   18% is stillness on the hero card. */
+.ring{position:relative;width:min(34vw,360px);aspect-ratio:16/11;transform-style:preserve-3d;
+  transform:translateZ(calc(-1 * var(--rad)))
+            rotateY(calc(clamp(0, var(--e) / .82, 1) * -135deg));
+  --rad:min(56vw,585px)}
+.ring-card{position:absolute;inset:0;border-radius:var(--r);overflow:hidden;
+  background:var(--deep);
+  box-shadow:0 40px 80px -30px rgba(0,0,0,.85), inset 0 0 0 1px rgba(223,246,255,.09);
+  transform:rotateY(calc(var(--i) * 45deg)) translateZ(var(--rad))}
+/* The captures are light-UI dashboards on a dark page. Untreated they read as
+   four bright rectangles rather than one deck, so each gets a scrim tuned to
+   sit them into the page without hiding what they show. */
+.ring-card img{width:100%;height:100%;object-fit:cover;object-position:top left;
+  filter:saturate(.88) brightness(.82) contrast(1.04)}
+.ring-card::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(165deg, rgba(11,23,32,.05), rgba(11,23,32,.55));
+  mix-blend-mode:multiply}
+/* The floor the deck turns on. Centred INSIDE its own box, not on the top edge:
+   an `ellipse at 50% 0%` is at full opacity along that edge, which draws a hard
+   horizontal line across the viewport instead of a glow. */
+.ring-floor{position:absolute;left:50%;top:50%;translate:-50% 0;
+  width:min(130vw,1600px);height:80vh;pointer-events:none;
+  background:radial-gradient(ellipse 55% 46% at 50% 42%, rgba(92,130,201,.22), transparent 68%)}
+.ring-card__label{position:absolute;left:0;right:0;bottom:0;padding:14px 16px;
+  background:linear-gradient(transparent,rgba(7,15,22,.94));color:var(--ice-1);
+  font-size:14px;font-weight:800;line-height:1.25}
+/* Empty slots. Visibly empty on purpose: an invented screenshot of a product
+   that does not exist yet is worse than an honest gap. */
+.ring-card--ph{background:var(--deep);display:grid;place-items:center;
+  box-shadow:inset 0 0 0 1px rgba(223,246,255,.14)}
+.ring-card--ph b{font-size:17px;font-weight:800;color:var(--dim)}
+.ring-card--ph i{position:absolute;left:16px;top:14px;font-style:normal;font-size:10px;
+  letter-spacing:.16em;text-transform:uppercase;color:#3f5b6b}
+
+/* The star lives on the front card and, in beat 2, eats the screen. */
+.star{position:absolute;left:50%;top:50%;translate:-50% -50%;transform-origin:50% 50%}
+
+/* Holds until the beat is nearly over, then goes. The first version faded it
+   out across the first 40% of the runway, so the one clickable thing on the
+   screen was already ghosted before the deck had finished its first quarter turn. */
+.ring-cta{position:absolute;left:50%;bottom:6vh;translate:-50% 0;z-index:3;
+  opacity:clamp(0, calc((.94 - var(--p)) / .12), 1)}
+
+/* =========================================================================
+   BEAT 2 — THE STAR SWALLOWS THE PAGE
+   Read off the reference frame by frame: it is not a mask and not one star.
+   A black star grows on its own curve while a smaller white one grows more
+   slowly inside it, reading as a light source; the particle sphere is already
+   fading up INSIDE the black star before the star has finished covering the
+   screen. Three overlapping windows, three different rates. That overlap is
+   the whole effect. A mask would repaint the viewport every frame; two scaled
+   <svg> elements stay on the compositor.
+   ========================================================================= */
+/* THE STAR IS A MASK, NOT A SHAPE. Read off the 60fps frames: the next section
+   is visible THROUGH the star from very early - you can see the sphere clipped
+   to the star's outline while the old page is still there in the corners. The
+   first attempt drew a solid star on top and it was invisible, because a dark
+   star on a dark page has nothing to contrast against.
+
+   Two masked layers, same star, one a few px larger than the other. The larger
+   one is ice, the smaller is the page's deep colour, so the difference between
+   them renders as a clean ice outline of exactly the star shape - which is what
+   makes the boundary legible here when the reference got it for free from a
+   white page. One mechanism, no size-matching arithmetic between a mask and a
+   transform.
+
+   mask-size is a repaint, and this is the one place on the page that spends
+   one: it is a single element, it is scroll-driven so it can only move as fast
+   as the wheel, and there is no transform that reproduces a growing hole. */
+#swallow .pin{background:var(--bg)}
+.swallow-cut{position:absolute;inset:0;pointer-events:none;
+  --star:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='%23fff' d='M50 0 C54 38 62 46 100 50 C62 54 54 62 50 100 C46 62 38 54 0 50 C38 46 46 38 50 0Z'/%3E%3C/svg%3E");
+  /* squared: creeps for the first half of the beat, then rushes. The measured
+     motion energy of the reference does exactly this - the two quietest thirds
+     of a second in the whole clip are immediately before this beat's blowout,
+     which is the loudest. */
+  /* A STAR IS NOT A CIRCLE, AND THE CORNERS DECIDE THE SIZE. Its sides are
+     concave, so the boundary at 45deg sits at only ~0.35 of the half-width
+     (measured off the path: the curve's midpoint between the top and right
+     points lands 17.3 units from centre in a 100-unit box). The viewport
+     corner on this pane is 600px from centre, so the mask has to reach
+     600/0.347 = 1729 half, i.e. ~3460px, not the 2840px the first pass grew
+     to. Sized past that, and then closed out for real below. */
+  --size:calc(7vmin + var(--e) * var(--e) * 560vmin);
+  -webkit-mask:var(--star) center / var(--size) var(--size) no-repeat;
+  mask:var(--star) center / var(--size) var(--size) no-repeat}
+.swallow-cut--rim{background:var(--ice-2);--size:calc(7.9vmin + var(--e) * var(--e) * 566vmin)}
+.swallow-cut--fill{background:var(--deep)}
+/* THE GUARANTEE. The arithmetic above is right for this viewport, and a star
+   whose corners have not quite closed hands over to the next beat through four
+   pale triangles. Rather than trust the geometry at every aspect ratio, the
+   last 6% of the beat lays a plain full-bleed fill over the top. The mask does
+   the show; this makes the handoff true. */
+.swallow-seal{position:absolute;inset:0;pointer-events:none;background:var(--deep);
+  opacity:clamp(0, calc((var(--p) - .94) / .06), 1)}
+/* what you see through the hole: the sphere's first light, already turning up
+   before the star is anywhere near covering the screen */
+.swallow-glow{position:absolute;width:80vmin;height:80vmin;border-radius:50%;
+  background:radial-gradient(circle, rgba(127,216,255,.30), transparent 62%);
+  opacity:clamp(0, calc((var(--p) - .30) / .35), 1);
+  transform:scale(calc(.4 + var(--o) * 1))}
+.star-core{width:min(9vmin,78px);height:min(9vmin,78px);
+  transform:scale(calc(1 + var(--e) * 4.5));
+  filter:drop-shadow(0 0 40px rgba(223,246,255,.9))}
+
+/* =========================================================================
+   BEAT 3 — THE PARTICLE SPHERE
+   2D canvas, not WebGL. ~4200 points holds 60fps and costs no library; this
+   page will eventually sit on a machine already decoding the DNA clip.
+   ========================================================================= */
+#sphere .pin{background:var(--deep)}
+#sphere canvas{position:absolute;inset:0;width:100%;height:100%}
+.split{position:absolute;inset:0;pointer-events:none}
+.split b{position:absolute;font-size:clamp(52px,9.5vw,140px);font-weight:900;
+  letter-spacing:-.045em;line-height:.92}
+/* The two halves of the line travel at different rates and in different
+   directions. Same reason as everything else here: synchronised is a slideshow. */
+.split .a{left:5vw;top:10vh;translate:0 calc(var(--e) * -7vh);
+  opacity:clamp(0, calc(var(--p) / .18), 1)}
+.split .b{right:5vw;bottom:13vh;text-align:right;color:var(--dim);
+  translate:0 calc(var(--e) * -17vh);
+  opacity:clamp(0, calc((var(--p) - .06) / .18), 1)}
+.split p{position:absolute;left:5vw;bottom:16vh;max-width:33ch;font-size:15px;line-height:1.6;
+  color:#a9bfcc;opacity:clamp(0, calc((var(--p) - .3) / .22), 1);
+  translate:0 calc((1 - var(--o)) * 3vh)}
+
+/* =========================================================================
+   BEAT 4 — THE RAIL
+   Scrolling down drives it sideways. Same idea as useDeckRail in V2.tsx, done
+   here with one translate so this page carries no imports. The cards lean
+   slightly into the travel, which is what stops a horizontal strip reading as
+   a filmstrip on a conveyor.
+   ========================================================================= */
+#rail .pin{background:var(--deep);place-items:stretch;perspective:1400px}
+.rail{display:flex;gap:26px;align-items:center;height:100%;padding:0 8vw;
+  transform-style:preserve-3d;
+  transform:translate3d(calc(var(--e) * -64%),0,0) rotateY(calc((1 - var(--e)) * 4deg))}
+.rail figure{margin:0;flex:0 0 clamp(320px,44vw,660px);border-radius:var(--r);overflow:hidden;
+  position:relative;aspect-ratio:16/11;background:var(--bg);
+  box-shadow:0 40px 80px -34px rgba(0,0,0,.9), inset 0 0 0 1px rgba(223,246,255,.08)}
+.rail img{width:100%;height:100%;object-fit:cover;object-position:top left}
+.rail figcaption{position:absolute;left:0;right:0;bottom:0;padding:26px;
+  background:linear-gradient(transparent,rgba(7,15,22,.95));color:var(--ice-1)}
+.rail figcaption b{display:block;font-size:clamp(21px,2.5vw,32px);line-height:1.12;
+  letter-spacing:-.02em}
+.rail figcaption em{display:block;font-style:normal;font-size:13.5px;color:#a9bfcc;margin-top:8px}
+
+/* =========================================================================
+   BEAT 5 — THE FIELD
+   Cards scattered through Z; scroll dollies the camera forward. Linear on
+   purpose: a camera that eases is a camera that stalls, and this is the one
+   move in the page that should feel like constant travel.
+   ========================================================================= */
+#field .pin{background:var(--deep);perspective:820px}
+.field{position:absolute;inset:0;transform-style:preserve-3d;
+  transform:translateZ(calc(var(--p) * 2750px))}
+.field div{position:absolute;left:50%;top:50%;border-radius:14px;overflow:hidden;
+  background:linear-gradient(150deg,#12293a,var(--deep));
+  box-shadow:0 24px 60px -20px rgba(0,0,0,.85), inset 0 0 0 1px rgba(223,246,255,.07);
+  transform:translate3d(calc(var(--x) * 1px - 50%), calc(var(--y) * 1px - 50%), calc(var(--z) * 1px))}
+.field img{width:100%;height:100%;object-fit:cover;object-position:top left}
+
+/* =========================================================================
+   BEAT 6 — A CARD BECOMES THE SECTION
+   The card the camera was heading for stops being a card. It arrives at the
+   size it left the field at and lands full bleed, its radius flattening out as
+   it goes. The copy fades up while it is STILL growing, and the last 12% of the
+   beat is a zoom-through: the section rushes past the camera and blows out to
+   a radial glow, which is where beat 7 comes from. That handoff is read off the
+   reference, where the previous section does not cross-fade, it is flown through.
+   ========================================================================= */
+#grow .pin{background:var(--deep)}
+.grow-card{position:absolute;width:min(92vw,1240px);aspect-ratio:16/9;
+  border-radius:calc(var(--r) - var(--e) * 14px);overflow:hidden;
+  background:radial-gradient(130% 130% at 20% 12%, #2b6d95 0%, transparent 58%),
+             linear-gradient(155deg,#1b4a6b 0%, var(--deep) 76%);
+  box-shadow:0 60px 120px -50px rgba(0,0,0,.9);
+  transform:scale(calc(.30 + var(--e) * .70 + max(0, var(--p) - .88) * 9))}
+.grow-copy{position:absolute;left:7%;top:50%;translate:0 -50%;max-width:29ch;
+  opacity:clamp(0, calc((var(--p) - .30) / .28), 1)}
+.grow-copy h2{font-size:clamp(36px,5.2vw,72px);line-height:1.0;letter-spacing:-.04em;
+  margin:0 0 .38em;font-weight:900}
+.grow-copy h2 span{display:block;color:var(--dim)}
+.grow-copy p{font-size:15.5px;line-height:1.6;color:#bcd0dc;margin:0 0 1.7em;max-width:31ch}
+.chrome{position:absolute;right:-7%;top:50%;translate:0 -50%;width:54%;
+  filter:drop-shadow(0 40px 70px rgba(0,0,0,.55));
+  transform:rotate(calc(var(--o) * 8deg))}
+/* the blow-out that beat 7 emerges from */
+.grow-flare{position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(circle at 50% 50%, rgba(127,216,255,.5), transparent 55%);
+  opacity:clamp(0, calc((var(--p) - .86) / .14), 1)}
+
+/* =========================================================================
+   BEAT 7 — THE ANSWER PANEL
+   Arrives out of the flare rather than sliding in: it starts oversized and
+   settles back, which is what an object flying toward the camera and stopping
+   looks like.
+   ========================================================================= */
+#answer .pin{background:var(--deep)}
+.panel{width:min(92vw,1240px);aspect-ratio:16/9;border-radius:var(--r);overflow:hidden;
+  position:relative;display:grid;place-items:center;padding:6%;
+  background:radial-gradient(130% 130% at 80% 16%, #2b6d95 0%, transparent 56%),
+             linear-gradient(205deg,#1b4a6b 0%, var(--deep) 74%);
+  box-shadow:0 60px 120px -50px rgba(0,0,0,.9);
+  transform:scale(calc(1.55 - var(--o) * .55));
+  opacity:clamp(0, calc(var(--p) / .2), 1)}
+.panel h2{font-size:clamp(32px,4.6vw,64px);line-height:1.02;letter-spacing:-.04em;margin:0;
+  text-align:center;max-width:17ch;font-weight:900}
+.panel h2 span{color:var(--dim)}
+.panel-flare{position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(circle at 50% 50%, rgba(127,216,255,.5), transparent 55%);
+  opacity:clamp(0, calc(1 - var(--p) / .18), 1)}
+
+/* =========================================================================
+   BEAT 1 — THE OPENING FOLD
+
+   THIS IS WHERE THE JOURNEY STARTS, and getting that wrong cost a rebuild.
+   The screen recording had its first seconds cut off, so the deck looked like
+   the opening and this move looked like the ending. It is the other way round:
+   the site opens on a full-bleed hero page, and the first thing scrolling does
+   is fold that page into a card in the deck. Everything after is the deck's
+   journey. The reference closes the loop by flying back into the same page at
+   the end, which is why it reads as a cycle rather than a list.
+
+   The panel does not shrink in place, it SWINGS: origin low and just left of
+   centre, so it reads as a card being dealt rather than a poster spinning. The
+   deck it lands in arrives late and from underneath, on its own window.
+   Nothing lines up, which is the point.
+   ========================================================================= */
+#open .pin{background:var(--bg);perspective:1500px}
+/* Origin low and just left of centre: enough to swing, not so much that the
+   card walks out of frame. An earlier pass used 22%/86% and it drifted into
+   the left third by mid-beat. */
+.opener{width:min(92vw,1240px);aspect-ratio:16/9;border-radius:calc(var(--r) * var(--e) + 2px);
+  overflow:hidden;position:relative;
+  transform-style:preserve-3d;transform-origin:42% 94%;
+  background:radial-gradient(130% 130% at 80% 16%, #2b6d95 0%, transparent 56%),
+             linear-gradient(205deg,#1b4a6b 0%, var(--deep) 74%);
+  box-shadow:0 60px 120px -50px rgba(0,0,0,.9);
+  transform:rotateZ(calc(var(--e) * -46deg)) rotateY(calc(var(--e) * 30deg))
+            scale(calc(1 - var(--e) * .74))}
+/* The hero copy rides the panel down and is gone well before it lands, so the
+   card that arrives in the deck is a card, not a page with unreadable text on it. */
+.opener-copy{position:absolute;left:7%;top:50%;translate:0 -50%;max-width:24ch;
+  opacity:clamp(0, calc((.34 - var(--p)) / .34), 1)}
+.opener-copy h1{font-size:clamp(38px,5.6vw,78px);line-height:.98;letter-spacing:-.045em;
+  margin:0 0 .34em;font-weight:900}
+.opener-copy h1 span{display:block;color:var(--dim)}
+.opener-copy p{font-size:15.5px;line-height:1.6;color:#bcd0dc;margin:0 0 1.7em;max-width:30ch}
+.opener-shot{position:absolute;right:6%;top:50%;translate:0 -50%;
+  width:38%;aspect-ratio:16/11;border-radius:12px;overflow:hidden;
+  box-shadow:0 30px 60px -20px rgba(0,0,0,.7)}
+.opener-shot img{width:100%;height:100%;object-fit:cover;object-position:top left;
+  filter:saturate(.88) brightness(.84)}
+/* the deck it is being dealt into, arriving late and from underneath */
+.fold-deck{position:absolute;display:flex;gap:14px;
+  opacity:clamp(0, calc((var(--p) - .55) / .35), 1);
+  transform:translateY(calc((1 - var(--o)) * 14vh))}
+.fold-deck span{width:clamp(90px,11vw,150px);aspect-ratio:16/11;border-radius:12px;
+  background:var(--deep);box-shadow:inset 0 0 0 1px rgba(223,246,255,.12)}
+
+/* The closing screen. Not a beat: the place the journey puts you down. */
+.end{min-height:100svh;display:grid;place-items:center;background:var(--bg);
+  text-align:center;padding:10vh 6vw}
+.end h2{font-size:clamp(34px,5.2vw,68px);line-height:1.03;letter-spacing:-.04em;margin:0 0 .45em;
+  font-weight:900;max-width:16ch}
+.end p{font-size:16px;color:#a9bfcc;max-width:46ch;margin:0 auto 2.2em;line-height:1.6}
+.end div{display:grid;place-items:center;gap:0}
+.end .row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+
+.hud{position:fixed;right:14px;top:12px;z-index:99;font-size:11px;letter-spacing:.1em;
+  font-weight:800;padding:6px 10px;border-radius:999px;background:rgba(11,23,32,.75);
+  color:var(--ice-1);backdrop-filter:blur(8px);font-variant-numeric:tabular-nums;
+  box-shadow:inset 0 0 0 1px rgba(223,246,255,.14)}
+
+@media (max-width:768px){
+  .ring{width:min(74vw,340px);--rad:min(78vw,360px)}
+  .split .a{left:6vw;top:8vh}
+  .split .b{right:6vw;bottom:22vh}
+  .split p{left:6vw;bottom:8vh;max-width:88vw}
+  .grow-copy{left:8%;right:8%;max-width:none;top:auto;bottom:9%;translate:0 0}
+  .chrome{right:-24%;top:32%;width:78%;opacity:.5}
+  .rail figure{flex:0 0 82vw}
+}
+
+/* ---------------------------------------------------------------------------
+   REDUCED MOTION. The whole page is scroll-driven motion, so the honest
+   fallback is not "less animation" — it is to freeze every beat at a readable
+   pose and let the page be an ordinary stack of sections.
+--------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce){
+  .stage{height:auto;min-height:100svh}
+  .pin{position:relative}
+  .marquee{animation:none}
+  .ring{transform:none;width:min(90vw,560px)}
+  .ring-card{transform:none;position:relative;inset:auto}
+  .ring-card:not(:first-child){display:none}
+  .ring-cta{opacity:1}
+  .star-bloom{transform:scale(1)}
+  .star-core{transform:scale(1)}
+  .swallow-glow{opacity:1;transform:none}
+  .swallow-wash{opacity:0}
+  .rail{transform:none;overflow-x:auto;padding:0 6vw}
+  .field{transform:none}
+  .field div{position:relative;left:auto;top:auto;transform:none;margin:8px;display:inline-block}
+  .grow-card,.panel,.opener{transform:none;opacity:1}
+  .opener-copy{opacity:1}
+  .grow-copy,.split p,.split b,.fold-deck{opacity:1;translate:0 0;transform:none}
+  .grow-flare,.panel-flare{opacity:0}
+}
+</style>
+</head>
+<body>
+
+<div class="hud" id="hud">00%</div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="s4" viewBox="0 0 100 100">
+    <path d="M50 0 C54 38 62 46 100 50 C62 54 54 62 50 100 C46 62 38 54 0 50 C38 46 46 38 50 0Z"/>
+  </symbol>
+  <defs>
+    <linearGradient id="chromeGrad" x1="0" y1="0" x2=".9" y2="1">
+      <stop offset="0" stop-color="#ffffff"/><stop offset=".38" stop-color="#DFF6FF"/>
+      <stop offset=".66" stop-color="#5C82C9"/><stop offset="1" stop-color="#0b1720"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<!-- ══ BEAT 1 ══ the opening fold: the hero page becomes a card ═══════════ -->
+<section class="stage" id="open" style="--h:320svh">
+  <div class="pin">
+    <div class="fold-deck" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+    <div class="opener">
+      <div class="opener-copy">
+        <h1>Софт под ваш<span>процесс</span></h1>
+        <p>Внутренние системы на заказ: склад, взаиморасчёты, парк техники, каталог.
+           Собираем под то, как вы работаете сейчас.</p>
+        <a class="btn btn--ice" href="#/request">Обсудить задачу</a>
+      </div>
+      <div class="opener-shot">
+        <img src="/shots/sklad.jpg" alt="" width="1120" height="780" fetchpriority="high" />
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ BEAT 2 ══ the ring ═════════════════════════════════════════════════ -->
+<section class="stage" id="ring" style="--h:380svh">
+  <div class="pin">
+    <div class="marquee" aria-hidden="true">
+      <span>Автоматизируем бизнес-процессы. Быстро не значит плохо.</span>
+      <span>Автоматизируем бизнес-процессы. Быстро не значит плохо.</span>
+    </div>
+
+    <div class="ring-floor" aria-hidden="true"></div>
+    <div class="ring-scene">
+      <div class="ring">
+        <div class="ring-card" style="--i:0">
+          <img src="/shots/park.jpg" alt="" width="1120" height="780" fetchpriority="high" />
+          <svg class="star" width="88" height="88" viewBox="0 0 100 100" fill="#fff" aria-hidden="true"><use href="#s4"/></svg>
+          <span class="ring-card__label">Аренда спецтехники</span>
+        </div>
+        <div class="ring-card" style="--i:1">
+          <img src="/shots/zapchasti.jpg" alt="" width="1120" height="780" />
+          <span class="ring-card__label">Магазин автозапчастей</span>
+        </div>
+        <div class="ring-card" style="--i:2">
+          <img src="/shots/vzaimoraschety-v2.jpg" alt="" width="1120" height="780" />
+          <span class="ring-card__label">Взаиморасчёты с контрагентами</span>
+        </div>
+        <div class="ring-card" style="--i:3">
+          <img src="/shots/sklad.jpg" alt="" width="1120" height="780" />
+          <span class="ring-card__label">Складской терминал</span>
+        </div>
+        <div class="ring-card ring-card--ph" style="--i:4"><i>[placeholder]</i><b>CRM под процесс</b></div>
+        <div class="ring-card ring-card--ph" style="--i:5"><i>[placeholder]</i><b>Документооборот</b></div>
+        <div class="ring-card ring-card--ph" style="--i:6"><i>[placeholder]</i><b>Отчётность</b></div>
+        <div class="ring-card ring-card--ph" style="--i:7"><i>[placeholder]</i><b>Интеграции 1С</b></div>
+      </div>
+    </div>
+
+    <a class="btn btn--ice ring-cta" href="#/works">Смотреть решения</a>
+  </div>
+</section>
+
+<!-- ══ BEAT 2 ══ the star swallows the page ═══════════════════════════════ -->
+<section class="stage" id="swallow" style="--h:240svh">
+  <div class="pin">
+    <div class="swallow-cut swallow-cut--rim"></div>
+    <div class="swallow-cut swallow-cut--fill"><div class="swallow-glow"></div></div>
+    <div class="swallow-seal"></div>
+    <svg class="star star-core" viewBox="0 0 100 100" fill="#ffffff" aria-hidden="true"><use href="#s4"/></svg>
+  </div>
+</section>
+
+<!-- ══ BEAT 3 ══ the particle sphere ══════════════════════════════════════ -->
+<section class="stage" id="sphere" style="--h:400svh">
+  <div class="pin">
+    <canvas id="pts"></canvas>
+    <div class="split">
+      <b class="a">Быстро</b>
+      <b class="b">не значит<br />плохо</b>
+      <p>Мы не пишем систему год. Первый рабочий контур собирается за недели,
+         и вы им пользуетесь, пока мы достраиваем остальное.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ BEAT 4 ══ the rail ═════════════════════════════════════════════════ -->
+<section class="stage" id="rail" style="--h:360svh">
+  <div class="pin">
+    <div class="rail">
+      <figure><img src="/shots/park.jpg" alt="" width="1120" height="780" />
+        <figcaption><b>Аренда спецтехники</b><em>Календарь занятости, наработка по сменам, окупаемость парка</em></figcaption></figure>
+      <figure><img src="/shots/zapchasti.jpg" alt="" width="1120" height="780" />
+        <figcaption><b>Магазин автозапчастей</b><em>Подбор по VIN, каталог на 40 000 позиций</em></figcaption></figure>
+      <figure><img src="/shots/vzaimoraschety-v2.jpg" alt="" width="1120" height="780" />
+        <figcaption><b>Взаиморасчёты</b><em>Свёрнутое сальдо, акт сверки одной кнопкой</em></figcaption></figure>
+      <figure><img src="/shots/sklad.jpg" alt="" width="1120" height="780" />
+        <figcaption><b>Складской терминал</b><em>FEFO, приёмка, размещение, слепой пересчёт</em></figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<!-- ══ BEAT 5 ══ the field ════════════════════════════════════════════════ -->
+<section class="stage" id="field" style="--h:420svh">
+  <div class="pin"><div class="field" id="fieldWrap"></div></div>
+</section>
+
+<!-- ══ BEAT 6 ══ a card becomes the section, then is flown through ════════ -->
+<section class="stage" id="grow" style="--h:330svh">
+  <div class="pin">
+    <div class="grow-card">
+      <svg class="chrome" viewBox="0 0 100 100" fill="url(#chromeGrad)" aria-hidden="true"><use href="#s4"/></svg>
+      <div class="grow-copy">
+        <h2>Только практика<span>ноль теории</span></h2>
+        <p>Каждая система собрана под конкретный процесс конкретной компании.
+           Не платформа с сотней настроек, а инструмент под одну работу.</p>
+        <a class="btn btn--ice" href="#/request">Обсудить задачу</a>
+      </div>
+    </div>
+    <div class="grow-flare"></div>
+  </div>
+</section>
+
+<!-- ══ BEAT 7 ══ the answer panel ═════════════════════════════════════════ -->
+<section class="stage" id="answer" style="--h:270svh">
+  <div class="pin">
+    <div class="panel"><h2>Системы, которые<span>считают за вас</span></h2></div>
+    <div class="panel-flare"></div>
+  </div>
+</section>
+
+<section class="end">
+  <div>
+    <h2>Ваш процесс станет следующей карточкой</h2>
+    <p>Расскажите, что отнимает время. Покажем, как это выглядит в работе, до того как вы что-то заплатите.</p>
+    <div class="row">
+      <a class="btn btn--ice" href="#/request">Оставить заявку</a>
+      <a class="btn btn--ghost" href="#/works">Смотреть решения</a>
+    </div>
+  </div>
+</section>
+
+<script>
+/* ---------------------------------------------------------------------------
+   ONE LOOP, AND IT IS DAMPED.
+
+   The first version wrote raw scroll progress straight into the CSS, and that
+   is exactly why it read as mechanical: every element tracked the wheel 1:1,
+   started the instant the wheel started and stopped dead the instant it
+   stopped. The reference does not do that. Its values LAG the scroll and
+   settle into place.
+
+   So: --p is not the scroll position, it is a value chasing the scroll
+   position at a fixed rate per frame. Two lines, no library, and it is the
+   single biggest difference between "scroll-linked" and "flowing".
+
+   LAG is per-frame, so it is framerate-dependent by construction. That is
+   deliberate and it is the cheap version: the alternative is a delta-time
+   exponential, which costs a clock read per frame to fix a difference nobody
+   can see between 60 and 120Hz. ponytail: raise this to dt-based smoothing
+   only if a 120Hz machine actually looks different.
+--------------------------------------------------------------------------- */
+const LAG = 0.12
+const clamp = (v, a, b) => v < a ? a : v > b ? b : v
+/* The two curves. easeInOutCubic for anything that travels or scales — it
+   leaves and arrives slowly. easeOutCubic for anything that ARRIVES — fast in,
+   settles. Nothing on the page uses raw linear except the field camera. */
+const easeInOut = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
+const easeOut = t => 1 - Math.pow(1 - t, 3)
+
+const stages = [...document.querySelectorAll('.stage')]
+const hud = document.getElementById('hud')
+const smoothed = new WeakMap()
+let awake = 0
+
+function frame(force) {
+  const vh = innerHeight
+  let moving = false
+
+  for (const s of stages) {
+    const r = s.getBoundingClientRect()
+    /* Off screen with margin: skip the write entirely. Setting a custom
+       property invalidates style for the whole subtree, and seven of the eight
+       beats are always off screen. */
+    if (!force && (r.bottom < -vh || r.top > vh * 2)) continue
+
+    const span = r.height - vh
+    const raw = span > 0 ? clamp(-r.top / span, 0, 1) : (r.top < 0 ? 1 : 0)
+
+    const was = smoothed.has(s) ? smoothed.get(s) : raw
+    const now = force ? raw : was + (raw - was) * LAG
+    smoothed.set(s, now)
+    if (Math.abs(raw - now) > 0.0004) moving = true
+
+    s.style.setProperty('--p', now.toFixed(4))
+    s.style.setProperty('--e', easeInOut(now).toFixed(4))
+    s.style.setProperty('--o', easeOut(now).toFixed(4))
+  }
+
+  const doc = document.documentElement
+  hud.textContent = String(Math.round(doc.scrollTop / (doc.scrollHeight - vh) * 100))
+    .padStart(2, '0') + '%'
+
+  /* Keep the loop alive only while something is still settling, plus a short
+     tail so a flick does not die mid-glide. An always-on rAF on a page this
+     size is a warm laptop with no visible cause. */
+  if (moving) awake = 90
+  if (awake > 0) { awake--; requestAnimationFrame(() => frame(false)) }
+}
+
+let pending = false
+addEventListener('scroll', () => {
+  awake = 90
+  if (!pending) { pending = true; requestAnimationFrame(() => { pending = false; frame(false) }) }
+}, { passive: true })
+addEventListener('resize', () => frame(true))
+frame(true)
+
+/* ---------------------------------------------------------------------------
+   SMOOTH SCROLL.
+
+   Damping the derived values got the elements gliding, but the PAGE was still
+   moving in wheel notches underneath them, and that is what still read as
+   mechanical. This is the Lenis idea in thirty lines: swallow the wheel, keep
+   a target scroll position, and ease the real scrollTop toward it every frame.
+
+   Real scrollTop, not a transform on a wrapper. A wrapper translate is the
+   other common way to do this and it silently breaks position:sticky, which is
+   what all eight beats are pinned with.
+
+   Not a library, per the ladder - lenis is ~10KB and would have to be vendored
+   into this file anyway, since a page in public/ cannot import from
+   node_modules and the page must make zero external requests to be deployable.
+
+   Keyboard, spacebar, Home/End and the scrollbar are all left alone: they go
+   through native scrolling, which still works, and hijacking them is how a
+   smooth-scroll script becomes an accessibility problem. */
+const SMOOTH = 0.085
+let target = scrollY, gliding = false
+
+function glide() {
+  const max = document.documentElement.scrollHeight - innerHeight
+  target = clamp(target, 0, max)
+  const d = target - scrollY
+  if (Math.abs(d) < 0.5) { scrollTo(0, target); gliding = false; return }
+  scrollTo(0, scrollY + d * SMOOTH)
+  requestAnimationFrame(glide)
+}
+
+/* Touch is left native. Phone scrolling already has momentum from the OS and
+   it is tuned better than anything done here; overriding it is how a page
+   starts feeling wrong on a phone specifically. */
+const fine = matchMedia('(pointer: fine)').matches
+const still = matchMedia('(prefers-reduced-motion: reduce)').matches
+
+if (fine && !still) {
+  addEventListener('wheel', (e) => {
+    if (e.ctrlKey) return                 // pinch zoom is not scrolling
+    e.preventDefault()
+    target = clamp(target + e.deltaY, 0, document.documentElement.scrollHeight - innerHeight)
+    if (!gliding) { gliding = true; requestAnimationFrame(glide) }
+  }, { passive: false })
+
+  /* Anything that scrolls the page by other means - keyboard, scrollbar drag,
+     the ?at= jump - must not be fought by a stale target. */
+  addEventListener('scroll', () => { if (!gliding) target = scrollY }, { passive: true })
+}
+
+/* DEBUG JUMPS. Same idea as ~/101-scroll's ?f=, and on this page they are not a
+   nicety: a scroll-driven page cannot be screenshotted any other way. The
+   preview pane reports document.hidden, which freezes rAF AND the CSS
+   animation timeline, and a scripted scrollTo moves the DOM while the picture
+   stays stale - two blank screenshots of a beat that the DOM proved was
+   rendering correctly.
+
+   ?at=<id>&p=<0..1>   scrolls to that point. Real page, real scroll position.
+                       Fine in a normal browser, useless in the pane.
+   ?solo=<id>&p=<0..1> shows ONE beat at a fixed pose with no scrolling at all.
+                       Nothing moves after load, so the first paint is the right
+                       paint and the pane can photograph it.
+
+   force=true on frame() skips the damping, so the pose is exactly the one asked
+   for rather than one lerp step toward it. */
+const q = new URLSearchParams(location.search)
+const P_AT = clamp(parseFloat(q.get('p')) || 0, 0, 1)
+
+if (q.get('solo')) {
+  const s = document.getElementById(q.get('solo'))
+  if (s) {
+    history.scrollRestoration = 'manual'
+    for (const other of stages) if (other !== s) other.style.display = 'none'
+    document.querySelector('.end').style.display = 'none'
+    s.style.height = '100svh'
+    const pin = s.querySelector('.pin')
+    pin.style.position = 'relative'
+    for (const [k, fn] of [['--p', v => v], ['--e', easeInOut], ['--o', easeOut]]) {
+      s.style.setProperty(k, fn(P_AT).toFixed(4))
+    }
+    hud.textContent = q.get('solo') + ' ' + P_AT.toFixed(2)
+    /* frame() would immediately overwrite those three props from the real
+       scroll position, which in solo mode is always 0. */
+    stages.length = 0
+  }
+} else if (q.get('at')) {
+  const s = document.getElementById(q.get('at'))
+  if (s) {
+    history.scrollRestoration = 'manual'
+    scrollTo(0, s.offsetTop + (s.offsetHeight - innerHeight) * P_AT)
+    frame(true)
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   BEAT 5's cards, written from JS: 22 hand-typed divs of random coordinates in
+   the markup is 22 lines of noise that say nothing. Deterministic positions —
+   a seeded walk, not Math.random — so the composition is identical on every
+   load and a screenshot of it means something.
+--------------------------------------------------------------------------- */
+const SHOTS = ['/shots/park.jpg', '/shots/zapchasti.jpg', '/shots/vzaimoraschety-v2.jpg', '/shots/sklad.jpg']
+const wrap = document.getElementById('fieldWrap')
+let seed = 20260810
+const rnd = () => (seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff
+
+for (let i = 0; i < 22; i++) {
+  const d = document.createElement('div')
+  const w = 150 + rnd() * 330
+  d.style.width = w + 'px'
+  d.style.height = w * 0.69 + 'px'
+  /* Held off the centre line: a card dead ahead is a card you fly into, and it
+     fills the screen with one blurred texture on the way past. */
+  const ang = rnd() * Math.PI * 2
+  const rad = 380 + rnd() * 560
+  d.style.setProperty('--x', Math.round(Math.cos(ang) * rad))
+  d.style.setProperty('--y', Math.round(Math.sin(ang) * rad * .72))
+  d.style.setProperty('--z', Math.round(-2750 * (i / 22) - rnd() * 130))
+  /* Every third card carries a real capture; the rest are ice panels. A field
+     of 22 identical screenshots reads as a bug, not as depth. */
+  if (i % 3 === 0) {
+    const img = document.createElement('img')
+    img.src = SHOTS[(i / 3 | 0) % SHOTS.length]
+    img.alt = ''
+    d.appendChild(img)
+  }
+  wrap.appendChild(d)
+}
+
+/* ---------------------------------------------------------------------------
+   BEAT 3's sphere. ~4200 points on a Fibonacci sphere, projected by hand.
+   Deliberately not three.js: the library is 775KB, this is 30 lines, and the
+   page it will eventually join is already decoding a video.
+
+   ponytail: 2D canvas. If a real device cannot hold 60fps here, the upgrade is
+   three.js (already in the repo) or the trick the ribbons use — film it once
+   and play the clip. Do not reach for either until a measurement says so.
+--------------------------------------------------------------------------- */
+const cv = document.getElementById('pts')
+const cx = cv.getContext('2d', { alpha: false })
+const N = 4200
+const P = new Float32Array(N * 3)
+for (let i = 0; i < N; i++) {
+  /* Fibonacci sphere: even coverage without the pole clustering you get from
+     two uniform random angles. */
+  const y = 1 - (i / (N - 1)) * 2
+  const r = Math.sqrt(1 - y * y)
+  const th = i * 2.399963229728653
+  P[i * 3] = Math.cos(th) * r
+  P[i * 3 + 1] = y
+  P[i * 3 + 2] = Math.sin(th) * r
+}
+
+let dpr = 1, W = 0, H = 0
+function size() {
+  dpr = Math.min(devicePixelRatio || 1, 2)
+  W = cv.clientWidth * dpr
+  H = cv.clientHeight * dpr
+  cv.width = W
+  cv.height = H
+}
+size()
+addEventListener('resize', size)
+
+const sphereStage = document.getElementById('sphere')
+let t = 0
+function draw() {
+  requestAnimationFrame(draw)
+  const r = sphereStage.getBoundingClientRect()
+  if (r.bottom < 0 || r.top > innerHeight) return
+
+  const p = parseFloat(sphereStage.style.getPropertyValue('--p')) || 0
+  t += 0.0035
+
+  cx.fillStyle = '#070f16'
+  cx.fillRect(0, 0, W, H)
+
+  const R = Math.min(W, H) * 0.33
+  /* The dissolve: points push outward along their own normal and fade as they
+     go. Squared so the sphere holds its shape for the first half of the beat
+     and comes apart in the second, which is what the reference does. */
+  const blow = 1 + p * p * 2.6
+  const sin = Math.sin(t), cos = Math.cos(t)
+
+  for (let i = 0; i < N; i++) {
+    const x0 = P[i * 3], y0 = P[i * 3 + 1], z0 = P[i * 3 + 2]
+    const x1 = x0 * cos - z0 * sin
+    const z1 = x0 * sin + z0 * cos
+    const d = 2.6
+    const k = d / (d + z1 * blow)
+    const sx = W / 2 + x1 * blow * R * k
+    const sy = H / 2 + y0 * blow * R * k
+    if (sx < 0 || sx > W || sy < 0 || sy > H) continue
+    const a = (0.22 + 0.78 * k) * (1 - p * 0.72)
+    cx.fillStyle = z1 > 0 ? 'rgba(223,246,255,' + a.toFixed(3) + ')'
+                          : 'rgba(92,130,201,' + (a * 0.75).toFixed(3) + ')'
+    cx.fillRect(sx, sy, dpr, dpr)
+  }
+}
+draw()
+</script>
+</body>
+</html>

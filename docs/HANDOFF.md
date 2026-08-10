@@ -90,8 +90,11 @@ Adapting a 21st.dev drop means, every time:
 2. Replace its palette with the project's: `ICE = ['#DFF6FF','#7FD8FF','#5C82C9']`
    from `hooks/heroTuning.ts`. There is **no violet on this site** — Damir
    removed it explicitly.
-3. Strip any `framer-motion` dependency. This project animates with CSS and
-   rAF only; adding a motion library for one component is not acceptable.
+3. Animation library is a free choice. Damir lifted the CSS-and-rAF-only rule
+   on 2026-08-10: "no limits on development". `framer-motion` is already an
+   installed dependency, and GSAP, Motion or three.js may be added when they
+   are the right tool. Pick per component, do not mix two of them in one tree,
+   and lazy-load anything heavy that is not above the fold.
 4. Check what it animates. See trap §5.1 — a component that animates a
    registered `@property` will cost more than every other effect combined.
 
