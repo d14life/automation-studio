@@ -74,7 +74,13 @@ img{display:block;max-width:100%}
   display:flex;gap:.55em;white-space:nowrap;pointer-events:none;
   font-size:clamp(64px,12.5vw,190px);font-weight:900;letter-spacing:-.045em;line-height:1;
   color:transparent;-webkit-text-stroke:1px rgba(127,216,255,.22);
-  animation:mq 34s linear infinite}
+  animation:mq 34s linear infinite;
+  /* FOCUS PULL, the third instance of this motif. In the reference the marquee
+     behind the deck is soft while the page is still folding and sharpens as the
+     card lands (f300-371). Same device as the hero entrance and the sphere
+     headline - blur-resolve is this reference's signature, not a one-off. */
+  filter:blur(calc((1 - clamp(0, (var(--p) - .18) / .28, 1)) * 9px));
+  opacity:clamp(.15, calc((var(--p) - .10) / .3), 1)}
 @keyframes mq{to{transform:translateX(-50%)}}
 
 .btn{display:inline-flex;align-items:center;gap:.5em;padding:.8em 1.5em;border-radius:999px;
