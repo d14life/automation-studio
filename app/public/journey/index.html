@@ -262,9 +262,16 @@ img{display:block;max-width:100%}
    ========================================================================= */
 #sphere .pin{background:var(--deep)}
 #sphere canvas{position:absolute;inset:0;width:100%;height:100%}
+.sphere-star{width:min(5vmin,44px);height:min(5vmin,44px);
+  filter:drop-shadow(0 0 30px rgba(223,246,255,.8));
+  opacity:clamp(0, calc(1 - (var(--p) - .72) / .28), 1)}
 .split{position:absolute;inset:0;pointer-events:none}
 .split b{position:absolute;font-size:clamp(52px,9.5vw,140px);font-weight:900;
-  letter-spacing:-.045em;line-height:.92}
+  letter-spacing:-.045em;line-height:.92;
+  /* FOCUS PULL, exactly as the hero does it. f492-500: "limits" arrives heavily
+     blurred and sharpens as it rises. Blur-resolve is a recurring motif in this
+     reference, not a one-off on the entrance. */
+  filter:blur(calc((1 - clamp(0, (var(--p) - .04) / .26, 1)) * 16px))}
 /* The two halves of the line travel at different rates and in different
    directions. Same reason as everything else here: synchronised is a slideshow. */
 .split .a{left:5vw;top:10vh;translate:0 calc(var(--e) * -7vh);
@@ -273,7 +280,7 @@ img{display:block;max-width:100%}
   translate:0 calc(var(--e) * -17vh);
   opacity:clamp(0, calc((var(--p) - .06) / .18), 1)}
 .split p{position:absolute;left:5vw;bottom:16vh;max-width:33ch;font-size:15px;line-height:1.6;
-  color:#a9bfcc;opacity:clamp(0, calc((var(--p) - .3) / .22), 1);
+  color:#a9bfcc;opacity:clamp(0, calc((var(--p) - .10) / .18), 1);
   translate:0 calc((1 - var(--o)) * 3vh)}
 
 /* =========================================================================
@@ -544,6 +551,9 @@ img{display:block;max-width:100%}
 <section class="stage" id="sphere" style="--h:240svh">
   <div class="pin">
     <canvas id="pts"></canvas>
+    <!-- the same star that swallowed the deck, still burning at the centre.
+         Continuity: it is never re-introduced, it simply never left. -->
+    <svg class="star sphere-star" viewBox="0 0 100 100" fill="#fff" aria-hidden="true"><use href="#s4"/></svg>
     <div class="split">
       <b class="a">Быстро</b>
       <b class="b">не значит<br />плохо</b>
@@ -910,7 +920,10 @@ for (let i = 0; i < 22; i++) {
 --------------------------------------------------------------------------- */
 const cv = document.getElementById('pts')
 const cx = cv.getContext('2d', { alpha: false })
-const N = 4200
+/* 4200 rendered as a faint dot-field next to the reference's dense shell.
+   14000 1px rects in a 2D canvas is still nothing - the cost here is the
+   per-point maths, and it is a dozen multiplies. */
+const N = 14000
 const P = new Float32Array(N * 3)
 for (let i = 0; i < N; i++) {
   /* Fibonacci sphere: even coverage without the pole clustering you get from
@@ -963,7 +976,12 @@ function draw() {
     const sx = W / 2 + x1 * blow * R * k
     const sy = H / 2 + y0 * blow * R * k
     if (sx < 0 || sx > W || sy < 0 || sy > H) continue
-    const a = (0.22 + 0.78 * k) * (1 - p * 0.72)
+    /* HOLLOW SHELL, NOT A BALL. In the reference the centre is empty and the
+       particles crowd the silhouette. A point is on the limb when its rotated z
+       is near zero, so weighting by (1-|z|) empties the middle and leaves the
+       rim. Without this it renders as a solid blob, which is what it was. */
+    const limb = Math.pow(1 - Math.abs(z1), 1.35)   // 1.7 made the shell too thin
+    const a = (0.34 + 0.86 * k) * (1 - p * 0.72) * limb
     cx.fillStyle = z1 > 0 ? 'rgba(223,246,255,' + a.toFixed(3) + ')'
                           : 'rgba(92,130,201,' + (a * 0.75).toFixed(3) + ')'
     cx.fillRect(sx, sy, dpr, dpr)
