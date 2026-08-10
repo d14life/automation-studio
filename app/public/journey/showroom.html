@@ -866,6 +866,7 @@ wrap.appendChild(fieldTarget)
    three.js (already in the repo) or the trick the ribbons use — film it once
    and play the clip. Do not reach for either until a measurement says so.
 --------------------------------------------------------------------------- */
+const FLAT = new URLSearchParams(location.search).has('flat')
 const cv = document.getElementById('pts')
 const cx = cv.getContext('2d', { alpha: false })
 /* 4200 rendered as a faint dot-field next to the reference's dense shell.
@@ -931,6 +932,7 @@ new IntersectionObserver(es => { sphereVisible = es[0].isIntersecting },
 
 let t = 0
 function draw() {
+  if (FLAT) return
   /* POSED means a still is being captured: draw one frame and do NOT re-arm.
      Under headless --virtual-time-budget an unyielding rAF loop never lets the
      budget expire, which hung every screenshot of this page. */
