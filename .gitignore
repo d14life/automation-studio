@@ -5,3 +5,4 @@ app/dist/
 .recovery/
 .claude/
 .catalogue/
+app/public/refs/
