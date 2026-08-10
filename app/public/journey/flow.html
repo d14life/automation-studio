@@ -48,13 +48,28 @@ img{display:block;max-width:100%}
    Pinned, and only the CHILDREN animate (official rule: never animate the
    pinned element itself). data-speed is ScrollSmoother's parallax - it is
    applied by the smoother, not by a ScrollTrigger, so it costs nothing extra. */
-/* 250lvh: the extra 1.5 viewports are the fly-through's runway. The pin holds
-   the hero still while its contents rush past the camera. */
-#hero{height:250lvh}
-.hero-pin{position:relative;height:100lvh;display:grid;place-items:center;
-  overflow:hidden;perspective:900px}
-.hero-pin .wrap{transform-style:preserve-3d;will-change:transform}
-#hero .glow{position:absolute;inset:-30% -10% auto;height:90vmax;pointer-events:none;
+/* THE CAMERA PULLS BACK. The landing page is not a section you scroll past,
+   it is an OBJECT on a plane: scroll retreats the camera from it until you can
+   see it was one card in a gallery. That is a zoom OUT.
+   The build before this flew you INTO the type and out the far side. That is
+   the opposite gesture and it read as a different page entirely - Damir caught
+   it immediately.
+
+   Plain 2D scale on one wrapper, NOT perspective + z. Two reasons, both paid
+   for already: a scale has no wall to hit, where z reaching the perspective
+   value puts the element at the lens and it vanishes (that bug cost two
+   fixes); and the whole plane is one transform no matter how many cards sit
+   on it. This is the camera-on-a-plane model from showroom.html. */
+#opening{height:640lvh}
+.op-pin{position:relative;height:100lvh;overflow:hidden;background:var(--deep)}
+.op-world{position:absolute;left:50%;top:50%;width:0;height:0;will-change:transform}
+/* The landing page, on the plane at exactly viewport size - so at scale 1 it
+   fills the frame and nothing around it is reachable yet. */
+.op-hero{position:absolute;left:50%;top:50%;width:100vw;height:100lvh;
+  transform:translate(-50%,-50%);display:grid;place-items:center;
+  background:var(--bg);overflow:hidden;
+  box-shadow:0 0 0 1px rgba(127,216,255,.18)}
+.op-hero .glow{position:absolute;inset:-30% -10% auto;height:90vmax;pointer-events:none;
   background:radial-gradient(closest-side,rgba(127,216,255,.16),transparent 70%)}
 .h1{font:900 clamp(44px,9.4vw,148px)/.92 Nunito;letter-spacing:-.035em;margin:0;
   text-wrap:balance}
@@ -62,7 +77,7 @@ img{display:block;max-width:100%}
 /* SplitText mask:"lines" wraps every line in overflow:clip, so the line can
    slide up from behind its own edge. This is the reveal, not a fade. */
 .h1 .line{will-change:transform}
-#hero .sub{margin-top:2.2rem;display:flex;gap:.8rem;flex-wrap:wrap;align-items:center}
+.op-hero .sub{margin-top:2.2rem;display:flex;gap:.8rem;flex-wrap:wrap;align-items:center}
 
 /* --- 2. GALLERY ----------------------------------------------------------
    The flight. Cards are scattered in real Z inside one perspective, and the
@@ -74,16 +89,8 @@ img{display:block;max-width:100%}
    reference: about six cards on screen at a time, sharp-cornered, face-on.
    Nothing rotates - the camera dollies, and that is what makes it read as
    travel rather than as a swarm. */
-#gallery{height:600lvh}
-/* perspective and the card z-range are ONE budget, not two settings. A card
-   whose z reaches the perspective origin is at the camera lens: its scale
-   goes to infinity. Measured it doing exactly that - 24609px wide, 459031px
-   off to the left. So the field must finish its travel with the NEAREST card
-   still short of this value. 1200 / (-1400 nearest + 2000 travel = 600) = 2x,
-   which is as big as anything gets. */
-.gal-pin{position:relative;height:100lvh;overflow:hidden;background:var(--deep);
-  perspective:1200px}
-.field{position:absolute;inset:0;transform-style:preserve-3d;will-change:transform}
+/* Cards live on the same plane as the landing page, in WORLD units, so they
+   are simply out of frame until the camera has pulled back far enough. */
 .fc{position:absolute;left:50%;top:50%;border-radius:6px;overflow:hidden;
   background:linear-gradient(150deg,#1c445f,#0a1620);
   box-shadow:0 24px 60px -20px rgba(0,0,0,.85), inset 0 0 0 1px rgba(223,246,255,.07)}
@@ -106,8 +113,13 @@ img{display:block;max-width:100%}
 .mk-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6%;height:100%}
 .mk-grid i{background:rgba(223,246,255,.1);border-radius:3px}
 .mk-grid i:nth-child(3n+1){background:rgba(127,216,255,.16)}
-.gal-head{position:absolute;left:6vw;top:clamp(22px,8vh,80px);z-index:3;
-  mix-blend-mode:difference}
+/* mix-blend-mode:difference turned this muddy brown the moment a card slid
+   under it - unreadable, and it was sitting on top of artwork. A scrim behind
+   the type is the boring fix and the correct one: the title has to stay
+   legible over whatever the camera happens to reveal. */
+.gal-head{position:absolute;left:0;right:0;top:0;z-index:3;
+  padding:clamp(22px,7vh,64px) 6vw clamp(60px,12vh,120px);pointer-events:none;
+  background:linear-gradient(180deg,rgba(7,15,22,.92) 0%,rgba(7,15,22,.68) 45%,transparent 100%)}
 .gal-head h2{margin:.4rem 0 0;font:900 clamp(26px,4vw,58px)/1 Nunito;letter-spacing:-.03em}
 
 /* --- 3. MARQUEE ----------------------------------------------------------
@@ -217,28 +229,27 @@ img{display:block;max-width:100%}
 <div id="smooth-wrapper"><div id="smooth-content">
 
   <!-- 1 ------------------------------------------------------------------ -->
-  <section class="s" id="hero">
-    <div class="hero-pin">
-      <div class="glow"></div>
-      <div class="wrap">
-        <p class="eyebrow">Solutions101 · шоурум</p>
-        <h1 class="h1">Изменим <span class="dim">инструменты</span><br>вашего бизнеса</h1>
-        <div class="sub">
-          <a class="btn" href="#cta">Обсудить задачу</a>
-          <a class="btn ghost" href="#track">Смотреть решения</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 2 ------------------------------------------------------------------ -->
-  <section class="s" id="gallery">
-    <div class="gal-pin">
+  <section class="s" id="opening">
+    <div class="op-pin">
+      <!-- overlay, NOT on the plane: it must stay readable while everything
+           behind it shrinks, so it cannot be a child of .op-world -->
       <div class="gal-head">
         <p class="eyebrow">Зал</p>
         <h2>Всё, что уже стоит<br>и работает</h2>
       </div>
-      <div class="field" id="fieldWrap"></div>
+      <div class="op-world" id="opWorld">
+        <div class="op-hero">
+          <div class="glow"></div>
+          <div class="wrap">
+            <p class="eyebrow">Solutions101 · шоурум</p>
+            <h1 class="h1">Изменим <span class="dim">инструменты</span><br>вашего бизнеса</h1>
+            <div class="sub">
+              <a class="btn" href="#cta">Обсудить задачу</a>
+              <a class="btn ghost" href="#track">Смотреть решения</a>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -375,6 +386,19 @@ img{display:block;max-width:100%}
 /* Registration order matters: ScrollSmoother depends on ScrollTrigger. */
 gsap.registerPlugin(ScrollTrigger, ScrollSmoother, SplitText)
 
+/* ?still=1 - CAPTURE MODE, and it exists because verification kept lying.
+   With smoothing on, ScrollSmoother owns the scroll position and keeps
+   settling after you have measured: readings came back at scrollY 3825 while
+   #smooth-content was actually at -17860, so every screenshot landed somewhere
+   other than where the numbers said. Scrub lag does the same thing one layer
+   down - the tween is still chasing when the shutter fires.
+   still=1 removes both: no smoothing, no normalizeScroll, and every scrub
+   becomes instant. Scroll position then means exactly what it says, and a
+   screenshot is the frame that position really produces.
+   This is a debug affordance, never a mode the site ships in. */
+const STILL = new URLSearchParams(location.search).has('still')
+const SCRUB = v => STILL ? true : v
+
 const mm = gsap.matchMedia()
 
 /* ---------------------------------------------------------------------------
@@ -398,17 +422,17 @@ mm.add({
   const smoother = ScrollSmoother.create({
     wrapper: '#smooth-wrapper',
     content: '#smooth-content',
-    smooth: 1.2,
-    smoothTouch: 0.1,
+    smooth: STILL ? 0 : 1.2,
+    smoothTouch: STILL ? 0 : 0.1,
     effects: true,
-    normalizeScroll: true,
+    normalizeScroll: !STILL,
     ignoreMobileResize: true,
   })
 
   /* --- progress rail --------------------------------------------------- */
   gsap.to('#rail', {
     scaleX: 1, ease: 'none',
-    scrollTrigger: { start: 0, end: 'max', scrub: 0.3 },
+    scrollTrigger: { start: 0, end: 'max', scrub: SCRUB(0.3) },
   })
 
   /* --- 1. hero ---------------------------------------------------------
@@ -422,7 +446,7 @@ mm.add({
       yPercent: 118, duration: 1.15, ease: 'expo.out', stagger: 0.1, delay: 0.15,
     }),
   })
-  gsap.from('#hero .eyebrow, #hero .sub', {
+  gsap.from('.op-hero .eyebrow, .op-hero .sub', {
     y: 24, autoAlpha: 0, duration: .9, ease: 'power3.out', stagger: .08, delay: .45,
   })
   /* THE FLY-THROUGH. The hero does not scroll away, it goes PAST you: pinned,
@@ -437,60 +461,47 @@ mm.add({
      leaves at the edges without ever touching the wall.
      Durations are explicit so z spans the WHOLE beat; on GSAP's default 0.5
      it finished at the halfway point and the rest of the pin was dead scroll. */
-  gsap.timeline({
-    scrollTrigger: { trigger: '#hero', pin: '.hero-pin', scrub: 0.8,
-      start: 'top top', end: 'bottom bottom', anticipatePin: 1 },
-  })
-    .to('#hero .wrap', { z: 700, ease: 'none', duration: 1 }, 0)
-    .to('#hero .glow', { scale: 2.4, autoAlpha: 0, ease: 'none', duration: 1 }, 0)
-    .to('#hero .wrap', { autoAlpha: 0, ease: 'none', duration: 0.42 }, 0.58)
-
-  /* --- 2. gallery ------------------------------------------------------
-     Built in JS because 30 hand-written divs is 30 chances to fudge a
-     coordinate. Seeded RNG, so the layout is identical on every load and a
-     screenshot taken today still matches one taken next week.             */
+  const OUT = 0.16   // final camera scale: the landing page ends ~190px wide
   ;(() => {
-    const wrap = document.getElementById('fieldWrap')
+    const world = document.getElementById('opWorld')
     const SHOTS = ['/shots/park.jpg', '/shots/zapchasti.jpg',
                    '/shots/vzaimoraschety-v2.jpg', '/shots/sklad.jpg']
     let seed = 20260810
     const rnd = () => (seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff
-    const N = 30
-    /* showroom.html spread these across THREE viewports because there the
-       camera panned right along them as well as forward. Here it only flies
-       forward, so anything past ~1 viewport either side is never in frame.  */
-    const span = innerWidth * 2.2
 
-    for (let i = 0; i < N; i++) {
+    /* A loose grid in WORLD units, not a random scatter. Random placement on a
+       plane clumps and leaves holes, and at the end of the pull-back you are
+       looking at the whole plane at once, so every hole is visible. The cell
+       nearest the centre is skipped because the landing page is standing in it.
+       Sized so that at scale OUT the visible world is about 6 cells across. */
+    const COLS = 6, ROWS = 5, CW = 1320, CH = 1010
+    let n = 0
+    for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+      const x = Math.round((c - (COLS - 1) / 2) * CW + (rnd() - .5) * CW * .34)
+      const y = Math.round((r - (ROWS - 1) / 2) * CH + (rnd() - .5) * CH * .34)
+      if (Math.abs(x) < 840 && Math.abs(y) < 640) continue   // hero's footprint
+
       const d = document.createElement('div')
       d.className = 'fc'
-      /* squared random pushes the size distribution to the low end: many
-         small thumbnails, a few mediums, which is what depth actually
-         looks like. A field of equal-sized cards reads as wallpaper. */
-      const r = rnd()
-      const w = 90 + r * r * 430
-      const x = Math.round((i / N - 0.5) * span + (rnd() - 0.5) * innerWidth * 0.5)
-      const y = Math.round((rnd() - 0.5) * innerHeight * 1.15)
-      const z = Math.round(-1400 - 3000 * (i / N) - rnd() * 120)
-      d.style.cssText =
-        `width:${w}px;height:${w * 0.69}px;` +
-        `transform:translate3d(${x}px,${y}px,${z}px) translate(-50%,-50%)`
-      /* NO card is left blank. showroom.html filled two thirds of them with
-         empty panels, which was fine when the camera shot past in half a
-         second - here you dwell for five viewports and it reads as twenty
-         empty boxes. Measured that from the render, not from the code.
-         Four real captures spread across the deck; everything else is
-         invented interface furniture. Repeating the four screenshots eight
-         times each would read as one image pasted everywhere. */
-      if (i % 4 === 1) {
+      /* world-sized, so on screen these land at roughly the same size as the
+         landing page does - it has to read as one card among peers, not as a
+         giant next to thumbnails. */
+      const w = Math.round(620 + rnd() * 620)
+      d.style.cssText = `width:${w}px;height:${Math.round(w * 0.66)}px;` +
+        `transform:translate3d(${x}px,${y}px,0) translate(-50%,-50%)`
+
+      /* NO card is left blank. Four real captures spread across the plane;
+         everything else is invented interface furniture. Repeating the four
+         screenshots eight times each reads as one image pasted everywhere. */
+      if (n % 4 === 1) {
         const img = document.createElement('img')
-        img.src = SHOTS[(i / 4 | 0) % SHOTS.length]
+        img.src = SHOTS[(n / 4 | 0) % SHOTS.length]
         img.alt = ''
-        img.style.objectPosition = `${(i * 37) % 70}% 0%`
+        img.style.objectPosition = `${(n * 37) % 70}% 0%`
         d.appendChild(img)
       } else {
         d.classList.add('mock')
-        const kind = ['rows', 'bars', 'grid'][i % 3]
+        const kind = ['rows', 'bars', 'grid'][n % 3]
         const body =
           kind === 'rows' ? '<div class="mk-row"></div>'.repeat(5)
         : kind === 'bars' ? '<div class="mk-bars">' +
@@ -499,17 +510,25 @@ mm.add({
         d.innerHTML = '<div class="mk-bar"><i></i><i></i><i></i></div>' +
                       '<div class="mk-body">' + body + '</div>'
       }
-      wrap.appendChild(d)
+      world.appendChild(d)
+      n++
     }
 
-    /* ease:'none' for the same reason the horizontal track needs it - this is
-       travel, and a camera that eases is a camera that stalls. */
-    gsap.fromTo(wrap, { z: 0 }, {
-      z: 2000, ease: 'none',
-      scrollTrigger: { trigger: '#gallery', pin: '.gal-pin', scrub: 0.8,
+    /* ease:'none' - this is camera travel, and a camera that eases stalls. */
+    gsap.fromTo(world, { scale: 1 }, {
+      scale: OUT, ease: 'none',
+      scrollTrigger: { trigger: '#opening', pin: '.op-pin', scrub: SCRUB(0.8),
         start: 'top top', end: 'bottom bottom', anticipatePin: 1 },
     })
+    /* The gallery title is invisible while the landing page still fills the
+       frame - it only means anything once you can see there IS a gallery. */
+    gsap.fromTo('.gal-head', { autoAlpha: 0 }, {
+      autoAlpha: 1, ease: 'none',
+      scrollTrigger: { trigger: '#opening', scrub: true,
+        start: 'top top', end: '38% top' },
+    })
   })()
+
 
   /* --- 2. marquee ------------------------------------------------------
      One tween loops the first half out of view; the duplicated half is
@@ -539,7 +558,7 @@ mm.add({
     const trackTween = gsap.to(lanes, {
       x: () => -dist(), ease: 'none',
       scrollTrigger: {
-        trigger: '#track', pin: true, scrub: 1, anticipatePin: 1,
+        trigger: '#track', pin: true, scrub: SCRUB(1), anticipatePin: 1,
         start: 'top top', end: () => '+=' + dist(),
         invalidateOnRefresh: true,
       },
@@ -576,7 +595,7 @@ mm.add({
   gsap.fromTo(apMask, { scale: 0 }, {
     scale: END, ease: 'none',
     scrollTrigger: {
-      trigger: '#aperture', pin: '.ap-pin', scrub: 0.6,
+      trigger: '#aperture', pin: '.ap-pin', scrub: SCRUB(0.6),
       start: 'top top', end: 'bottom bottom',
     },
     onUpdate: function () {
