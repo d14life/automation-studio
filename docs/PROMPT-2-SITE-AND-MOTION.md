@@ -145,6 +145,36 @@ room.
 Build the Solutions101 site using the design system you just produced. Same
 tokens, same components, no new colours and no new type.
 
+> **If you do not have that system in this conversation, stop and ask for it.**
+> Do not invent a replacement. The non-negotiables are below either way, and
+> they override anything that contradicts them.
+
+## The non-negotiables, restated so nothing drifts
+
+**Palette — exact, do not substitute or "improve":**
+
+    --bg     #0b1720   page background. Off-black tinted navy. NEVER pure black
+    --deep   #070f16   deeper panels, section floors
+    --ink    #F2F7F5   primary text
+    --dim    #8fa6b4   secondary text
+    --ice-1  #DFF6FF   lightest ice — headlines on dark, highlights
+    --ice-2  #7FD8FF   THE accent — one per screen
+    --ice-3  #5C82C9   deeper blue — emphasis words inside headlines
+
+**There is no violet on this site.** Removed deliberately. No purple gradients,
+no indigo glows, no AI-lavender, no blue-to-pink "tech gradient". One accent,
+one dark theme.
+
+"Ice" means cold, clear, slightly wet, faintly luminous — frozen glass over deep
+water. Not neon, not cyberpunk.
+
+**Type — two faces.** A condensed angular Cyrillic constructivist display face
+carries the wordmark, section headlines and stat numbers: uppercase, tightly
+tracked, large, never below about 28px and never in running text, table cells or
+form fields. A workhorse with a real Cyrillic cut carries everything else
+(Nunito, Golos Text and JetBrains Mono are self-hosted and available). This
+studio is Russian and the type should say so before a word is read.
+
 ## What it is
 
 **The site is a place, not a page.** Every competitor in custom software has the
