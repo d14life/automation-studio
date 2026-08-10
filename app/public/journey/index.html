@@ -291,18 +291,29 @@ img{display:block;max-width:100%}
    a filmstrip on a conveyor.
    ========================================================================= */
 #rail .pin{background:var(--deep);place-items:stretch;perspective:1400px}
-.rail{display:flex;gap:26px;align-items:center;height:100%;padding:0 8vw;
-  transform-style:preserve-3d;
-  transform:translate3d(calc(var(--e) * -64%),0,0) rotateY(calc((1 - var(--e)) * 4deg))}
-.rail figure{margin:0;flex:0 0 clamp(320px,44vw,660px);border-radius:var(--r);overflow:hidden;
-  position:relative;aspect-ratio:16/11;background:var(--bg);
-  box-shadow:0 40px 80px -34px rgba(0,0,0,.9), inset 0 0 0 1px rgba(223,246,255,.08)}
-.rail img{width:100%;height:100%;object-fit:cover;object-position:top left}
-.rail figcaption{position:absolute;left:0;right:0;bottom:0;padding:26px;
-  background:linear-gradient(transparent,rgba(7,15,22,.95));color:var(--ice-1)}
-.rail figcaption b{display:block;font-size:clamp(21px,2.5vw,32px);line-height:1.12;
-  letter-spacing:-.02em}
-.rail figcaption em{display:block;font-style:normal;font-size:13.5px;color:#a9bfcc;margin-top:8px}
+/* FULL BLEED, EDGE TO EDGE. Read off f109-120: the cards are the full height of
+   the viewport with no vertical margin, square corners, and a hairline gap. Two
+   are visible at a time. The first pass had rounded 16/11 cards floating in a
+   centred row with big gaps, which is a gallery strip, not this. */
+.rail{display:flex;gap:6px;align-items:stretch;height:100%;
+  transform:translate3d(calc(var(--e) * -58%),0,0)}
+.rail figure{margin:0;flex:0 0 48vw;position:relative;overflow:hidden;background:var(--deep);
+  display:grid;align-content:center}
+/* THE ONE HONEST DEVIATION. The reference's cards are full-bleed ARTWORK, so it
+   can crop them to a tall portrait and lose nothing. Mine are product captures,
+   1120x780 landscape - cropped to a portrait card they become an unreadable
+   zoom into a corner of a dashboard. So the CARD keeps the reference's shape
+   (full height, edge to edge, square corners) and the capture sits inside it at
+   its own aspect. Same silhouette, content that can actually be read. */
+.rail img{width:100%;height:64%;object-fit:cover;object-position:top left;
+  filter:saturate(.9) brightness(.86)}
+/* the small meta line, top left, and the name, bottom left - both inside the card */
+.rail .meta{position:absolute;left:22px;top:calc(18% - 30px);font-size:11.5px;letter-spacing:.04em;
+  color:rgba(242,247,245,.72);z-index:2}
+.rail figcaption{position:absolute;left:0;right:0;bottom:0;padding:26px 22px;
+  background:linear-gradient(transparent,rgba(7,15,22,.9));color:var(--ink)}
+.rail figcaption b{display:block;font-size:clamp(24px,3.2vw,42px);line-height:1.05;
+  letter-spacing:-.03em;font-weight:800}
 
 /* =========================================================================
    BEAT 5 — THE FIELD
@@ -568,13 +579,17 @@ img{display:block;max-width:100%}
   <div class="pin">
     <div class="rail">
       <figure><img src="/shots/park.jpg" alt="" width="1120" height="780" />
-        <figcaption><b>Аренда спецтехники</b><em>Календарь занятости, наработка по сменам, окупаемость парка</em></figcaption></figure>
+        <span class="meta">Календарь занятости, наработка по сменам, окупаемость парка</span>
+        <figcaption><b>Аренда спецтехники</b></figcaption></figure>
       <figure><img src="/shots/zapchasti.jpg" alt="" width="1120" height="780" />
-        <figcaption><b>Магазин автозапчастей</b><em>Подбор по VIN, каталог на 40 000 позиций</em></figcaption></figure>
+        <span class="meta">Подбор по VIN, каталог на 40 000 позиций</span>
+        <figcaption><b>Магазин автозапчастей</b></figcaption></figure>
       <figure><img src="/shots/vzaimoraschety-v2.jpg" alt="" width="1120" height="780" />
-        <figcaption><b>Взаиморасчёты</b><em>Свёрнутое сальдо, акт сверки одной кнопкой</em></figcaption></figure>
+        <span class="meta">Свёрнутое сальдо, акт сверки одной кнопкой</span>
+        <figcaption><b>Взаиморасчёты</b></figcaption></figure>
       <figure><img src="/shots/sklad.jpg" alt="" width="1120" height="780" />
-        <figcaption><b>Складской терминал</b><em>FEFO, приёмка, размещение, слепой пересчёт</em></figcaption></figure>
+        <span class="meta">FEFO, приёмка, размещение, слепой пересчёт</span>
+        <figcaption><b>Складской терминал</b></figcaption></figure>
     </div>
   </div>
 </section>
