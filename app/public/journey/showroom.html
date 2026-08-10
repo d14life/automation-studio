@@ -819,10 +819,13 @@ const rnd = () => (seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff
    widely spaced, sharp-cornered and face-on - the camera dollies, nothing
    rotates. 22 packed into a narrow radius read as a swarm rather than a flight
    through a room. Spread wider and deeper so the same six-at-a-time holds. */
-const FIELD_N = 14
+const FIELD_N = 30
 for (let i = 0; i < FIELD_N; i++) {
   const d = document.createElement('div')
-  const w = 320 + rnd() * 520
+  /* small thumbnails dominate; a few mediums. Squaring the random pushes the
+     distribution toward the low end, which is what the reference frame shows. */
+  const r0 = rnd()
+  const w = 90 + r0 * r0 * 430
   d.style.width = w + 'px'
   d.style.height = w * 0.69 + 'px'
   /* Held off the centre line: a card dead ahead is a card you fly into, and it
