@@ -539,7 +539,7 @@ img{display:block;max-width:100%}
 #trip{position:relative;height:900svh}
 #cam{position:sticky;top:0;height:100lvh;overflow:hidden;background:var(--bg)}
 #world{position:absolute;left:50%;top:50%;width:0;height:0;will-change:transform}
-.stage{position:absolute;left:0;top:0;
+.stage{position:absolute;left:0;top:0;visibility:hidden;
   width:calc(var(--ww,1) * 100vw);height:calc(var(--wh,1) * 100lvh);
   margin-left:calc((var(--wx,0) - var(--ww,1)/2) * 100vw);
   margin-top:calc((var(--wy,0) - var(--wh,1)/2) * 100lvh);
@@ -700,18 +700,31 @@ const world = document.getElementById('world')
 const hud = document.getElementById('hud')
 
 const CAM = [
-  { p:0.00, x:0,   y:0,    z:2.60 },
-  { p:0.16, x:0,   y:0,    z:1.00 },
-  { p:0.34, x:0,   y:0,    z:1.00 },
-  { p:0.46, x:0,   y:0,    z:5.00 },
-  { p:0.56, x:0,   y:0,    z:1.00 },
-  { p:0.64, x:0,   y:1.15, z:1.00 },
-  { p:0.76, x:2.2, y:1.15, z:1.00 },
-  { p:0.90, x:5.0, y:1.15, z:1.00 },
-  { p:1.00, x:5.0, y:1.15, z:2.60 },
+  /* FRAME-MATCHED, not estimated. The loop starts at f266 (4.42s, the landing
+     page) and runs 577 frames back to itself, so p = (frame - 266) / 577 with
+     a wrap at 578. Beat boundaries read off the reference:
+       f266 landing · f300 fold · f345 deck · f440 star · f478 sphere
+       f560+f1-130 rail · f130-240 field · f240-258 grow · f258-266 zoom-through
+     Two things fall out that my estimates had badly wrong: the RAIL owns a
+     quarter of the whole loop (0.51-0.77), and grow + the zoom-through are
+     compressed into the last 4%. */
+  { p:0.000, x:0,   y:0,    z:2.60 },  // f266  landing page, full bleed
+  { p:0.059, x:0,   y:0,    z:2.60 },  // f300  it holds still, then the fold starts
+  { p:0.137, x:0,   y:0,    z:1.00 },  // f345  pulled back: the box is there
+  { p:0.301, x:0,   y:0,    z:1.00 },  // f440  box has turned, camera still
+  { p:0.340, x:0,   y:0,    z:5.00 },  // f462  zoom INTO the star on a face
+  { p:0.367, x:0,   y:0,    z:1.00 },  // f478  out into the sphere page
+  { p:0.509, x:0,   y:1.15, z:1.00 },  // f560  DOWN to the images
+  { p:0.766, x:2.2, y:1.15, z:1.00 },  // f130  RIGHT along them, the long stretch
+  { p:0.957, x:5.0, y:1.15, z:1.00 },  // f240  further RIGHT: the collage
+  { p:0.988, x:5.0, y:1.15, z:1.00 },  // f258  a piece of it becomes the section
+  { p:1.000, x:5.0, y:1.15, z:2.60 },  // f266  zoom through it, back to the page
 ]
-const OWNER = [['open',0,0.46],['sphere',0.46,0.64],['rail',0.62,0.78],
-               ['field',0.74,0.92],['grow',0.88,0.97],['answer',0.94,1.00]]
+
+/* owners follow the same frame-derived boundaries, overlapping at the seams so
+   two scenes are always on screen together during a handover */
+const OWNER = [['open',0.000,0.380],['sphere',0.355,0.520],['rail',0.500,0.780],
+               ['field',0.760,0.965],['grow',0.950,0.992],['answer',0.985,1.000]]
 
 const ringEl = document.querySelector('.ring')
 const RING = { x:1, y:1 }
@@ -737,8 +750,13 @@ function poseCamera(p) {
   for (const [id, s0, s1] of OWNER) {
     const el = document.getElementById(id); if (!el) continue
     const lp = clamp((p-s0)/(s1-s0), 0, 1)
-    el.style.setProperty('--vis',
-      Math.min(clamp((p-s0)/0.05,0,1), clamp((s1-p)/0.05,0,1)).toFixed(3))
+    /* The first scene must NOT fade in at p=0 and the last must NOT fade out at
+       p=1, or the page opens blank and ends blank. The fade only exists for
+       handovers between scenes, not at the two ends of the whole path. */
+    const vis = Math.min(s0 <= 0 ? 1 : clamp((p-s0)/0.05,0,1),
+                         s1 >= 1 ? 1 : clamp((s1-p)/0.05,0,1))
+    el.style.setProperty('--vis', vis.toFixed(3))
+    el.style.visibility = vis > 0.001 ? 'visible' : 'hidden'
     el.style.setProperty('--p', lp.toFixed(4))
     el.style.setProperty('--e', easeInOut(lp).toFixed(4))
     el.style.setProperty('--o', easeOut(lp).toFixed(4))
