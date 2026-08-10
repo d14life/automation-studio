@@ -103,6 +103,29 @@ img{display:block;max-width:100%}
    as it needs motion.
    ========================================================================= */
 #open .pin{background:var(--bg)}
+
+/* THE ENTRANCE, and it is the actual beginning of the animation - frame 266,
+   4.42s in the recording. Missed it the first time because the hero LOOKS
+   static in a 12-up sheet; per frame it is anything but. Over ~10 frames the
+   page does three things at once:
+     focus pull      heavy blur resolving to sharp
+     brightness ramp dark to fully lit
+     scale settle    slightly small, easing up to rest
+   It arrives out of a radial glow rather than simply being there.
+
+   Time-driven, not scroll-driven: at scroll 0 there is no scroll to drive it.
+   filter and opacity only, so it never fights the JS transform on .ring. */
+@keyframes heroIn{
+  from{filter:blur(22px) brightness(.28);opacity:0;transform:scale(.94)}
+  60%{opacity:1}
+  to{filter:blur(0) brightness(1);opacity:1;transform:scale(1)}
+}
+@keyframes heroGlow{ from{opacity:.9;transform:scale(.5)} to{opacity:0;transform:scale(1.5)} }
+.ring-scene{animation:heroIn .95s cubic-bezier(.16,1,.3,1) both}
+/* the glow it comes out of */
+.hero-glow{position:absolute;width:90vmin;height:90vmin;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle, rgba(127,216,255,.35), transparent 62%);
+  animation:heroGlow 1.1s cubic-bezier(.16,1,.3,1) both}
 .ring-scene{position:absolute;inset:0;display:grid;place-items:center;
   perspective:1150px;perspective-origin:50% 47%}
 /* PORTRAIT, and the deck is TIGHT. Both read straight off the high-res frames
@@ -111,7 +134,7 @@ img{display:block;max-width:100%}
    the neighbours sit nearly face to face, like a concertina - the radius is
    barely over one card width, not the 1.6x that gives a wide open cylinder. */
 .ring{position:relative;width:min(26vw,300px);aspect-ratio:3/4;transform-style:preserve-3d;
-  --rad:calc(var(--spread,1) * min(30vw,345px));
+  --rad:calc(var(--spread,1) * min(38vw,430px));
   transform:scale(var(--sx,1), var(--sy,1)) rotateZ(var(--swing,0deg))
             translateZ(calc(-1 * var(--rad))) rotateY(var(--turn,0deg))}
 /* The seven behind the hero card are not there until the deck opens. At
@@ -360,7 +383,7 @@ img{display:block;max-width:100%}
    rather than a cut between two things. Sizes are in card units and get
    multiplied by the card's scale, so the hero reads at ~2x these numbers. */
 .opener-page{position:absolute;inset:0;padding:0 7%;display:grid;align-content:center;
-  opacity:clamp(0, calc((.30 - var(--p)) / .22), 1);
+  opacity:clamp(0, calc((.19 - var(--p)) / .11), 1);
   /* The card morphs shape, so its X and Y scales differ and anything inside it
      would be stretched. Undo exactly that ratio here and the type stays true. */
   transform:scaleX(calc(var(--sy,1) / var(--sx,1)));transform-origin:left center}
@@ -371,7 +394,7 @@ img{display:block;max-width:100%}
 .opener-page .btn{font-size:5px;padding:.7em 1.5em;justify-self:start}
 /* the card's own face, arriving as the page leaves */
 .ring-card__face{position:absolute;inset:0;
-  opacity:clamp(0, calc((var(--p) - .20) / .22), 1)}
+  opacity:clamp(0, calc((var(--p) - .15) / .11), 1)}
 /* every card except the hero is only ever a face, so it must not fade */
 .ring-card:not(:first-child) .ring-card__face{opacity:1}
 
@@ -408,6 +431,8 @@ img{display:block;max-width:100%}
   .stage{height:auto;min-height:100svh}
   .pin{position:relative}
   .marquee{animation:none}
+  .ring-scene,.hero-glow{animation:none}
+  .hero-glow{opacity:0}
   .ring{transform:none;width:min(90vw,560px)}
   .ring-card{transform:none;position:relative;inset:auto}
   .ring-card:not(:first-child){display:none}
@@ -451,6 +476,7 @@ img{display:block;max-width:100%}
     </div>
 
     <div class="ring-floor" aria-hidden="true"></div>
+    <div class="hero-glow" aria-hidden="true"></div>
     <div class="ring-scene">
       <div class="ring">
         <div class="ring-card" style="--i:0">
@@ -649,23 +675,29 @@ function frame(force) {
        because the swing is a sine and the windows all differ - a named special
        case with a comment beats CSS gymnastics nobody can read at 3am. */
     if (s.id === 'open') {
-      const f = clamp(now / 0.42, 0, 1)          // the fold: page becomes card
+      /* SEQUENCED, NOT OVERLAPPING. These four used to run on top of each
+         other: the spread opened at .12 while the swing was still running to
+         .42, so the whole OPEN deck tilted 44 degrees and collapsed into a
+         fan of falling cards. In the reference the swing happens while the
+         card is still alone. Fold first, then open, then turn. */
+      const f  = clamp((now - 0.05) / 0.33, 0, 1)   // the swing
+      const fs = clamp((now - 0.05) / 0.24, 0, 1)   // the shrink, on a FASTER window   // the fold: page becomes card
       /* 16:9 page at the start, 3:4 card at the end. The base card is 300x400,
          so filling the viewport needs a wider X scale than Y, and that DIFFERENCE
          is the shape morph: the page really does change proportion as it folds,
          it does not just shrink. */
-      const fe = easeInOut(f)
+      const fe = easeInOut(fs)
       s.style.setProperty('--sx', (RING.x - fe * (RING.x - 1)).toFixed(3))
       s.style.setProperty('--sy', (RING.y - fe * (RING.y - 1)).toFixed(3))
       /* out to -44deg and back to 0: a card being dealt, not a poster spinning */
-      s.style.setProperty('--swing', (Math.sin(f * Math.PI) * -44).toFixed(2) + 'deg')
+      s.style.setProperty('--swing', (Math.sin(f * Math.PI) * -34).toFixed(2) + 'deg')
       /* the deck opening IS the spread. Starts after the fold has begun. */
-      s.style.setProperty('--spread', easeOut(clamp((now - 0.12) / 0.30, 0, 1)).toFixed(4))
+      s.style.setProperty('--spread', easeOut(clamp((now - 0.40) / 0.22, 0, 1)).toFixed(4))
       /* and only then does it turn. Finishes at .88 so the card is still for
          the handoff. 95deg, not the 135 of the first pass - the reference turns
          about two cards' worth, not three. */
       s.style.setProperty('--turn',
-        (easeInOut(clamp((now - 0.46) / 0.42, 0, 1)) * -95).toFixed(2) + 'deg')
+        (easeInOut(clamp((now - 0.62) / 0.30, 0, 1)) * -95).toFixed(2) + 'deg')
     }
   }
 
@@ -769,18 +801,19 @@ if (q.get('solo')) {
       s.style.setProperty(k, fn(P_AT).toFixed(4))
     }
     if (s.id === 'open') {
-      const f = clamp(P_AT / 0.42, 0, 1)
+      const f  = clamp((P_AT - 0.05) / 0.33, 0, 1)   // the swing
+      const fs = clamp((P_AT - 0.05) / 0.24, 0, 1)   // the shrink, on a FASTER window
       /* 16:9 page at the start, 3:4 card at the end. The base card is 300x400,
          so filling the viewport needs a wider X scale than Y, and that DIFFERENCE
          is the shape morph: the page really does change proportion as it folds,
          it does not just shrink. */
-      const fe = easeInOut(f)
+      const fe = easeInOut(fs)
       s.style.setProperty('--sx', (RING.x - fe * (RING.x - 1)).toFixed(3))
       s.style.setProperty('--sy', (RING.y - fe * (RING.y - 1)).toFixed(3))
-      s.style.setProperty('--swing', (Math.sin(f * Math.PI) * -44).toFixed(2) + 'deg')
-      s.style.setProperty('--spread', easeOut(clamp((P_AT - 0.12) / 0.30, 0, 1)).toFixed(4))
+      s.style.setProperty('--swing', (Math.sin(f * Math.PI) * -34).toFixed(2) + 'deg')
+      s.style.setProperty('--spread', easeOut(clamp((P_AT - 0.40) / 0.22, 0, 1)).toFixed(4))
       s.style.setProperty('--turn',
-        (easeInOut(clamp((P_AT - 0.46) / 0.42, 0, 1)) * -95).toFixed(2) + 'deg')
+        (easeInOut(clamp((P_AT - 0.62) / 0.30, 0, 1)) * -95).toFixed(2) + 'deg')
     }
     hud.textContent = q.get('solo') + ' ' + P_AT.toFixed(2)
     /* frame() would immediately overwrite those three props from the real
