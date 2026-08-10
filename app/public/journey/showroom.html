@@ -913,7 +913,10 @@ new IntersectionObserver(es => { sphereVisible = es[0].isIntersecting },
 
 let t = 0
 function draw() {
-  requestAnimationFrame(draw)
+  /* POSED means a still is being captured: draw one frame and do NOT re-arm.
+     Under headless --virtual-time-budget an unyielding rAF loop never lets the
+     budget expire, which hung every screenshot of this page. */
+  if (!POSED) requestAnimationFrame(draw)
   if (!sphereVisible) return
 
   const p = parseFloat(sphereStage.style.getPropertyValue('--p')) || 0
