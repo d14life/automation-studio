@@ -148,10 +148,15 @@ img{display:block;max-width:100%}
    piercing zone, and no amount of tuning the radius was ever going to fix it.
    Every one of those was a guess dressed up as arithmetic.
 
-   N=6 at 60deg needs rad >= 0.87*w. At 0.95*w the neighbour's near edge lands
-   at 0.57*w against the front card's 0.5*w: a clean gap, nothing pierces, and
-   the neighbour is foreshortened to half width so the front card still owns the
-   frame. Six slots instead of eight, which is what the content is anyway.
+   IT IS A BOX, NOT A RING. Damir's words: four cards in a square so they do not
+   intersect. That is why f366 shows one flat face and two THIN EDGE SLIVERS -
+   you are looking head-on at one wall of a square box and seeing the edges of
+   the two side walls.
+
+   Four faces at 90deg with the radius at exactly half the card width close into
+   a square: adjacent faces meet at their edges, so non-intersection is
+   automatic, not something to tune. Every radius I tried before was hunting for
+   a value that a 6- or 8-sided ring can never have.
 
    The test below asserts the front card dominates, so this cannot regress
    silently again.
@@ -165,7 +170,7 @@ img{display:block;max-width:100%}
    actual A/B rather than from reading the frames, and it is the one that was
    most obviously wrong the whole time. */
 .ring{position:relative;width:min(25vw,340px);aspect-ratio:9/20;transform-style:preserve-3d;
-  --rad:calc(var(--spread,1) * min(24vw,323px));
+  --rad:calc(var(--spread,1) * min(12.5vw,170px));
   transform:scale(var(--sx,1), var(--sy,1)) rotateZ(var(--swing,0deg))
             translateZ(calc(-1 * var(--rad))) rotateY(var(--turn,0deg))}
 /* The seven behind the hero card are not there until the deck opens. At
@@ -177,7 +182,7 @@ img{display:block;max-width:100%}
 .ring-card{position:absolute;inset:0;border-radius:var(--r);overflow:hidden;container-type:size;
   background:var(--deep);
   box-shadow:0 40px 80px -30px rgba(0,0,0,.85), inset 0 0 0 1px rgba(223,246,255,.09);
-  transform:rotateY(calc(var(--i) * 60deg)) translateZ(var(--rad))}
+  transform:rotateY(calc(var(--i) * 90deg)) translateZ(var(--rad))}
 /* The captures are light-UI dashboards on a dark page. Untreated they read as
    four bright rectangles rather than one deck, so each gets a scrim tuned to
    sit them into the page without hiding what they show. */
@@ -583,8 +588,6 @@ img{display:block;max-width:100%}
           <img src="/shots/sklad.jpg" alt="" width="1120" height="780" />
           <span class="ring-card__label">Складской терминал</span>
         </div>
-        <div class="ring-card ring-card--ph" style="--i:4"><i>[placeholder]</i><b>CRM под процесс</b></div>
-        <div class="ring-card ring-card--ph" style="--i:5"><i>[placeholder]</i><b>Документооборот</b></div>
       </div>
     </div>
 
@@ -721,7 +724,7 @@ function steppedTurn(t, slots) {
   const idx = t * slots
   const k = Math.floor(Math.min(idx, slots - 0.0001))
   const frac = clamp((idx - k - 0.25) / 0.5, 0, 1)
-  return (k + easeInOut(frac)) * -60
+  return (k + easeInOut(frac)) * -90
 }
 
 const stages = [...document.querySelectorAll('.stage')]
@@ -878,6 +881,24 @@ if (fine && !still) {
   addEventListener('scroll', () => { if (!gliding) target = scrollY }, { passive: true })
 }
 
+/* ?bench=1 - time the canvas synchronously and write the result into the DOM so
+   a headless --dump-dom run can read it. Needed because the preview pane is a
+   hidden tab and Chrome throttles it: the same code measures a clean 2.5ms
+   median there but with 9.5% of samples spiking to a uniform ~76ms, which is
+   the throttle, not the loop. Debug-only. */
+if (new URLSearchParams(location.search).get('bench')) {
+  addEventListener('load', () => {
+    for (let i = 0; i < 10; i++) draw()
+    const M = 200, ts = []
+    for (let i = 0; i < M; i++) { const a = performance.now(); draw(); ts.push(performance.now() - a) }
+    ts.sort((a, b) => a - b)
+    const over = ts.filter(v => v > 16.7).length
+    hud.textContent = 'BENCH median=' + ts[M >> 1].toFixed(2) + 'ms p90=' +
+      ts[(M * 0.9) | 0].toFixed(2) + 'ms p99=' + ts[(M * 0.99) | 0].toFixed(2) +
+      'ms over16.7=' + over + '/' + M
+  })
+}
+
 /* DEBUG JUMPS. Same idea as ~/101-scroll's ?f=, and on this page they are not a
    nicety: a scroll-driven page cannot be screenshotted any other way. The
    preview pane reports document.hidden, which freezes rAF AND the CSS
@@ -1006,7 +1027,12 @@ const cx = cv.getContext('2d', { alpha: false })
 /* 4200 rendered as a faint dot-field next to the reference's dense shell.
    14000 1px rects in a 2D canvas is still nothing - the cost here is the
    per-point maths, and it is a dozen multiplies. */
-const N = 20000
+const N = (() => {
+  /* scaled to canvas area: 20000 suits a desktop, a 390pt phone has about a
+     fifth of the pixels and no business plotting a desktop's worth of points. */
+  const area = innerWidth * innerHeight
+  return Math.max(6000, Math.min(20000, Math.round(area / 64)))
+})()
 const P = new Float32Array(N * 3)
 for (let i = 0; i < N; i++) {
   /* Fibonacci sphere: even coverage without the pole clustering you get from
@@ -1031,43 +1057,79 @@ size()
 addEventListener('resize', size)
 
 const sphereStage = document.getElementById('sphere')
+
+/* BATCHED BY COLOUR BUCKET, and this was a real measurement, not a guess.
+   Timing draw() synchronously (the only way, since rAF is frozen in the preview
+   pane) the naive version cost median 11.5ms and p95 71.7ms per frame against a
+   16.7ms budget - it did NOT hold 60fps and nothing on screen would have told me.
+
+   The cost was 20000 fillStyle assignments per frame: each one is a CSS colour
+   string parsed from scratch. Quantising alpha into 8 buckets x 2 colours means
+   16 fillStyle changes per frame instead of 20000, with the points collected
+   into preallocated arrays so nothing allocates in the loop. */
+const BUCKETS = 8
+const PAL_FRONT = [], PAL_BACK = []
+for (let i = 0; i < BUCKETS; i++) {
+  const a = (i + 0.5) / BUCKETS
+  PAL_FRONT.push('rgba(223,246,255,' + a.toFixed(3) + ')')
+  PAL_BACK.push('rgba(92,130,201,' + (a * 0.75).toFixed(3) + ')')
+}
+/* two sets of buckets (front/back), each a flat x,y list plus a count */
+const BX = Array.from({ length: BUCKETS * 2 }, () => new Float32Array(N * 2))
+const BN = new Int32Array(BUCKETS * 2)
+
+/* Visibility via IntersectionObserver, not getBoundingClientRect. The old check
+   forced a layout read inside the rAF loop on every frame - the single most
+   likely source of the frame spikes, and free to remove. */
+let sphereVisible = false
+new IntersectionObserver(es => { sphereVisible = es[0].isIntersecting },
+  { rootMargin: '10% 0px' }).observe(sphereStage)
+
 let t = 0
 function draw() {
   requestAnimationFrame(draw)
-  const r = sphereStage.getBoundingClientRect()
-  if (r.bottom < 0 || r.top > innerHeight) return
+  if (!sphereVisible) return
 
   const p = parseFloat(sphereStage.style.getPropertyValue('--p')) || 0
   t += 0.0035
 
   cx.fillStyle = '#070f16'
   cx.fillRect(0, 0, W, H)
+  BN.fill(0)
 
   const R = Math.min(W, H) * 0.285
-  /* The dissolve: points push outward along their own normal and fade as they
-     go. Squared so the sphere holds its shape for the first half of the beat
-     and comes apart in the second, which is what the reference does. */
   const blow = 1 + p * p * 2.6
   const sin = Math.sin(t), cos = Math.cos(t)
+  const fade = 1 - p * 0.72
 
   for (let i = 0; i < N; i++) {
     const x0 = P[i * 3], y0 = P[i * 3 + 1], z0 = P[i * 3 + 2]
     const x1 = x0 * cos - z0 * sin
     const z1 = x0 * sin + z0 * cos
-    const d = 2.6
-    const k = d / (d + z1 * blow)
+    const k = 2.6 / (2.6 + z1 * blow)
     const sx = W / 2 + x1 * blow * R * k
     const sy = H / 2 + y0 * blow * R * k
     if (sx < 0 || sx > W || sy < 0 || sy > H) continue
-    /* HOLLOW SHELL, NOT A BALL. In the reference the centre is empty and the
-       particles crowd the silhouette. A point is on the limb when its rotated z
-       is near zero, so weighting by (1-|z|) empties the middle and leaves the
-       rim. Without this it renders as a solid blob, which is what it was. */
-    const limb = Math.pow(1 - Math.abs(z1), 1.35)   // 1.7 made the shell too thin
-    const a = (0.5 + 1.15 * k) * (1 - p * 0.72) * limb
-    cx.fillStyle = z1 > 0 ? 'rgba(223,246,255,' + a.toFixed(3) + ')'
-                          : 'rgba(92,130,201,' + (a * 0.75).toFixed(3) + ')'
-    cx.fillRect(sx, sy, dpr, dpr)
+    const az = z1 < 0 ? -z1 : z1
+    const limb = Math.pow(1 - az, 1.35)
+    let a = (0.5 + 1.15 * k) * fade * limb
+    if (a <= 0.02) continue
+    if (a > 1) a = 1
+    let b = (a * BUCKETS) | 0
+    if (b >= BUCKETS) b = BUCKETS - 1
+    if (z1 <= 0) b += BUCKETS
+    const n = BN[b]
+    BX[b][n * 2] = sx
+    BX[b][n * 2 + 1] = sy
+    BN[b] = n + 1
+  }
+
+  for (let b = 0; b < BUCKETS * 2; b++) {
+    const n = BN[b]
+    if (!n) continue
+    cx.fillStyle = b < BUCKETS ? PAL_FRONT[b] : PAL_BACK[b - BUCKETS]
+    const arr = BX[b]
+    for (let j = 0; j < n; j++) cx.fillRect(arr[j * 2], arr[j * 2 + 1], dpr, dpr)
   }
 }
 draw()
