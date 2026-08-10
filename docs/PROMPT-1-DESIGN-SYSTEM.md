@@ -53,23 +53,46 @@ semantic success / warning / danger / info that sit beside ice without breaking
 it. Danger and warning are the hard ones — they must read as urgent in a
 warehouse at a glance while still belonging to this palette.
 
-## Type
+## Type — two faces, and the display face is the brand
 
-Self-hosted and available: **Nunito** (variable 300–900, full Cyrillic),
-**Golos Text**, **JetBrains Mono**.
+**This studio is Russian and the type should say so before a word is read.**
+The display face is a condensed angular Cyrillic constructivist face — tall,
+geometric, narrow, uppercase, with hard diagonal joins. Think Russian avant-garde
+poster lettering rather than anything from a Silicon Valley type foundry. It is
+the single strongest differentiator available here: every competitor in
+worldwide B2B software sets its headlines in a neutral grotesque, and none of
+them look like this.
 
-Nunito is the current voice — rounded, warm, confident, and its Cyrillic is
-properly drawn, which most display faces cannot claim. Current headline
-treatment is weight 800–900, tracking about −0.03em, line-height under 1.
+**DISPLAY — the constructivist face.** Wordmark, section headlines, the numbers
+on a stat, room titles inside the showroom. Always uppercase, always tightly
+tracked, always large. This face carries the brand.
 
-If you propose a different pairing it **must ship a real Cyrillic cut**, and you
-must show «Изменим инструменты вашего бизнеса» set in it. A face that renders
-that badly is disqualified however good it looks in English.
+**TEXT — a workhorse with a real Cyrillic cut.** Everything else: body copy,
+buttons, form labels, table cells, tooltips, error messages. Currently
+**Nunito** (variable 300–900, full Cyrillic), with **Golos Text** and
+**JetBrains Mono** also self-hosted and available.
+
+Propose 2–3 pairings for the text face against the display face and show each
+one setting «Изменим инструменты вашего бизнеса». A face that renders that
+badly is disqualified however good it looks in English.
+
+**Do not use the display face below about 28px, and never for running text,
+table cells or form fields.** A condensed uppercase face at 14px in a
+reconciliation table is unreadable, and this system has to dress that table as
+convincingly as it dresses a headline. Define the exact size at which the
+display face stops and the text face takes over, and make that a token.
+
+**Cyrillic and Latin must both work.** English is a front door for this studio,
+so tell me plainly whether the display face has a Latin cut. If it does not,
+specify what English headlines use instead and how the two stay recognisably
+the same brand — that is a real design problem and I want a real answer, not a
+substitution made silently.
 
 Give me one type scale that covers a 96px display headline *and* an 11px table
-label, with line-heights and tracking per step. Body text never wider than 52
-characters. Numbers in tables must be tabular-figure and monospaced-aligned —
-a reconciliation screen where the columns don't line up is a broken screen.
+label, with line-heights and tracking per step, and which face owns each step.
+Body text never wider than 52 characters. Numbers in tables must be
+tabular-figure and column-aligned — a reconciliation screen where the columns
+do not line up is a broken screen.
 
 ## What to deliver
 
