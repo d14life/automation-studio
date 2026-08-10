@@ -48,7 +48,12 @@ img{display:block;max-width:100%}
    Pinned, and only the CHILDREN animate (official rule: never animate the
    pinned element itself). data-speed is ScrollSmoother's parallax - it is
    applied by the smoother, not by a ScrollTrigger, so it costs nothing extra. */
-#hero{min-height:100lvh;display:grid;place-items:center;overflow:hidden}
+/* 250lvh: the extra 1.5 viewports are the fly-through's runway. The pin holds
+   the hero still while its contents rush past the camera. */
+#hero{height:250lvh}
+.hero-pin{position:relative;height:100lvh;display:grid;place-items:center;
+  overflow:hidden;perspective:900px}
+.hero-pin .wrap{transform-style:preserve-3d;will-change:transform}
 #hero .glow{position:absolute;inset:-30% -10% auto;height:90vmax;pointer-events:none;
   background:radial-gradient(closest-side,rgba(127,216,255,.16),transparent 70%)}
 .h1{font:900 clamp(44px,9.4vw,148px)/.92 Nunito;letter-spacing:-.035em;margin:0;
@@ -59,7 +64,35 @@ img{display:block;max-width:100%}
 .h1 .line{will-change:transform}
 #hero .sub{margin-top:2.2rem;display:flex;gap:.8rem;flex-wrap:wrap;align-items:center}
 
-/* --- 2. MARQUEE ----------------------------------------------------------
+/* --- 2. GALLERY ----------------------------------------------------------
+   The flight. Cards are scattered in real Z inside one perspective, and the
+   camera does not move - the whole field is translated toward the viewer on
+   ONE transform. Thirty cards animated individually would be thirty transforms
+   a frame; this is one, and the depth is free because the browser is already
+   compositing them in 3D.
+   Ported from showroom.html's `field` beat, which was measured off the
+   reference: about six cards on screen at a time, sharp-cornered, face-on.
+   Nothing rotates - the camera dollies, and that is what makes it read as
+   travel rather than as a swarm. */
+#gallery{height:600lvh}
+/* perspective and the card z-range are ONE budget, not two settings. A card
+   whose z reaches the perspective origin is at the camera lens: its scale
+   goes to infinity. Measured it doing exactly that - 24609px wide, 459031px
+   off to the left. So the field must finish its travel with the NEAREST card
+   still short of this value. 1200 / (-1400 nearest + 2000 travel = 600) = 2x,
+   which is as big as anything gets. */
+.gal-pin{position:relative;height:100lvh;overflow:hidden;background:var(--deep);
+  perspective:1200px}
+.field{position:absolute;inset:0;transform-style:preserve-3d;will-change:transform}
+.fc{position:absolute;left:50%;top:50%;border-radius:6px;overflow:hidden;
+  background:linear-gradient(150deg,#1c445f,#0a1620);
+  box-shadow:0 24px 60px -20px rgba(0,0,0,.85), inset 0 0 0 1px rgba(223,246,255,.07)}
+.fc img{width:100%;height:100%;object-fit:cover;object-position:top left}
+.gal-head{position:absolute;left:6vw;top:clamp(22px,8vh,80px);z-index:3;
+  mix-blend-mode:difference}
+.gal-head h2{margin:.4rem 0 0;font:900 clamp(26px,4vw,58px)/1 Nunito;letter-spacing:-.03em}
+
+/* --- 3. MARQUEE ----------------------------------------------------------
    Two identical rows translated -50% give a seamless loop; scroll velocity
    skews and speeds it, which is what makes a ticker feel attached to the page
    instead of decorative. */
@@ -167,14 +200,27 @@ img{display:block;max-width:100%}
 
   <!-- 1 ------------------------------------------------------------------ -->
   <section class="s" id="hero">
-    <div class="glow" data-speed="0.8"></div>
-    <div class="wrap">
-      <p class="eyebrow" data-speed="1.05">Solutions101 · шоурум</p>
-      <h1 class="h1">Изменим <span class="dim">инструменты</span><br>вашего бизнеса</h1>
-      <div class="sub" data-speed="1.12">
-        <a class="btn" href="#cta">Обсудить задачу</a>
-        <a class="btn ghost" href="#track">Смотреть решения</a>
+    <div class="hero-pin">
+      <div class="glow"></div>
+      <div class="wrap">
+        <p class="eyebrow">Solutions101 · шоурум</p>
+        <h1 class="h1">Изменим <span class="dim">инструменты</span><br>вашего бизнеса</h1>
+        <div class="sub">
+          <a class="btn" href="#cta">Обсудить задачу</a>
+          <a class="btn ghost" href="#track">Смотреть решения</a>
+        </div>
       </div>
+    </div>
+  </section>
+
+  <!-- 2 ------------------------------------------------------------------ -->
+  <section class="s" id="gallery">
+    <div class="gal-pin">
+      <div class="gal-head">
+        <p class="eyebrow">Зал</p>
+        <h2>Всё, что уже стоит<br>и работает</h2>
+      </div>
+      <div class="field" id="fieldWrap"></div>
     </div>
   </section>
 
@@ -361,11 +407,68 @@ mm.add({
   gsap.from('#hero .eyebrow, #hero .sub', {
     y: 24, autoAlpha: 0, duration: .9, ease: 'power3.out', stagger: .08, delay: .45,
   })
-  /* The hero leaves by sinking and dimming rather than scrolling away flat. */
-  gsap.to('#hero .wrap', {
-    yPercent: -14, autoAlpha: 0, ease: 'none',
-    scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true },
+  /* THE FLY-THROUGH. The hero does not scroll away, it goes PAST you: pinned,
+     pushed toward the camera on z until it leaves the frame at the edges. z on
+     a perspective parent is what makes the type grow from its own centre and
+     exit sideways; a plain scale grows it toward the middle and reads flat.
+     Fade starts late (60%) so it is still solid while it is still big.       */
+  gsap.timeline({
+    scrollTrigger: { trigger: '#hero', pin: '.hero-pin', scrub: 0.8,
+      start: 'top top', end: 'bottom bottom', anticipatePin: 1 },
   })
+    .to('#hero .wrap', { z: 1250, ease: 'none' }, 0)
+    .to('#hero .glow', { scale: 2.4, autoAlpha: 0, ease: 'none' }, 0)
+    .to('#hero .wrap', { autoAlpha: 0, ease: 'none', duration: 0.4 }, 0.6)
+
+  /* --- 2. gallery ------------------------------------------------------
+     Built in JS because 30 hand-written divs is 30 chances to fudge a
+     coordinate. Seeded RNG, so the layout is identical on every load and a
+     screenshot taken today still matches one taken next week.             */
+  ;(() => {
+    const wrap = document.getElementById('fieldWrap')
+    const SHOTS = ['/shots/park.jpg', '/shots/zapchasti.jpg',
+                   '/shots/vzaimoraschety-v2.jpg', '/shots/sklad.jpg']
+    let seed = 20260810
+    const rnd = () => (seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff
+    const N = 30
+    /* showroom.html spread these across THREE viewports because there the
+       camera panned right along them as well as forward. Here it only flies
+       forward, so anything past ~1 viewport either side is never in frame.  */
+    const span = innerWidth * 2.2
+
+    for (let i = 0; i < N; i++) {
+      const d = document.createElement('div')
+      d.className = 'fc'
+      /* squared random pushes the size distribution to the low end: many
+         small thumbnails, a few mediums, which is what depth actually
+         looks like. A field of equal-sized cards reads as wallpaper. */
+      const r = rnd()
+      const w = 90 + r * r * 430
+      const x = Math.round((i / N - 0.5) * span + (rnd() - 0.5) * innerWidth * 0.5)
+      const y = Math.round((rnd() - 0.5) * innerHeight * 1.15)
+      const z = Math.round(-1400 - 3000 * (i / N) - rnd() * 120)
+      d.style.cssText =
+        `width:${w}px;height:${w * 0.69}px;` +
+        `transform:translate3d(${x}px,${y}px,${z}px) translate(-50%,-50%)`
+      /* Every third card carries a real capture, the rest are ice panels.
+         Thirty copies of the same screenshot reads as a bug, not as depth. */
+      if (i % 3 === 0) {
+        const img = document.createElement('img')
+        img.src = SHOTS[(i / 3 | 0) % SHOTS.length]
+        img.alt = ''
+        d.appendChild(img)
+      }
+      wrap.appendChild(d)
+    }
+
+    /* ease:'none' for the same reason the horizontal track needs it - this is
+       travel, and a camera that eases is a camera that stalls. */
+    gsap.fromTo(wrap, { z: 0 }, {
+      z: 2000, ease: 'none',
+      scrollTrigger: { trigger: '#gallery', pin: '.gal-pin', scrub: 0.8,
+        start: 'top top', end: 'bottom bottom', anticipatePin: 1 },
+    })
+  })()
 
   /* --- 2. marquee ------------------------------------------------------
      One tween loops the first half out of view; the duplicated half is
