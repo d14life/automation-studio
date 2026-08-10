@@ -63,7 +63,10 @@ img{display:block;max-width:100%}
    Two identical rows translated -50% give a seamless loop; scroll velocity
    skews and speeds it, which is what makes a ticker feel attached to the page
    instead of decorative. */
-#marquee{padding:9rem 0;overflow:hidden;border-block:1px solid rgba(127,216,255,.14)}
+/* One full viewport, like every non-runway section on the reference. A ticker
+   that is only 0.44vh tall is gone before the eye has settled on it. */
+#marquee{min-height:100lvh;display:grid;align-content:center;gap:3rem;
+  overflow:hidden;border-block:1px solid rgba(127,216,255,.14)}
 .mq{display:flex;width:max-content;will-change:transform}
 .mq span{font:900 clamp(38px,7.4vw,104px)/1 Nunito;letter-spacing:-.03em;
   padding-inline:.4em;white-space:nowrap;color:transparent;
@@ -78,8 +81,17 @@ img{display:block;max-width:100%}
 #track{background:var(--deep)}
 .track-vp{height:100lvh;display:flex;align-items:center;overflow:hidden}
 .lanes{display:flex;gap:clamp(20px,3.2vw,52px);padding-inline:6vw;will-change:transform}
-.lane{position:relative;flex:0 0 clamp(280px,42vw,620px);border-radius:var(--r);
+/* Lane width and lane COUNT are what set the pin length: ScrollTrigger spends
+   exactly as much vertical scroll as the lane has horizontal travel, so
+   "make the track last longer" means "put more in it", never "slow it down".
+   Slowing it breaks the 1:1 tracking that makes the effect feel physical. */
+.lane{position:relative;flex:0 0 clamp(280px,46vw,700px);border-radius:var(--r);
   overflow:hidden;background:#0d1c27;box-shadow:inset 0 0 0 1px rgba(127,216,255,.16)}
+.lane.is-text{display:grid;align-content:center;padding:2.6rem 2.2rem;min-height:46vh;
+  background:linear-gradient(150deg,#102432,#0b1720)}
+.lane.is-text h3{margin:.7rem 0 .6rem;font:800 clamp(22px,2.6vw,40px)/1.08 Nunito;
+  letter-spacing:-.025em}
+.lane.is-text p{margin:0;color:var(--dim);font-size:16px;line-height:1.6;max-width:34ch}
 .lane img{aspect-ratio:16/10;object-fit:cover;object-position:top left;width:100%}
 .lane-meta{padding:1.5rem 1.6rem 1.8rem}
 .lane-meta h3{margin:.5rem 0 .45rem;font:800 clamp(19px,2vw,28px)/1.15 Nunito}
@@ -92,7 +104,10 @@ img{display:block;max-width:100%}
    transform on two elements - the mask scales up, the content counter-scales
    by 1/s so the type inside never stretches. Animating clip-path instead
    would repaint the whole viewport every frame. */
-#aperture{height:320lvh}
+/* 7.5 viewports. Measured off the reference's longest pinned beat (7.48vh):
+   a wipe that resolves in three viewports reads as a transition, one that
+   takes seven reads as a place you travelled through. */
+#aperture{height:750lvh}
 .ap-pin{position:relative;height:100lvh;overflow:hidden;display:grid;place-items:center;
   background:var(--bg)}
 .ap-from{position:absolute;inset:0;display:grid;place-items:center;padding:0 6vw;text-align:center}
@@ -203,6 +218,22 @@ img{display:block;max-width:100%}
             <h3>Магазин автозапчастей</h3>
             <p>Подбор по VIN, каталог на 40 000 позиций.</p></div>
         </article>
+        <article class="lane is-text"><p class="eyebrow">05 · Графика</p>
+          <h3>3D&#8209;графика<br>и анимация</h3>
+          <p>Товар, узел, помещение — крутится, разбирается, показывает себя
+             сам. Без выезда на съёмку.</p></article>
+        <article class="lane is-text"><p class="eyebrow">06 · Интеграции</p>
+          <h3>API и обмен<br>с учётными системами</h3>
+          <p>Ваша система разговаривает с 1С, банком, маркетплейсом
+             и складом без человека посередине.</p></article>
+        <article class="lane is-text"><p class="eyebrow">07 · Невидимая работа</p>
+          <h3>Боты, парсеры,<br>сборщики данных</h3>
+          <p>То, что кто-то до сих пор делает руками по вечерам.
+             Собирает, сверяет, присылает готовое.</p></article>
+        <article class="lane is-text"><p class="eyebrow">08 · Витрина</p>
+          <h3>Сайты, которых<br>нет у конкурентов</h3>
+          <p>Страница как место, а не как лист бумаги.
+             Ровно то, по чему вы сейчас скроллите.</p></article>
       </div>
     </div>
   </section>
