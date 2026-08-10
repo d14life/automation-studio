@@ -72,8 +72,8 @@ img{display:block;max-width:100%}
 /* one marquee on the page, and it belongs to beat 1 */
 .marquee{position:absolute;top:50%;left:0;translate:0 -50%;width:max-content;
   display:flex;gap:.55em;white-space:nowrap;pointer-events:none;
-  font-size:clamp(64px,12.5vw,190px);font-weight:900;letter-spacing:-.045em;line-height:1;
-  color:transparent;-webkit-text-stroke:1px rgba(127,216,255,.22);
+  font-size:clamp(80px,15vw,230px);font-weight:900;letter-spacing:-.045em;line-height:1;
+  color:transparent;-webkit-text-stroke:1.5px rgba(127,216,255,.42);
   animation:mq 34s linear infinite;
   /* FOCUS PULL, the third instance of this motif. In the reference the marquee
      behind the deck is soft while the page is still folding and sharpens as the
@@ -158,8 +158,14 @@ img{display:block;max-width:100%}
 
    Portrait 3:4, also off the frames, not the 16:11 landscape inherited from the
    shape of the screenshots. */
-.ring{position:relative;width:min(27vw,310px);aspect-ratio:3/4;transform-style:preserve-3d;
-  --rad:calc(var(--spread,1) * min(26vw,295px));
+/* SIZE AND PROPORTION, MEASURED OFF f366 SIDE BY SIDE. On the reference's own
+   1342x958 the front card is 339 x 753 - a quarter of the width and 79% of the
+   HEIGHT, aspect 0.45. Mine was 3:4 at 43% of the height: far too squat and far
+   too small, floating in an empty frame. This is the first change made from an
+   actual A/B rather than from reading the frames, and it is the one that was
+   most obviously wrong the whole time. */
+.ring{position:relative;width:min(25vw,340px);aspect-ratio:9/20;transform-style:preserve-3d;
+  --rad:calc(var(--spread,1) * min(24vw,323px));
   transform:scale(var(--sx,1), var(--sy,1)) rotateZ(var(--swing,0deg))
             translateZ(calc(-1 * var(--rad))) rotateY(var(--turn,0deg))}
 /* The seven behind the hero card are not there until the deck opens. At
@@ -168,14 +174,22 @@ img{display:block;max-width:100%}
   /* scenery, not subject: the slivers frame the front card, they do not compete
      with it. Without this the edges read as clutter at every turn angle. */
   filter:brightness(.4) saturate(.7)}
-.ring-card{position:absolute;inset:0;border-radius:var(--r);overflow:hidden;
+.ring-card{position:absolute;inset:0;border-radius:var(--r);overflow:hidden;container-type:size;
   background:var(--deep);
   box-shadow:0 40px 80px -30px rgba(0,0,0,.85), inset 0 0 0 1px rgba(223,246,255,.09);
   transform:rotateY(calc(var(--i) * 60deg)) translateZ(var(--rad))}
 /* The captures are light-UI dashboards on a dark page. Untreated they read as
    four bright rectangles rather than one deck, so each gets a scrim tuned to
    sit them into the page without hiding what they show. */
-.ring-card img{width:100%;height:100%;object-fit:cover;object-position:top left}
+/* Same tension as the rail, same resolution. The reference's cards are art
+   drawn FOR a 0.45 aspect; a 1120x780 capture cropped to that is a vertical
+   slice of a dashboard and reads as nothing. So the card keeps the reference's
+   tall silhouette and the capture sits in its top third at its own aspect,
+   poster-style, with the name under it. */
+.ring-card{display:grid;align-content:start}
+.ring-card img{width:100%;height:58cqh;object-fit:cover;object-position:top left}
+.ring-card__label{position:static;padding:18px 16px 0;background:none;
+  font-size:15px;line-height:1.3}
 /* The scrim was there to stop four bright dashboards competing for attention.
    Now that only ONE card is ever the subject, the front card gets none of it -
    it should read as crisply as the reference's does - and the neighbours carry
@@ -203,11 +217,12 @@ img{display:block;max-width:100%}
 
 /* The star lives on the front card and, in beat 2, eats the screen. */
 .star{position:absolute;left:50%;top:50%;translate:-50% -50%;transform-origin:50% 50%}
+.ring-card .star{top:28%}
 
 /* Holds until the beat is nearly over, then goes. The first version faded it
    out across the first 40% of the runway, so the one clickable thing on the
    screen was already ghosted before the deck had finished its first quarter turn. */
-.ring-cta{position:absolute;left:50%;bottom:6vh;translate:-50% 0;z-index:3;
+.ring-cta{position:absolute;left:50%;bottom:3vh;translate:-50% 0;z-index:3;
   opacity:clamp(0, calc(1 - var(--sw,0) / .18), 1)}
 
 /* =========================================================================
@@ -269,6 +284,9 @@ img{display:block;max-width:100%}
   opacity:clamp(0, calc((var(--sw,0) - .30) / .35), 1);
   transform:scale(calc(.4 + var(--sw,0) * 1))}
 .star-core{width:min(9vmin,78px);height:min(9vmin,78px);
+  /* gated on --sw: without this it renders at full size through the entire deck
+     beat, which put TWO stars on screen at once. */
+  opacity:clamp(0, calc(var(--sw,0) / .06), 1);
   transform:scale(calc(1 + var(--sw,0) * 4.5));
   filter:drop-shadow(0 0 40px rgba(223,246,255,.9))}
 
@@ -788,8 +806,12 @@ function frame(force) {
   }
 
   const doc = document.documentElement
-  hud.textContent = String(Math.round(doc.scrollTop / (doc.scrollHeight - vh) * 100))
-    .padStart(2, '0') + '%'
+  /* solo mode leaves the page exactly one viewport tall, so this divided by
+     zero and printed NaN% - visible in every A/B screenshot until now. */
+  const range = doc.scrollHeight - vh
+  hud.textContent = range > 0
+    ? String(Math.round(doc.scrollTop / range * 100)).padStart(2, '0') + '%'
+    : '00%'
 
   /* Keep the loop alive only while something is still settling, plus a short
      tail so a flick does not die mid-glide. An always-on rAF on a page this
