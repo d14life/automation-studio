@@ -301,7 +301,7 @@ img{display:block;max-width:100%}
   filter:drop-shadow(0 0 30px rgba(223,246,255,.8));
   opacity:clamp(0, calc(1 - (var(--p) - .72) / .28), 1)}
 .split{position:absolute;inset:0;pointer-events:none}
-.split b{position:absolute;font-size:clamp(52px,9.5vw,140px);font-weight:900;
+.split b{position:absolute;font-size:clamp(64px,13vw,210px);font-weight:900;
   letter-spacing:-.045em;line-height:.92;
   /* FOCUS PULL, exactly as the hero does it. f492-500: "limits" arrives heavily
      blurred and sharpens as it rises. Blur-resolve is a recurring motif in this
@@ -314,7 +314,7 @@ img{display:block;max-width:100%}
 .split .b{right:5vw;bottom:13vh;text-align:right;color:var(--dim);
   translate:0 calc(var(--e) * -17vh);
   opacity:clamp(0, calc((var(--p) - .06) / .18), 1)}
-.split p{position:absolute;left:5vw;bottom:16vh;max-width:33ch;font-size:15px;line-height:1.6;
+.split p{position:absolute;left:5vw;bottom:16vh;max-width:33ch;font-size:17px;line-height:1.6;
   color:#a9bfcc;opacity:clamp(0, calc((var(--p) - .10) / .18), 1);
   translate:0 calc((1 - var(--o)) * 3vh)}
 
@@ -340,10 +340,10 @@ img{display:block;max-width:100%}
    zoom into a corner of a dashboard. So the CARD keeps the reference's shape
    (full height, edge to edge, square corners) and the capture sits inside it at
    its own aspect. Same silhouette, content that can actually be read. */
-.rail img{width:100%;height:64%;object-fit:cover;object-position:top left;
+.rail img{width:100%;height:100%;object-fit:cover;object-position:top left;
   filter:saturate(.9) brightness(.86)}
 /* the small meta line, top left, and the name, bottom left - both inside the card */
-.rail .meta{position:absolute;left:22px;top:calc(18% - 30px);font-size:11.5px;letter-spacing:.04em;
+.rail .meta{position:absolute;left:22px;top:20px;font-size:11.5px;letter-spacing:.04em;
   color:rgba(242,247,245,.72);z-index:2}
 .rail figcaption{position:absolute;left:0;right:0;bottom:0;padding:26px 22px;
   background:linear-gradient(transparent,rgba(7,15,22,.9));color:var(--ink)}
@@ -363,7 +363,7 @@ img{display:block;max-width:100%}
 .field{position:absolute;inset:0;transform-style:preserve-3d;
   transform:translateZ(calc(var(--p) * 2750px))}
 .field div{position:absolute;left:50%;top:50%;border-radius:4px;overflow:hidden;
-  background:linear-gradient(150deg,#12293a,var(--deep));
+  background:linear-gradient(150deg,#1c445f,#0a1620);
   box-shadow:0 24px 60px -20px rgba(0,0,0,.85), inset 0 0 0 1px rgba(223,246,255,.07);
   transform:translate3d(calc(var(--x) * 1px - 50%), calc(var(--y) * 1px - 50%), calc(var(--z) * 1px))}
 .field img{width:100%;height:100%;object-fit:cover;object-position:top left}
@@ -378,18 +378,18 @@ img{display:block;max-width:100%}
    reference, where the previous section does not cross-fade, it is flown through.
    ========================================================================= */
 #grow .pin{background:var(--deep)}
-.grow-card{position:absolute;width:min(92vw,1240px);aspect-ratio:16/9;
-  border-radius:calc(var(--r) - var(--e) * 14px);overflow:hidden;
+.grow-card{position:absolute;width:100vw;height:100lvh;
+  border-radius:calc(var(--r) * (1 - var(--e)));overflow:hidden;
   background:radial-gradient(130% 130% at 20% 12%, #2b6d95 0%, transparent 58%),
              linear-gradient(155deg,#1b4a6b 0%, var(--deep) 76%);
   box-shadow:0 60px 120px -50px rgba(0,0,0,.9);
-  transform:scale(calc(.30 + var(--e) * .70 + max(0, var(--p) - .88) * 9))}
+  transform:scale(calc(.30 + min(1, var(--e) / .72) * .70 + max(0, var(--p) - .88) * 9))}
 .grow-copy{position:absolute;left:7%;top:50%;translate:0 -50%;max-width:29ch;
   opacity:clamp(0, calc((var(--p) - .30) / .28), 1)}
-.grow-copy h2{font-size:clamp(36px,5.2vw,72px);line-height:1.0;letter-spacing:-.04em;
+.grow-copy h2{font-size:clamp(42px,6.4vw,96px);line-height:1.0;letter-spacing:-.04em;
   margin:0 0 .38em;font-weight:900}
 .grow-copy h2 span{display:block;color:var(--dim)}
-.grow-copy p{font-size:15.5px;line-height:1.6;color:#bcd0dc;margin:0 0 1.7em;max-width:31ch}
+.grow-copy p{font-size:17px;line-height:1.6;color:#bcd0dc;margin:0 0 1.7em;max-width:31ch}
 .chrome{position:absolute;right:-7%;top:50%;translate:0 -50%;width:54%;
   filter:drop-shadow(0 40px 70px rgba(0,0,0,.55));
   transform:rotate(calc(var(--o) * 8deg))}
@@ -413,15 +413,15 @@ img{display:block;max-width:100%}
    looks like.
    ========================================================================= */
 #answer .pin{background:var(--deep)}
-.panel{width:min(92vw,1240px);aspect-ratio:16/9;border-radius:var(--r);overflow:hidden;
-  position:relative;display:grid;place-items:center;padding:6%;
+.panel{width:100vw;height:100lvh;border-radius:0;overflow:hidden;
+  position:relative;display:grid;align-content:center;justify-items:start;padding:0 12%;
   background:radial-gradient(130% 130% at 80% 16%, #2b6d95 0%, transparent 56%),
              linear-gradient(205deg,#1b4a6b 0%, var(--deep) 74%);
   box-shadow:0 60px 120px -50px rgba(0,0,0,.9);
-  transform:scale(calc(1.55 - var(--o) * .55));
+  transform:scale(calc(1.22 - var(--o) * .22));
   opacity:clamp(0, calc(var(--p) / .2), 1)}
-.panel h2{font-size:clamp(32px,4.6vw,64px);line-height:1.02;letter-spacing:-.04em;margin:0;
-  text-align:center;max-width:17ch;font-weight:900}
+.panel h2{font-size:clamp(42px,6.4vw,96px);line-height:1.0;letter-spacing:-.045em;margin:0;
+  text-align:left;max-width:15ch;font-weight:900}
 .panel h2 span{color:var(--dim)}
 .panel-flare{position:absolute;inset:0;pointer-events:none;
   background:radial-gradient(circle at 50% 50%, rgba(127,216,255,.5), transparent 55%);
@@ -957,7 +957,7 @@ const rnd = () => (seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff
 const FIELD_N = 14
 for (let i = 0; i < FIELD_N; i++) {
   const d = document.createElement('div')
-  const w = 170 + rnd() * 300
+  const w = 320 + rnd() * 520
   d.style.width = w + 'px'
   d.style.height = w * 0.69 + 'px'
   /* Held off the centre line: a card dead ahead is a card you fly into, and it
@@ -985,8 +985,8 @@ for (let i = 0; i < FIELD_N; i++) {
    one card allowed to be dead ahead because it is the destination. */
 const fieldTarget = document.createElement('div')
 fieldTarget.className = 'field-target'
-fieldTarget.style.width = '430px'
-fieldTarget.style.height = '270px'
+fieldTarget.style.width = '760px'
+fieldTarget.style.height = '470px'
 fieldTarget.style.setProperty('--x', 90)
 fieldTarget.style.setProperty('--y', 40)
 fieldTarget.style.setProperty('--z', -3450)
@@ -1006,7 +1006,7 @@ const cx = cv.getContext('2d', { alpha: false })
 /* 4200 rendered as a faint dot-field next to the reference's dense shell.
    14000 1px rects in a 2D canvas is still nothing - the cost here is the
    per-point maths, and it is a dozen multiplies. */
-const N = 14000
+const N = 20000
 const P = new Float32Array(N * 3)
 for (let i = 0; i < N; i++) {
   /* Fibonacci sphere: even coverage without the pole clustering you get from
@@ -1043,7 +1043,7 @@ function draw() {
   cx.fillStyle = '#070f16'
   cx.fillRect(0, 0, W, H)
 
-  const R = Math.min(W, H) * 0.33
+  const R = Math.min(W, H) * 0.285
   /* The dissolve: points push outward along their own normal and fade as they
      go. Squared so the sphere holds its shape for the first half of the beat
      and comes apart in the second, which is what the reference does. */
@@ -1064,7 +1064,7 @@ function draw() {
        is near zero, so weighting by (1-|z|) empties the middle and leaves the
        rim. Without this it renders as a solid blob, which is what it was. */
     const limb = Math.pow(1 - Math.abs(z1), 1.35)   // 1.7 made the shell too thin
-    const a = (0.34 + 0.86 * k) * (1 - p * 0.72) * limb
+    const a = (0.5 + 1.15 * k) * (1 - p * 0.72) * limb
     cx.fillStyle = z1 > 0 ? 'rgba(223,246,255,' + a.toFixed(3) + ')'
                           : 'rgba(92,130,201,' + (a * 0.75).toFixed(3) + ')'
     cx.fillRect(sx, sy, dpr, dpr)
