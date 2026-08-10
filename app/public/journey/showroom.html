@@ -827,10 +827,11 @@ for (let i = 0; i < FIELD_N; i++) {
   d.style.height = w * 0.69 + 'px'
   /* Held off the centre line: a card dead ahead is a card you fly into, and it
      fills the screen with one blurred texture on the way past. */
-  const ang = rnd() * Math.PI * 2
-  const rad = 520 + rnd() * 700
-  d.style.setProperty('--x', Math.round(Math.cos(ang) * rad))
-  d.style.setProperty('--y', Math.round(Math.sin(ang) * rad * .72))
+  /* spread along the camera's path, not around a point: x across the scene's
+     3.4-viewport width, y across the full height either side of centre */
+  const span = innerWidth * 3.0
+  d.style.setProperty('--x', Math.round((i / FIELD_N - 0.5) * span + (rnd() - 0.5) * innerWidth * 0.5))
+  d.style.setProperty('--y', Math.round((rnd() - 0.5) * innerHeight * 1.15))
   d.style.setProperty('--z', Math.round(-3400 * (i / FIELD_N) - rnd() * 120))
   /* Every third card carries a real capture; the rest are ice panels. A field
      of identical screenshots reads as a bug, not as depth. */
@@ -852,8 +853,8 @@ const fieldTarget = document.createElement('div')
 fieldTarget.className = 'field-target'
 fieldTarget.style.width = '760px'
 fieldTarget.style.height = '470px'
-fieldTarget.style.setProperty('--x', 90)
-fieldTarget.style.setProperty('--y', 40)
+fieldTarget.style.setProperty('--x', Math.round(innerWidth * 1.25))
+fieldTarget.style.setProperty('--y', Math.round(innerHeight * 0.18))
 fieldTarget.style.setProperty('--z', -3450)
 wrap.appendChild(fieldTarget)
 
