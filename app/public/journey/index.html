@@ -86,29 +86,37 @@ img{display:block;max-width:100%}
 .btn--ghost{color:var(--ice-1);box-shadow:inset 0 0 0 1px rgba(223,246,255,.28)}
 
 /* =========================================================================
-   BEAT 1 — THE RING
-   Cards on a cylinder, landscape because the real product captures are
-   landscape (1120x780). The ring turns on one rotateY, so eight cards cost one
-   composited transform. The turn runs on --e, so it eases in and settles out
-   instead of starting and stopping at full speed.
+   BEAT 1 — THE PAGE THAT BECOMES THE DECK
+   ONE CARD, NOT TWO SECTIONS. Watched frame by frame at 60fps: the hero page
+   does not fly away and get replaced by a deck. It IS the deck's front card the
+   whole time. Its content crossfades from page to card while it rotates, and
+   the other seven spread out from behind it.
+
+   So the ring starts with --spread at 0: all eight cards collapsed into one
+   stack at the centre, zoomed up until the front one is full bleed. The fold
+   shrinks the zoom, swings the stack, and opens --spread, which IS the deck
+   forming. Then the turn takes over. Four values, four different windows, all
+   computed in the loop - see the `open` case there for why they are not CSS.
+
+   The deck also PARKS: the turn finishes before the beat does, so the hero card
+   is completely still for the handoff into the star. Flow needs rests as much
+   as it needs motion.
    ========================================================================= */
-#ring .pin{background:var(--bg)}
+#open .pin{background:var(--bg)}
 .ring-scene{position:absolute;inset:0;display:grid;place-items:center;
   perspective:1150px;perspective-origin:50% 47%}
-/* 8 cards at 45deg apart need radius >= w/(2*tan(22.5)) = 1.21w just to stop
-   touching, and about 1.6w before there is air between them. At 1.14w the ring
-   read as a flat filmstrip - that was the first version's real problem, not the
-   colours. */
-/* THE DECK PARKS. At 60fps the reference holds the front card completely still
-   for the whole star transition - the ring finishes turning first, then there
-   is a rest, and only then does the next beat start. The first version rotated
-   right up to the handoff and it read as relentless. Flow needs rests as much
-   as it needs motion, so the turn saturates at 82% of the runway and the last
-   18% is stillness on the hero card. */
-.ring{position:relative;width:min(34vw,360px);aspect-ratio:16/11;transform-style:preserve-3d;
-  transform:translateZ(calc(-1 * var(--rad)))
-            rotateY(calc(clamp(0, var(--e) / .82, 1) * -135deg));
-  --rad:min(56vw,585px)}
+/* PORTRAIT, and the deck is TIGHT. Both read straight off the high-res frames
+   and both were wrong before. The card the page folds into is ~3:4 upright, not
+   the 16:11 landscape I had inherited from the shape of the screenshots. And
+   the neighbours sit nearly face to face, like a concertina - the radius is
+   barely over one card width, not the 1.6x that gives a wide open cylinder. */
+.ring{position:relative;width:min(26vw,300px);aspect-ratio:3/4;transform-style:preserve-3d;
+  --rad:calc(var(--spread,1) * min(30vw,345px));
+  transform:scale(var(--sx,1), var(--sy,1)) rotateZ(var(--swing,0deg))
+            translateZ(calc(-1 * var(--rad))) rotateY(var(--turn,0deg))}
+/* The seven behind the hero card are not there until the deck opens. At
+   --spread 0 they are stacked in exactly the same place and would z-fight. */
+.ring-card:not(:first-child){opacity:clamp(0, calc((var(--spread,1) - .06) / .3), 1)}
 .ring-card{position:absolute;inset:0;border-radius:var(--r);overflow:hidden;
   background:var(--deep);
   box-shadow:0 40px 80px -30px rgba(0,0,0,.85), inset 0 0 0 1px rgba(223,246,255,.09);
@@ -345,25 +353,27 @@ img{display:block;max-width:100%}
   box-shadow:0 60px 120px -50px rgba(0,0,0,.9);
   transform:rotateZ(calc(var(--e) * -46deg)) rotateY(calc(var(--e) * 30deg))
             scale(calc(1 - var(--e) * .74))}
-/* The hero copy rides the panel down and is gone well before it lands, so the
-   card that arrives in the deck is a card, not a page with unreadable text on it. */
-.opener-copy{position:absolute;left:7%;top:50%;translate:0 -50%;max-width:24ch;
-  opacity:clamp(0, calc((.34 - var(--p)) / .34), 1)}
-.opener-copy h1{font-size:clamp(38px,5.6vw,78px);line-height:.98;letter-spacing:-.045em;
-  margin:0 0 .34em;font-weight:900}
-.opener-copy h1 span{display:block;color:var(--dim)}
-.opener-copy p{font-size:15.5px;line-height:1.6;color:#bcd0dc;margin:0 0 1.7em;max-width:30ch}
-.opener-shot{position:absolute;right:6%;top:50%;translate:0 -50%;
-  width:38%;aspect-ratio:16/11;border-radius:12px;overflow:hidden;
-  box-shadow:0 30px 60px -20px rgba(0,0,0,.7)}
-.opener-shot img{width:100%;height:100%;object-fit:cover;object-position:top left;
-  filter:saturate(.88) brightness(.84)}
-/* the deck it is being dealt into, arriving late and from underneath */
-.fold-deck{position:absolute;display:flex;gap:14px;
-  opacity:clamp(0, calc((var(--p) - .55) / .35), 1);
-  transform:translateY(calc((1 - var(--o)) * 14vh))}
-.fold-deck span{width:clamp(90px,11vw,150px);aspect-ratio:16/11;border-radius:12px;
-  background:var(--deep);box-shadow:inset 0 0 0 1px rgba(223,246,255,.12)}
+/* THE CROSSFADE THAT MAKES IT ONE OBJECT. Both layers live inside the front
+   card. The page layer is what you land on; the card layer is what the deck
+   gets. They swap over the middle of the fold, while the card is still turning,
+   which is the whole reason the reference reads as a page BECOMING a card
+   rather than a cut between two things. Sizes are in card units and get
+   multiplied by the card's scale, so the hero reads at ~2x these numbers. */
+.opener-page{position:absolute;inset:0;padding:0 7%;display:grid;align-content:center;
+  opacity:clamp(0, calc((.30 - var(--p)) / .22), 1);
+  /* The card morphs shape, so its X and Y scales differ and anything inside it
+     would be stretched. Undo exactly that ratio here and the type stays true. */
+  transform:scaleX(calc(var(--sy,1) / var(--sx,1)));transform-origin:left center}
+.opener-page h1{font-size:23px;line-height:.98;letter-spacing:-.045em;margin:0 0 .34em;
+  font-weight:900}
+.opener-page h1 span{display:block;color:var(--dim)}
+.opener-page p{font-size:5.2px;line-height:1.6;color:#bcd0dc;margin:0 0 1.4em;max-width:34ch}
+.opener-page .btn{font-size:5px;padding:.7em 1.5em;justify-self:start}
+/* the card's own face, arriving as the page leaves */
+.ring-card__face{position:absolute;inset:0;
+  opacity:clamp(0, calc((var(--p) - .20) / .22), 1)}
+/* every card except the hero is only ever a face, so it must not fade */
+.ring-card:not(:first-child) .ring-card__face{opacity:1}
 
 /* The closing screen. Not a beat: the place the journey puts you down. */
 .end{min-height:100svh;display:grid;place-items:center;background:var(--bg);
@@ -432,26 +442,8 @@ img{display:block;max-width:100%}
   </defs>
 </svg>
 
-<!-- ══ BEAT 1 ══ the opening fold: the hero page becomes a card ═══════════ -->
-<section class="stage" id="open" style="--h:320svh">
-  <div class="pin">
-    <div class="fold-deck" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
-    <div class="opener">
-      <div class="opener-copy">
-        <h1>Софт под ваш<span>процесс</span></h1>
-        <p>Внутренние системы на заказ: склад, взаиморасчёты, парк техники, каталог.
-           Собираем под то, как вы работаете сейчас.</p>
-        <a class="btn btn--ice" href="#/request">Обсудить задачу</a>
-      </div>
-      <div class="opener-shot">
-        <img src="/shots/sklad.jpg" alt="" width="1120" height="780" fetchpriority="high" />
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ══ BEAT 2 ══ the ring ═════════════════════════════════════════════════ -->
-<section class="stage" id="ring" style="--h:380svh">
+<!-- ══ BEAT 1 ══ the page that becomes the deck ═════════════════════════ -->
+<section class="stage" id="open" style="--h:300svh">
   <div class="pin">
     <div class="marquee" aria-hidden="true">
       <span>Автоматизируем бизнес-процессы. Быстро не значит плохо.</span>
@@ -462,9 +454,17 @@ img{display:block;max-width:100%}
     <div class="ring-scene">
       <div class="ring">
         <div class="ring-card" style="--i:0">
-          <img src="/shots/park.jpg" alt="" width="1120" height="780" fetchpriority="high" />
-          <svg class="star" width="88" height="88" viewBox="0 0 100 100" fill="#fff" aria-hidden="true"><use href="#s4"/></svg>
-          <span class="ring-card__label">Аренда спецтехники</span>
+          <div class="ring-card__face">
+            <img src="/shots/park.jpg" alt="" width="1120" height="780" fetchpriority="high" />
+            <svg class="star" width="88" height="88" viewBox="0 0 100 100" fill="#fff" aria-hidden="true"><use href="#s4"/></svg>
+            <span class="ring-card__label">Аренда спецтехники</span>
+          </div>
+          <div class="opener-page">
+            <h1>Софт под ваш<span>процесс</span></h1>
+            <p>Внутренние системы на заказ: склад, взаиморасчёты, парк техники, каталог.
+               Собираем под то, как вы работаете сейчас.</p>
+            <a class="btn btn--ice" href="#/request">Обсудить задачу</a>
+          </div>
         </div>
         <div class="ring-card" style="--i:1">
           <img src="/shots/zapchasti.jpg" alt="" width="1120" height="780" />
@@ -490,7 +490,7 @@ img{display:block;max-width:100%}
 </section>
 
 <!-- ══ BEAT 2 ══ the star swallows the page ═══════════════════════════════ -->
-<section class="stage" id="swallow" style="--h:240svh">
+<section class="stage" id="swallow" style="--h:170svh">
   <div class="pin">
     <div class="swallow-cut swallow-cut--rim"></div>
     <div class="swallow-cut swallow-cut--fill"><div class="swallow-glow"></div></div>
@@ -500,7 +500,7 @@ img{display:block;max-width:100%}
 </section>
 
 <!-- ══ BEAT 3 ══ the particle sphere ══════════════════════════════════════ -->
-<section class="stage" id="sphere" style="--h:400svh">
+<section class="stage" id="sphere" style="--h:240svh">
   <div class="pin">
     <canvas id="pts"></canvas>
     <div class="split">
@@ -513,7 +513,7 @@ img{display:block;max-width:100%}
 </section>
 
 <!-- ══ BEAT 4 ══ the rail ═════════════════════════════════════════════════ -->
-<section class="stage" id="rail" style="--h:360svh">
+<section class="stage" id="rail" style="--h:230svh">
   <div class="pin">
     <div class="rail">
       <figure><img src="/shots/park.jpg" alt="" width="1120" height="780" />
@@ -529,12 +529,12 @@ img{display:block;max-width:100%}
 </section>
 
 <!-- ══ BEAT 5 ══ the field ════════════════════════════════════════════════ -->
-<section class="stage" id="field" style="--h:420svh">
+<section class="stage" id="field" style="--h:220svh">
   <div class="pin"><div class="field" id="fieldWrap"></div></div>
 </section>
 
 <!-- ══ BEAT 6 ══ a card becomes the section, then is flown through ════════ -->
-<section class="stage" id="grow" style="--h:330svh">
+<section class="stage" id="grow" style="--h:210svh">
   <div class="pin">
     <div class="grow-card">
       <svg class="chrome" viewBox="0 0 100 100" fill="url(#chromeGrad)" aria-hidden="true"><use href="#s4"/></svg>
@@ -550,7 +550,7 @@ img{display:block;max-width:100%}
 </section>
 
 <!-- ══ BEAT 7 ══ the answer panel ═════════════════════════════════════════ -->
-<section class="stage" id="answer" style="--h:270svh">
+<section class="stage" id="answer" style="--h:170svh">
   <div class="pin">
     <div class="panel"><h2>Системы, которые<span>считают за вас</span></h2></div>
     <div class="panel-flare"></div>
@@ -597,6 +597,24 @@ const easeInOut = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
 const easeOut = t => 1 - Math.pow(1 - t, 3)
 
 const stages = [...document.querySelectorAll('.stage')]
+
+/* Beat 1's scale factors are MEASURED, not hardcoded. An earlier pass wrote
+   2.88/2.08 for an 864px viewport and the card sat inset at every other size,
+   because .ring is min(26vw,300px) and its natural size moves with the
+   viewport. Read at rest and on resize, never per frame - measuring an element
+   while it is scaled would feed its own output back in. */
+const ringEl = document.querySelector('.ring')
+const RING = { x: 1, y: 1 }
+function measureRing() {
+  if (!ringEl) return
+  const prev = ringEl.style.transform
+  ringEl.style.transform = 'none'
+  const r = ringEl.getBoundingClientRect()
+  ringEl.style.transform = prev
+  if (r.width && r.height) { RING.x = innerWidth / r.width; RING.y = innerHeight / r.height }
+}
+measureRing()
+addEventListener('resize', measureRing)
 const hud = document.getElementById('hud')
 const smoothed = new WeakMap()
 let awake = 0
@@ -623,6 +641,32 @@ function frame(force) {
     s.style.setProperty('--p', now.toFixed(4))
     s.style.setProperty('--e', easeInOut(now).toFixed(4))
     s.style.setProperty('--o', easeOut(now).toFixed(4))
+
+    /* BEAT 1 IS THE ONE SPECIAL CASE, and it earns it. Four gestures overlap
+       here on four different windows: the zoom out of full bleed, the swing
+       that goes out and comes back, the deck spreading open, and the turn.
+       Written here rather than as four layers of nested clamp() in the CSS,
+       because the swing is a sine and the windows all differ - a named special
+       case with a comment beats CSS gymnastics nobody can read at 3am. */
+    if (s.id === 'open') {
+      const f = clamp(now / 0.42, 0, 1)          // the fold: page becomes card
+      /* 16:9 page at the start, 3:4 card at the end. The base card is 300x400,
+         so filling the viewport needs a wider X scale than Y, and that DIFFERENCE
+         is the shape morph: the page really does change proportion as it folds,
+         it does not just shrink. */
+      const fe = easeInOut(f)
+      s.style.setProperty('--sx', (RING.x - fe * (RING.x - 1)).toFixed(3))
+      s.style.setProperty('--sy', (RING.y - fe * (RING.y - 1)).toFixed(3))
+      /* out to -44deg and back to 0: a card being dealt, not a poster spinning */
+      s.style.setProperty('--swing', (Math.sin(f * Math.PI) * -44).toFixed(2) + 'deg')
+      /* the deck opening IS the spread. Starts after the fold has begun. */
+      s.style.setProperty('--spread', easeOut(clamp((now - 0.12) / 0.30, 0, 1)).toFixed(4))
+      /* and only then does it turn. Finishes at .88 so the card is still for
+         the handoff. 95deg, not the 135 of the first pass - the reference turns
+         about two cards' worth, not three. */
+      s.style.setProperty('--turn',
+        (easeInOut(clamp((now - 0.46) / 0.42, 0, 1)) * -95).toFixed(2) + 'deg')
+    }
   }
 
   const doc = document.documentElement
@@ -723,6 +767,20 @@ if (q.get('solo')) {
     pin.style.position = 'relative'
     for (const [k, fn] of [['--p', v => v], ['--e', easeInOut], ['--o', easeOut]]) {
       s.style.setProperty(k, fn(P_AT).toFixed(4))
+    }
+    if (s.id === 'open') {
+      const f = clamp(P_AT / 0.42, 0, 1)
+      /* 16:9 page at the start, 3:4 card at the end. The base card is 300x400,
+         so filling the viewport needs a wider X scale than Y, and that DIFFERENCE
+         is the shape morph: the page really does change proportion as it folds,
+         it does not just shrink. */
+      const fe = easeInOut(f)
+      s.style.setProperty('--sx', (RING.x - fe * (RING.x - 1)).toFixed(3))
+      s.style.setProperty('--sy', (RING.y - fe * (RING.y - 1)).toFixed(3))
+      s.style.setProperty('--swing', (Math.sin(f * Math.PI) * -44).toFixed(2) + 'deg')
+      s.style.setProperty('--spread', easeOut(clamp((P_AT - 0.12) / 0.30, 0, 1)).toFixed(4))
+      s.style.setProperty('--turn',
+        (easeInOut(clamp((P_AT - 0.46) / 0.42, 0, 1)) * -95).toFixed(2) + 'deg')
     }
     hud.textContent = q.get('solo') + ' ' + P_AT.toFixed(2)
     /* frame() would immediately overwrite those three props from the real
