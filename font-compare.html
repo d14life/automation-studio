@@ -1,0 +1,145 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Hero 101 — three faces</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  /* Same three faces the real hero can use. Both new ones are Latin-only, so they are
+     declared with a unicode-range that stops at Latin+digits -- Cyrillic can never fall
+     into them by accident, it stays on Golos. */
+  @font-face{font-family:Golos;font-weight:400 900;font-display:swap;
+    src:url(/app/public/fonts/golos-latin.woff2) format('woff2')}
+  @font-face{font-family:Nunito;font-weight:700 900;font-display:swap;
+    src:url(/app/public/fonts/nunito-latin.woff2) format('woff2')}
+  @font-face{font-family:Bosieh;font-weight:400;font-display:swap;
+    src:url(/app/public/fonts/bosieh.woff2) format('woff2');
+    unicode-range:U+0000-00FF,U+2000-206F}
+  @font-face{font-family:KabisatTall;font-style:italic;font-weight:400;font-display:swap;
+    src:url(/app/public/fonts/kabisat-tall-italic.woff2) format('woff2');
+    unicode-range:U+0000-00FF,U+2000-206F}
+
+  * { box-sizing:border-box; margin:0 }
+  body { background:#05080c; color:#dff6ff; font:14px/1.5 Golos,ui-sans-serif,system-ui,sans-serif;
+         padding:26px 22px 80px }
+  h1 { font-size:14px; letter-spacing:.18em; text-transform:uppercase; color:#7fd8ff }
+  .sub { color:#7e93a3; font-size:12.5px; margin-top:6px; max-width:820px }
+  .warn { margin-top:14px; background:#1a1410; border:1px solid #4a3520; border-radius:9px;
+          padding:12px 14px; font-size:12.5px; color:#e8b17f; max-width:820px }
+  .warn b { color:#ffd8ac }
+
+  .row { margin-top:26px; border-top:1px solid #16222c; padding-top:16px }
+  .tag { font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#7e93a3 }
+  .tag b { color:#7fd8ff; letter-spacing:.06em }
+
+  /* lifted verbatim from app/src/site.css .hero101 so the comparison is like-for-like */
+  .stage { position:relative; margin-top:8px; padding:14px 0 18px; overflow:visible;
+           border-radius:14px; background:radial-gradient(80% 120% at 50% 40%,#0b1620,#05080c 72%) }
+  .stage::before{ content:''; position:absolute; left:50%; top:50%; width:70%; height:150%;
+    transform:translate(-50%,-50%); pointer-events:none;
+    background:radial-gradient(46% 40% at 50% 50%,rgba(127,216,255,.22),transparent 70%),
+               radial-gradient(30% 26% at 66% 60%,rgba(92,130,201,.20),transparent 70%) }
+  .n101 { position:relative; z-index:4; text-align:center; color:transparent; letter-spacing:-.05em;
+          font-size:clamp(64px,7.4vw,118px); line-height:.92; font-weight:900;
+          -webkit-text-stroke:2.5px rgba(223,246,255,.42);
+          filter:drop-shadow(0 0 34px rgba(127,216,255,.26)) }
+  .n101.fill { color:rgba(223,246,255,.92); -webkit-text-stroke-width:0 }
+
+  .f-nunito  { font-family:Nunito,sans-serif }
+  .f-bosieh  { font-family:Bosieh,sans-serif; font-weight:400; letter-spacing:0 }
+  .f-kabisat { font-family:KabisatTall,sans-serif; font-weight:400; font-style:italic; letter-spacing:0 }
+
+  .marks { display:flex; gap:34px; flex-wrap:wrap; align-items:baseline; margin-top:14px }
+  .mark { font-size:38px; color:#dff6ff }
+  .glyphs { margin-top:10px; color:#93a8b6; font-size:26px; word-break:break-all }
+  .cols { display:grid; gap:18px; grid-template-columns:repeat(3,1fr); margin-top:12px }
+  .col .pair { display:grid; gap:9px; grid-template-columns:1fr 1fr }
+  .mark { font-size:26px; color:#dff6ff; margin-top:11px; white-space:nowrap;
+          overflow:hidden; text-overflow:ellipsis }
+  .glyphs { margin-top:6px; color:#93a8b6; font-size:15px; line-height:1.35 }
+  .note { margin-top:20px; border-top:1px solid #16222c; padding-top:12px }
+</style>
+
+<h1>Hero “101” — three faces</h1>
+<div class="sub">Left of each pair is the outline the hero ships today, right is the same face filled.
+Real stroke and bloom from <code>app/src/site.css</code>. Say <b>1</b> or <b>2</b> and I wire it into
+<code>app/v2.html</code> + <code>index.html</code>; say <b>keep</b> and nothing changes.</div>
+
+<div class="cols">
+  <div class="col">
+    <div class="tag">now · <b>Nunito 900</b></div>
+    <div class="pair"><div class="stage"><div class="n101 f-nunito">101</div></div>
+                      <div class="stage"><div class="n101 fill f-nunito">101</div></div></div>
+    <div class="mark f-nunito">Solutions101</div>
+    <div class="glyphs f-nunito">ABCDEFGHIJKLM<br>abcdefghijklm 0123456789</div>
+  </div>
+  <div class="col">
+    <div class="tag">option 1 · <b>Bosieh</b> · 11.7 KB</div>
+    <div class="pair"><div class="stage"><div class="n101 f-bosieh">101</div></div>
+                      <div class="stage"><div class="n101 fill f-bosieh">101</div></div></div>
+    <div class="mark f-bosieh">Solutions101</div>
+    <div class="glyphs f-bosieh">ABCDEFGHIJKLM<br>abcdefghijklm 0123456789</div>
+  </div>
+  <div class="col">
+    <div class="tag">option 2 · <b>Kabisat Tall Italic</b> · <b style="color:#ff9d7a">no digits</b></div>
+    <div class="pair"><div class="stage"><div class="n101 f-kabisat">101</div></div>
+                      <div class="stage"><div class="n101 fill f-kabisat">101</div></div></div>
+    <div style="color:#ff9d7a;font-size:12px;margin-top:7px">Both boxes above are empty, and that is the
+      font, not the page. Kabisat maps 0-9 in its cmap and gives each an advance of 2200 units, but every
+      digit glyph has <b>zero contours</b> — the demo cut ships the numerals blank. It can never draw the
+      101. Letters only.</div>
+    <div class="mark f-kabisat">Solutions101</div>
+    <div class="glyphs f-kabisat">ABCDEFGHIJKLM<br>abcdefghijklm 0123456789</div>
+  </div>
+</div>
+
+<div class="note">
+  <div class="tag">the Russian copy is untouched either way · <b>Golos</b></div>
+  <div style="font-size:24px;margin-top:8px">АВТОМАТИЗИРУЕМ БИЗНЕС-ПРОЦЕССЫ</div>
+</div>
+
+<div class="warn">
+  <b>Two things before you pick.</b><br>
+  <b>1 · Neither font has one Cyrillic glyph.</b> Bosieh 95 glyphs, Kabisat 151 — Latin and digits only,
+  nothing in U+0400–U+04FF. They can only ever touch the <b>101</b>, Latin words and numerals; every Russian
+  line stays on Golos. I gave both a Latin-only <code>unicode-range</code> so Cyrillic can never silently
+  fall into them.<br>
+  <b>3 · Kabisat cannot render the 101 at all</b> — checked with fontTools, its ten digit glyphs are empty
+  outlines. It is only ever an option for Latin <i>words</i>, e.g. an accent line, never a numeral.<br>
+  <b>2 · Bosieh ships under 1001Fonts “Free For Personal Use”.</b> The EULA in the zip names
+  “websites for companies” as commercial and requires written permission from the author. Solutions101 is
+  commercial. Kabisat is a “Demo” cut, normally the same restriction. Converting to woff2 is explicitly
+  allowed, so the files are fine — the usage is the open question, and it is your call.
+</div>
+
+<script type="module">
+// These three faces have wildly different glyph widths per em -- Bosieh's "101" is half
+// Nunito's and Kabisat's is nearly double -- so a shared font-size compares nothing and
+// clips Kabisat out of its box entirely. Measure each face and solve for the size that
+// puts every sample at the same drawn width, which is what the eye is actually judging.
+await document.fonts.ready;
+const ctx = document.createElement('canvas').getContext('2d');
+const ink = (family, style, text, px) => {
+  ctx.font = `${style} ${px}px ${family}`;
+  const m = ctx.measureText(text);
+  // advance width is a lie for a display face: Kabisat's digits carry ink far outside their
+  // advance and above the em box, which is why sizing on measureText().width drew them
+  // straight through the top of the card. actualBoundingBox* is the drawn ink.
+  return { w: m.actualBoundingBoxLeft + m.actualBoundingBoxRight,
+           h: m.actualBoundingBoxAscent + m.actualBoundingBoxDescent };
+};
+const sizeFor = (family, style, text, targetPx) => {
+  const i = ink(family, style, text, 200);
+  return i.w > 1 ? 200 * targetPx / i.w : 200;
+};
+for (const [cls, fam, style] of FACES) {
+  const px = sizeFor(fam, style, '101', 210);
+  const i = ink(fam, style, '101', px);
+  document.querySelectorAll('.n101.' + cls).forEach(el => {
+    el.style.fontSize = px + 'px';
+    el.style.lineHeight = Math.ceil(i.h * 1.06) + 'px';   // a tall face needs a tall line box
+  });
+  document.querySelectorAll('.mark.' + cls).forEach(el =>
+    el.style.fontSize = sizeFor(fam, style, 'Solutions101', 300) + 'px');
+  document.querySelectorAll('.glyphs.' + cls).forEach(el =>
+    el.style.fontSize = sizeFor(fam, style, 'ABCDEFGHIJKLM', 250) + 'px');
+}
+</script>
