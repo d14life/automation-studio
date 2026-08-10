@@ -64,9 +64,26 @@ pair. This is real, ongoing cost and it was chosen deliberately.
 - All copy is Russian only.
 - "Автоматизируем бизнес-процессы" describes maybe a third of the actual range
   (CRM, custom systems, 3D rendering, sites, API integration, accounting).
-- "Изменим ДНК вашего бизнеса" is the category cliché the research found
-  everywhere, and it fights the one genuinely good line already on the site:
-  «только практика, ноль теории».
+
+## The line, corrected by Damir 2026-08-10
+
+It is **«Изменим ИНСТРУМЕНТЫ вашего бизнеса»** — instruments, not DNA. I had
+this wrong and wrote DNA into an earlier draft. His words: "mine is change
+business instruments, important, this is what we do."
+
+That is a much better line than the DNA cliché and it is literally accurate:
+he does not change what the business IS, he changes what it works WITH. A
+warehouse terminal, a CRM, a reconciliation screen, a 3D configurator - those
+are instruments. It also survives translation, which the DNA line does not:
+**"We change the instruments your business works with."**
+
+It sits directly under the showroom: a showroom is where you come to see the
+instruments, pick one up, and try it.
+
+**«Только практика, ноль теории» is retired.** Damir does not like it and is
+right that it does not hold up - it is a boast about method, not a promise
+about outcome, and "zero theory" is not something a buyer wants to hear about
+software that has to work.
 
 ## Rejected, and why
 
