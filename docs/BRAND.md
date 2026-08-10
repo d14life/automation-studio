@@ -65,25 +65,39 @@ pair. This is real, ongoing cost and it was chosen deliberately.
 - "Автоматизируем бизнес-процессы" describes maybe a third of the actual range
   (CRM, custom systems, 3D rendering, sites, API integration, accounting).
 
-## The line, corrected by Damir 2026-08-10
+## The line — settled by Damir 2026-08-10, third and final version
 
-It is **«Изменим ИНСТРУМЕНТЫ вашего бизнеса»** — instruments, not DNA. I had
-this wrong and wrote DNA into an earlier draft. His words: "mine is change
-business instruments, important, this is what we do."
+**«Изменим ДНК ваших инструментов»**
+**"We change the DNA of your instruments."**
 
-That is a much better line than the DNA cliché and it is literally accurate:
-he does not change what the business IS, he changes what it works WITH. A
-warehouse terminal, a CRM, a reconciliation screen, a 3D configurator - those
-are instruments. It also survives translation, which the DNA line does not:
-**"We change the instruments your business works with."**
+It arrived in three steps and the last one is the good one:
+
+1. *«Изменим ДНК вашего бизнеса»* — rejected. Every consultancy on earth claims
+   to change a business's DNA, and this studio does not reorganise companies.
+2. *«Изменим ИНСТРУМЕНТЫ вашего бизнеса»* — closer. Literally accurate, and
+   "instruments" is the right noun: a warehouse terminal, a reconciliation
+   screen, a parts catalogue, a 3D configurator. But "change your instruments"
+   is only procurement — it says he swaps one tool for another.
+3. **«Изменим ДНК ваших инструментов»** — Damir's own combination, and it beats
+   both. DNA moves off the business, where it was a cliché and a false claim,
+   and onto the instruments, where it is precise: he does not hand you a
+   different tool, he changes what the tool is made of.
+
+Two things fall out of it, which is why it is worth the extra word:
+
+- It pays off the header. The site already opens on a scroll-scrubbed DNA
+  strand coming apart — locked motion, signed off 2026-08-06. That animation
+  stops being decoration and becomes the argument.
+- It survives translation intact, which the business-DNA version never did.
 
 It sits directly under the showroom: a showroom is where you come to see the
-instruments, pick one up, and try it.
+instruments, pick one up, and find out what they are made of.
 
 **«Только практика, ноль теории» is retired.** Damir does not like it and is
-right that it does not hold up - it is a boast about method, not a promise
-about outcome, and "zero theory" is not something a buyer wants to hear about
+right that it does not hold up — it is a boast about method, not a promise
+about outcome, and "zero theory" is not what a buyer wants to hear about
 software that has to work.
+
 
 ## Rejected, and why
 

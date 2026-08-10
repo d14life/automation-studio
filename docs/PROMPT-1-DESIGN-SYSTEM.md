@@ -18,9 +18,10 @@ and API integrations, Telegram bots and parsers, 3D product graphics, and sites.
 Clients are Russian, the studio is going worldwide, so **every component must
 work in Cyrillic and Latin**.
 
-The line is **«Изменим инструменты вашего бизнеса»** — "we change the
-instruments your business works with". Instruments, not "transformation". The
-studio does not change what a business *is*, it changes what it works *with*.
+The line is **«Изменим ДНК ваших инструментов»** — "we change the DNA of your
+instruments". Not the DNA of the *business*: the studio does not reorganise a
+company, it changes what the company works *with* — and changes what those
+instruments are made of.
 
 **The one thing that makes this brand different:** business software is
 universally ugly, and the studios that can design don't do plumbing. Enterprise
@@ -73,8 +74,8 @@ buttons, form labels, table cells, tooltips, error messages. Currently
 **JetBrains Mono** also self-hosted and available.
 
 Propose 2–3 pairings for the text face against the display face and show each
-one setting «Изменим инструменты вашего бизнеса». A face that renders that
-badly is disqualified however good it looks in English.
+one setting «Изменим ДНК ваших инструментов». A face that renders that badly is
+disqualified however good it looks in English.
 
 **Do not use the display face below about 28px, and never for running text,
 table cells or form fields.** A condensed uppercase face at 14px in a
