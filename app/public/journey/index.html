@@ -128,18 +128,33 @@ img{display:block;max-width:100%}
   animation:heroGlow 1.1s cubic-bezier(.16,1,.3,1) both}
 .ring-scene{position:absolute;inset:0;display:grid;place-items:center;
   perspective:1150px;perspective-origin:50% 47%}
-/* PORTRAIT, and the deck is TIGHT. Both read straight off the high-res frames
-   and both were wrong before. The card the page folds into is ~3:4 upright, not
-   the 16:11 landscape I had inherited from the shape of the screenshots. And
-   the neighbours sit nearly face to face, like a concertina - the radius is
-   barely over one card width, not the 1.6x that gives a wide open cylinder. */
-.ring{position:relative;width:min(26vw,300px);aspect-ratio:3/4;transform-style:preserve-3d;
-  --rad:calc(var(--spread,1) * min(38vw,430px));
+/* THE DECK IS A CLOSED BOOK, NOT A CAROUSEL. This one took three passes to get
+   right and the frames settle it (see f360-371): there is ONE card, front,
+   centre, flat and fully readable, and the other seven are almost entirely
+   BEHIND it - all you see is a thin sliver down each edge.
+
+   That fixes the radius by arithmetic. For a neighbour at 45deg to peek out by
+   about a quarter of a card width, its centre sits at rad*sin45 = 0.71*rad and
+   its projected half-width is 0.35*w, so 0.71*rad + 0.35*w = 0.74*w gives
+   rad = 0.55*w. Barely half a card width. The cards intersect in space and the
+   z-order sorts them out; that IS the look.
+
+   Both earlier guesses were wrong in opposite directions: 1.15x collided into
+   mush, then 1.4x splayed seven cards across the screen like a hand of playing
+   cards. Neither was measured. This one is.
+
+   Portrait 3:4, also off the frames, not the 16:11 landscape inherited from the
+   shape of the screenshots. */
+.ring{position:relative;width:min(27vw,310px);aspect-ratio:3/4;transform-style:preserve-3d;
+  --rad:calc(var(--spread,1) * min(14vw,165px));
   transform:scale(var(--sx,1), var(--sy,1)) rotateZ(var(--swing,0deg))
             translateZ(calc(-1 * var(--rad))) rotateY(var(--turn,0deg))}
 /* The seven behind the hero card are not there until the deck opens. At
    --spread 0 they are stacked in exactly the same place and would z-fight. */
-.ring-card:not(:first-child){opacity:clamp(0, calc((var(--spread,1) - .06) / .3), 1)}
+.ring-card:not(:first-child){opacity:clamp(0, calc((var(--spread,1) - .06) / .3), 1);
+  /* scenery, not subject: the slivers frame the front card, they do not compete
+     with it. Without this the edges read as clutter at every turn angle. */
+  filter:brightness(.55)}
 .ring-card{position:absolute;inset:0;border-radius:var(--r);overflow:hidden;
   background:var(--deep);
   box-shadow:0 40px 80px -30px rgba(0,0,0,.85), inset 0 0 0 1px rgba(223,246,255,.09);
@@ -176,7 +191,7 @@ img{display:block;max-width:100%}
    out across the first 40% of the runway, so the one clickable thing on the
    screen was already ghosted before the deck had finished its first quarter turn. */
 .ring-cta{position:absolute;left:50%;bottom:6vh;translate:-50% 0;z-index:3;
-  opacity:clamp(0, calc((.94 - var(--p)) / .12), 1)}
+  opacity:clamp(0, calc(1 - var(--sw,0) / .18), 1)}
 
 /* =========================================================================
    BEAT 2 — THE STAR SWALLOWS THE PAGE
@@ -204,7 +219,7 @@ img{display:block;max-width:100%}
    mask-size is a repaint, and this is the one place on the page that spends
    one: it is a single element, it is scroll-driven so it can only move as fast
    as the wheel, and there is no transform that reproduces a growing hole. */
-#swallow .pin{background:var(--bg)}
+
 .swallow-cut{position:absolute;inset:0;pointer-events:none;
   --star:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='%23fff' d='M50 0 C54 38 62 46 100 50 C62 54 54 62 50 100 C46 62 38 54 0 50 C38 46 46 38 50 0Z'/%3E%3C/svg%3E");
   /* squared: creeps for the first half of the beat, then rushes. The measured
@@ -218,10 +233,10 @@ img{display:block;max-width:100%}
      corner on this pane is 600px from centre, so the mask has to reach
      600/0.347 = 1729 half, i.e. ~3460px, not the 2840px the first pass grew
      to. Sized past that, and then closed out for real below. */
-  --size:calc(7vmin + var(--e) * var(--e) * 560vmin);
+  --size:calc(7vmin + var(--sw,0) * var(--sw,0) * 560vmin);
   -webkit-mask:var(--star) center / var(--size) var(--size) no-repeat;
   mask:var(--star) center / var(--size) var(--size) no-repeat}
-.swallow-cut--rim{background:var(--ice-2);--size:calc(7.9vmin + var(--e) * var(--e) * 566vmin)}
+.swallow-cut--rim{background:var(--ice-2);--size:calc(7.9vmin + var(--sw,0) * var(--sw,0) * 566vmin)}
 .swallow-cut--fill{background:var(--deep)}
 /* THE GUARANTEE. The arithmetic above is right for this viewport, and a star
    whose corners have not quite closed hands over to the next beat through four
@@ -229,15 +244,15 @@ img{display:block;max-width:100%}
    last 6% of the beat lays a plain full-bleed fill over the top. The mask does
    the show; this makes the handoff true. */
 .swallow-seal{position:absolute;inset:0;pointer-events:none;background:var(--deep);
-  opacity:clamp(0, calc((var(--p) - .94) / .06), 1)}
+  opacity:clamp(0, calc((var(--sw,0) - .90) / .10), 1)}
 /* what you see through the hole: the sphere's first light, already turning up
    before the star is anywhere near covering the screen */
 .swallow-glow{position:absolute;width:80vmin;height:80vmin;border-radius:50%;
   background:radial-gradient(circle, rgba(127,216,255,.30), transparent 62%);
-  opacity:clamp(0, calc((var(--p) - .30) / .35), 1);
-  transform:scale(calc(.4 + var(--o) * 1))}
+  opacity:clamp(0, calc((var(--sw,0) - .30) / .35), 1);
+  transform:scale(calc(.4 + var(--sw,0) * 1))}
 .star-core{width:min(9vmin,78px);height:min(9vmin,78px);
-  transform:scale(calc(1 + var(--e) * 4.5));
+  transform:scale(calc(1 + var(--sw,0) * 4.5));
   filter:drop-shadow(0 0 40px rgba(223,246,255,.9))}
 
 /* =========================================================================
@@ -468,7 +483,7 @@ img{display:block;max-width:100%}
 </svg>
 
 <!-- ══ BEAT 1 ══ the page that becomes the deck ═════════════════════════ -->
-<section class="stage" id="open" style="--h:300svh">
+<section class="stage" id="open" style="--h:420svh">
   <div class="pin">
     <div class="marquee" aria-hidden="true">
       <span>Автоматизируем бизнес-процессы. Быстро не значит плохо.</span>
@@ -512,12 +527,12 @@ img{display:block;max-width:100%}
     </div>
 
     <a class="btn btn--ice ring-cta" href="#/works">Смотреть решения</a>
-  </div>
-</section>
 
-<!-- ══ BEAT 2 ══ the star swallows the page ═══════════════════════════════ -->
-<section class="stage" id="swallow" style="--h:170svh">
-  <div class="pin">
+    <!-- THE STAR COMES OUT OF THE FRONT CARD. Not a section you scroll into:
+         in the reference (f456-479) the deck is still on screen, the page is
+         still light, and the cards are still visible at the edges while the
+         star grows out of the card and swallows everything. Same pin, same
+         beat, driven by --sw over the last quarter of it. -->
     <div class="swallow-cut swallow-cut--rim"></div>
     <div class="swallow-cut swallow-cut--fill"><div class="swallow-glow"></div></div>
     <div class="swallow-seal"></div>
@@ -622,6 +637,23 @@ const clamp = (v, a, b) => v < a ? a : v > b ? b : v
 const easeInOut = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
 const easeOut = t => 1 - Math.pow(1 - t, 3)
 
+/* THE DECK DWELLS. In the reference the front card sits face-on for many frames
+   and then flicks to the next (f360-370 hold, f371 moves). A single continuous
+   sweep - which is what this had - spends most of its time at the in-between
+   angles where two cards are equally edge-on and the whole thing reads as a
+   jumble. That was the difference, not the geometry.
+
+   So the turn is stepped: N slots of 45deg, and inside each slot the card
+   rests for the first and last quarter and travels through the middle half.
+   You get time to actually read each card, which is the entire point of a deck
+   of products. */
+function steppedTurn(t, slots) {
+  const idx = t * slots
+  const k = Math.floor(Math.min(idx, slots - 0.0001))
+  const frac = clamp((idx - k - 0.25) / 0.5, 0, 1)
+  return (k + easeInOut(frac)) * -45
+}
+
 const stages = [...document.querySelectorAll('.stage')]
 
 /* Beat 1's scale factors are MEASURED, not hardcoded. An earlier pass wrote
@@ -697,7 +729,9 @@ function frame(force) {
          the handoff. 95deg, not the 135 of the first pass - the reference turns
          about two cards' worth, not three. */
       s.style.setProperty('--turn',
-        (easeInOut(clamp((now - 0.62) / 0.30, 0, 1)) * -95).toFixed(2) + 'deg')
+        steppedTurn(clamp((now - 0.44) / 0.28, 0, 1), 2).toFixed(2) + 'deg')
+      /* and the star grows out of the front card once the deck has parked */
+      s.style.setProperty('--sw', clamp((now - 0.76) / 0.24, 0, 1).toFixed(4))
     }
   }
 
@@ -813,7 +847,9 @@ if (q.get('solo')) {
       s.style.setProperty('--swing', (Math.sin(f * Math.PI) * -34).toFixed(2) + 'deg')
       s.style.setProperty('--spread', easeOut(clamp((P_AT - 0.40) / 0.22, 0, 1)).toFixed(4))
       s.style.setProperty('--turn',
-        (easeInOut(clamp((P_AT - 0.62) / 0.30, 0, 1)) * -95).toFixed(2) + 'deg')
+        steppedTurn(clamp((P_AT - 0.44) / 0.28, 0, 1), 2).toFixed(2) + 'deg')
+      /* and the star grows out of the front card once the deck has parked */
+      s.style.setProperty('--sw', clamp((P_AT - 0.76) / 0.24, 0, 1).toFixed(4))
     }
     hud.textContent = q.get('solo') + ' ' + P_AT.toFixed(2)
     /* frame() would immediately overwrite those three props from the real
