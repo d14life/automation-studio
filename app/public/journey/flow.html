@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Solutions101 — showroom</title>
+<meta name="robots" content="noindex" />
+<link rel="preload" href="/fonts/nunito-cyrillic.woff2" as="font" type="font/woff2" crossorigin />
+<style>
+@font-face{font-family:Nunito;font-style:normal;font-weight:300 900;font-display:swap;
+  src:url(/fonts/nunito-cyrillic.woff2) format('woff2');
+  unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:Nunito;font-style:normal;font-weight:300 900;font-display:swap;
+  src:url(/fonts/nunito-latin.woff2) format('woff2')}
+
+/* Palette lifted from v2.css / heroTuning.ts, not invented. No violet on this
+   site. One accent, one radius, one theme. */
+:root{
+  --bg:#0b1720; --deep:#070f16; --ink:#F2F7F5; --dim:#8fa6b4;
+  --ice-1:#DFF6FF; --ice-2:#7FD8FF; --ice-3:#5C82C9;
+  --r:20px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:Nunito,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+html{scrollbar-width:none}
+html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none}
+img{display:block;max-width:100%}
+
+/* ScrollSmoother's required structure. Anything position:fixed must live
+   OUTSIDE #smooth-wrapper - inside it, the wrapper's transform becomes the
+   containing block and fixed elements scroll away with the content. */
+#smooth-wrapper{overflow:hidden}
+
+.s{position:relative}
+.wrap{width:min(1240px,92vw);margin-inline:auto}
+.eyebrow{font:800 12px/1 Nunito;letter-spacing:.18em;text-transform:uppercase;color:var(--ice-2)}
+.lead{color:var(--dim);font-size:clamp(15px,1.5vw,19px);line-height:1.6;max-width:52ch}
+
+.btn{display:inline-flex;align-items:center;gap:.6em;border-radius:999px;
+  padding:.85em 1.5em;font:800 15px/1 Nunito;text-decoration:none;
+  background:var(--ice-2);color:var(--deep);border:0;cursor:pointer;
+  transition:transform .18s ease}
+.btn:active{transform:translateY(1px) scale(.985)}
+.btn.ghost{background:transparent;color:var(--ice-1);box-shadow:inset 0 0 0 1.5px rgba(127,216,255,.42)}
+
+/* --- 1. HERO -------------------------------------------------------------
+   Pinned, and only the CHILDREN animate (official rule: never animate the
+   pinned element itself). data-speed is ScrollSmoother's parallax - it is
+   applied by the smoother, not by a ScrollTrigger, so it costs nothing extra. */
+#hero{min-height:100lvh;display:grid;place-items:center;overflow:hidden}
+#hero .glow{position:absolute;inset:-30% -10% auto;height:90vmax;pointer-events:none;
+  background:radial-gradient(closest-side,rgba(127,216,255,.16),transparent 70%)}
+.h1{font:900 clamp(44px,9.4vw,148px)/.92 Nunito;letter-spacing:-.035em;margin:0;
+  text-wrap:balance}
+.h1 .dim{color:var(--ice-3)}
+/* SplitText mask:"lines" wraps every line in overflow:clip, so the line can
+   slide up from behind its own edge. This is the reveal, not a fade. */
+.h1 .line{will-change:transform}
+#hero .sub{margin-top:2.2rem;display:flex;gap:.8rem;flex-wrap:wrap;align-items:center}
+
+/* --- 2. MARQUEE ----------------------------------------------------------
+   Two identical rows translated -50% give a seamless loop; scroll velocity
+   skews and speeds it, which is what makes a ticker feel attached to the page
+   instead of decorative. */
+#marquee{padding:9rem 0;overflow:hidden;border-block:1px solid rgba(127,216,255,.14)}
+.mq{display:flex;width:max-content;will-change:transform}
+.mq span{font:900 clamp(38px,7.4vw,104px)/1 Nunito;letter-spacing:-.03em;
+  padding-inline:.4em;white-space:nowrap;color:transparent;
+  -webkit-text-stroke:1.5px rgba(223,246,255,.5)}
+.mq span:nth-child(2n){color:var(--ice-1);-webkit-text-stroke:0}
+
+/* --- 3. HORIZONTAL TRACK -------------------------------------------------
+   The landonorris.com move: a tall section is pinned, and vertical wheel
+   distance is spent translating a horizontal lane. Nested reveals inside it
+   must use containerAnimation, which cannot pin or snap - that is a hard
+   limit of the technique, not a shortcut. */
+#track{background:var(--deep)}
+.track-vp{height:100lvh;display:flex;align-items:center;overflow:hidden}
+.lanes{display:flex;gap:clamp(20px,3.2vw,52px);padding-inline:6vw;will-change:transform}
+.lane{position:relative;flex:0 0 clamp(280px,42vw,620px);border-radius:var(--r);
+  overflow:hidden;background:#0d1c27;box-shadow:inset 0 0 0 1px rgba(127,216,255,.16)}
+.lane img{aspect-ratio:16/10;object-fit:cover;object-position:top left;width:100%}
+.lane-meta{padding:1.5rem 1.6rem 1.8rem}
+.lane-meta h3{margin:.5rem 0 .45rem;font:800 clamp(19px,2vw,28px)/1.15 Nunito}
+.lane-meta p{margin:0;color:var(--dim);font-size:15px;line-height:1.55}
+.track-head{position:absolute;top:clamp(24px,7vh,72px);left:6vw;z-index:2}
+.track-head h2{margin:.4rem 0 0;font:900 clamp(28px,4.4vw,64px)/1 Nunito;letter-spacing:-.03em}
+
+/* --- 4. THE APERTURE -----------------------------------------------------
+   A circular window scaled from nothing to bigger than the viewport. Pure
+   transform on two elements - the mask scales up, the content counter-scales
+   by 1/s so the type inside never stretches. Animating clip-path instead
+   would repaint the whole viewport every frame. */
+#aperture{height:320lvh}
+.ap-pin{position:relative;height:100lvh;overflow:hidden;display:grid;place-items:center;
+  background:var(--bg)}
+.ap-from{position:absolute;inset:0;display:grid;place-items:center;padding:0 6vw;text-align:center}
+.ap-from h2{margin:0;font:900 clamp(30px,5.6vw,84px)/1 Nunito;letter-spacing:-.03em}
+.ap-mask{position:absolute;width:120vmax;height:120vmax;border-radius:50%;
+  overflow:hidden;background:var(--ice-1);display:grid;place-items:center;
+  transform:scale(0);will-change:transform}
+.ap-to{display:grid;place-items:center;text-align:center;padding:0 6vw;
+  width:100vw;height:100lvh;will-change:transform}
+.ap-to h2{margin:0;font:900 clamp(30px,5.6vw,84px)/1 Nunito;letter-spacing:-.035em;
+  color:var(--deep)}
+.ap-to p{color:#33505f;max-width:46ch;margin:1.1rem auto 0;line-height:1.6}
+
+/* --- 5. STACK ------------------------------------------------------------
+   Cards pinned at the same spot; each next one rises over the last while the
+   one beneath sinks and dims. Scale + translate only. */
+#stack{background:var(--deep);padding-bottom:6rem}
+.stack-head{padding:8rem 0 2rem}
+.stack-head h2{margin:.5rem 0 0;font:900 clamp(28px,4.6vw,66px)/1 Nunito;letter-spacing:-.03em}
+.cards{position:relative}
+.card{position:sticky;top:calc(50lvh - 200px);height:400px;border-radius:var(--r);
+  display:grid;grid-template-columns:1.1fr .9fr;overflow:hidden;
+  background:#0e202d;box-shadow:inset 0 0 0 1px rgba(127,216,255,.18);
+  margin-bottom:2.4rem;will-change:transform}
+.card-txt{padding:2.2rem;display:flex;flex-direction:column;justify-content:center}
+.card-txt h3{margin:.6rem 0 .5rem;font:800 clamp(20px,2.4vw,34px)/1.1 Nunito}
+.card-txt p{margin:0;color:var(--dim);line-height:1.6}
+.card figure{margin:0;overflow:hidden}
+.card img{width:100%;height:100%;object-fit:cover;object-position:top left}
+
+/* --- 6. CTA -------------------------------------------------------------- */
+#cta{min-height:100lvh;display:grid;place-items:center;text-align:center;padding:6rem 0}
+#cta h2{margin:0;font:900 clamp(32px,6.4vw,96px)/.98 Nunito;letter-spacing:-.035em}
+#cta .lead{margin:1.4rem auto 2.2rem}
+#cta .row{display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap}
+
+/* Progress rail. OUTSIDE the smooth wrapper, because fixed elements inside a
+   transformed ancestor are not fixed at all. */
+#rail{position:fixed;left:0;top:0;height:2px;width:100%;z-index:20;
+  transform-origin:0 50%;transform:scaleX(0);background:var(--ice-2)}
+
+@media (max-width:860px){
+  .card{grid-template-columns:1fr;height:auto;top:auto;position:relative}
+  .card figure{height:220px}
+}
+@media (prefers-reduced-motion:reduce){
+  .h1 .line,.mq,.ap-mask,.ap-to,.lanes{transform:none!important}
+  .ap-mask{transform:scale(1)!important}
+}
+</style>
+</head>
+<body>
+
+<div id="rail"></div>
+
+<div id="smooth-wrapper"><div id="smooth-content">
+
+  <!-- 1 ------------------------------------------------------------------ -->
+  <section class="s" id="hero">
+    <div class="glow" data-speed="0.8"></div>
+    <div class="wrap">
+      <p class="eyebrow" data-speed="1.05">Solutions101 · шоурум</p>
+      <h1 class="h1">Изменим <span class="dim">инструменты</span><br>вашего бизнеса</h1>
+      <div class="sub" data-speed="1.12">
+        <a class="btn" href="#cta">Обсудить задачу</a>
+        <a class="btn ghost" href="#track">Смотреть решения</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 ------------------------------------------------------------------ -->
+  <section class="s" id="marquee">
+    <div class="mq">
+      <span>Склад</span><span>Взаиморасчёты</span><span>Парк техники</span><span>Каталог</span><span>3D</span><span>Интеграции</span>
+      <span>Склад</span><span>Взаиморасчёты</span><span>Парк техники</span><span>Каталог</span><span>3D</span><span>Интеграции</span>
+    </div>
+  </section>
+
+  <!-- 3 ------------------------------------------------------------------ -->
+  <section class="s" id="track">
+    <div class="track-vp">
+      <div class="track-head">
+        <p class="eyebrow">Что стоит в зале</p>
+        <h2>Софт под ваш процесс</h2>
+      </div>
+      <div class="lanes">
+        <article class="lane">
+          <img src="/shots/sklad.jpg" alt="Складской терминал" width="1600" height="1000">
+          <div class="lane-meta"><p class="eyebrow">01 · Склад</p>
+            <h3>Складской терминал</h3>
+            <p>FEFO, приёмка, размещение, слепой пересчёт.</p></div>
+        </article>
+        <article class="lane">
+          <img src="/shots/vzaimoraschety-v2.jpg" alt="Взаиморасчёты" width="1600" height="1000">
+          <div class="lane-meta"><p class="eyebrow">02 · Финансы</p>
+            <h3>Взаиморасчёты</h3>
+            <p>Свёрнутое сальдо, акт сверки одной кнопкой.</p></div>
+        </article>
+        <article class="lane">
+          <img src="/shots/park.jpg" alt="Парк техники" width="1600" height="1000">
+          <div class="lane-meta"><p class="eyebrow">03 · Парк</p>
+            <h3>Аренда спецтехники</h3>
+            <p>Календарь занятости, наработка по сменам, окупаемость.</p></div>
+        </article>
+        <article class="lane">
+          <img src="/shots/zapchasti.jpg" alt="Каталог автозапчастей" width="1600" height="1000">
+          <div class="lane-meta"><p class="eyebrow">04 · Каталог</p>
+            <h3>Магазин автозапчастей</h3>
+            <p>Подбор по VIN, каталог на 40 000 позиций.</p></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 ------------------------------------------------------------------ -->
+  <section class="s" id="aperture">
+    <div class="ap-pin">
+      <div class="ap-from"><h2>Быстро&nbsp;— не значит плохо</h2></div>
+      <div class="ap-mask">
+        <div class="ap-to">
+          <div>
+            <h2>Первый контур&nbsp;— за недели</h2>
+            <p>Мы не пишем систему год. Вы пользуетесь рабочим контуром,
+               пока мы достраиваем остальное.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 ------------------------------------------------------------------ -->
+  <section class="s" id="stack">
+    <div class="wrap">
+      <div class="stack-head">
+        <p class="eyebrow">Как это работает</p>
+        <h2>Каждая система собрана<br>под один процесс</h2>
+      </div>
+      <div class="cards">
+        <article class="card">
+          <div class="card-txt"><p class="eyebrow">Не платформа</p>
+            <h3>Инструмент под одну работу</h3>
+            <p>Не платформа с сотней настроек, которую надо неделю настраивать.
+               Один экран, который делает вашу задачу.</p></div>
+          <figure><img src="/shots/sklad.jpg" alt="" width="1600" height="1000"></figure>
+        </article>
+        <article class="card">
+          <div class="card-txt"><p class="eyebrow">Под ваш процесс</p>
+            <h3>Собираем под то, как вы работаете сейчас</h3>
+            <p>Не переучиваем людей под софт. Софт повторяет маршрут,
+               который у вас уже есть.</p></div>
+          <figure><img src="/shots/vzaimoraschety-v2.jpg" alt="" width="1600" height="1000"></figure>
+        </article>
+        <article class="card">
+          <div class="card-txt"><p class="eyebrow">Можно потрогать</p>
+            <h3>Показываем в работе, до оплаты</h3>
+            <p>Каждое решение в зале открывается и кликается.
+               Расскажите, что отнимает время.</p></div>
+          <figure><img src="/shots/park.jpg" alt="" width="1600" height="1000"></figure>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 ------------------------------------------------------------------ -->
+  <section class="s" id="cta">
+    <div class="wrap">
+      <p class="eyebrow">Следующий экспонат</p>
+      <h2 class="cta-h">Ваш процесс станет<br>следующей карточкой</h2>
+      <p class="lead">Расскажите, что отнимает время. Покажем, как это выглядит
+        в работе, до того как вы что-то заплатите.</p>
+      <div class="row">
+        <a class="btn" href="#/request">Оставить заявку</a>
+        <a class="btn ghost" href="#/works">Смотреть решения</a>
+      </div>
+    </div>
+  </section>
+
+</div></div>
+
+<script src="/vendor/gsap/gsap.min.js"></script>
+<script src="/vendor/gsap/ScrollTrigger.min.js"></script>
+<script src="/vendor/gsap/ScrollSmoother.min.js"></script>
+<script src="/vendor/gsap/SplitText.min.js"></script>
+<script>
+/* Registration order matters: ScrollSmoother depends on ScrollTrigger. */
+gsap.registerPlugin(ScrollTrigger, ScrollSmoother, SplitText)
+
+const mm = gsap.matchMedia()
+
+/* ---------------------------------------------------------------------------
+   Reduced motion gets a real page, not a broken one: no smoothing, no scrubs,
+   and the aperture is simply open. Everything still reads.
+--------------------------------------------------------------------------- */
+mm.add({
+  motion:  '(prefers-reduced-motion: no-preference)',
+  still:   '(prefers-reduced-motion: reduce)',
+  desktop: '(min-width: 861px)',
+}, (ctx) => {
+  const { motion, still, desktop } = ctx.conditions
+  if (still) { gsap.set('.ap-mask', {scale:1}); return }
+
+  /* --- smoothing -------------------------------------------------------
+     smooth:1.2 is the lag in SECONDS the content takes to catch the real
+     scrollbar. normalizeScroll hands touch scrolling to GSAP, which is what
+     stops the iOS address bar fighting the pins; ignoreMobileResize then
+     stops that same bar triggering a refresh mid-scroll.
+     effects:true is what makes data-speed / data-lag work at all.       */
+  const smoother = ScrollSmoother.create({
+    wrapper: '#smooth-wrapper',
+    content: '#smooth-content',
+    smooth: 1.2,
+    smoothTouch: 0.1,
+    effects: true,
+    normalizeScroll: true,
+    ignoreMobileResize: true,
+  })
+
+  /* --- progress rail --------------------------------------------------- */
+  gsap.to('#rail', {
+    scaleX: 1, ease: 'none',
+    scrollTrigger: { start: 0, end: 'max', scrub: 0.3 },
+  })
+
+  /* --- 1. hero ---------------------------------------------------------
+     autoSplit re-splits when the webfont lands or the box is resized, so the
+     line boxes are never measured against the fallback font. The tween MUST
+     be built inside onSplit and returned, or it targets dead elements after
+     the re-split.                                                         */
+  SplitText.create('.h1', {
+    type: 'lines', mask: 'lines', linesClass: 'line', autoSplit: true,
+    onSplit: (self) => gsap.from(self.lines, {
+      yPercent: 118, duration: 1.15, ease: 'expo.out', stagger: 0.1, delay: 0.15,
+    }),
+  })
+  gsap.from('#hero .eyebrow, #hero .sub', {
+    y: 24, autoAlpha: 0, duration: .9, ease: 'power3.out', stagger: .08, delay: .45,
+  })
+  /* The hero leaves by sinking and dimming rather than scrolling away flat. */
+  gsap.to('#hero .wrap', {
+    yPercent: -14, autoAlpha: 0, ease: 'none',
+    scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true },
+  })
+
+  /* --- 2. marquee ------------------------------------------------------
+     One tween loops the first half out of view; the duplicated half is
+     already sitting where it lands, so the seam never shows. Scroll velocity
+     drives skew and playback rate.                                        */
+  const mq = gsap.to('.mq', { xPercent: -50, ease: 'none', duration: 22, repeat: -1 })
+  const skew = gsap.quickTo('.mq', 'skewX', { duration: .5, ease: 'power3' })
+  ScrollTrigger.create({
+    trigger: '#marquee', start: 'top bottom', end: 'bottom top',
+    onUpdate: (self) => {
+      const v = self.getVelocity()
+      mq.timeScale(gsap.utils.clamp(-4, 4, 1 + v / 900))
+      skew(gsap.utils.clamp(-14, 14, v / 260))
+    },
+    onLeave: () => skew(0), onLeaveBack: () => skew(0),
+  })
+
+  /* --- 3. horizontal track --------------------------------------------
+     ease:'none' is mandatory - any other ease and the lane stops tracking
+     the wheel 1:1, which is the single most common way this effect is got
+     wrong. The distance is a function so a resize re-measures it, and
+     invalidateOnRefresh makes GSAP actually re-run that function.        */
+  if (desktop) {
+    const lanes = document.querySelector('.lanes')
+    const dist = () => Math.max(0, lanes.scrollWidth - innerWidth)
+
+    const trackTween = gsap.to(lanes, {
+      x: () => -dist(), ease: 'none',
+      scrollTrigger: {
+        trigger: '#track', pin: true, scrub: 1, anticipatePin: 1,
+        start: 'top top', end: () => '+=' + dist(),
+        invalidateOnRefresh: true,
+      },
+    })
+
+    /* Nested reveals ride the horizontal tween instead of the scrollbar.
+       containerAnimation triggers cannot pin or snap - documented limit. */
+    gsap.utils.toArray('.lane').forEach((lane) => {
+      gsap.from(lane.querySelector('.lane-meta'), {
+        yPercent: 40, autoAlpha: 0, ease: 'power2.out',
+        scrollTrigger: {
+          containerAnimation: trackTween, trigger: lane,
+          start: 'left 82%', end: 'left 45%', scrub: true,
+        },
+      })
+      gsap.fromTo(lane.querySelector('img'), { scale: 1.16 }, {
+        scale: 1, ease: 'none',
+        scrollTrigger: {
+          containerAnimation: trackTween, trigger: lane,
+          start: 'left right', end: 'right left', scrub: true,
+        },
+      })
+    })
+  }
+
+  /* --- 4. aperture -----------------------------------------------------
+     The circle grows past the viewport; the panel inside counter-scales by
+     1/s so its type stays the size it was authored at. Two transforms, no
+     repaint. onUpdate reads the tween's own progress rather than measuring
+     anything, so there is no layout read in the scroll loop.             */
+  const apMask = document.querySelector('.ap-mask')
+  const apTo = document.querySelector('.ap-to')
+  const END = 1.05
+  gsap.fromTo(apMask, { scale: 0 }, {
+    scale: END, ease: 'none',
+    scrollTrigger: {
+      trigger: '#aperture', pin: '.ap-pin', scrub: 0.6,
+      start: 'top top', end: 'bottom bottom',
+    },
+    onUpdate: function () {
+      const s = gsap.getProperty(apMask, 'scale')
+      apTo.style.transform = 'scale(' + (s > 0.02 ? 1 / s : 50) + ')'
+    },
+  })
+  gsap.to('.ap-from h2', {
+    scale: 1.35, autoAlpha: 0, ease: 'none',
+    scrollTrigger: { trigger: '#aperture', start: 'top top', end: '40% top', scrub: true },
+  })
+
+  /* --- 5. stack --------------------------------------------------------
+     position:sticky does the stacking; GSAP only sinks and dims the card
+     that is being covered. Cheaper and smoother than pinning three sections. */
+  if (desktop) {
+    const cards = gsap.utils.toArray('.card')
+    cards.forEach((card, i) => {
+      if (i === cards.length - 1) return
+      gsap.to(card, {
+        scale: 0.9, yPercent: -4, filter: 'brightness(.55)', ease: 'none',
+        scrollTrigger: {
+          trigger: cards[i + 1], start: 'top bottom', end: 'top top', scrub: true,
+        },
+      })
+    })
+  }
+
+  /* --- 6. cta ---------------------------------------------------------- */
+  SplitText.create('.cta-h', {
+    type: 'lines', mask: 'lines', linesClass: 'line', autoSplit: true,
+    onSplit: (self) => gsap.from(self.lines, {
+      yPercent: 118, duration: 1, ease: 'expo.out', stagger: .09,
+      scrollTrigger: { trigger: '#cta', start: 'top 62%' },
+    }),
+  })
+
+  return () => smoother && smoother.kill()
+})
+
+/* Images have width/height so layout is stable, but the pin distances are
+   measured from real boxes - refresh once everything has actually decoded. */
+window.addEventListener('load', () => ScrollTrigger.refresh())
+</script>
+</body>
+</html>
