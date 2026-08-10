@@ -322,9 +322,12 @@ img{display:block;max-width:100%}
    move in the page that should feel like constant travel.
    ========================================================================= */
 #field .pin{background:var(--deep);perspective:820px}
+/* the destination, wearing the same skin as the section it becomes */
+.field-target{background:radial-gradient(130% 130% at 20% 12%, #2b6d95 0%, transparent 58%),
+  linear-gradient(155deg,#1b4a6b 0%, var(--deep) 76%) !important}
 .field{position:absolute;inset:0;transform-style:preserve-3d;
   transform:translateZ(calc(var(--p) * 2750px))}
-.field div{position:absolute;left:50%;top:50%;border-radius:14px;overflow:hidden;
+.field div{position:absolute;left:50%;top:50%;border-radius:4px;overflow:hidden;
   background:linear-gradient(150deg,#12293a,var(--deep));
   box-shadow:0 24px 60px -20px rgba(0,0,0,.85), inset 0 0 0 1px rgba(223,246,255,.07);
   transform:translate3d(calc(var(--x) * 1px - 50%), calc(var(--y) * 1px - 50%), calc(var(--z) * 1px))}
@@ -355,6 +358,14 @@ img{display:block;max-width:100%}
 .chrome{position:absolute;right:-7%;top:50%;translate:0 -50%;width:54%;
   filter:drop-shadow(0 40px 70px rgba(0,0,0,.55));
   transform:rotate(calc(var(--o) * 8deg))}
+/* THE TINY STAR IN THE FLARE. f286-300: as the section blows out to a radial
+   glow there is a small DARK star at the dead centre - the next section seen
+   from very far away, already on its way in. It is the detail that makes the
+   handoff read as flying through rather than cross-fading. */
+.grow-seed{position:absolute;left:50%;top:50%;translate:-50% -50%;
+  width:min(9vmin,74px);height:min(9vmin,74px);pointer-events:none;
+  opacity:clamp(0, calc((var(--p) - .88) / .08), 1);
+  transform:scale(calc(.25 + max(0, var(--p) - .88) * 5))}
 /* the blow-out that beat 7 emerges from */
 .grow-flare{position:absolute;inset:0;pointer-events:none;
   background:radial-gradient(circle at 50% 50%, rgba(127,216,255,.5), transparent 55%);
@@ -612,6 +623,7 @@ img{display:block;max-width:100%}
       </div>
     </div>
     <div class="grow-flare"></div>
+    <svg class="star grow-seed" viewBox="0 0 100 100" fill="#06121a" aria-hidden="true"><use href="#s4"/></svg>
   </div>
 </section>
 
@@ -901,20 +913,25 @@ const wrap = document.getElementById('fieldWrap')
 let seed = 20260810
 const rnd = () => (seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff
 
-for (let i = 0; i < 22; i++) {
+/* 14, NOT 22. Counted off f181-192: about six cards are on screen at any moment,
+   widely spaced, sharp-cornered and face-on - the camera dollies, nothing
+   rotates. 22 packed into a narrow radius read as a swarm rather than a flight
+   through a room. Spread wider and deeper so the same six-at-a-time holds. */
+const FIELD_N = 14
+for (let i = 0; i < FIELD_N; i++) {
   const d = document.createElement('div')
-  const w = 150 + rnd() * 330
+  const w = 170 + rnd() * 300
   d.style.width = w + 'px'
   d.style.height = w * 0.69 + 'px'
   /* Held off the centre line: a card dead ahead is a card you fly into, and it
      fills the screen with one blurred texture on the way past. */
   const ang = rnd() * Math.PI * 2
-  const rad = 380 + rnd() * 560
+  const rad = 520 + rnd() * 700
   d.style.setProperty('--x', Math.round(Math.cos(ang) * rad))
   d.style.setProperty('--y', Math.round(Math.sin(ang) * rad * .72))
-  d.style.setProperty('--z', Math.round(-2750 * (i / 22) - rnd() * 130))
+  d.style.setProperty('--z', Math.round(-3400 * (i / FIELD_N) - rnd() * 120))
   /* Every third card carries a real capture; the rest are ice panels. A field
-     of 22 identical screenshots reads as a bug, not as depth. */
+     of identical screenshots reads as a bug, not as depth. */
   if (i % 3 === 0) {
     const img = document.createElement('img')
     img.src = SHOTS[(i / 3 | 0) % SHOTS.length]
@@ -923,6 +940,20 @@ for (let i = 0; i < 22; i++) {
   }
   wrap.appendChild(d)
 }
+/* THE TARGET IS ALREADY IN THE FIELD. In the reference the chrome card that
+   becomes the next section is visible the whole way through the flight, dead
+   ahead and growing - you can see where you are going. It was appearing from
+   nowhere at the start of `grow`, which is the same continuity break as the
+   deck-arriving-from-nowhere. Sits on the centre line, nearest, and it is the
+   one card allowed to be dead ahead because it is the destination. */
+const fieldTarget = document.createElement('div')
+fieldTarget.className = 'field-target'
+fieldTarget.style.width = '430px'
+fieldTarget.style.height = '270px'
+fieldTarget.style.setProperty('--x', 90)
+fieldTarget.style.setProperty('--y', 40)
+fieldTarget.style.setProperty('--z', -3450)
+wrap.appendChild(fieldTarget)
 
 /* ---------------------------------------------------------------------------
    BEAT 3's sphere. ~4200 points on a Fibonacci sphere, projected by hand.
