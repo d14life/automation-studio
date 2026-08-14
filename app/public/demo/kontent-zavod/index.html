@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Контент-Завод · АИР-ГАЗ</title>
+<title>Контент-Завод · ГАЗ-СЕРВИС</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23FF6B00'/%3E%3Crect x='2' y='2' width='12' height='12' fill='%230A192F'/%3E%3C/svg%3E">
 <style>
 /* ============================================================
@@ -381,7 +381,7 @@ function sameMinute(a,b){ return Math.floor(a/60000)===Math.floor(b/60000); }
 /* ============================================================
    §2 STATIC KNOWLEDGE — tones, rubrics, channels, cta, contacts
    ============================================================ */
-const CONTACTS = { phones:['+7 (843) 211-85-85','+7 (843) 204-49-49'], email:'info@air-gaz.ru', site:'air-gaz.ru' };
+const CONTACTS = { phones:['+7 (843) 211-85-85','+7 (843) 204-49-49'], email:'info@gazservis.ru', site:'gazservis.ru' };
 
 const CHANNEL_DEFS = [
   {id:'max', name:'MAX',       phase:1, color:'#0072CE'},
@@ -413,23 +413,23 @@ function chLogo(id){ return CH_LOGO[id] || ''; }
 const RUBRIC_DEFS = [
   { id:'agp', name:'AG-PROTECT', short:'AG-PROTECT',
     facts:['защитное покрытие от 2,5 мм держит пробой 10 кВ','бесфутлярная конструкция допущена по ТР ТС 032','система сертифицирована по «ГАЗСЕРТ» ПАО «Газпром»','заводская гарантия на покрытие — 50 лет'],
-    hashtags:['#AGPROTECT','#цокольныйввод','#безфутляра','#газификация','#АИРГАЗ','#Казань'],
+    hashtags:['#AGPROTECT','#цокольныйввод','#безфутляра','#газификация','#ГАЗСЕРВИС','#Казань'],
     phrases:['цокольный ввод без футляра','защита газопровода от коррозии','монтаж без лишних узлов'] },
   { id:'nsps', name:'НСПС', short:'НСПС',
     facts:['полиэтиленовые трубы SDR 11 и SDR 17,6','диапазон диаметров от 32 до 630 мм','производство сертифицировано по ISO 9001','сварные соединения проходят 100% контроль'],
-    hashtags:['#НСПС','#полиэтилентрубы','#газосети','#АИРГАЗ','#Казань'],
+    hashtags:['#НСПС','#полиэтилентрубы','#газосети','#ГАЗСЕРВИС','#Казань'],
     phrases:['наружные сети под ключ','полиэтиленовые газопроводы','подземная прокладка сетей'] },
   { id:'grpsh', name:'ГРПШ/ГРУ/ПГБ', short:'ГРПШ/ГРУ/ПГБ',
     facts:['смета на узел снижается до 35%','сроки поставки сокращаются до 40%','блочная конструкция соответствует СП 62.13330','узлы учёта сертифицированы по системе «ГАЗСЕРТ»'],
-    hashtags:['#ГРПШ','#ГРУ','#ПГБ','#газорегулирование','#АИРГАЗ'],
+    hashtags:['#ГРПШ','#ГРУ','#ПГБ','#газорегулирование','#ГАЗСЕРВИС'],
     phrases:['шкафной регуляторный пункт','блочный пункт редуцирования','узел учёта газа'] },
   { id:'gis', name:'ГИС/ИФС', short:'ГИС/ИФС',
     facts:['изолирующие фланцевые соединения соответствуют ТР ТС 032','производство сертифицировано по ISO 9001','каждый узел проходит заводские испытания','заводская гарантия — 50 лет'],
-    hashtags:['#ГИС','#ИФС','#изолирующиесоединения','#АИРГАЗ'],
+    hashtags:['#ГИС','#ИФС','#изолирующиесоединения','#ГАЗСЕРВИС'],
     phrases:['газоизолирующие соединения','электрохимическая защита трубопровода','контроль на каждом этапе'] },
   { id:'turnkey', name:'Газификация под ключ', short:'Под ключ',
     facts:['сроки реализации сокращаются до 40%','смета проекта — экономия до 35%','сопровождение проекта по СП 62.13330','проект допускается по ТР ТС 032'],
-    hashtags:['#газификацияподключ','#АИРГАЗ','#Казань','#Татарстан'],
+    hashtags:['#газификацияподключ','#ГАЗСЕРВИС','#Казань','#Татарстан'],
     phrases:['от проекта до пуска газа','полный цикл газификации объекта','сопровождение на каждом этапе'] },
 ];
 
@@ -486,7 +486,7 @@ const TONE_DEFS = [
     dev:['Решение прошло заводские испытания.','Параметр подтверждён протоколом испытаний.','Технология применяется на объектах Республики Татарстан.'],
     soften:false },
   { id:'formal', name:'Официально-деловая (ГАЗСЕРТ)', abbr:'ОД',
-    openers:['ООО «АИР-ГАЗ» информирует.','В соответствии с требованиями отрасли,','Официально подтверждаем:','Сообщаем о соответствии продукции нормам.'],
+    openers:['ООО «ГАЗ-СЕРВИС» информирует.','В соответствии с требованиями отрасли,','Официально подтверждаем:','Сообщаем о соответствии продукции нормам.'],
     dev:['Соответствие подтверждено сертификатом.','Документация предоставляется по запросу.','Продукция включена в реестр разрешённого применения.'],
     soften:false },
   { id:'caring', name:'Заботливая (Газификация)', abbr:'ЗБ',
@@ -629,7 +629,7 @@ const OBJECTION_DEFS = [
     crisis:'Частый вопрос про {phrase}. {fact} Разбираем подробно, почему это безопасно и надёжнее классической схемы.' },
   { id:'price', name:'Высокая стоимость', triggers:['дорого','цена','стоимост','конск'],
     official:'По смете: {fact}. Расчёт по вашему объекту делаем бесплатно — {phone}.',
-    crisis:'Почему решения АИР-ГАЗ не дороже, а выгоднее: {fact} Разбираем на реальных сметах.' },
+    crisis:'Почему решения ГАЗ-СЕРВИС не дороже, а выгоднее: {fact} Разбираем на реальных сметах.' },
   { id:'delay', name:'Задержка сроков', triggers:['задержка газа','долго','сроки','когда уже'],
     official:'По срокам: {fact}. Актуальный график предоставляем по объекту — {phone}.',
     crisis:'Почему сроки у нас предсказуемы: {fact} Показываем, как устроен процесс на заводе.' },
@@ -642,7 +642,7 @@ const OBJECTION_DEFS = [
     crisis:'Как отличить заводское изделие от подделки: {fact} Каждая партия имеет протокол и маркировку.' },
 ];
 const KEYWORD_DEFS = [
-  {word:'АИР-ГАЗ', cat:null},
+  {word:'ГАЗ-СЕРВИС', cat:null},
   {word:'цокольный ввод', cat:'tech'},
   {word:'без футляра', cat:'tech'},
   {word:'дорого', cat:'price'},
@@ -927,7 +927,7 @@ const MENTION_TEXTS = [
   '«Опять задержка газа, обещали на прошлой неделе завершить.»',
   '«Отличная работа, рекомендую всем соседям по улице!»',
   '«Подскажите, какие диаметры труб используете для НСПС?»',
-  '«АИР-ГАЗ, а у вас есть сертификат ГАЗСЕРТ на ГРПШ?»',
+  '«ГАЗ-СЕРВИС, а у вас есть сертификат ГАЗСЕРТ на ГРПШ?»',
   '«Цена как в частной клинике. Дорого для обычной семьи.»',
   '«Без футляра — это нарушение норм, коллеги-газовики со мной согласны.»',
   '«Сколько стоит ждать монтажа после оплаты?»',
@@ -954,7 +954,7 @@ function seedState(){
          Phase 2 stays unconnected on purpose - it is the roadmap, and it keeps the
          'publish fails, connect, retry' path reachable for anyone who wants to see it. */
       connected: c.phase===1,
-      account: c.phase===1 ? '@airgaz_'+c.id : '',
+      account: c.phase===1 ? '@gazservis_'+c.id : '',
       connectedAt: c.phase===1 ? Date.now()-30*86400000 : null,
       autopost:true})),
     tones: clone(TONE_DEFS),
@@ -1129,7 +1129,7 @@ function seedState(){
       let t = p.text;
       if(ch==='tt' || ch==='ig') t = t.split('\n')[0];
       if(t.length > lim) t = t.slice(0, lim-1) + '…';
-      if(ch==='vk') t = t + '\n\n#АИРГАЗ #ГАЗСЕРТ #газификация #НСПС #AGPROTECT';
+      if(ch==='vk') t = t + '\n\n#ГАЗСЕРВИС #ГАЗСЕРТ #газификация #НСПС #AGPROTECT';
       if(ch==='wa') t = t.split('\n')[0] + '\n\nПодробности: ' + CONTACTS.phoneMain;
       p.adaptations[ch] = t;
     });
@@ -1855,7 +1855,7 @@ function renderConnectModal(payload){
   return `<div class="modal">
     <div class="modal-head"><div class="modal-title">Подключить ${esc(c.name)}</div><button class="modal-close" data-act="closemodal">${ICO.x}</button></div>
     <div class="modal-body">
-      <div class="field"><label>Токен или аккаунт</label><input type="text" class="input" id="conn-val" placeholder="например: @airgaz_official или API-токен"></div>
+      <div class="field"><label>Токен или аккаунт</label><input type="text" class="input" id="conn-val" placeholder="например: @gazservis_official или API-токен"></div>
       <div id="conn-warn" class="disabled-note" style="color:var(--bad);"></div>
     </div>
     <div class="modal-foot">
@@ -2295,7 +2295,7 @@ function renderScenarioWizardModal(payload){
    ============================================================ */
 function renderKB(){
   const canEdit = can(state,'kb.edit');
-  const head = `<div class="view-head"><div class="view-head-row"><div class="view-title">База знаний</div><div class="view-sub">Пять направлений АИР-ГАЗ · правки сразу влияют на генерацию текстов</div></div></div>`;
+  const head = `<div class="view-head"><div class="view-head-row"><div class="view-title">База знаний</div><div class="view-sub">Пять направлений ГАЗ-СЕРВИС · правки сразу влияют на генерацию текстов</div></div></div>`;
   const cards = state.rubrics.map(r=>`<div style="border:1px solid var(--line); border-radius:var(--r-md); padding:14px; margin-bottom:12px;">
     <div style="font-weight:700; font-size:15px; margin-bottom:8px;">${esc(r.name)}</div>
     <div class="field"><label>Характеристики, сертификаты, нормы (по одной в строке)</label><textarea class="textarea" id="kb-facts-${r.id}" rows="4" ${canEdit?'':'disabled'}>${esc(r.facts.join('\n'))}</textarea></div>
@@ -2528,7 +2528,7 @@ function renderPrintScenario(id){
   const rows = s.scenes.map(sc=>`<tr><td>${sc.n}</td><td>${esc(sc.shot)}</td><td>${esc(sc.voice)}</td><td>${esc(sc.onscreen)}</td><td>${esc(sc.sfx)}</td><td>${sc.sec} сек</td></tr>`).join('');
   return `<div class="print-page">${printBar()}
     <h1>Сценарий: ${esc(s.topic)}</h1>
-    <div class="meta">ООО «АИР-ГАЗ» · ${esc(s.audience)} · эмоция: ${esc(s.emotion)} · хронометраж ${s.duration} сек · ${s.totalWords} слов</div>
+    <div class="meta">ООО «ГАЗ-СЕРВИС» · ${esc(s.audience)} · эмоция: ${esc(s.emotion)} · хронометраж ${s.duration} сек · ${s.totalWords} слов</div>
     <table><thead><tr><th>№</th><th>Кадр / видеоряд</th><th>Голос</th><th>Текст на экране</th><th>Аудио / SFX</th><th>Время</th></tr></thead>
     <tbody>${rows}</tbody>
     <tfoot><tr><td colspan="5" style="text-align:right;"><b>Итого</b></td><td><b>${s.duration} сек</b></td></tr></tfoot></table>
@@ -2549,7 +2549,7 @@ function renderPrintWeekplan(){
   const dayHeads = [0,1,2,3,4,5,6].map(i=>`<th>${dayLabels[i]} ${fmtDate(start+days(i))}</th>`).join('');
   return `<div class="print-page">${printBar()}
     <h1>План публикаций на неделю</h1>
-    <div class="meta">ООО «АИР-ГАЗ» · неделя с ${fmtDate(start)} · по каналам</div>
+    <div class="meta">ООО «ГАЗ-СЕРВИС» · неделя с ${fmtDate(start)} · по каналам</div>
     <table><thead><tr><th>Канал</th>${dayHeads}</tr></thead><tbody>${rows}</tbody></table>
   </div>`;
 }
@@ -2561,7 +2561,7 @@ function renderPrintOrmReport(){
   const avgMin = resolved.length ? Math.round(resolved.reduce((s,m)=>s+(m.resolvedAt-m.at),0)/resolved.length/60000) : null;
   return `<div class="print-page">${printBar()}
     <h1>Отчёт по репутации</h1>
-    <div class="meta">ООО «АИР-ГАЗ» · период: последние 30 дней · всего упоминаний: ${state.mentions.length}</div>
+    <div class="meta">ООО «ГАЗ-СЕРВИС» · период: последние 30 дней · всего упоминаний: ${state.mentions.length}</div>
     <table><thead><tr><th>Категория</th><th>Упоминаний</th></tr></thead><tbody>${byCat.map(c=>`<tr><td>${esc(c.name)}</td><td>${c.n}</td></tr>`).join('')}</tbody></table>
     <br>
     <table><thead><tr><th>Статус отработки</th><th>Упоминаний</th></tr></thead><tbody>${byStatus.map(c=>`<tr><td>${esc(c.name)}</td><td>${c.n}</td></tr>`).join('')}</tbody></table>
