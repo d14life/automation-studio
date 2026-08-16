@@ -1,0 +1,264 @@
+<title>101 solutions — scroll-scrubbed melt</title>
+<style>
+  html, body {
+    margin: 0;
+    height: 100%;
+    background: #000;
+  }
+  .scrub-wrap {
+    position: relative;
+    height: 400vh;
+  }
+  .scrub-stage {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #000;
+  }
+  .scrub-stage video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    cursor: crosshair;
+  }
+  .loading {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+    font: 14px/1.4 -apple-system, system-ui, sans-serif;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .loading.hidden {
+    opacity: 0;
+  }
+  .flare {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 480px;
+    height: 480px;
+    margin-left: -240px;
+    margin-top: -240px;
+    border-radius: 50%;
+    pointer-events: none;
+    background: radial-gradient(circle,
+      rgba(255, 244, 214, 0.95) 0%,
+      rgba(255, 200, 110, 0.55) 25%,
+      rgba(255, 150, 60, 0.22) 50%,
+      rgba(255, 150, 60, 0) 72%);
+    opacity: 0;
+    transform: scale(0.2);
+    animation: flare-burst 1.3s ease-out forwards;
+  }
+  @keyframes flare-burst {
+    0%   { opacity: 0;   transform: scale(0.15); }
+    12%  { opacity: 1;   transform: scale(0.6); }
+    100% { opacity: 0;   transform: scale(1.6); }
+  }
+  .sound-hint {
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
+    color: rgba(255, 255, 255, 0.45);
+    font: 11px/1.4 -apple-system, system-ui, sans-serif;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+  }
+  .sound-hint.hidden {
+    opacity: 0;
+  }
+</style>
+
+<div class="scrub-wrap" id="scrubWrap">
+  <div class="scrub-stage" id="stage">
+    <video id="video" preload="auto" muted playsinline></video>
+    <div class="loading" id="loading">Loading…</div>
+    <div class="sound-hint" id="soundHint">Click for sound</div>
+  </div>
+</div>
+
+<script>
+  const wrap = document.getElementById('scrubWrap');
+  const stage = document.getElementById('stage');
+  const video = document.getElementById('video');
+  const loading = document.getElementById('loading');
+  const soundHint = document.getElementById('soundHint');
+
+  let duration = 0;
+  let ready = false;
+  let ticking = false;
+
+  // ponytail: fetch+blob instead of setting video.src directly — python3 -m http.server
+  // (this demo's dev server) doesn't implement HTTP Range requests, and without range
+  // support a plain <video src> can't seek. A Blob URL is always fully seekable regardless
+  // of server support. Technique from github.com/oso95/scroll-world (MIT).
+  fetch('xray-assets/melt-scrub.mp4')
+    .then(r => r.ok ? r.blob() : Promise.reject(new Error('fetch failed: ' + r.status)))
+    .then(blob => {
+      video.src = URL.createObjectURL(blob);
+    })
+    .catch(err => {
+      loading.textContent = 'Failed to load video';
+      console.error(err);
+    });
+
+  video.addEventListener('loadedmetadata', () => {
+    duration = video.duration;
+    ready = true;
+    loading.classList.add('hidden');
+  });
+
+  // --- Scroll-scrubbed audio (Web Audio granular playback) ---
+  // Setting <audio>.currentTime on scroll doesn't work — it clicks, stutters, and mostly
+  // stays silent. Instead: decode the whole track into an AudioBuffer once, then on scroll
+  // fire short overlapping "grains" (AudioBufferSourceNode playing a ~150ms slice starting
+  // at the current scroll-mapped time) through a GainNode with a fast attack/release so
+  // grain edges don't click. Same forward-playing-grains-at-a-moving-position technique
+  // works for scrubbing backwards too — no reverse playback needed.
+  const GRAIN_S = 0.15;          // grain length
+  const GRAIN_ATTACK_S = 0.02;   // fade-in, prevents a click at grain start
+  const GRAIN_RELEASE_S = 0.02;  // fade-out, prevents a click at grain end
+  const GRAIN_MOVE_THRESHOLD_S = 0.05; // schedule a new grain once target moves this much
+  const SCROLL_IDLE_MS = 120;    // no scroll event for this long = "stopped"
+
+  let audioCtx = null;
+  let masterGain = null;
+  let audioBuffer = null;
+  let audioReady = false;
+  let isScrolling = false;
+  let scrollIdleTimer = null;
+  let lastGrainTime = null;
+  let grainsScheduled = 0; // exposed below for verification/debugging
+
+  const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
+  if (AudioCtxClass) {
+    audioCtx = new AudioCtxClass(); // starts 'suspended' until a user gesture resumes it
+    masterGain = audioCtx.createGain();
+    masterGain.connect(audioCtx.destination);
+
+    fetch('xray-assets/melt-audio.m4a')
+      .then(r => r.ok ? r.arrayBuffer() : Promise.reject(new Error('audio fetch failed: ' + r.status)))
+      .then(buf => audioCtx.decodeAudioData(buf))
+      .then(decoded => {
+        audioBuffer = decoded;
+        audioReady = true;
+      })
+      .catch(err => console.error('audio load failed', err));
+  } else {
+    soundHint.classList.add('hidden');
+  }
+
+  function unlockAudio() {
+    if (!audioCtx) return;
+    if (audioCtx.state === 'suspended') audioCtx.resume().catch(err => console.error(err));
+    soundHint.classList.add('hidden');
+  }
+  window.addEventListener('pointerdown', unlockAudio, { passive: true });
+  window.addEventListener('keydown', unlockAudio);
+
+  function scheduleGrain(t) {
+    const start = Math.min(Math.max(t, 0), audioBuffer.duration - 0.02);
+    const grainDur = Math.min(GRAIN_S, audioBuffer.duration - start);
+    if (grainDur <= GRAIN_ATTACK_S + GRAIN_RELEASE_S) return; // too close to the end to fade
+
+    const now = audioCtx.currentTime;
+    const src = audioCtx.createBufferSource();
+    src.buffer = audioBuffer;
+    const g = audioCtx.createGain();
+    g.gain.setValueAtTime(0, now);
+    g.gain.linearRampToValueAtTime(1, now + GRAIN_ATTACK_S);
+    g.gain.setValueAtTime(1, now + grainDur - GRAIN_RELEASE_S);
+    g.gain.linearRampToValueAtTime(0, now + grainDur);
+    src.connect(g).connect(masterGain);
+    src.start(now, start, grainDur);
+    src.stop(now + grainDur + 0.02);
+    src.onended = () => src.disconnect();
+
+    lastGrainTime = t;
+    grainsScheduled++;
+  }
+
+  function scrubAudio(progress) {
+    if (!audioReady || !isScrolling || audioCtx.state !== 'running') return;
+    const t = progress * audioBuffer.duration;
+    if (lastGrainTime === null || Math.abs(t - lastGrainTime) >= GRAIN_MOVE_THRESHOLD_S) {
+      scheduleGrain(t);
+    }
+  }
+
+  // ponytail: minimal read-only hooks for verifying the audio pipeline from outside the
+  // closure (devtools / automated checks) — not used by the page itself.
+  window.__audioDebug = {
+    state: () => audioCtx && audioCtx.state,
+    bufferDuration: () => audioBuffer && audioBuffer.duration,
+    grainsScheduled: () => grainsScheduled,
+    scheduleTestGrain: (t) => { scheduleGrain(t); return grainsScheduled; },
+  };
+
+  // Seek coalescing: never assign currentTime while a previous seek is still resolving —
+  // pile up fast scroll flicks otherwise and the decoder chokes. Store the latest requested
+  // target and apply it the moment the pending seek finishes (the 'seeked' event).
+  // Same technique as github.com/oso95/scroll-world (MIT).
+  let pendingTarget = null;
+  video.addEventListener('seeked', () => {
+    if (pendingTarget !== null) {
+      const t = pendingTarget;
+      pendingTarget = null;
+      video.currentTime = t;
+    }
+  });
+
+  function seekTo(t) {
+    if (video.seeking) {
+      pendingTarget = t;
+    } else {
+      video.currentTime = t;
+    }
+  }
+
+  function scrub() {
+    ticking = false;
+    if (!ready) return;
+    const rect = wrap.getBoundingClientRect();
+    const scrollable = rect.height - window.innerHeight;
+    const progress = scrollable > 0 ? Math.min(1, Math.max(0, -rect.top / scrollable)) : 0;
+    seekTo(progress * duration);
+    scrubAudio(progress);
+  }
+
+  window.addEventListener('scroll', () => {
+    isScrolling = true;
+    clearTimeout(scrollIdleTimer);
+    scrollIdleTimer = setTimeout(() => { isScrolling = false; }, SCROLL_IDLE_MS);
+    if (!ticking) {
+      ticking = true;
+      requestAnimationFrame(scrub);
+    }
+  }, { passive: true });
+
+  // ponytail: click flares don't wait on prior ones — each element cleans itself up via animationend
+  stage.addEventListener('click', (e) => {
+    unlockAudio();
+    const rect = stage.getBoundingClientRect();
+    const flare = document.createElement('div');
+    flare.className = 'flare';
+    flare.style.left = (e.clientX - rect.left) + 'px';
+    flare.style.top = (e.clientY - rect.top) + 'px';
+    flare.addEventListener('animationend', () => flare.remove());
+    stage.appendChild(flare);
+  });
+</script>

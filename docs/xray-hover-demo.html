@@ -1,0 +1,75 @@
+<title>101 solutions — X-ray hover reveal</title>
+<style>
+  html {
+    height: 100%;
+  }
+  body {
+    margin: 0;
+    min-height: 100%;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .stage {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+    aspect-ratio: 1264 / 848;
+    margin: 0 auto;
+    /* reveal circle position, updated on pointermove */
+    --x: 50%;
+    --y: 50%;
+    --r: 110px; /* reveal radius */
+  }
+  .stage img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+  .stage .riveted {
+    z-index: 1;
+  }
+  .stage .clean {
+    z-index: 2;
+    -webkit-mask-image: radial-gradient(circle var(--r) at var(--x) var(--y),
+      transparent 0%,
+      transparent calc(100% - 8px),
+      #000 100%);
+    mask-image: radial-gradient(circle var(--r) at var(--x) var(--y),
+      transparent 0%,
+      transparent calc(100% - 8px),
+      #000 100%);
+    transition: mask-image 0.15s ease-out, -webkit-mask-image 0.15s ease-out;
+  }
+  .stage.idle .clean {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+</style>
+
+<div class="stage idle" id="stage">
+  <img class="riveted" src="xray-assets/riveted.png" alt="">
+  <img class="clean" src="xray-assets/clean.png" alt="">
+</div>
+
+<script>
+  const stage = document.getElementById('stage');
+
+  function updateReveal(e) {
+    const rect = stage.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    stage.style.setProperty('--x', x + 'px');
+    stage.style.setProperty('--y', y + 'px');
+    stage.classList.remove('idle');
+  }
+
+  stage.addEventListener('pointermove', updateReveal);
+  stage.addEventListener('pointerleave', () => {
+    stage.classList.add('idle');
+  });
+</script>
